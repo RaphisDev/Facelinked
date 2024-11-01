@@ -1,0 +1,31 @@
+services:
+  database:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=SQLDatabase'
+      - 'POSTGRES_PASSWORD=5875662'
+      - 'POSTGRES_USER=SqlDB'
+    ports:
+      - '5432:5432'
+  mongodb:
+    image: mongo
+    container_name: mongo_db
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo:/data
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: MongoDB
+      MONGO_INITDB_ROOT_PASSWORD: 5236492
+  mongo-express:
+    image: mongo-express
+    container_name: mongo_express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: MongoDB
+      ME_CONFIG_MONGODB_ADMINPASSWORD: 5236492
+      ME_CONFIG_MONGODB_SERVER: mongodb
+volumes:
+  mongo: {}

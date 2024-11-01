@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="LogIn" target="22" />
+      <module name="LogIn.main" target="22" />
+      <module name="LogIn.test" target="22" />
+      <module name="net.facelinked.PrivateMessaging.test" target="22" />
+      <module name="PrivateMessaging" target="22" />
+      <module name="PrivateMessaging.main" target="22" />
+      <module name="PrivateMessaging.test" target="22" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
