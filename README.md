@@ -1,13 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<title>
-    <meta charset="utf-8" />
-    <link rel="icon" href="" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    
-    
-</title>
 <body>
 <!-- *Kommentar*
 	Dieses File ist nur gedacht, um Facelinked-Teammitglieder einzuführen!
