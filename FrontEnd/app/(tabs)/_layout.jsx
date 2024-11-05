@@ -5,21 +5,25 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 export default function TabsLayout() {
     return (
         <>
-            <Stack>>
-                <Stack.Screen name="index"/>
+            <Tabs screenOptions={{tabBarShowLabel: false}}>
+                <Tabs.Screen name="home" options={{headerTitle: "Home",
+                    headerTitleAlign: "center",
+                    tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "home-sharp" : "home-outline"} size={30}/>,
+                }}/>
+                <Tabs.Screen name="networks" options={{headerTitle: "Networks",
+                    headerTitleAlign: "center",
+                    tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "git-network-sharp" : "git-network-outline"} size={30}/>
+                }}/>
+                <Stack.Screen name="chats" options={{headerTitle: "Chats",
+                    headerTitleAlign: "center",
+                    tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "chatbox-sharp" : "chatbox-outline"} size={30}/>
+                }}/>
 
-                <Stack.Screen name="profile"/>
-            </Stack>
+                <Tabs.Screen name="(profiles)" options={{headerShown: false, headerTitle: "Profile",
+                    headerTitleAlign: "center",
+                    tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "person-sharp" : "person-outline"} size={30}/>
+                }}/>
+            </Tabs>
         </>
     );
 }
-/*options={{headerTitle: "Home",
-    headerTitleAlign: "center",
-    tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "home-sharp" : "home-outline"} size={30}/>,
-}}/>
-
- options={{headerTitle: "Profile",
-                    headerTitleAlign: "center",
-                    tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "person-sharp" : "person-outline"} size={30}%
-
-                     screenOptions={{tabBarShowLabel: false}}*/

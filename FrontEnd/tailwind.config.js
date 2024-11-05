@@ -11,10 +11,12 @@ module.exports = {
         secText: "#828282",
 
         //dark mode
-        dprimary: "#222427", //maybe this: #353843, (look at Docs Folder)
-        daccent: "#27ae60", //maybe: #0210ae, #050533, #0519c0
-        dtext: "#FEFEFE",
-        dsecText: "#828282"
+        dark:{
+          primary: "#222427", //maybe this: #353843, (look at Docs Folder)
+          accent: "#27ae60", //maybe: #0210ae, #050533, #0519c0
+          text: "#FEFEFE",
+          secText: "#828282"
+        }
       }
     },
   },
