@@ -5,31 +5,38 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
-      <change afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile]/index.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile]/posts.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/_layout.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(tabs)/chats/_layout.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(tabs)/chats/index.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(tabs)/home.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(tabs)/networks/_layout.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(tabs)/networks/index.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/index.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/login.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/favicon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/profilePicture.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/Account/Account Data.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/Entries/Chat.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/Entries/Message.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/Entries/Post.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/app.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/_layout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/_layout.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/index.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/profile.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/+not-found.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/+not-found.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/_layout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/_layout.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/tailwind.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/.dockerignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/build.gradle.kts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/gradlew" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/gradlew.bat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/settings.gradle.kts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/java/net/facelinked/user/UserApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/java/net/facelinked/user/chatting/ChatMessage.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/java/net/facelinked/user/chatting/ChatNotification.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/java/net/facelinked/user/chatting/ChatRoom.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/java/net/facelinked/user/config/CorsConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/java/net/facelinked/user/config/WebSocketConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/java/net/facelinked/user/controller/ChatController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/java/net/facelinked/user/controller/MessagingController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/java/net/facelinked/user/controller/UserController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/java/net/facelinked/user/repository/ChatMessageRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/java/net/facelinked/user/repository/ChatRoomRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/java/net/facelinked/user/repository/Class.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/java/net/facelinked/user/repository/Status.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/java/net/facelinked/user/repository/User.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/java/net/facelinked/user/repository/UserRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/java/net/facelinked/user/service/ChatMessageService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/java/net/facelinked/user/service/ChatRoomService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/java/net/facelinked/user/service/S3Client.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/java/net/facelinked/user/service/UserService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/resources/graphql/schema.graphqls" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/main/resources/schema.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/User/src/test/java/net/facelinked/user/UserApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile]/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile]/index.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -131,6 +138,7 @@
       <workItem from="1730833530675" duration="3800000" />
       <workItem from="1730838004091" duration="3818000" />
       <workItem from="1730842154519" duration="2208000" />
+      <workItem from="1730913268242" duration="3458000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />

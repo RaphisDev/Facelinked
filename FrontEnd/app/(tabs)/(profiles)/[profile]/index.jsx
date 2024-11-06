@@ -7,7 +7,7 @@ import {Image} from "expo-image";
 
 export default function Index() {
 
-    const data = {name: "Raphael Templer", username: "raphi.t08", age: 16, school: "Willibald-Gymnasium", class: 10, classInteger: "b", relationshipStatus: false};
+    const data = {name: "Raphael Templer", username: "raphi.t08", age: 16, school: "Willibald-Gymnasium", relationshipStatus: false}; //Display infos of school when pressing on text
     //Too much shadow for profile picture??
 
     return (
