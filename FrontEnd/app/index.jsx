@@ -5,7 +5,10 @@ import React, {useEffect} from "react";
 
 export default function Index() {
 
-    let signedIn = false;
+    function signedIn() {
+
+        return false;
+    }
 
     useEffect(() => {
        setTimeout(() => {

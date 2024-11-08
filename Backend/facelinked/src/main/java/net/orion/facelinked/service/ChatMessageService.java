@@ -1,7 +1,7 @@
 package net.orion.facelinked.service;
 
-import net.facelinked.user.chatting.ChatMessage;
-import net.facelinked.user.repository.ChatMessageRepository;
+import net.orion.facelinked.chatting.ChatMessage;
+import net.orion.facelinked.repository.ChatMessageRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

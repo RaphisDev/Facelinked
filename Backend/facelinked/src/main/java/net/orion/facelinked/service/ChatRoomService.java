@@ -1,7 +1,7 @@
 package net.orion.facelinked.service;
 
-import net.facelinked.user.chatting.ChatRoom;
-import net.facelinked.user.repository.ChatRoomRepository;
+import net.orion.facelinked.chatting.ChatRoom;
+import net.orion.facelinked.repository.ChatRoomRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;

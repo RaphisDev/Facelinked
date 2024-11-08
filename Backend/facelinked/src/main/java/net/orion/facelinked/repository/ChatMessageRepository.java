@@ -1,6 +1,6 @@
 package net.orion.facelinked.repository;
 
-import net.facelinked.user.chatting.ChatMessage;
+import net.orion.facelinked.chatting.ChatMessage;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;

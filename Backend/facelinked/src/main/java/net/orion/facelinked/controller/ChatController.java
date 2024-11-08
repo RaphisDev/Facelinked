@@ -1,9 +1,9 @@
 package net.orion.facelinked.controller;
 
-import net.facelinked.user.chatting.ChatMessage;
-import net.facelinked.user.chatting.ChatNotification;
-import net.facelinked.user.chatting.ChatRoom;
-import net.facelinked.user.service.ChatMessageService;
+import net.orion.facelinked.chatting.ChatMessage;
+import net.orion.facelinked.chatting.ChatNotification;
+import net.orion.facelinked.chatting.ChatRoom;
+import net.orion.facelinked.service.ChatMessageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
