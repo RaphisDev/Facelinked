@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS Profile(
     inRelationship boolean NOT NULL,
     partner varchar(20),
     location varchar(30) NOT NULL,
+    profilePicturePath TEXT NOT NULL,
     username varchar(20) NOT NULL,
-    FOREIGN KEY(username) references UserSchema(username)
+    PRIMARY KEY(username)
 );

@@ -1,4 +1,4 @@
-package net.orion.facelinked.chatting;
+package net.orion.facelinked.chats;
 
 import lombok.Builder;
 

@@ -12,7 +12,7 @@ export default function Index() {
 
     useEffect(() => {
        setTimeout(() => {
-            if (signedIn) {
+            if (signedIn()) {
                 router.push("/home");
             } else {
                 router.push("/login");

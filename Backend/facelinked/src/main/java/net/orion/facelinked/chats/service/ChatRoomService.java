@@ -1,17 +1,14 @@
-package net.orion.facelinked.service;
+package net.orion.facelinked.chats.service;
 
-import net.orion.facelinked.chatting.ChatRoom;
-import net.orion.facelinked.repository.ChatRoomRepository;
+//import net.orion.facelinked.repository.ChatRoomRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class ChatRoomService
 {
-    private final ChatRoomRepository chatRoomRepository;
+    //private final ChatRoomRepository chatRoomRepository;
 
-    public ChatRoomService(ChatRoomRepository chatRoomRepository)
+    /*public ChatRoomService(ChatRoomRepository chatRoomRepository)
     {
         this.chatRoomRepository = chatRoomRepository;
     }
@@ -38,5 +35,5 @@ public class ChatRoomService
         chatRoomRepository.save(senderRecipient);
         chatRoomRepository.save(recipientSender);
         return chatId;
-    }
+    }*/
 }

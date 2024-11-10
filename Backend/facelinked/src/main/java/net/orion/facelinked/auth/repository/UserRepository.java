@@ -1,23 +1,17 @@
-package net.orion.facelinked.repository;
+package net.orion.facelinked.auth.repository;
 
-import org.springframework.data.jdbc.repository.query.Query;
-import org.springframework.data.repository.ListCrudRepository;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.simple.JdbcClient;
+import net.orion.facelinked.auth.User;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.Assert;
 
-import java.io.File;
-import java.lang.Class;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class UserRepository
+public interface UserRepository extends JpaRepository<User, Integer>
 {
-    private final JdbcClient jdbcClient;
+    Optional<User> findByEmail(String email);
+
+    /*private final JdbcClient jdbcClient;
 
     public UserRepository(JdbcClient jdbcClient)
     {
@@ -30,13 +24,13 @@ public class UserRepository
 
         var updatedUser = jdbcClient.sql(
                 "INSERT INTO UserSchema (username, name, profilePicturePath) " +
-                "values (?,?,?)").params(List.of(user.username(), user.name(), "profilePicture.path")).update();
+                "values (?,?,?)").params(List.of(user.getUsername(), user.getName(), "profilePicture.path")).update();
 
         var updatedProfile = jdbcClient.sql(
-                "INSERT INTO ProfileSchema (age, schoolName, inRelationship, partner, location) values (?,?,?,?,?,?)").params(List.of(user.age(),
-                user.schoolName(),
-                user.inRelationship(), user.partner(),
-                user.location())).update();
+                "INSERT INTO ProfileSchema (age, schoolName, inRelationship, partner, location) values (?,?,?,?,?,?)").params(List.of(user.getAge(),
+                user.getSchoolName(),
+                user.isInRelationship(), user.getPartner(),
+                user.getLocation())).update();
 
         Assert.state(updatedUser == 1, "Cannot insert user");
         Assert.state(updatedProfile == 1, "Cannot insert profile");
@@ -73,14 +67,17 @@ public class UserRepository
         {
             return new User(
                     rs.getString("username"),
+                    rs.getString("email"),
+                    rs.getString("password"),
                     rs.getString("name"),
                     rs.getString("profilePicturePath"),
                     rs.getInt("age"),
                     rs.getString("schoolName"),
                     rs.getBoolean("inRelationship"),
                     rs.getString("partner"),
-                    rs.getString("location")
+                    rs.getString("location"),
+                    Role.USER
             );
         }
-    }
+    }*/
 }

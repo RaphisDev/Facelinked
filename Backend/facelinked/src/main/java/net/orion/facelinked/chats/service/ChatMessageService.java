@@ -1,19 +1,15 @@
-package net.orion.facelinked.service;
+package net.orion.facelinked.chats.service;
 
-import net.orion.facelinked.chatting.ChatMessage;
-import net.orion.facelinked.repository.ChatMessageRepository;
+//import net.orion.facelinked.repository.ChatMessageRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class ChatMessageService
 {
-    private final ChatMessageRepository repository;
-    private final ChatRoomService chatRoomService;
+    //private final ChatMessageRepository repository;
+    //private final ChatRoomService chatRoomService;
 
-    public ChatMessageService(ChatMessageRepository chatMessageRepository, ChatRoomService chatRoomService)
+    /*public ChatMessageService(ChatMessageRepository chatMessageRepository, ChatRoomService chatRoomService)
     {
         this.repository = chatMessageRepository;
         this.chatRoomService = chatRoomService;
@@ -31,5 +27,5 @@ public class ChatMessageService
     {
         var chatRoomId = chatRoomService.getChatRoomId(senderId, receiverId, false);
         return chatRoomId.map(repository::findByChatId).orElse(new ArrayList<>());
-    }
+    }*/
 }
