@@ -1,14 +1,13 @@
-package net.orion.facelinked.profile.controller;
+package net.orion.facelinked.profile;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
 
 @Data
 @Builder
@@ -21,8 +20,7 @@ public class Profile {
     String username;
     String name;
     String profilePicturePath;
-    @Positive
-    int age;
+    String dateOfBirth;
     String schoolName;
     boolean inRelationship;
     String partner;

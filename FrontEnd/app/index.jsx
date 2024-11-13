@@ -16,7 +16,7 @@ export default function Index() {
             if (await signedIn()) {
                 router.push("/home");
             } else {
-                router.push("/login");
+                router.push("/register");
             }
     })}, []);
 

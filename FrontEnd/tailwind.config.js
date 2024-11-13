@@ -12,7 +12,7 @@ module.exports = {
 
         //dark mode
         dark:{
-          primary: "#222427", //maybe this: #353843, (look at Docs Folder)
+          primary: "#2a313c", //maybe this: #353843, (look at Docs Folder)
           accent: "#27ae60", //maybe: #0210ae, #050533, #0519c0
           text: "#FEFEFE",
           secText: "#828282"

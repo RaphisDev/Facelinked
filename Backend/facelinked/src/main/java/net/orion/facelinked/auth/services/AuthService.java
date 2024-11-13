@@ -23,6 +23,14 @@ public class AuthService
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("Email already in use");
+        }
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new IllegalArgumentException("Username already in use");
+        }
+
         var user = User.builder()
                 .email(request.getEmail())
                 .name(request.getName())
