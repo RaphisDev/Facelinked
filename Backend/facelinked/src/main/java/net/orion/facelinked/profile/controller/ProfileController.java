@@ -42,7 +42,8 @@ public class ProfileController {
     @DeleteMapping("/{username}")
     private void Delete(@PathVariable String username)
     {
-        profileRepository.delete(profileRepository.findByUsername(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+        //Only when user is authenticated
+        //profileRepository.delete(profileRepository.findByUsername(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register")

@@ -44,7 +44,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 userDetails = this.userDetailsService.loadUserByUsername(email);
             } catch (UsernameNotFoundException e) {
-                throw new ServletException("User not found");
+                filterChain.doFilter(request, response);
+                return;
             }
             if(jwtService.isTokenValid(token, userDetails)) {
 

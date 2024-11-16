@@ -1,38 +1,81 @@
-//Modal for more profile infos?? Better solution?
-//Also for own profile. By clicking on Tab icon it opens your profile /"empty": own profile
-import {FlatList, Pressable, Text, TouchableOpacity, View} from "react-native";
+import {FlatList, Platform, Pressable, Text, TouchableOpacity, View} from "react-native";
 import "../../../../global.css"
-import {router} from "expo-router";
+import {router, useLocalSearchParams, useNavigation} from "expo-router";
 import {Image} from "expo-image";
+import {useEffect, useLayoutEffect, useState} from "react";
+import * as SecureStore from "expo-secure-store";
 
 export default function Index() {
 
-    const data = {name: "Raphael Templer", username: "raphi.t08", age: 16, school: "Willibald-Gymnasium", relationshipStatus: false}; //Display infos of school when pressing on text
-    //Too much shadow for profile picture??
+
+    //Seite persoenlicher machen wie in Notion beschrieben anstatt nur die Daten anzuzeigen
+    //Like Bio/Description, Hobbies/Interests, things in Design Image + on BlockBlatt, Posts, later friends, etc.
+    const navigation = useNavigation();
+    let {username} = useLocalSearchParams();
+
+    const [profileInfos, setProfileInfos] = useState({});
+
+    function displayData() {
+
+    }
+
+    async function fetchData() {
+        try {
+            if(username === undefined) {
+                username = await SecureStore.getItemAsync('username');
+            }
+            const ip = Platform.OS === 'android' ? '10.0.2.2' : '192.168.0.178';
+            const data = await fetch(`http://${ip}:8080/profile/${username}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + await SecureStore.getItemAsync('token'),
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (data.ok){
+                setProfileInfos(await data.json());
+            }
+        }
+        catch (error) {
+            console.error("Error fetching data: ", error);
+        }
+    }
+
+    function calculateAge(birthDate) {
+        const ageDiff = Date.now() - birthDate.getTime();
+        const ageDate = new Date(ageDiff);
+        return Math.abs(ageDate.getUTCFullYear() - 1970);
+    }
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: username ? username : "Profile",
+        });
+    }, [navigation]);
+
+    useEffect( () => {
+        fetchData();
+    }, []);
 
     return (
         <>
             <View className="bg-primary dark:bg-dark-primary w-full h-full">
-                <Text className="text-text dark:text-dark-text text-center font-bold mt-24 text-4xl">{data.name}</Text>
+                <Text className="text-text dark:text-dark-text text-center font-bold mt-7 text-4xl">{profileInfos.name}</Text>
                 <View className="justify-between flex-row mt-10">
-                    <View className="ml-3">
-                        <Text className="font-medium text-xl text-text dark:text-dark-text">{data.username}</Text>
+                    <View className="ml-3 overflow-hidden">
                         <Text className="font-bold text-2xl underline text-text dark:text-dark-text">Infos</Text>
                         <FlatList data={[
-                            {id: "age", value: data.age},
-                            {id: "school", value: data.school},
-                            {id: "class", value: data.class + data.classInteger},
-                            {id: "relationshipStatus", value: data.relationshipStatus ? "in Relationship" : "Single"}
-                        ]} renderItem={({item}) => <Text className="text-xl font-medium text-text dark:text-dark-text" id={item.id}>• {item.value}</Text>}/>
+                            {id: "age", value: calculateAge(new Date(profileInfos.dateOfBirth))},
+                            {id: "school", value: profileInfos.schoolName},
+                            {id: "location", value: profileInfos.location},
+                            {id: "relationshipStatus", value: profileInfos.inRelationship ? "in Relationship" : "Single"},
+                            {id: "partner", value: profileInfos.partner},
+                        ]} renderItem={({item}) => <Text className="text-xl font-medium text-text dark:text-dark-text" style={{display: item.id === "partner" ? profileInfos.inRelationship ? "flex" : "none" : "flex"}} id={item.id}>• {item.value}</Text>}/>
                     </View>
-                    <View className="shadow-xl shadow-black h-80 w-56 mr-3 rounded-3xl overflow-hidden">
-                        <Image style={{ width: '100%', height: '100%', objectFit: "cover", position: "static", borderRadius: 24 }} alt="Profile picture" source={require('../../../../assets/images/profilePicture.jpeg')}/>
+                    <View className="h-64 aspect-[16/19] mr-3 rounded-3xl overflow-hidden">
+                        <Image style={{ width: '100%', height: '100%', objectFit: "cover", position: "static", borderRadius: 24 }}
+                               alt="Profile picture" source={{uri: profileInfos.profilePicturePath}}/>
                     </View>
-                </View>
-
-
-                <View className="invisible">
-                    <Pressable onPress={() => router.push(`/${data.username}/posts`)}><Text>Posts</Text></Pressable>
                 </View>
             </View>
         </>
