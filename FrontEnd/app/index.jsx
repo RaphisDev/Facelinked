@@ -14,9 +14,9 @@ export default function Index() {
     useEffect(() => {
        setTimeout(async () => {
             if (await signedIn()) {
-                router.push("/home");
+                router.replace("/home");
             } else {
-                router.push("/register");
+                router.replace("/register");
             }
     })}, []);
 

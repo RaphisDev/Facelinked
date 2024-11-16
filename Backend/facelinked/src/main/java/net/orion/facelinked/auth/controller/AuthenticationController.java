@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.orion.facelinked.auth.repository.UserRepository;
 import net.orion.facelinked.auth.User;
 import net.orion.facelinked.auth.services.AuthService;
+import net.orion.facelinked.profile.service.StorageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthenticationController
 {
-    private final UserRepository userRepository;
     private final AuthService authService;
 
     @ResponseStatus(HttpStatus.CREATED)

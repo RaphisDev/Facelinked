@@ -1,8 +1,10 @@
 package net.orion.facelinked.profile.controller;
 
 import lombok.RequiredArgsConstructor;
+import net.orion.facelinked.auth.repository.UserRepository;
 import net.orion.facelinked.profile.Profile;
 import net.orion.facelinked.profile.repository.ProfileRepository;
+import net.orion.facelinked.profile.service.StorageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,13 +15,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
-
 @Controller
 @RequestMapping("/profile")
 @RequiredArgsConstructor
 public class ProfileController {
 
     private final ProfileRepository profileRepository;
+    private final UserRepository userRepository;
+    private final StorageService storageService;
 
     //Make Get with GraphQL
     @ResponseStatus(HttpStatus.FOUND)
@@ -45,13 +48,25 @@ public class ProfileController {
     @PostMapping("/register")
     private void CompleteProfile(@RequestBody Profile profile, @AuthenticationPrincipal UserDetails userDetails)
     {
-        if (userDetails == null || !userDetails.getUsername().equals(profile.getUsername())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to complete this profile");
+        if (userDetails != null) {
+            if(!userRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)).getUserName().equals(profile.getUsername())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to complete this profile");
+            }
+        }
+        else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
 
         if(profileRepository.existsByUsername(profile.getUsername())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         }
         profileRepository.save(profile);
+    }
+
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @GetMapping("/upload")
+    private ResponseEntity<String> BucketUrl()
+    {
+        return ResponseEntity.ok(storageService.generatePresignedUrl());
     }
 }

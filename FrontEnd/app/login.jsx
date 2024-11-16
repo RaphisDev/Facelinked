@@ -66,7 +66,7 @@ export default function Login() {
                     const data = await response.json();
                     const token = data.token;
                     await SecureStore.setItemAsync("token", token);
-                    router.push("/");
+                    router.replace("/");
                 } else {
                     alert("Wrong email or password");
                 }
