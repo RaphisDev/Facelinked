@@ -24,8 +24,7 @@ export default function TabsLayout() {
                     tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "chatbox-sharp" : "chatbox-outline"} size={30}/>
                 }}/>
 
-                <Tabs.Screen name="(profiles)" options={{headerShown: false, headerTitle: "Profile",
-                    headerTitleAlign: "center",
+                <Tabs.Screen name="(profiles)" options={{headerShown: false,
                     tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "person-sharp" : "person-outline"} size={30}/>
                 }}/>
             </Tabs>

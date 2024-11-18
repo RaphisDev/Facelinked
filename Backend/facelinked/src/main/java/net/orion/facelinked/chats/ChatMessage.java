@@ -11,7 +11,6 @@ import java.util.Date;
 @Setter
 @Getter
 @Builder
-//@Document
 public class ChatMessage
 {
     @Id

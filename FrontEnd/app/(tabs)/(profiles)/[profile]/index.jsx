@@ -15,10 +15,6 @@ export default function Index() {
 
     const [profileInfos, setProfileInfos] = useState({});
 
-    function displayData() {
-
-    }
-
     async function fetchData() {
         try {
             if(username === undefined) {
