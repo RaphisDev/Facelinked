@@ -1,13 +1,18 @@
 package net.orion.facelinked.chats.controller;
 
+import net.orion.facelinked.chats.ChatMessage;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.client.WebSocketClient;
 
 @Controller
-@RestController("/chat")
 public class ChatController {
 
-    
+    @MessageMapping("/chat")
+    @SendTo("/topic/messages")
+    public ChatMessage send(ChatMessage message) {
+        return message;
+    }
 }
