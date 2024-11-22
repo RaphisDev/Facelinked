@@ -12,7 +12,8 @@ public class ChatController {
 
     @MessageMapping("/chat")
     @SendTo("/topic/messages")
-    public ChatMessage send(ChatMessage message) {
-        return message;
+    public ChatMessage send(String message) {
+        //Verify the message with the token
+        return ChatMessage.builder().content(message).build();
     }
 }
