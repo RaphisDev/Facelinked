@@ -83,23 +83,25 @@ export default function Login() {
         <View className="h-full w-full bg-primary dark:bg-dark-primary">
             <View className="mt-[80]">
                 <Text className="text-center font-bold text-text dark:text-dark-text text-5xl">Login</Text>
-                <View className="p-7 items-center self-center flex-wrap">
-                    <View className="w-full">
-                        <View className="border-2 border-black dark:border-white w-3/4 p-5 rounded-xl">
-                            <Text className="dark:text-dark-text text-text font-bold text-lg">Email</Text>
-                            <TextInput value={email} textContentType="emailAddress" autoComplete="email" onChangeText={e => setEmail(e)} className="dark:text-dark-text text-text border-gray-700/80 border-4 rounded-lg active:bg-gray-600/10 font-medium text-lg p-0.5 pl-2.5 mb-1 min-w-full max-w-full" type="email" placeholder="Enter your email"/>
-                            <Text className="dark:text-dark-text text-text mt-4 font-bold text-lg">Password</Text>
-                            <TextInput value={password} textContentType="password" autoComplete="current-password" onSubmitEditing={() => {
-                                if (email.length > 0 && password.length > 0) {
+                <View className="p-7">
+                    <View className="w-full h-full">
+                        <View className="h-[55%%] self-center flex-wrap justify-center items-centers">
+                            <View className="border-2 border-black dark:border-white w-3/4 p-5 rounded-xl">
+                              <Text className="dark:text-dark-text text-text font-bold text-lg">Email</Text>
+                              <TextInput value={email} textContentType="emailAddress" autoComplete="email" onChangeText={e => setEmail(e)} className="dark:text-dark-text text-text border-gray-700/80 border-4 rounded-lg active:bg-gray-600/10 font-medium text-lg p-0.5 pl-2.5 mb-1 min-w-full max-w-full" type="email" placeholder="Enter your email"/>
+                              <Text className="dark:text-dark-text text-text mt-4 font-bold text-lg">Password</Text>
+                              <TextInput value={password} textContentType="password" autoComplete="password" onSubmitEditing={() => {
+                                  if (email.length > 0 && password.length > 0) {
                                     loginEmail();
-                                }
-                            }} onChangeText={p => setPassword(p)} className="dark:text-dark-text text-text border-gray-700/80 active:bg-gray-600/10 rounded-lg border-4 font-medium text-lg p-0.5 pl-2.5 mb-4" type="password" placeholder="Enter your password"/>
+                                  }
+                              }} onChangeText={p => setPassword(p)} className="dark:text-dark-text text-text border-gray-700/80 active:bg-gray-600/10 rounded-lg border-4 font-medium text-lg p-0.5 pl-2.5 mb-4" type="password" placeholder="Enter your password"/>
 
-                            <TouchableOpacity activeOpacity={0.6} className="rounded-lg max-w-40 self-center border-2 border-secText p-2 bg-dark-primary dark:bg-primary" onPress={loginEmail}><Text className="text-center text-dark-text dark:text-text font-bold">Login</Text></TouchableOpacity>
+                              <TouchableOpacity activeOpacity={0.6} className="rounded-lg min-w-20 self-center border-2 border-secText p-2 bg-dark-primary dark:bg-primary" onPress={loginEmail}><Text className="text-center text-dark-text dark:text-text font-bold">Login</Text></TouchableOpacity>
+                            </View>
+                            <Text className="dark:text-dark-text text-text self-center text-center font-bold text-lg mt-5">or</Text>
+                            <TouchableOpacity className="self-center min-w-40 rounded-lg border-2 border-secText p-2 mt-5 bg-dark-primary dark:bg-primary" onPress={loginGoogle}><Text className="text-center text-dark-text dark:text-text font-bold">Login with Google</Text></TouchableOpacity>
+                            <TouchableOpacity className="self-center min-w-40 rounded-lg border-2 border-secText p-2 mt-5 bg-dark-primary dark:bg-primary" onPress={loginApple}><Text className="text-center text-dark-text dark:text-text font-bold">Login with Apple</Text></TouchableOpacity>
                         </View>
-                        <Text className="dark:text-dark-text text-text text-center font-bold text-lg mt-5">or</Text>
-                        <TouchableOpacity className="rounded-lg border-2 border-secText p-2 mt-5 bg-dark-primary dark:bg-primary" onPress={loginGoogle}><Text className="text-center text-dark-text dark:text-text font-bold">Login with Google</Text></TouchableOpacity>
-                        <TouchableOpacity className="rounded-lg border-2 border-secText p-2 mt-5 bg-dark-primary dark:bg-primary" onPress={loginApple}><Text className="text-center text-dark-text dark:text-text font-bold">Login with Apple</Text></TouchableOpacity>
                     </View>
                 </View>
             </View>
