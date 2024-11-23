@@ -5,7 +5,7 @@ import {Image} from "expo-image";
 import {useEffect, useLayoutEffect, useState} from "react";
 import * as SecureStore from "expo-secure-store";
 
-export default function Index() {
+export default function Profile() {
 
 
     //Seite persoenlicher machen wie in Notion beschrieben anstatt nur die Daten anzuzeigen

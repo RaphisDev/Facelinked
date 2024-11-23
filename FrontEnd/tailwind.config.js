@@ -5,7 +5,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#FEFEFE",
+        primary: "#FEFEFE", //f2f2f2?
         accent: "#27ae60",
         text: "#222427",
         secText: "#828282",

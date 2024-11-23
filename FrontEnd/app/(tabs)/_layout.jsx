@@ -19,7 +19,7 @@ export default function TabsLayout() {
                     headerTitleAlign: "center",
                     tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "git-network-sharp" : "git-network-outline"} size={30}/>
                 }}/>
-                <Stack.Screen name="chats" options={{headerTitle: "Chats",
+                <Stack.Screen name="chat" options={{headerTitle: "Chats",
                     headerTitleAlign: "center",
                     tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "chatbox-sharp" : "chatbox-outline"} size={30}/>
                 }}/>

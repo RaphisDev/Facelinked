@@ -1,9 +1,10 @@
 import "../../../global.css"
-import {Platform, TextInput, View} from "react-native";
+import {FlatList, Platform, TextInput, View} from "react-native";
 import {useEffect, useRef} from "react";
 import * as SecureStorage from "expo-secure-store";
 import * as StompJs from "@stomp/stompjs";
 import {TextEncoder} from 'text-encoding';
+import Chat from "../../../components/Entries/Chat";
 
 global.TextEncoder = TextEncoder;
 
@@ -49,16 +50,13 @@ export default function Chats() {
         })
     }
 
+    //Chats sind Kacheln; 3 in einer Reihe; Profilbild und Name darunter
+    //change color of background maybe
     return (
-        <View className="h-full w-full bg-primary dark:bg-dark-primary">
-            <View>
-                <TextInput onSubmitEditing={
-                    (e) => {
-                        sendMessage(e.nativeEvent.text);
-                    }
-                } className="h-10 w-full bg-white dark:bg-dark-secondary" placeholder="Type a message" style={{borderBottomWidth: 1}
-                }></TextInput>
-            </View>
+        <View className="h-full w-full bg-primary dark:bg-dark-primary mt-4">
+            <FlatList columnWrapperStyle={{flex: 1, justifyContent: "space-around"}} numColumns={3} data={[{ name: "Sample Chat", username: "asd", image: "sadasd" },
+                {name: "Raphi", username: "asd", image: "sadasd"}, {name: "Ferdi", username: "asd", image: "sadasd"},
+                {name: "Jizzy", username: "asd", image: "sadasd"}]} renderItem={({ item }) => <Chat {...item} />}/>
         </View>
     )
 }
