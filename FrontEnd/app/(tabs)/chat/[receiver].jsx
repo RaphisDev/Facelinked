@@ -31,7 +31,7 @@ export default function ChatRoom(props) {
         stompClient.current = new StompJs.Client({
             brokerURL: `wss://${ip}:8080/ws`,
             webSocketFactory: () => {
-                return new WebSocket(`ws://${ip}:8080/ws`, [], {
+                return new WebSocket(`wss://${ip}:8080/ws`, [], {
                     headers: {
                         "Authorization": `Bearer ${SecureStorage.getItem("token")}`
                     }
