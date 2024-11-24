@@ -12,44 +12,6 @@ Object.assign(global, { WebSocket });
 
 export default function Chats() {
 
-    const ip = Platform.OS === "android" ? "10.0.2.2" : "192.168.0.178";
-
-    const stompClient = new StompJs.Client({
-        brokerURL: `ws://${ip}:8080/ws`,
-        webSocketFactory: () => {
-            return new WebSocket(`ws://${ip}:8080/ws`, [], {
-                headers: {
-                    "Authorization": `Bearer ${SecureStorage.getItem("token")}`
-                }
-            });
-        },
-        forceBinaryWSFrames: true,
-        appendMissingNULLonIncoming: true,
-        onConnect: () => {
-            stompClient.subscribe('/topic/messages', (message) => {
-                alert(JSON.parse(message.body).content);
-            });
-        }
-    });
-
-    useEffect(() => {
-        stompClient.activate();
-        return () => {
-            handleDisconnect();
-        }
-    }, []);
-
-    function handleDisconnect() {
-
-    }
-
-    function sendMessage(message) {
-        stompClient.publish({
-            destination: '/app/chat',
-            body: message
-        })
-    }
-
     //Chats sind Kacheln; 3 in einer Reihe; Profilbild und Name darunter
     //change color of background maybe
     return (

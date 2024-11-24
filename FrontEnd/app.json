@@ -18,6 +18,7 @@
       "bundleIdentifier": "com.FaceLinked.Frontend"
     },
     "android": {
+      "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"

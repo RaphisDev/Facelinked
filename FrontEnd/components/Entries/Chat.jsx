@@ -1,6 +1,9 @@
-import {Text, TouchableOpacity, View} from "react-native";
+import {Platform, Text, TouchableOpacity, View} from "react-native";
 import {Image} from "expo-image";
 import {useRouter} from "expo-router";
+import * as StompJs from "@stomp/stompjs";
+import * as SecureStorage from "expo-secure-store";
+import {useEffect} from "react";
 
 export default function Chat(props) {
     const router = useRouter();

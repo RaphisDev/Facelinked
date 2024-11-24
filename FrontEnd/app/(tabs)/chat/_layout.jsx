@@ -4,7 +4,7 @@ export default function ChatsLayout() { //maybe do Utilities instead and put cha
     return (
         <>
             <Stack>
-                <Stack.Screen name="index"/>
+                <Stack.Screen name="index" options={{headerShown: false}}/>
                 <Stack.Screen name="[receiver]" options={{headerShown: false}}/>
             </Stack>
         </>
