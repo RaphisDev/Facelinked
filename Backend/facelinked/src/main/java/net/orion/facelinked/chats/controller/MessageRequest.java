@@ -12,6 +12,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MessageRequest {
+    private String receiver;
     private String content;
     private String timestamp;
 }

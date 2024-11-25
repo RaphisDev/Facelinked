@@ -9,65 +9,52 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import {useLocalSearchParams} from "expo-router";
+import {useLocalSearchParams, useNavigation} from "expo-router";
 import Message from "../../../components/Entries/Message";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as StompJs from "@stomp/stompjs";
 import * as SecureStorage from "expo-secure-store";
 import {useEffect, useRef, useState} from "react";
+import WebSocketProvider from "../../../components/WebSocketProvider";
 
 export default function ChatRoom(props) {
 
-    const {username} = useLocalSearchParams();
-    const ip = Platform.OS === "android" ? "10.0.2.2" : "192.168.0.178";
+    const {receiver} = useLocalSearchParams();
     const message = useRef("");
     const input = useRef(null);
     const [messages, addMessage] = useState([]);
     const connected = useRef(false);
 
-    const stompClient = useRef(null);
+    const navigation = useNavigation("../../");
 
-    if (!connected.current) {
-        stompClient.current = new StompJs.Client({
-            brokerURL: `wss://${ip}:8080/ws`,
-            webSocketFactory: () => {
-                return new WebSocket(`wss://${ip}:8080/ws`, [], {
-                    headers: {
-                        "Authorization": `Bearer ${SecureStorage.getItem("token")}`
-                    }
-                });
-            },
-            forceBinaryWSFrames: true,
-            appendMissingNULLonIncoming: true,
-            onConnect: () => {
-                stompClient.current.subscribe('/topic/messages', (message) => {
-                    const parsedMessage = JSON.parse(message.body);
-                    addMessage((prevMessages) => [...prevMessages, {content: parsedMessage.content, timestamp: parsedMessage.timestamp}]);
-                });
-            }
-        });
-    }
+    const ws = new WebSocketProvider();
 
     useEffect(() => {
         if (connected.current) {
             return;
         }
-        stompClient.current.activate();
+
+        navigation.setOptions({
+            headerTitle: receiver
+        });
+
         connected.current = true;
 
         return () => {
-            handleDisconnect();
+            navigation.setOptions({
+                headerTitle: "Chats"
+            });
         }
     }, []);
 
     const translateY = useRef(new Animated.Value(0)).current;
 
-    //Why need 83 offset? -> fix
+    //offset bug?
     useEffect(() => {
         const keyboardWillShow = Keyboard.addListener(
             Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
             (event) => {
-                const offset = event.endCoordinates.height - 83;
+                const offset = Platform.OS === "ios" ? event.endCoordinates.height - 83 : event.endCoordinates.height - 295;
                 Animated.timing(translateY, {
                     toValue: -offset,
                     duration: 250,
@@ -95,11 +82,6 @@ export default function ChatRoom(props) {
         };
     }, []);
 
-    function handleDisconnect() {
-        stompClient.current.deactivate();
-    }
-
-    //bug where messages are not sent sometimes -> fix
     function sendMessage(message) {
 
         input.current.clear();
@@ -108,16 +90,14 @@ export default function ChatRoom(props) {
         if (message === "") {return;}
 
         try {
-            /*if(!stompClient.current.connected) {
-                stompClient.current.activate();
-            }*/
-            stompClient.current.publish({
-                destination: '/app/chat',
+            ws.stompClient.publish({
+                destination: `/app/chat`,
                 body: JSON.stringify({
                     content: message,
-                    timestamp: new Date().toString()
+                    timestamp: new Date().toString(),
+                    receiver: props.receiver
                 })
-            })
+            });
         }
         catch (e) {
             console.error(e);
@@ -132,8 +112,6 @@ export default function ChatRoom(props) {
         }
     });
 
-    //Save messages only in localStorage???
-    //Change header to show name instead of Chats and change when navigating to different chat or back to all chats
     return(
         <View className="h-full w-full bg-primary dark:bg-dark-primary">
             <View>

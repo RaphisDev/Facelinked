@@ -45,7 +45,7 @@ export default function Profile() {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            title: username ? username : "Profile",
+            headerTitle: username ? username : "Profile",
         });
     }, [navigation]);
 
