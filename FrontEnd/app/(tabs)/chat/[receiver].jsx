@@ -12,12 +12,13 @@ import {
 import {useLocalSearchParams, useNavigation} from "expo-router";
 import Message from "../../../components/Entries/Message";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import * as StompJs from "@stomp/stompjs";
+import StompJs from "@stomp/stompjs";
 import * as SecureStorage from "expo-secure-store";
 import {useEffect, useRef, useState} from "react";
 import WebSocketProvider from "../../../components/WebSocketProvider";
+import SockJS from "sockjs-client";
 
-export default function ChatRoom(props) {
+export default function ChatRoom() {
 
     const {receiver} = useLocalSearchParams();
     const message = useRef("");
@@ -51,10 +52,11 @@ export default function ChatRoom(props) {
 
     //offset bug?
     useEffect(() => {
+
         const keyboardWillShow = Keyboard.addListener(
             Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
             (event) => {
-                const offset = Platform.OS === "ios" ? event.endCoordinates.height - 83 : event.endCoordinates.height - 295;
+                const offset = Platform.OS === "ios" ? event.endCoordinates.height - 83 : 10;
                 Animated.timing(translateY, {
                     toValue: -offset,
                     duration: 250,
@@ -93,9 +95,9 @@ export default function ChatRoom(props) {
             ws.stompClient.publish({
                 destination: `/app/chat`,
                 body: JSON.stringify({
+                    receiver: receiver,
                     content: message,
-                    timestamp: new Date().toString(),
-                    receiver: props.receiver
+                    timestamp: new Date().toString()
                 })
             });
         }
