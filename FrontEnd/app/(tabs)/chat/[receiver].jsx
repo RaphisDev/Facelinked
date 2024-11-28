@@ -16,7 +16,6 @@ import StompJs from "@stomp/stompjs";
 import * as SecureStorage from "expo-secure-store";
 import {useEffect, useRef, useState} from "react";
 import WebSocketProvider from "../../../components/WebSocketProvider";
-import SockJS from "sockjs-client";
 
 export default function ChatRoom() {
 

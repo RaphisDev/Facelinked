@@ -21,6 +21,8 @@ class WebsocketController{
                 brokerURL: `ws://${ip}:8080/ws`,
                 forceBinaryWSFrames: true,
                 appendMissingNULLonIncoming: true,
+                heartbeatOutgoing: 10000,
+                heartbeatIncoming: 10000,
                 webSocketFactory: () => {
                     return new WebSocket(`ws://${ip}:8080/ws`, [], {
                         headers: {
@@ -32,7 +34,8 @@ class WebsocketController{
                     this.stompClient.subscribe(`/user/${SecureStorage.getItem("username")}/queue/messages`, (message) => {
                         const parsedMessage = JSON.parse(message.body);
                         this.messageReceived.emit("messageReceived", { detail: { content: parsedMessage.content, sender: parsedMessage.sender, timestamp: parsedMessage.timestamp } });
-                    })},
+                    });
+                },
             });
             this.stompClient.activate();
 

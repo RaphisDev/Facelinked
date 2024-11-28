@@ -3,6 +3,7 @@ package net.orion.facelinked.profile.controller;
 import lombok.RequiredArgsConstructor;
 import net.orion.facelinked.auth.repository.UserRepository;
 import net.orion.facelinked.profile.Profile;
+import net.orion.facelinked.profile.ProfileRequest;
 import net.orion.facelinked.profile.repository.ProfileRepository;
 import net.orion.facelinked.profile.service.StorageService;
 import org.springframework.http.HttpStatus;
@@ -47,7 +48,7 @@ public class ProfileController {
     }
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register")
-    private void CompleteProfile(@RequestBody Profile profile, @AuthenticationPrincipal UserDetails userDetails)
+    private void CompleteProfile(@RequestBody ProfileRequest profile, @AuthenticationPrincipal UserDetails userDetails)
     {
         if (userDetails != null) {
             if(!userRepository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)).getUserName().equals(profile.getUsername())) {
@@ -61,7 +62,10 @@ public class ProfileController {
         if(profileRepository.existsByUsername(profile.getUsername())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         }
-        profileRepository.save(profile);
+        profileRepository.save(Profile.builder().profilePicturePath(profile.getProfilePicturePath())
+                .username(profile.getUsername()).name(profile.getName()).dateOfBirth(profile.getDateOfBirth())
+                .hobbies(profile.getHobbies()).score(0).inRelationship(profile.isInRelationship())
+                .partner(profile.getPartner()).location(profile.getLocation()).build());
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)

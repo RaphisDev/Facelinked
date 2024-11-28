@@ -6,14 +6,14 @@ module.exports = {
     extend: {
       colors: {
         primary: "#f4f4f4",
-        accent: "#27ae60",
+        accent: "#285FF5",
         text: "#222427",
         secText: "#828282",
 
         //dark mode
         dark:{
           primary: "#2a313c", //maybe this: #353843, (look at Docs Folder)
-          accent: "#27ae60", //maybe: #0210ae, #050533, #0519c0
+          accent: "#285FF5", //or this: #27ae60
           text: "#FEFEFE",
           secText: "#828282"
         }

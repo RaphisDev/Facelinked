@@ -10,6 +10,8 @@ export default function Profile() {
 
     //Seite persoenlicher machen wie in Notion beschrieben anstatt nur die Daten anzuzeigen
     //Like Bio/Description, Hobbies/Interests, things in Design Image + on BlockBlatt, Posts, later friends, etc.
+    // Bullet point icon: • Use or dont use???
+    //Do icon instead of score text
     const navigation = useNavigation();
     let {username} = useLocalSearchParams();
 
@@ -59,14 +61,15 @@ export default function Profile() {
                 <Text className="text-text dark:text-dark-text text-center font-bold mt-7 text-4xl">{profileInfos.name}</Text>
                 <View className="justify-between flex-row mt-10">
                     <View className="ml-3 overflow-hidden">
-                        <Text className="font-bold text-2xl underline text-text dark:text-dark-text">Infos</Text>
+                        <Text className="font-bold text-lg text-center text-accent mb-1">Score: {profileInfos.score}</Text>
                         <FlatList data={[
-                            {id: "age", value: calculateAge(new Date(profileInfos.dateOfBirth))},
-                            {id: "school", value: profileInfos.schoolName},
+                            {id: "age", value: `${profileInfos.name.split(" ")[0]}, ${calculateAge(new Date(profileInfos.dateOfBirth))}`},
                             {id: "location", value: profileInfos.location},
+                            {id: "hobbies", value: profileInfos.hobbies},
                             {id: "relationshipStatus", value: profileInfos.inRelationship ? "in Relationship" : "Single"},
                             {id: "partner", value: profileInfos.partner},
-                        ]} renderItem={({item}) => <Text className="text-xl font-medium text-text dark:text-dark-text" style={{display: item.id === "partner" ? profileInfos.inRelationship ? "flex" : "none" : "flex"}} id={item.id}>• {item.value}</Text>}/>
+                        ]} renderItem={({item}) => <Text className="text-xl font-medium text-text dark:text-dark-text" style={{display: item.id === "partner" ? profileInfos.inRelationship ?
+                                "flex" : "none" : "flex"}} id={item.id}> {item.value}</Text>}/>
                     </View>
                     <View className="h-64 aspect-[16/19] mr-3 rounded-3xl overflow-hidden">
                         <Image style={{ width: '100%', height: '100%', objectFit: "cover", position: "static", borderRadius: 24 }}

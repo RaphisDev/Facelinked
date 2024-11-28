@@ -24,7 +24,6 @@ export default function Index() {
 
     return (
         <>
-            <Text>FaceLinked (Logo)</Text>
         </>
     );
 }
