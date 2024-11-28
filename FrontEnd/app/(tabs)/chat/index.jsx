@@ -17,7 +17,7 @@ export default function Chats() {
     return (
         <View className="h-full w-full bg-primary dark:bg-dark-primary mt-4">
             <FlatList columnWrapperStyle={{flex: 1, justifyContent: "space-around"}} numColumns={3} data={[{ name: "Sample Chat", username: "asd", image: "sadasd" },
-                {name: "Raphi", username: "asd", image: "sadasd"}, {name: "Ferdi", username: "asd", image: "sadasd"},
+                {name: "Raphi", username: "raphi.t08", image: "sadasd"}, {name: "Ferdi", username: "asd", image: "sadasd"},
                 {name: "Jizzy", username: "asd", image: "sadasd"}]} renderItem={({ item }) => <Chat {...item} />}/>
         </View>
     )

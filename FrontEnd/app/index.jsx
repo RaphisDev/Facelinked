@@ -1,8 +1,9 @@
-import {Pressable, Text, TouchableOpacity, View} from "react-native";
+import {Platform, Pressable, Text, TouchableOpacity, View} from "react-native";
 import "../global.css"
 import {router, useRouter} from "expo-router";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import * as SecureStore from "expo-secure-store";
+import WebSocketProvider from "../components/WebSocketProvider";
 
 export default function Index() {
 
@@ -14,6 +15,7 @@ export default function Index() {
     useEffect(() => {
        setTimeout(async () => {
             if (await signedIn()) {
+                new WebSocketProvider();
                 router.replace("/home");
             } else {
                 router.replace("/register");
