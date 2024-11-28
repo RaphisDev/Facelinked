@@ -4,13 +4,19 @@
     "slug": "FaceLinked",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/icon.jpeg",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/icon.png",
+      "image": "./assets/images/icon.jpeg",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#ffffff",
+      "fadeOutDuration": 300,
+      "dark": {
+        "image": "./assets/images/icon.jpeg",
+        "resizeMode": "contain",
+        "backgroundColor": "#000000"
+      }
     },
     "ios": {
       "usesAppleSignIn": true,
@@ -20,7 +26,7 @@
     "android": {
       "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
+        "foregroundImage": "./assets/images/icon.jpeg",
         "backgroundColor": "#ffffff"
       },
       "package": "com.FaceLinked.Frontend"
