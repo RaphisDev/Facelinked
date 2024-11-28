@@ -41,7 +41,13 @@ export default function ChatRoom() {
 
         connected.current = true;
 
+        ws.messageReceived.addListener("messageReceived", (e) => {
+            addMessage((prevMessages) => [...prevMessages, e.detail]);
+        });
+        //load messsages from localStorage and server
+
         return () => {
+            ws.messageReceived.removeAllListeners("messageReceived");
             navigation.setOptions({
                 headerTitle: "Chats"
             });
@@ -52,6 +58,10 @@ export default function ChatRoom() {
 
     //offset bug?
     useEffect(() => {
+
+        if (connected.current) {
+            return;
+        }
 
         const keyboardWillShow = Keyboard.addListener(
             Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
