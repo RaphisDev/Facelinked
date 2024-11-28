@@ -5,9 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
-      <change afterPath="$PROJECT_DIR$/assets/images/icon.jpeg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/icon.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/app.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/icon.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/tailwind.config.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,11 +75,11 @@
       <recent name="D:\Projects\FaceLinked\FrontEnd\assets\images" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/assets/images" />
       <recent name="D:\Projects\FaceLinked\FrontEnd\app\(tabs)\chat" />
       <recent name="D:\Projects\FaceLinked\FrontEnd\app\(tabs)\chat\[receiver]" />
       <recent name="D:\Projects\FaceLinked\FrontEnd\app\(tabs)" />
       <recent name="D:\Projects\FaceLinked\FrontEnd\app" />
-      <recent name="D:\Projects\FaceLinked\FrontEnd\app\(tabs)\(profiles)\[profilePage]" />
     </key>
   </component>
   <component name="SharedIndexes">
