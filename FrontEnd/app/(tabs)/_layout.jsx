@@ -17,7 +17,7 @@ export default function TabsLayout() {
                 }}/>
                 <Tabs.Screen name="networks" options={{headerTitle: "Networks",
                     headerTitleAlign: "center",
-                    tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "git-network-sharp" : "git-network-outline"} size={30}/>
+                    tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "git-merge-sharp" : "git-merge-outline"} size={30}/>
                 }}/>
                 <Tabs.Screen name="chat" options={{headerTitle: "Chats",
                     headerTitleAlign: "center",

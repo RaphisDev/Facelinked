@@ -33,7 +33,7 @@ class WebsocketController{
                 onConnect: () => {
                     this.stompClient.subscribe(`/user/${SecureStorage.getItem("username")}/queue/messages`, (message) => {
                         const parsedMessage = JSON.parse(message.body);
-                        this.messageReceived.emit("messageReceived", { detail: { content: parsedMessage.content, sender: parsedMessage.sender, timestamp: parsedMessage.timestamp } });
+                        this.messageReceived.emit("messageReceived", { detail: { isSender: false, content: parsedMessage.content, sender: parsedMessage.sender, timestamp: parsedMessage.timestamp } });
                     });
                 },
             });

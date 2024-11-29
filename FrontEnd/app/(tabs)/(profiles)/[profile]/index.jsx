@@ -4,6 +4,7 @@ import {router, useLocalSearchParams, useNavigation} from "expo-router";
 import {Image} from "expo-image";
 import {useEffect, useLayoutEffect, useState} from "react";
 import * as SecureStore from "expo-secure-store";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function Profile() {
 
@@ -61,15 +62,18 @@ export default function Profile() {
                 <Text className="text-text dark:text-dark-text text-center font-bold mt-7 text-4xl">{profileInfos.name}</Text>
                 <View className="justify-between flex-row mt-10">
                     <View className="ml-3 overflow-hidden">
-                        <Text className="font-bold text-lg text-center text-accent mb-1">Score: {profileInfos.score}</Text>
+                        <View className="flex-row items-center justify-center mb-1.5 border-4 border-accent bg-white/55 rounded-xl">
+                            <Ionicons size={14} name={"aperture"}/>
+                            <Text className="font-bold text-lg text-center text-text dark:text-dark-text"> {profileInfos.score}</Text>
+                        </View>
                         <FlatList data={[
-                            {id: "age", value: `${profileInfos.name.split(" ")[0]}, ${calculateAge(new Date(profileInfos.dateOfBirth))}`},
+                            {id: "age", value: `${profileInfos.name?.split(" ")[0]}, ${calculateAge(new Date(profileInfos?.dateOfBirth))}`},
                             {id: "location", value: profileInfos.location},
                             {id: "hobbies", value: profileInfos.hobbies},
                             {id: "relationshipStatus", value: profileInfos.inRelationship ? "in Relationship" : "Single"},
                             {id: "partner", value: profileInfos.partner},
                         ]} renderItem={({item}) => <Text className="text-xl font-medium text-text dark:text-dark-text" style={{display: item.id === "partner" ? profileInfos.inRelationship ?
-                                "flex" : "none" : "flex"}} id={item.id}> {item.value}</Text>}/>
+                                "flex" : "none" : "flex"}} id={item.id}>{item.value}</Text>}/>
                     </View>
                     <View className="h-64 aspect-[16/19] mr-3 rounded-3xl overflow-hidden">
                         <Image style={{ width: '100%', height: '100%', objectFit: "cover", position: "static", borderRadius: 24 }}

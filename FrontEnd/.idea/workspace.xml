@@ -5,19 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
-      <change afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/ProfileRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/Profile.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/Profile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/controller/ProfileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/controller/ProfileController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/resources/db(delete)/ProfileSchema.sql" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile]/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile]/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/_layout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/_layout.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/chat/[receiver].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chat/[receiver].jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/index.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/register.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/register.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/icon.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/Entries/Chat.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Entries/Chat.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/Entries/Message.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Entries/Message.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/WebSocketProvider.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/WebSocketProvider.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/tailwind.config.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -149,6 +145,8 @@
       <workItem from="1732812045578" duration="65000" />
       <workItem from="1732819103401" duration="5000" />
       <workItem from="1732819125596" duration="2882000" />
+      <workItem from="1732912923378" duration="2426000" />
+      <workItem from="1732915702037" duration="7198000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />
