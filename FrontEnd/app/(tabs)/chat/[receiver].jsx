@@ -20,13 +20,15 @@ import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncSto
 
 export default function ChatRoom() {
 
-    //encrypt with key thats stored in secure storage
+    //Todo: encrypt localStorage with key thats stored in secure storage
+    //Flatlist view not adapted when keyboard is active
 
     const {receiver} = useLocalSearchParams();
     const message = useRef("");
     const input = useRef(null);
     const [messages, addMessage] = useState([]);
     const connected = useRef(false);
+    const messageList = useRef(null);
 
     const navigation = useNavigation("../../");
 
@@ -52,17 +54,17 @@ export default function ChatRoom() {
         loadMessages();
 
         ws.messageReceived.addListener("messageReceived", async (e) => {
+            if (e.detail.sender !== receiver) {
+                return;
+            }
+
             addMessage((prevMessages) => [...prevMessages, e.detail]);
-            let loadedMessages = await asyncStorage.getItem(`messages/${receiver}`);
-            if (loadedMessages !== null) {
-                loadedMessages = JSON.parse(loadedMessages);
-                await asyncStorage.setItem(`messages/${receiver}`, JSON.stringify([...loadedMessages, e.detail]));
-            }
-            else {
-                await asyncStorage.setItem(`messages/${receiver}`, JSON.stringify([e.detail]));
-            }
+
+            let loadedMessages = await asyncStorage.getItem(`messages/${receiver}`) || [];
+            if (loadedMessages.length !== 0) {loadedMessages = JSON.parse(loadedMessages);}
+            await asyncStorage.setItem(`messages/${receiver}`, JSON.stringify([...loadedMessages, e.detail]));
         });
-        //load messsages from localStorage and server
+        //load messsages from server in chat page
 
         return () => {
             ws.messageReceived.removeAllListeners("messageReceived");
@@ -76,10 +78,6 @@ export default function ChatRoom() {
 
     //offset bug?
     useEffect(() => {
-
-        if (connected.current) {
-            return;
-        }
 
         const keyboardWillShow = Keyboard.addListener(
             Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
@@ -128,23 +126,16 @@ export default function ChatRoom() {
                     timestamp: new Date().toString()
                 })
             });
+
             addMessage((prevMessages) => [...prevMessages, {isSender: true, content: message, timestamp: new Date().toString()}]);
-            let loadedMessages = await asyncStorage.getItem(`messages/${receiver}`);
-            if (loadedMessages !== null) {
-                loadedMessages = JSON.parse(loadedMessages);
-                await asyncStorage.setItem(`messages/${receiver}`, JSON.stringify([...loadedMessages, {
-                    isSender: true,
-                    content: message,
-                    timestamp: new Date().toString()
-                }]));
-            }
-            else {
-                await asyncStorage.setItem(`messages/${receiver}`, JSON.stringify([{
-                    isSender: true,
-                    content: message,
-                    timestamp: new Date().toString()
-                }]));
-            }
+
+            let loadedMessages = await asyncStorage.getItem(`messages/${receiver}`) || [];
+            if (loadedMessages.length !== 0) {loadedMessages = JSON.parse(loadedMessages);}
+            await asyncStorage.setItem(`messages/${receiver}`, JSON.stringify([...loadedMessages, {
+                isSender: true,
+                content: message,
+                timestamp: new Date().toString()
+            }]));
         }
         catch (e) {
             console.error(e);
@@ -161,10 +152,11 @@ export default function ChatRoom() {
 
     return(
         <View className="h-full w-full bg-primary dark:bg-dark-primary">
-            <View>
-                <FlatList data={messages} renderItem={(item) =>
+            <View className="mb-14 h-fit">
+                <FlatList ref={messageList} onContentSizeChange={() => messageList.current.scrollToEnd()} data={messages} renderItem={(item) =>
                     <Message content={item.item.content} isSender={item.item.isSender} timestamp={item.item.timestamp}/>}
-                          keyExtractor={(item, index) => index.toString()}></FlatList>
+                          keyExtractor={(item, index) => index.toString()}>
+                </FlatList>
             </View>
             <Pressable className="h-full w-full" onPress={Keyboard.dismiss}></Pressable>
             <View className="bottom-0 absolute w-full">

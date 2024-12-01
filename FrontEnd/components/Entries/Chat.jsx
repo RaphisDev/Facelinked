@@ -13,9 +13,15 @@ export default function Chat(props) {
     return (
         <TouchableOpacity activeOpacity={0.9} onPress={() => router.navigate(`/chat/${props.username}`)}>
             <View className="rounded-xl" style={{backgroundColor: "#6C757D", width: 120, marginBottom: 20, height: 150}}>
-                <View className="p-7">
-                    <Image source={{uri: props.image}} className="overflow-hidden rounded-lg" style={{width: '80%', height: '80%'}} />
-                    <Text className="text-center text-dark-text font-bold">{props.name}</Text>
+                <View className="p-7 h-full">
+                    <Image source={{uri: props.image}}
+                           style={{width: 75,
+                               aspectRatio: 16 / 19,
+                               objectFit: "cover",
+                               overflow: "hidden", borderRadius: 12, alignSelf: "center"}}/>
+                    <View className={"justify-center flex-1 " + props.name.split(" ")[0].size > 7 ? "pb-2" : "p-2"}>
+                        <Text className="text-center text-dark-text font-bold" numberOfLines={2}>{props.name.split(" ")[0]}</Text>
+                    </View>
                 </View>
             </View>
         </TouchableOpacity>

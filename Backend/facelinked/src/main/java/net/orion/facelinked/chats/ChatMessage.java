@@ -13,11 +13,8 @@ import java.util.Date;
 @Builder
 public class ChatMessage
 {
-    @Id
-    private String id;
     private String chatId;
     private String senderId;
-    private String receiverId;
     private String content;
     private String timestamp;
 }

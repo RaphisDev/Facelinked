@@ -50,7 +50,7 @@ public class ChatController {
                 .content(message.getContent())
                 .timestamp((message.getTimestamp()))
                 .senderId(sender)
-                .receiverId(message.getReceiver())
+                .chatId(sender + "-" + message.getReceiver())
                 .build());
     }
 }
