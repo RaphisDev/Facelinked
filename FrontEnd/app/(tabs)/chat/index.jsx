@@ -48,19 +48,22 @@ export default function Chats() {
     useEffect(() => {
 
         const loadChats = async () => {
-            const loadedChats = await asyncStorage.getItem("chats");
-            if (loadedChats !== null && chats.length === 0) {
-                setChats(JSON.parse(loadedChats));
+            let loadedChats = await asyncStorage.getItem("chats");
+            if (loadedChats !== null) {
+                loadedChats = JSON.parse(loadedChats);
+                if (chats.length !== loadedChats.length) {
+                    setChats(loadedChats);
+                }
             }
         }
         loadChats();
 
-        ws.messageReceived.addListener("messageReceived", () => {
+        ws.messageReceived.addListener("newMessageReceived", () => {
             loadChats();
         });
 
         return() => {
-            ws.messageReceived.removeAllListeners("messageReceived");
+            ws.messageReceived.removeAllListeners("newMessageReceived");
         }
     }, []);
 

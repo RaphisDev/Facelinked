@@ -33,7 +33,45 @@ class WebsocketController{
                         }
                     });
                 },
-                onConnect: () => {
+                onDisconnect: async () => {
+                    await asyncStorage.setItem("lastTimeDisconnected", new Date().getTime().toString());
+
+                    console.log("Is this also called when the app is closed?");
+                },
+                onConnect: async () => {
+                    const lastTimeDisconnected = await asyncStorage.getItem("lastTimeDisconnected");
+                    if (lastTimeDisconnected !== null) {
+                        const messages = await fetch(`http://${ip}:8080/messages/afterDate`, {
+                            method: "GET",
+                            body: lastTimeDisconnected,
+                            headers: {
+                                "Authorization": `Bearer ${SecureStorage.getItem("token")}`
+                            }
+                        });
+
+                        if (messages.ok) {
+                            const parsedMessages = await messages.json();
+                            parsedMessages.forEach((message) => {
+                                this.messageReceived.emit("messageReceived", { detail: { isSender: false, content: message.content, sender: message.senderId, timestamp: message.timestamp } });
+                            });
+                        }
+                    }
+                    else {
+                        const messages = await fetch(`http://${ip}:8080/messages/all`, {
+                            method: "GET",
+                            headers: {
+                                "Authorization": `Bearer ${SecureStorage.getItem("token")}`
+                            }
+                        });
+
+                        if (messages.ok) {
+                            const parsedMessages = await messages.json();
+                            parsedMessages.forEach((message) => {
+                                this.messageReceived.emit("messageReceived", { detail: { isSender: false, content: message.content, sender: message.senderId, timestamp: message.timestamp } });
+                            });
+                        }
+                    }
+
                     this.stompClient.subscribe(`/user/${SecureStorage.getItem("username")}/queue/messages`, async (message) => {
                         const parsedMessage = JSON.parse(message.body);
                         this.messageReceived.emit("messageReceived", { detail: { isSender: false, content: parsedMessage.content, sender: parsedMessage.senderId, timestamp: parsedMessage.timestamp } });
@@ -61,7 +99,7 @@ class WebsocketController{
                             }
 
                             await asyncStorage.setItem("chats", JSON.stringify([...loadedChats, { name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath }]));
-
+                            this.messageReceived.emit("newMessageReceived");
                         }
                         else {
                             //logic for adding unread symbol, dont forget to remove it when chat is opened
