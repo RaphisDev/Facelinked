@@ -1,7 +1,6 @@
 package net.orion.facelinked.chats;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import net.orion.facelinked.chats.repository.ChatRepository;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +17,10 @@ public class ChatService {
     }
 
     public List<ChatMessage> findByTimestampAfter(String timestamp, String senderId) {
-        return chatRepository.findByTimestampAfterAndSenderId(timestamp, senderId);
+        return chatRepository.findByTimestampAfterAndReceiverId(timestamp, senderId);
     }
 
     public List<ChatMessage> findBySenderId(String senderId) {
-        return chatRepository.findBySenderId(senderId);
+        return chatRepository.findByReceiverId(senderId);
     }
 }

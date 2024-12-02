@@ -162,7 +162,7 @@ export default function ChatRoom() {
             <View className="bottom-0 absolute w-full">
                 <Animated.View className="bg-gray-100 dark:bg-gray-700" style={[styles.inputContainer, { transform: [{ translateY }] }]}>
                     <View className="ml-0.5">
-                        <TextInput ref={input} onSubmitEditing={
+                        <TextInput ref={input} autoCapitalize='none' onSubmitEditing={
                             (e) => {
                                 sendMessage(e.nativeEvent.text);
                             }

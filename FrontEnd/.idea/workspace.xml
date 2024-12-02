@@ -5,14 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
-      <change afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/chats/ChatService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/chats/repository/ChatRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/notes.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/compose.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/chats/ChatMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/chats/ChatMessage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/chats/ChatService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/chats/ChatService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/chats/controller/ChatController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/chats/controller/ChatController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/chats/repository/ChatRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/chats/repository/ChatRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/chat/[receiver].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chat/[receiver].jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/chat/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chat/index.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/WebSocketProvider.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/WebSocketProvider.jsx" afterDir="false" />
     </list>
@@ -151,7 +148,8 @@
       <workItem from="1732977898004" duration="738000" />
       <workItem from="1732979345937" duration="3678000" />
       <workItem from="1733001419844" duration="16277000" />
-      <workItem from="1733069943266" duration="4179000" />
+      <workItem from="1733069943266" duration="4593000" />
+      <workItem from="1733144557967" duration="8686000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />

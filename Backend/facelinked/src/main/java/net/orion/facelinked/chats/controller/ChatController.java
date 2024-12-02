@@ -9,7 +9,7 @@ import net.orion.facelinked.chats.ChatService;
 import net.orion.facelinked.profile.Profile;
 import net.orion.facelinked.profile.repository.ProfileRepository;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -17,10 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.socket.client.WebSocketClient;
 
@@ -33,9 +30,11 @@ import java.util.Map;
 
 @Controller
 @AllArgsConstructor
-@RestController("/messages")
+@RestController
+@RequestMapping("/messages")
 public class ChatController {
 
+    private UserRepository userRepository;
     private ChatService chatService;
     private SimpMessagingTemplate template;
 
@@ -68,58 +67,32 @@ public class ChatController {
     }
 
     @GetMapping("/afterDate")
-    public void getChat(@AuthenticationPrincipal UserDetails userDetails, String date) {
+    public ResponseEntity<List<ChatMessage>> getChat(@AuthenticationPrincipal UserDetails userDetails, @RequestParam String date) {
 
         if (userDetails == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
         String sender = userDetails.getUsername();
+        var senderId = userRepository.findByEmail(sender).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        if (sender == null) {
+        if (senderId == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-
-        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss 'GMT'Z");
-        Date dateObj = null;
-        try {
-            dateObj = formatter.parse(date);
-        } catch (ParseException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
-        var chatMessageList = chatService.findByTimestampAfter(dateObj.toString(), sender);
-
-        for (ChatMessage chatMessage : chatMessageList) {
-            template.convertAndSendToUser(chatMessage.getReceiverId(), "/queue/messages",
-                    ChatMessage.builder()
-                    .content(chatMessage.getContent())
-                    .timestamp(chatMessage.getTimestamp())
-                    .senderId(chatMessage.getSenderId())
-                    .build());
-        }
+        return ResponseEntity.ok(chatService.findByTimestampAfter(date, senderId.getUserName()));
     }
 
     @GetMapping("/all")
-    public void getAllChat(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<List<ChatMessage>> getAllChat(@AuthenticationPrincipal UserDetails userDetails) {
 
         if (userDetails == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
         String sender = userDetails.getUsername();
+        var senderId = userRepository.findByEmail(sender).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        if (sender == null) {
+        if (senderId == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-
-        var chatMessageList = chatService.findBySenderId(sender);
-
-        for (ChatMessage chatMessage : chatMessageList) {
-            template.convertAndSendToUser(chatMessage.getReceiverId(), "/queue/messages",
-                    ChatMessage.builder()
-                    .content(chatMessage.getContent())
-                    .timestamp(chatMessage.getTimestamp())
-                    .senderId(chatMessage.getSenderId())
-                    .build());
-        }
+        return ResponseEntity.ok(chatService.findBySenderId(senderId.getUserName()));
     }
 }

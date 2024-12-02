@@ -24,6 +24,10 @@ export default function Chats() {
     async function addChat(username) {
         input.current.clear();
 
+        if (chats.find((chat) => chat.username === username)) {
+            return;
+        }
+
         const ip = Platform.OS === "android" ? "10.0.2.2" : "192.168.0.178";
         const profile = await fetch(`http://${ip}:8080/profile/${username}`, {
             method: "GET",
@@ -35,9 +39,6 @@ export default function Chats() {
             return;
         }
         const profileJson = await profile.json();
-        if (chats.find((chat) => chat.username === profileJson.username)) {
-            return;
-        }
 
         setChats([...chats, { name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath }]);
         await asyncStorage.setItem("chats", JSON.stringify([...chats, { name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath }]));
