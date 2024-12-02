@@ -14,10 +14,8 @@ Object.assign(global, { WebSocket });
 
 export default function Chats() {
 
-    //Todo: chats start left not middle
-    //Todo: is there a way to display the last message in the chat?
+    //Todo: do i need to display the last message?
     //Todo: new messages on top of chat list?
-    //Todo: add chats from new sender and unread symbol in websocket provider, not here
     const [chats, setChats] = useState([]);
     const input = useRef(null);
 
@@ -69,11 +67,13 @@ export default function Chats() {
     }, []);
 
     return (
-        <View className="h-full w-full bg-primary dark:bg-dark-primary mt-4">
-            <TextInput ref={input} placeholder="Add chat" autoCapitalize="none" className="rounded-xl p-2 w-3/4 mx-auto mb-4 border-4 border-accent" onSubmitEditing={(e) => {
+        <View className="h-full w-full bg-primary dark:bg-dark-primary">
+            <TextInput ref={input} placeholder="Enter username to add a chat" autoCapitalize="none" className="rounded-xl mt-4 p-2 w-3/4 bg-primary dark:bg-dark-primary dark:text-dark-text text-text mx-auto mb-4 border-4 border-accent" onSubmitEditing={(e) => {
                 addChat(e.nativeEvent.text);
             }}/>
-            <FlatList columnWrapperStyle={{flex: 1, justifyContent: "space-around"}} numColumns={3} data={chats} renderItem={({ item }) => <Chat {...item} />}/>
+            <FlatList columnWrapperStyle={{ justifyContent: 'flex-start', gap: 8, marginLeft: 8 }}
+                      contentContainerStyle={{ gap: 10 }}
+                       numColumns={3} data={chats} renderItem={({ item }) => <Chat {...item} />}/>
         </View>
     )
 }

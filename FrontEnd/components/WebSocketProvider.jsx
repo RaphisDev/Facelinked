@@ -14,7 +14,6 @@ const ip = Platform.OS === "android" ? "10.0.2.2" : "192.168.0.178";
 class WebsocketController{
 
     //Todo: add chats and unread symbol here also make the color of (1) to accent color
-    //Todo: when completely closing the app, the last time disconnected is not set, but maybe the old time is enough, but add duplicate filter
 
     stompClient = null;
     messageReceived = new EventEmitter();
@@ -36,6 +35,10 @@ class WebsocketController{
                 },
                 onWebSocketError: () => {
                     alert("Network error. Please check your internet connection.");
+                    if (this.stompClient.connected) {
+                        this.stompClient.deactivate();
+                        webSocketInstance = null;
+                    }
                 },
                 onConnect: async () => {
                     AppState.addEventListener("change", this.handleAppStateChange);
@@ -163,7 +166,7 @@ class WebsocketController{
     }
 
     async handleAppStateChange() {
-        if (AppState.currentState === "background") {
+        if (AppState.currentState === "background" && this.stompClient.connected) {
             await asyncStorage.setItem("lastTimeDisconnected", new Date().toString());
         }
     }

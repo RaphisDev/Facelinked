@@ -12,7 +12,7 @@ export default function Chat(props) {
     //navigate instead of push more often
     return (
         <TouchableOpacity activeOpacity={0.9} onPress={() => router.navigate(`/chat/${props.username}`)}>
-            <View className="rounded-xl" style={{backgroundColor: "#6C757D", width: 120, marginBottom: 20, height: 150}}>
+            <View className="rounded-xl" style={{backgroundColor: "#6C757D", width: 120, height: 150}}>
                 <View className="p-7 h-full">
                     <Image source={{uri: props.image}}
                            style={{width: 75,

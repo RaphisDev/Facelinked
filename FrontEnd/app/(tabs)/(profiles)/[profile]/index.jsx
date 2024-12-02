@@ -16,7 +16,16 @@ export default function Profile() {
     const navigation = useNavigation();
     let {username} = useLocalSearchParams();
 
-    const [profileInfos, setProfileInfos] = useState({});
+    const [profileInfos, setProfileInfos] = useState({
+        name: "Loading...",
+        score: 0,
+        location: "Loading...",
+        hobbies: "Loading...",
+        inRelationship: false,
+        partner: "Loading...",
+        profilePicturePath: "",
+        dateOfBirth: new Date()
+    });
 
     async function fetchData() {
         try {
@@ -66,7 +75,7 @@ export default function Profile() {
                             <Ionicons size={14} name={"aperture"}/>
                             <Text className="font-bold text-lg text-center text-text dark:text-dark-text"> {profileInfos.score}</Text>
                         </View>
-                        <FlatList data={[
+                        <FlatList scrollEnabled={false} data={[
                             {id: "age", value: `${profileInfos.name?.split(" ")[0]}, ${calculateAge(new Date(profileInfos?.dateOfBirth))}`},
                             {id: "location", value: profileInfos.location},
                             {id: "hobbies", value: profileInfos.hobbies},
