@@ -20,7 +20,8 @@ export default function Index() {
             } else {
                 router.replace("/register");
             }
-    })}, []);
+       })
+    }, []);
 
     return (
         <>

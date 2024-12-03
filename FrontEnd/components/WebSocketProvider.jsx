@@ -50,6 +50,10 @@ class WebsocketController{
                     }
                     const displayChats = async (parsedMessage, loadedChats) => {
 
+                        if (parsedMessage.senderId === username) {
+                            return;
+                        }
+
                         if (loadedChats.find((chat) => chat.username !== parsedMessage.senderId) || loadedChats.length === 0) {
 
                             const profile = await fetch(`http://${ip}:8080/profile/${parsedMessage.senderId}`, {
@@ -72,6 +76,7 @@ class WebsocketController{
                             //logic for adding unread symbol, dont forget to remove it when chat is opened
                         }
                     }
+                    const username = SecureStorage.getItem("username");
                     const saveChats = async (message) => {
                         let loadedMessages = await asyncStorage.getItem(`messages/${message.senderId}`) || [];
                         if (loadedMessages.length !== 0) {
@@ -82,7 +87,7 @@ class WebsocketController{
                             return;
                         }
                         await asyncStorage.setItem(`messages/${message.senderId}`, JSON.stringify([...loadedMessages, {
-                            isSender: false,
+                            isSender: username === message.senderId,
                             content: message.content,
                             timestamp: message.timestamp
                         }]));

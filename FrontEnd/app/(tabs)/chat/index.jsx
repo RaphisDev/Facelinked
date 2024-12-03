@@ -1,5 +1,5 @@
 import "../../../global.css"
-import {FlatList, Platform, TextInput, View} from "react-native";
+import {FlatList, Platform, TextInput, TouchableOpacity, View} from "react-native";
 import {useEffect, useRef, useState} from "react";
 import * as SecureStorage from "expo-secure-store";
 import * as StompJs from "@stomp/stompjs";
@@ -7,6 +7,8 @@ import {TextEncoder} from 'text-encoding';
 import Chat from "../../../components/Entries/Chat";
 import WebSocketProvider from "../../../components/WebSocketProvider";
 import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import {useNavigation} from "expo-router";
 
 global.TextEncoder = TextEncoder;
 
@@ -17,10 +19,14 @@ export default function Chats() {
     //Todo: do i need to display the last message?
     //Todo: new messages on top of chat list?
     const [chats, setChats] = useState([]);
+    const [showInput, setShowInput] = useState(false);
     const input = useRef(null);
+
+    const navigation = useNavigation("../../");
 
     async function addChat(username) {
         input.current.clear();
+        handleAddBar();
 
         if (chats.find((chat) => chat.username === username)) {
             return;
@@ -44,7 +50,14 @@ export default function Chats() {
 
     const ws = new WebSocketProvider();
 
+    function handleAddBar() {
+        setShowInput(shown => !shown);
+    }
+
     useEffect(() => {
+        navigation.setOptions({
+            headerRight: () => <TouchableOpacity onPress={() => handleAddBar()} className="mr-3"><Ionicons name="add" size={25}/></TouchableOpacity>,
+        })
 
         const loadChats = async () => {
             let loadedChats = await asyncStorage.getItem("chats");
@@ -68,11 +81,11 @@ export default function Chats() {
 
     return (
         <View className="h-full w-full bg-primary dark:bg-dark-primary">
-            <TextInput ref={input} placeholder="Enter username to add a chat" autoCapitalize="none" className="rounded-xl mt-4 p-2 w-3/4 bg-primary dark:bg-dark-primary dark:text-dark-text text-text mx-auto mb-4 border-4 border-accent" onSubmitEditing={(e) => {
+            <TextInput ref={input} style={{display: !showInput ? "none" : "flex"}} placeholder="Enter username to add a chat" autoCapitalize="none" className="rounded-xl mt-4 p-2 w-3/4 hidden bg-primary dark:bg-dark-primary dark:text-dark-text text-text mx-auto mb-4 border-4 border-accent" onSubmitEditing={(e) => {
                 addChat(e.nativeEvent.text);
             }}/>
             <FlatList columnWrapperStyle={{ justifyContent: 'flex-start', gap: 8, marginLeft: 8 }}
-                      contentContainerStyle={{ gap: 10 }}
+                      contentContainerStyle={{ gap: 10 }} style={{ marginTop: 20}}
                        numColumns={3} data={chats} renderItem={({ item }) => <Chat {...item} />}/>
         </View>
     )

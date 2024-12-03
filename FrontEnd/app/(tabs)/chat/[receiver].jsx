@@ -27,7 +27,6 @@ export default function ChatRoom() {
     const message = useRef("");
     const input = useRef(null);
     const [messages, addMessage] = useState([]);
-    const connected = useRef(false);
     const messageList = useRef(null);
 
     const navigation = useNavigation("../../");
@@ -35,15 +34,9 @@ export default function ChatRoom() {
     const ws = new WebSocketProvider();
 
     useEffect(() => {
-        if (connected.current) {
-            return;
-        }
-
         navigation.setOptions({
             headerTitle: receiver
         });
-
-        connected.current = true;
 
         const loadMessages = async () => {
             const loadedMessages = await asyncStorage.getItem(`messages/${receiver}`);
@@ -64,7 +57,6 @@ export default function ChatRoom() {
             if (loadedMessages.length !== 0) {loadedMessages = JSON.parse(loadedMessages);}
             await asyncStorage.setItem(`messages/${receiver}`, JSON.stringify([...loadedMessages, e.detail]));
         });
-        //load messsages from server in chat page
 
         return () => {
             ws.messageReceived.removeAllListeners("messageReceived");

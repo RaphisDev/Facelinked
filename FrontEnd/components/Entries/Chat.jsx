@@ -4,11 +4,11 @@ import {useRouter} from "expo-router";
 import * as StompJs from "@stomp/stompjs";
 import * as SecureStorage from "expo-secure-store";
 import {useEffect} from "react";
+import "../../global.css";
 
 export default function Chat(props) {
     const router = useRouter();
 
-    //Text oben, Bild darunter - oder andersrum?
     //navigate instead of push more often
     return (
         <TouchableOpacity activeOpacity={0.9} onPress={() => router.navigate(`/chat/${props.username}`)}>

@@ -1,8 +1,8 @@
-import "../../../global.css"
+import "../../../../global.css"
 import {FlatList, Text, View} from "react-native";
-import Network from "../../../components/Entries/Network";
+import Network from "../../../../components/Entries/Network";
 
-export default function Networks() {
+export default function index() {
     return (
         <View className="w-full h-full bg-primary dark:bg-dark-primary">
             <FlatList contentContainerStyle={{gap: 7}} style={{marginTop: 20, marginLeft: 15, marginRight: 15}} data={[

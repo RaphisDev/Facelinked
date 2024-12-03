@@ -10,5 +10,5 @@ import java.util.List;
 public interface ChatRepository extends MongoRepository<ChatMessage, String> {
 
     public List<ChatMessage> findByTimestampAfterAndReceiverId(String timestamp, String receiverId);
-    public List<ChatMessage> findByReceiverId(String receiverId);
+    public List<ChatMessage> findByReceiverIdOrSenderId(String receiverId, String senderId);
 }

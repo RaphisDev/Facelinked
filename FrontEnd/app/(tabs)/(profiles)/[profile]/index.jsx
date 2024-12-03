@@ -1,20 +1,22 @@
-import {FlatList, Platform, Pressable, Text, TouchableOpacity, View} from "react-native";
+import {FlatList, Keyboard, Platform, Pressable, Text, TextInput, TouchableOpacity, View} from "react-native";
 import "../../../../global.css"
-import {router, useLocalSearchParams, useNavigation} from "expo-router";
+import {router, useLocalSearchParams, useNavigation, useRouter} from "expo-router";
 import {Image} from "expo-image";
-import {useEffect, useLayoutEffect, useState} from "react";
+import {useEffect, useLayoutEffect, useRef, useState} from "react";
 import * as SecureStore from "expo-secure-store";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function Profile() {
 
 
-    //Seite persoenlicher machen wie in Notion beschrieben anstatt nur die Daten anzuzeigen
-    //Like Bio/Description, Hobbies/Interests, things in Design Image + on BlockBlatt, Posts, later friends, etc.
-    // Bullet point icon: • Use or dont use???
-    //Do icon instead of score text
+    //Posts
+    //Pressing on tab icon goes back to your profile or swiping right
     const navigation = useNavigation();
-    let {username} = useLocalSearchParams();
+    let {profile} = useLocalSearchParams();
+    const router = useRouter();
+
+    const [showInput, setShowInput] = useState(false);
+    const input = useRef(null);
 
     const [profileInfos, setProfileInfos] = useState({
         name: "Loading...",
@@ -29,11 +31,11 @@ export default function Profile() {
 
     async function fetchData() {
         try {
-            if(username === undefined) {
-                username = await SecureStore.getItemAsync('username');
+            if(profile === undefined) {
+                profile = await SecureStore.getItemAsync('username');
             }
             const ip = Platform.OS === 'android' ? '10.0.2.2' : '192.168.0.178';
-            const data = await fetch(`http://${ip}:8080/profile/${username}`, {
+            const data = await fetch(`http://${ip}:8080/profile/${profile}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Bearer ' + await SecureStore.getItemAsync('token'),
@@ -55,19 +57,31 @@ export default function Profile() {
         return Math.abs(ageDate.getUTCFullYear() - 1970);
     }
 
+    function handleAddBar() {
+        setShowInput(shown => !shown);
+    }
+
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerTitle: username ? username : "Profile",
+            headerRight: () => <TouchableOpacity onPress={handleAddBar}><Ionicons name="search" size={25}/></TouchableOpacity>,
         });
     }, [navigation]);
 
     useEffect( () => {
+        navigation.setOptions({
+            headerTitle: profile ? profile : "Profile",
+        });
         fetchData();
     }, []);
 
     return (
         <>
             <View className="bg-primary dark:bg-dark-primary w-full h-full">
+                <TextInput ref={input} style={{display: !showInput ? "none" : "flex"}} placeholder="Type in an username" autoCapitalize="none" className="rounded-xl mt-4 p-2 w-3/4 hidden bg-primary dark:bg-dark-primary dark:text-dark-text text-text mx-auto mb-4 border-4 border-accent" onSubmitEditing={(e) => {
+                    router.replace(`/${e.nativeEvent.text}`);
+                    input.current.clear();
+                    handleAddBar();
+                }}/>
                 <Text className="text-text dark:text-dark-text text-center font-bold mt-7 text-4xl">{profileInfos.name}</Text>
                 <View className="justify-between flex-row mt-10">
                     <View className="ml-3 overflow-hidden">

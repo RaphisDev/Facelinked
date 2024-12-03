@@ -21,6 +21,6 @@ public class ChatService {
     }
 
     public List<ChatMessage> findBySenderId(String senderId) {
-        return chatRepository.findByReceiverId(senderId);
+        return chatRepository.findByReceiverIdOrSenderId(senderId, senderId);
     }
 }
