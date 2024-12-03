@@ -1,14 +1,22 @@
-import {Stack, Tabs, useNavigation, useRouter} from "expo-router";
+import {Stack, Tabs, useGlobalSearchParams, useLocalSearchParams, useNavigation, useRouter} from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {TouchableOpacity} from "react-native";
+import * as SecureStore from "expo-secure-store";
 
 
 export default function TabsLayout() {
     const router = useRouter();
+    const route = useGlobalSearchParams();
 
     return (
         <>
-            <Tabs screenOptions={{tabBarShowLabel: false}}>
+            <Tabs screenOptions={{tabBarShowLabel: false}} screenListeners={{tabPress:
+                (e) => {
+                    if (e.target?.split("-")[0] === "(profiles)" && route?.profile !== SecureStore.getItem("username") && route?.profile !== undefined) {
+                        router.replace(`/${SecureStore.getItem("username")}`);
+                    }
+                }
+            }}>
                 <Tabs.Screen name="home" options={{headerTitle: "Home",
                     headerTitleAlign: "center",
                     tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "home-sharp" : "home-outline"} size={30}/>,

@@ -68,8 +68,10 @@ export default function Profile() {
     }, [navigation]);
 
     useEffect( () => {
+        if(!profile){ profile = SecureStore.getItem("username");}
+
         navigation.setOptions({
-            headerTitle: profile ? profile : "Profile",
+            headerTitle: profile !== SecureStore.getItem("username") ? profile : "Profile",
         });
         fetchData();
     }, []);
