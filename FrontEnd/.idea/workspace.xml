@@ -6,8 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
       <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile]/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile]/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile]/posts.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/_layout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/_layout.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/_layout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/_layout.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/notes.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/chat/[receiver].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chat/[receiver].jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/WebSocketProvider.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/WebSocketProvider.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -150,7 +153,8 @@
       <workItem from="1733144557967" duration="9316000" />
       <workItem from="1733174460299" duration="2243000" />
       <workItem from="1733241848661" duration="13824000" />
-      <workItem from="1733262261714" duration="1635000" />
+      <workItem from="1733262261714" duration="1696000" />
+      <workItem from="1733319027805" duration="5956000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />

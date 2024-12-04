@@ -9,7 +9,7 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import {useLocalSearchParams, useNavigation} from "expo-router";
+import {router, useLocalSearchParams, useNavigation} from "expo-router";
 import Message from "../../../components/Entries/Message";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import StompJs from "@stomp/stompjs";
@@ -35,7 +35,20 @@ export default function ChatRoom() {
 
     useEffect(() => {
         navigation.setOptions({
-            headerTitle: receiver
+            headerTitle: receiver,
+            headerLeft: () => (
+                <TouchableOpacity className="ml-2.5" onPress={() => {
+                    router.push("/chat");
+                    navigation.setOptions({
+                        headerTitle: "Chats",
+                        headerLeft: () => (
+                            <></>)
+                    });
+                    ws.messageReceived.removeAllListeners("messageReceived");
+                }}>
+                    <Ionicons name={"arrow-back"} size={24}></Ionicons>
+                </TouchableOpacity>
+            ),
         });
 
         const loadMessages = async () => {
@@ -61,7 +74,9 @@ export default function ChatRoom() {
         return () => {
             ws.messageReceived.removeAllListeners("messageReceived");
             navigation.setOptions({
-                headerTitle: "Chats"
+                headerTitle: "Chats",
+                headerLeft: () => (
+                    <></>)
             });
         }
     }, []);
@@ -120,6 +135,22 @@ export default function ChatRoom() {
             });
 
             addMessage((prevMessages) => [...prevMessages, {isSender: true, content: message, timestamp: new Date().toString()}]);
+
+            let loadedChats = await asyncStorage.getItem("chats") || [];
+            if (loadedChats.length !== 0) {loadedChats = JSON.parse(loadedChats);}
+            if(loadedChats.find((chat) => chat.username !== receiver) || loadedChats.length === 0) {
+                const ip = Platform.OS === "android" ? "10.0.2.2" : "192.168.0.178";
+                const profile = await fetch(`http://${ip}:8080/profile/${receiver}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${SecureStorage.getItem("token")}`
+                    }
+                });
+                if (profile.ok) {
+                    const profileJson = await profile.json();
+                    await asyncStorage.setItem("chats", JSON.stringify([...loadedChats, { name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath }]));
+                }
+            }
 
             let loadedMessages = await asyncStorage.getItem(`messages/${receiver}`) || [];
             if (loadedMessages.length !== 0) {loadedMessages = JSON.parse(loadedMessages);}

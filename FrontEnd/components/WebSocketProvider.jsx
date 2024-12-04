@@ -35,7 +35,7 @@ class WebsocketController{
                 },
                 onWebSocketError: () => {
                     alert("Network error. Please check your internet connection.");
-                    if (this.stompClient.connected) {
+                    if (!this.stompClient.connected) {
                         this.stompClient.deactivate();
                         webSocketInstance = null;
                     }

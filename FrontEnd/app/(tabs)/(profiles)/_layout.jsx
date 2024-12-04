@@ -9,7 +9,6 @@ export default function ProfileLayout() {
                 <Stack.Screen name="[profile]/index" options={{headerTitleAlign: "center",
                     headerLeft: () => <TouchableOpacity><Ionicons name="settings-outline" size={25}/></TouchableOpacity>,
                 }}/>
-                <Stack.Screen name="[profile]/posts" options={{headerShown: true, headerTitle: "Posts",}}/>
             </Stack>
         </>
     );

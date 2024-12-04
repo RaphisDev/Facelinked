@@ -105,6 +105,14 @@ export default function Profile() {
                                alt="Profile picture" source={{uri: profileInfos.profilePicturePath}}/>
                     </View>
                 </View>
+                    <View className="flex-row justify-center mt-5" style={{display: profile === SecureStore.getItem("username") || profile === undefined ? "none" : "flex"}}>
+                    <TouchableOpacity onPress={() => router.push(`/chat/${profile}`)} activeOpacity={0.6} className="mr-16 border-accent border-4 rounded-xl p-2">
+                        <Text>Message</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity activeOpacity={0.6} className="border-accent border-4 rounded-xl p-2">
+                      <Text>Add friend</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </>
     );
