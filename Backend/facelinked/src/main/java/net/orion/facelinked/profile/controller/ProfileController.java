@@ -25,7 +25,6 @@ public class ProfileController {
     private final UserRepository userRepository;
     private final StorageService storageService;
 
-    //Make Get with GraphQL
     @ResponseStatus(HttpStatus.FOUND)
     @GetMapping("/{username}")
     private ResponseEntity<Profile> GetProfile(@PathVariable String username) {
@@ -36,7 +35,6 @@ public class ProfileController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
     }
-    //Make Put/Update with GraphQL
 
     //To-Do: Also delete User
     @ResponseStatus(HttpStatus.ACCEPTED)
