@@ -1,32 +1,57 @@
 import "../../../global.css"
-import {FlatList, Text, View} from "react-native";
+import {FlatList, Text, TextInput, TouchableOpacity, View} from "react-native";
 import Network from "../../../components/Entries/Network";
+import {useEffect, useRef, useState} from "react";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {useRouter} from "expo-router";
 
 export default function Networks() {
+
+    const [selected, setSelected] = useState(0);
+    const [favoriteNetworks, setNetworks] = useState([]);
+
+    //reload networks when created network
+
+    useEffect(() => {
+        const loadNetworks = async () => {
+            let networks = await AsyncStorage.getItem("networks") || [];
+            if (networks.length !== 0) {
+               setNetworks(JSON.parse(networks));
+            }
+        }
+        loadNetworks();
+    }, [selected]);
+
+    const currentTab = () => {
+        switch (selected) {
+            case 0:
+                return <>
+                    <FlatList contentContainerStyle={{gap: 7}} style={{paddingTop: 15, marginLeft: 15, marginRight: 15}} data={favoriteNetworks}
+                              renderItem={(items) => <Network id={items.item.networkId} network={items.item.name} description={items.item.description} creator={items.item.creator} isPrivate={items.item.private}/>}/>
+                </>;
+            case 1:
+                return <></>;
+            case 2:
+                return <></>;
+        }
+    }
     return (
         <View className="w-full h-full bg-primary dark:bg-dark-primary">
-            <FlatList contentContainerStyle={{gap: 7}} style={{marginTop: 20, marginLeft: 15, marginRight: 15}} data={[
-                {network: "Network 1", networkId: 1},
-                {network: "Network 2", networkId: 2},
-                {network: "Network 3", networkId: 3},
-                {network: "Network 4", networkId: 4},
-                {network: "Network 5", networkId: 5},
-                {network: "Network 6", networkId: 6},
-                {network: "Network 7", networkId: 7},
-                {network: "Network 8", networkId: 8},
-                {network: "Network 9", networkId: 9},
-                {network: "Network 10", networkId: 10},
-                {network: "Network 11", networkId: 11},
-                {network: "Network 12", networkId: 12},
-                {network: "Network 13", networkId: 13},
-                {network: "Network 14", networkId: 14},
-                {network: "Network 15", networkId: 15},
-                {network: "Network 16", networkId: 16},
-                {network: "Network 17", networkId: 17},
-                {network: "Network 18", networkId: 18},
-                {network: "Network 19", networkId: 19},
-                {network: "Network 20", networkId: 20},
-            ]} renderItem={() => <Network/>}/>
+            <View className="flex flex-row justify-around items-center">
+                <TouchableOpacity activeOpacity={1} onPress={() => setSelected(0)}>
+                    <Ionicons className="mt-3 ml-3" name="heart" style={{color: selected !== 0 ? "rgba(76,76,76,0.76)" : "#000000"}} size={selected !== 0 ? 22 : 24} color="black"/>
+                </TouchableOpacity>
+                <View className="flex-1 ml-3 flex-row justify-around">
+                    <TouchableOpacity activeOpacity={1} onPress={() => setSelected(1)}>
+                        <Text style={{color: selected !== 1 ? "rgba(76,76,76,0.76)" : "#000000", fontSize: selected !== 1 ? 22 : 24}} className="text-text mt-3 dark:text-dark-text font-extrabold">Friends</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity activeOpacity={1} onPress={() => setSelected(2)}>
+                        <Text style={{color: selected !== 2 ? "rgba(76,76,76,0.76)" : "#000000", fontSize: selected !== 2 ? 22 : 24}} className="text-text mt-3 dark:text-dark-text font-extrabold">Explore</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+            {currentTab()}
         </View>
     )
 }

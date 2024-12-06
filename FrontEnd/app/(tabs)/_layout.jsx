@@ -1,6 +1,6 @@
 import {Stack, Tabs, useGlobalSearchParams, useLocalSearchParams, useNavigation, useRouter} from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import {TouchableOpacity} from "react-native";
+import {Text, TouchableOpacity} from "react-native";
 import * as SecureStore from "expo-secure-store";
 
 
@@ -17,7 +17,7 @@ export default function TabsLayout() {
                     }
                 }
             }}>
-                <Tabs.Screen name="home" options={{headerTitle: "Home",
+                <Tabs.Screen name="home/index" options={{headerTitle: () => <Text className="font-courier text-xl">FaceLinked</Text>,
                     headerTitleAlign: "center",
                     tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "home-sharp" : "home-outline"} size={30}/>,
                 }}/>

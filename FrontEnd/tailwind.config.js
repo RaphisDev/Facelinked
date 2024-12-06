@@ -4,6 +4,9 @@ module.exports = {
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
+      fontFamily: {
+        courier: ["courier", "monospace"],
+      },
       colors: {
         primary: "#f4f4f4",
         accent: "#285FF5",

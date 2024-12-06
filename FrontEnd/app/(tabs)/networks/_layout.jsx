@@ -8,8 +8,7 @@ export default function NetworksLayout() {
                 }}/>
                 <Stack.Screen name="create" options={{headerShown: false,
                 }}/>
-                <Stack.Screen name="(topics)/explore" options={{headerShown: false,
-                }}/>
+                <Stack.Screen name="[Network]" options={{headerShown: false,}}/>
             </Stack>
         </>
     );

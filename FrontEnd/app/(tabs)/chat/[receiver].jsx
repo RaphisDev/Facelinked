@@ -21,7 +21,7 @@ import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncSto
 export default function ChatRoom() {
 
     //Todo: encrypt localStorage with key thats stored in secure storage
-    //Flatlist view not adapted when keyboard is active
+    //Flatlist view not adapted view when keyboard is active
 
     const {receiver} = useLocalSearchParams();
     const message = useRef("");

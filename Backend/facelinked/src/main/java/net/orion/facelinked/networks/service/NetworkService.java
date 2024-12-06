@@ -12,7 +12,15 @@ public class NetworkService {
 
     private NetworkRepository networkRepository;
 
-    public void createNetwork(Network network) {
-        networkRepository.save(network);
+    public Long createNetwork(Network network) {
+       return networkRepository.save(network).getId();
+    }
+
+    public boolean isPrivate(String networkId) {
+        return networkRepository.findById(Long.parseLong(networkId)).isPrivate();
+    }
+
+    public boolean isMemberOfNetwork(String networkId, String memberId) {
+        return networkRepository.findById(Long.parseLong(networkId)).getMembers().stream().anyMatch(member -> member.getMemberId().equals(memberId));
     }
 }
