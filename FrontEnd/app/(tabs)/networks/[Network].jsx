@@ -13,9 +13,7 @@ import {
     View
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import Message from "../../../components/Entries/Message";
 import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
-import * as SecureStorage from "expo-secure-store";
 import WebSocketProvider from "../../../components/WebSocketProvider";
 import NetworkMessage from "../../../components/Entries/NetworkMessage";
 
@@ -40,6 +38,7 @@ export default function Network() {
 
         navigator.setOptions({
             headerLeft: () => <TouchableOpacity className="ml-2" onPress={() => router.back()}><Ionicons name="arrow-back" size={24} color="black"/></TouchableOpacity>,
+            headerRight: () => <TouchableOpacity className="mr-2" onPress={() => alert("open Modal and add 3 full rounded buttons in a row with icons. Below list all user")}><Ionicons name="people" size={24} color="black"/></TouchableOpacity>,
             headerTitle: name,
         });
 
@@ -47,9 +46,29 @@ export default function Network() {
             const loadedMessages = await asyncStorage.getItem(`networks/${Network}`) || null;
             if (loadedMessages !== null) {
                 addMessage(JSON.parse(loadedMessages));
+
+                if (messageList.current !== null) {
+                    messageList.current.scrollToEnd();
+                }
             }
         }
         loadMessages();
+
+        const loadNetworks = async () => {
+            const loadedNetworks = await asyncStorage.getItem("networks") || null;
+            if (loadedNetworks !== null) {
+                const parsedNetworks = JSON.parse(loadedNetworks);
+                if (!parsedNetworks.find((network) => Number.parseInt(network.networkId) === Number.parseInt(Network))) {
+                    if (ws.stompClient.connected) {
+                        ws.stompClient.subscribe(`/networks/${Network}`, async (message) => {
+                            const parsedMessage = JSON.parse(message.body);
+                            alert(parsedMessage.content);
+                        });
+                    }
+                }
+            }
+        }
+        loadNetworks();
 
         ws.messageReceived.addListener("networkMessageReceived", async (e) => {
             if (e.detail.networkId !== Network) {
@@ -68,6 +87,9 @@ export default function Network() {
                 headerLeft: () => <TouchableOpacity className="ml-2 mb-1" onPress={() => router.navigate("/networks/create")}>
                     <Ionicons name="add" size={25}/>
                 </TouchableOpacity>,
+                headerRight: () => <TouchableOpacity>
+                    <Ionicons className="mr-4 mb-1" name="search" size={25}/>
+                </TouchableOpacity>,
                 headerTitle: "Networks",
             });
             ws.messageReceived.removeAllListeners("messageReceived");
@@ -83,7 +105,7 @@ export default function Network() {
 
         try {
             ws.stompClient.publish({
-                destination: `/app/networks`,
+                destination: `/app/networks/send`,
                 body: JSON.stringify({
                     receiver: Network,
                     content: message,
@@ -93,13 +115,14 @@ export default function Network() {
 
             addMessage((prevMessages) => [...prevMessages, {isSender: true, content: message, timestamp: new Date().toString()}]);
 
+            /*
             let loadedMessages = await asyncStorage.getItem(`networks/${Network}`) || [];
             if (loadedMessages.length !== 0) {loadedMessages = JSON.parse(loadedMessages);}
             await asyncStorage.setItem(`networks/${Network}`, JSON.stringify([...loadedMessages, {
                 isSender: true,
                 content: message,
                 timestamp: new Date().toString()
-            }]));
+            }]));*/
         }
         catch (e) {
             console.error(e);
@@ -164,7 +187,7 @@ export default function Network() {
                             (e) => {
                                 sendMessage(e.nativeEvent.text);
                             }
-                        } className="bg-white dark:bg-dark-primary/50 w-fit mr-16 dark:text-dark-text text-text border-gray-700/80 active:bg-gray-600/10 rounded-lg border-4 font-medium text-lg p-0.5 pl-2.5" placeholder="Type a message" onChangeText={(text) => message.current = text}></TextInput>
+                        } className="bg-white dark:bg-dark-primary/50 w-fit mr-16 dark:text-dark-text text-text border-gray-700/80 active:bg-gray-600/10 rounded-lg border-4 font-medium h-10 p-0.5 pl-2.5" placeholder="Type a message" onChangeText={(text) => message.current = text}></TextInput>
                         <TouchableOpacity className="absolute right-0 bottom-0 m-1.5 mr-5" activeOpacity={0.7} onPress={() => sendMessage(message.current)}>
                             <Ionicons name={"send"} size={24}></Ionicons>
                         </TouchableOpacity>

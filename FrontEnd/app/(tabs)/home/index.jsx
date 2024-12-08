@@ -12,11 +12,11 @@ export default function Index() {
         <View className="w-full h-full bg-primary dark:bg-dark-primary">
             <View className="flex flex-row justify-around items-center">
                 <View className="flex-1 flex-row justify-around">
-                    <TouchableOpacity activeOpacity={1} onPress={() => setSelected(1)}>
-                        <Text style={{color: selected !== 1 ? "rgba(76,76,76,0.76)" : "#000000", fontSize: selected !== 1 ? 22 : 24}} className="text-text mt-3 dark:text-dark-text font-extrabold">Friends</Text>
+                    <TouchableOpacity activeOpacity={1} onPress={() => setSelected(0)}>
+                        <Text style={{color: selected !== 0 ? "rgba(76,76,76,0.76)" : "#000000", fontSize: selected !== 0 ? 22 : 24}} className="text-text mt-3 dark:text-dark-text font-extrabold">Friends</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity activeOpacity={1} onPress={() => setSelected(2)}>
-                        <Text style={{color: selected !== 2 ? "rgba(76,76,76,0.76)" : "#000000", fontSize: selected !== 2 ? 22 : 24}} className="text-text mt-3 dark:text-dark-text font-extrabold">Explore</Text>
+                    <TouchableOpacity activeOpacity={1} onPress={() => setSelected(1)}>
+                        <Text style={{color: selected !== 1 ? "rgba(76,76,76,0.76)" : "#000000", fontSize: selected !== 1 ? 22 : 24}} className="text-text mt-3 dark:text-dark-text font-extrabold">Explore</Text>
                     </TouchableOpacity>
                 </View>
             </View>

@@ -4,24 +4,25 @@ import Network from "../../../components/Entries/Network";
 import {useEffect, useRef, useState} from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {useRouter} from "expo-router";
+import {useLocalSearchParams, useRouter} from "expo-router";
 
 export default function Networks() {
 
     const [selected, setSelected] = useState(0);
     const [favoriteNetworks, setNetworks] = useState([]);
 
-    //reload networks when created network
-
     useEffect(() => {
-        const loadNetworks = async () => {
-            let networks = await AsyncStorage.getItem("networks") || [];
-            if (networks.length !== 0) {
-               setNetworks(JSON.parse(networks));
+        if (selected === 0) {
+            const loadNetworks = async () => {
+                let networks = await AsyncStorage.getItem("networks") || [];
+                if (networks.length !== 0 && networks.length !== favoriteNetworks.length) {
+                    setNetworks(JSON.parse(networks));
+                }
             }
+            loadNetworks();
         }
-        loadNetworks();
-    }, [selected]);
+    });
+
 
     const currentTab = () => {
         switch (selected) {

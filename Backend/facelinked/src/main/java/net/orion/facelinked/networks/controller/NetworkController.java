@@ -3,7 +3,6 @@ package net.orion.facelinked.networks.controller;
 import lombok.AllArgsConstructor;
 import net.orion.facelinked.auth.repository.UserRepository;
 import net.orion.facelinked.chats.ChatMessage;
-import net.orion.facelinked.chats.controller.ChatController;
 import net.orion.facelinked.chats.controller.MessageRequest;
 import net.orion.facelinked.networks.Network;
 import net.orion.facelinked.networks.repository.NetworkRequest;
@@ -11,9 +10,7 @@ import net.orion.facelinked.networks.service.NetworkService;
 import net.orion.facelinked.profile.repository.ProfileRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -58,25 +55,22 @@ public class NetworkController {
         return ResponseEntity.ok(NetworkResponse.builder().id(id).members(network.getMembers()).creatorId(sender).build());
     }
 
-    @MessageMapping("/networks/{networkId}")
-    public void sendMessage(@DestinationVariable String networkId, MessageRequest message, Principal senderDetails) {
+    @MessageMapping("/networks/send")
+    public void sendMessage(MessageRequest message, Principal senderDetails) {
         if (senderDetails == null) {
             throw new IllegalArgumentException("User not authenticated");
         }
         var sender = senderDetails.getName();
-        if (networkService.isPrivate(networkId)) {
-            if (!networkService.isMemberOfNetwork(networkId, sender)) {
+        if (networkService.isPrivate(message.getReceiver())) {
+            if (!networkService.isMemberOfNetwork(message.getReceiver(), sender)) {
                 throw new IllegalArgumentException("User not authorized to send message");
             }
         }
 
-        //test if user needs to be authorized to send message
-        //also secure getting messages from websocket and database
-
-        messagingTemplate.convertAndSend(networkId, ChatMessage.builder().
+        //also secure getting messages from database
+        messagingTemplate.convertAndSend("/networks/" + message.getReceiver(), ChatMessage.builder().
                 senderId(sender).
                 content(message.getContent()).
-                receiverId(networkId).
                 timestamp(message.getTimestamp()).
                 build());
 

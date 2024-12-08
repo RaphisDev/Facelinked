@@ -44,8 +44,8 @@ export default function Chats() {
         }
         const profileJson = await profile.json();
 
-        setChats([...chats, { name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath }]);
-        await asyncStorage.setItem("chats", JSON.stringify([...chats, { name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath }]));
+        setChats([...chats, { name: profileJson.name, unread: false, username: profileJson.username, image: profileJson.profilePicturePath }]);
+        await asyncStorage.setItem("chats", JSON.stringify([...chats, { name: profileJson.name, unread: false, username: profileJson.username, image: profileJson.profilePicturePath }]));
     }
 
     const ws = new WebSocketProvider();

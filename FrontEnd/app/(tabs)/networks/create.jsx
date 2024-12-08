@@ -48,7 +48,9 @@ export default function CreateNetwork() {
             alert("Please add at least one member to a private network.");
             return;
         }
-        setMembers([...members, {memberId: SecureStore.getItem("username")}]);
+        let currentMembers = members;
+        currentMembers = [...currentMembers, {memberId: await SecureStore.getItemAsync("username")}];
+
         const ip = Platform.OS === "android" ? "10.0.2.2" : "192.168.0.178";
         const data = await fetch(`http://${ip}:8080/networks/create`, {
             method: "POST",
@@ -60,7 +62,7 @@ export default function CreateNetwork() {
                 name: name.current,
                 description: description.current,
                 private: isPrivate,
-                members: members
+                members: currentMembers
             })
         });
 

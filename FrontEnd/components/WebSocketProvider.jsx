@@ -68,12 +68,22 @@ class WebsocketController{
                                 await asyncStorage.setItem("chats", JSON.stringify([...loadedChats, {
                                     name: profileJson.name,
                                     username: profileJson.username,
-                                    image: profileJson.profilePicturePath
+                                    image: profileJson.profilePicturePath,
+                                    unread: false
                                 }]));
                                 this.messageReceived.emit("newMessageReceived");
                             }
                         } else {
-                            //logic for adding unread symbol, dont forget to remove it when chat is opened
+                            await asyncStorage.setItem("chats", JSON.stringify(loadedChats.map((chat) => {
+                                if (chat.username === parsedMessage.senderId) {
+                                    return {
+                                        ...chat,
+                                        unread: true
+                                    }
+                                }
+                                return chat;
+                            })));
+                            this.messageReceived.emit("newMessageReceived");
                         }
                     }
                     const username = SecureStorage.getItem("username");

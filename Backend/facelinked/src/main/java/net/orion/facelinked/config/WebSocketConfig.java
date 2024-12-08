@@ -2,6 +2,7 @@ package net.orion.facelinked.config;
 
 import lombok.AllArgsConstructor;
 import net.orion.facelinked.auth.repository.UserRepository;
+import net.orion.facelinked.networks.service.NetworkService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
@@ -21,6 +22,8 @@ import java.util.Map;
 @Configuration
 @AllArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    private NetworkService networkService;
 
     public class HandshakeHandler extends DefaultHandshakeHandler {
 
@@ -50,8 +53,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic", "/user", "/networks");
-        config.setApplicationDestinationPrefixes("/app", "/networks");
+        config.enableSimpleBroker("/networks");
+        config.setApplicationDestinationPrefixes("/app");
         config.setUserDestinationPrefix("/user");
     }
 
@@ -62,6 +65,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration channelRegistration) {
-        channelRegistration.interceptors(new WebSocketChannelInterceptor());
+        channelRegistration.interceptors(new WebSocketChannelInterceptor(networkService));
     }
 }
