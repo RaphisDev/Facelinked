@@ -42,14 +42,14 @@ export default function ChatRoom() {
                     navigation.setOptions({
                         headerTitle: "Chats",
                         headerLeft: () => (
-                            <></>)
+                            <></>),
                     });
                     ws.messageReceived.removeAllListeners("messageReceived");
                 }}>
                     <Ionicons name={"arrow-back"} size={24}></Ionicons>
                 </TouchableOpacity>
-            ),
-        });
+            )
+        }, []);
 
         const loadMessages = async () => {
             const loadedMessages = await asyncStorage.getItem(`messages/${receiver}`);
@@ -60,7 +60,7 @@ export default function ChatRoom() {
         loadMessages();
 
         ws.messageReceived.addListener("messageReceived", async (e) => {
-            if (e.detail.sender !== receiver) {
+            if (e.detail.sender !== receiver && e.detail.sender !== SecureStorage.getItem("username")) {
                 return;
             }
 

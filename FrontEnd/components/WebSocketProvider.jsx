@@ -41,14 +41,13 @@ class WebsocketController{
                     }
                 },
                 onConnect: async () => {
-                    AppState.addEventListener("change", this.handleAppStateChange);
                     const lastTimeDisconnected = await asyncStorage.getItem("lastTimeDisconnected");
 
                     let chats = await asyncStorage.getItem("chats") || [];
                     if (chats.length !== 0) {
                         chats = JSON.parse(chats);
                     }
-                    const displayChats = async (parsedMessage, loadedChats) => {
+                    const saveChats = async (parsedMessage, loadedChats) => {
 
                         if (parsedMessage.senderId === username) {
                             return;
@@ -69,7 +68,7 @@ class WebsocketController{
                                     name: profileJson.name,
                                     username: profileJson.username,
                                     image: profileJson.profilePicturePath,
-                                    unread: false
+                                    unread: true
                                 }]));
                                 this.messageReceived.emit("newMessageReceived");
                             }
@@ -87,7 +86,7 @@ class WebsocketController{
                         }
                     }
                     const username = SecureStorage.getItem("username");
-                    const saveChats = async (message) => {
+                    const saveMessages = async (message) => {
                         let loadedMessages = await asyncStorage.getItem(`messages/${message.senderId}`) || [];
                         if (loadedMessages.length !== 0) {
                             loadedMessages = JSON.parse(loadedMessages);
@@ -102,9 +101,8 @@ class WebsocketController{
                             timestamp: message.timestamp
                         }]));
                     }
-                    await asyncStorage.setItem("lastTimeDisconnected", new Date().toString());
 
-                    if (lastTimeDisconnected !== null) {
+                    if (lastTimeDisconnected) {
                         const messages = await fetch(`http://${ip}:8080/messages/afterDate?date=${encodeURIComponent(lastTimeDisconnected)}`, {
                             method: "GET",
                             headers: {
@@ -116,8 +114,8 @@ class WebsocketController{
                         if (messages.ok) {
                             const parsedMessages = await messages.json();
                             parsedMessages.forEach((message) => {
-                                saveChats(message)
-                                displayChats(message, chats);
+                                saveMessages(message)
+                                saveChats(message, chats);
                             });
                         }
                         else {
@@ -135,8 +133,8 @@ class WebsocketController{
                         if (messages.ok) {
                             const parsedMessages = await messages.json();
                             parsedMessages.forEach((message) => {
-                                saveChats(message)
-                                displayChats(message, chats);
+                                saveMessages(message)
+                                saveChats(message, chats);
                             });
                         }
                         else {
@@ -144,7 +142,7 @@ class WebsocketController{
                         }
                     }
 
-                    this.stompClient.subscribe(`/user/${SecureStorage.getItem("username")}/queue/messages`, async (message) => {
+                    this.stompClient.subscribe(`/user/${username}/queue/messages`, async (message) => {
                         const parsedMessage = JSON.parse(message.body);
                         this.messageReceived.emit("messageReceived", {
                             detail: {
@@ -169,8 +167,9 @@ class WebsocketController{
                         if (loadedChats.length !== 0) {
                             loadedChats = JSON.parse(loadedChats);
                         }
-                        displayChats(parsedMessage, loadedChats);
+                        saveChats(parsedMessage, loadedChats);
                     });
+                    await asyncStorage.setItem("lastTimeDisconnected", new Date().toString());
                 },
             });
             this.stompClient.activate();
@@ -178,12 +177,6 @@ class WebsocketController{
             webSocketInstance = this;
         }
         return webSocketInstance;
-    }
-
-    async handleAppStateChange() {
-        if (AppState.currentState === "background" && this.stompClient.connected) {
-            await asyncStorage.setItem("lastTimeDisconnected", new Date().toString());
-        }
     }
 }
 

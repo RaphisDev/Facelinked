@@ -25,14 +25,14 @@ export default function Chat(props) {
                 return chat;
             })));
         }}>
-            <View className={props.unread ? "border-accent border-4 rounded-xl" : "rounded-xl"} style={{backgroundColor: "#6C757D", width: 120, height: 150}}>
+            <View className="rounded-xl bg-dark-primary/90 dark:bg-[#6C757D]" style={{ width: 120, height: 150, borderColor: "#285FF5", borderWidth: props.unread ? 4 : 0}}>
                 <View className="p-7 h-full">
                     <Image source={{uri: props.image}}
                            style={{width: 75,
                                aspectRatio: 16 / 19,
                                objectFit: "cover",
                                overflow: "hidden", borderRadius: 12, alignSelf: "center"}}/>
-                    <View className={"justify-center flex-1 " + props.name.split(" ")[0].size > 7 ? props.unread ? "pb-1" : "pb-2" : props.unread ? "p-1" : "p-2"}>
+                    <View className={"justify-center flex-1 " + props.name.split(" ")[0].length > 7 ? props.unread ? "pb-1" : "pb-2" : props.unread ? "p-1" : "p-2"}>
                         <Text className="text-center text-dark-text font-bold" numberOfLines={2}>{props.name.split(" ")[0]}</Text>
                     </View>
                 </View>

@@ -16,7 +16,6 @@ Object.assign(global, { WebSocket });
 
 export default function Chats() {
 
-    //Todo: do i need to display the last message?
     //Todo: new messages on top of chat list?
     const [chats, setChats] = useState([]);
     const [showInput, setShowInput] = useState(false);

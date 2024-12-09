@@ -58,6 +58,7 @@ export default function Network() {
             const loadedNetworks = await asyncStorage.getItem("networks") || null;
             if (loadedNetworks !== null) {
                 const parsedNetworks = JSON.parse(loadedNetworks);
+                //favorite networks should be subscribed in the background
                 if (!parsedNetworks.find((network) => Number.parseInt(network.networkId) === Number.parseInt(Network))) {
                     if (ws.stompClient.connected) {
                         ws.stompClient.subscribe(`/networks/${Network}`, async (message) => {

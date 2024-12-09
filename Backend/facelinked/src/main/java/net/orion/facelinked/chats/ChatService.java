@@ -20,7 +20,7 @@ public class ChatService {
         return chatRepository.findByTimestampAfterAndReceiverId(timestamp, senderId);
     }
 
-    public List<ChatMessage> findBySenderId(String senderId) {
+    public List<ChatMessage> findBySenderOrReceiverId(String senderId) {
         return chatRepository.findByReceiverIdOrSenderId(senderId, senderId);
     }
 }
