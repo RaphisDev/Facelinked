@@ -51,6 +51,13 @@ export default function ChatRoom() {
             )
         }, []);
 
+        setTimeout(() => {
+            navigation.setOptions({
+                headerRight: () => (
+                    <></>)
+            });
+        });
+
         const loadMessages = async () => {
             const loadedMessages = await asyncStorage.getItem(`messages/${receiver}`);
             if (loadedMessages !== null) {
@@ -66,9 +73,16 @@ export default function ChatRoom() {
 
             addMessage((prevMessages) => [...prevMessages, e.detail]);
 
-            let loadedMessages = await asyncStorage.getItem(`messages/${receiver}`) || [];
-            if (loadedMessages.length !== 0) {loadedMessages = JSON.parse(loadedMessages);}
-            await asyncStorage.setItem(`messages/${receiver}`, JSON.stringify([...loadedMessages, e.detail]));
+            let loadedChats = await asyncStorage.getItem("chats") || [];
+            if (loadedChats.length !== 0) {
+                loadedChats = JSON.parse(loadedChats);
+            }
+            await asyncStorage.setItem("chats", JSON.stringify(loadedChats.map((chat) => {
+                if (chat.username === receiver) {
+                    return {...chat, unread: false};
+                }
+                return chat;
+            })));
         });
 
         return () => {

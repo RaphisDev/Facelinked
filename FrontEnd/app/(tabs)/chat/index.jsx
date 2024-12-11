@@ -1,14 +1,13 @@
 import "../../../global.css"
 import {FlatList, Platform, TextInput, TouchableOpacity, View} from "react-native";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useLayoutEffect, useRef, useState} from "react";
 import * as SecureStorage from "expo-secure-store";
-import * as StompJs from "@stomp/stompjs";
 import {TextEncoder} from 'text-encoding';
 import Chat from "../../../components/Entries/Chat";
 import WebSocketProvider from "../../../components/WebSocketProvider";
 import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import {useNavigation} from "expo-router";
+import {useNavigation, useSegments} from "expo-router";
 
 global.TextEncoder = TextEncoder;
 
@@ -20,6 +19,7 @@ export default function Chats() {
     const [chats, setChats] = useState([]);
     const [showInput, setShowInput] = useState(false);
     const input = useRef(null);
+    const segments = useSegments();
 
     const navigation = useNavigation("../../");
 
@@ -43,7 +43,7 @@ export default function Chats() {
         }
         const profileJson = await profile.json();
 
-        setChats([...chats, { name: profileJson.name, unread: false, username: profileJson.username, image: profileJson.profilePicturePath }]);
+        setChats(previousChats => [...previousChats, { name: profileJson.name, unread: false, username: profileJson.username, image: profileJson.profilePicturePath }]);
         await asyncStorage.setItem("chats", JSON.stringify([...chats, { name: profileJson.name, unread: false, username: profileJson.username, image: profileJson.profilePicturePath }]));
     }
 
@@ -62,9 +62,8 @@ export default function Chats() {
             let loadedChats = await asyncStorage.getItem("chats");
             if (loadedChats !== null) {
                 loadedChats = JSON.parse(loadedChats);
-                if (chats.length !== loadedChats.length) {
-                    setChats(loadedChats);
-                }
+                loadedChats.sort((a, b) => a.unread === b.unread ? 0 : a.unread ? -1 : 1);
+                setChats(loadedChats);
             }
         }
         loadChats();
@@ -76,7 +75,8 @@ export default function Chats() {
         return() => {
             ws.messageReceived.removeAllListeners("newMessageReceived");
         }
-    }, []);
+    }, [segments]);
+
 
     return (
         <View className="h-full w-full bg-primary dark:bg-dark-primary">

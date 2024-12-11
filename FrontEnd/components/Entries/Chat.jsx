@@ -10,7 +10,6 @@ import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncSto
 export default function Chat(props) {
     const router = useRouter();
 
-    //navigate instead of push more often
     return (
         <TouchableOpacity activeOpacity={0.9} onPress={async () => {
             router.navigate(`/chat/${props.username}`);

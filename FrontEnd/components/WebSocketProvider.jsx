@@ -13,8 +13,6 @@ const ip = Platform.OS === "android" ? "10.0.2.2" : "192.168.0.178";
 
 class WebsocketController{
 
-    //Todo: add chats and unread symbol here also make the color of (1) to accent color
-
     stompClient = null;
     messageReceived = new EventEmitter();
 
@@ -113,7 +111,15 @@ class WebsocketController{
 
                         if (messages.ok) {
                             const parsedMessages = await messages.json();
+
+                            let loadedMessages = await asyncStorage.getItem(`messages/${parsedMessages.senderId}`) || [];
+                            if (loadedMessages.length !== 0) {
+                                loadedMessages = JSON.parse(loadedMessages);
+                            }
                             parsedMessages.forEach((message) => {
+                                if (loadedMessages.find((msg) => msg.timestamp === message.timestamp)) {
+                                    return;
+                                }
                                 saveMessages(message)
                                 saveChats(message, chats);
                             });

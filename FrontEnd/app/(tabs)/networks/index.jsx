@@ -11,6 +11,7 @@ export default function Networks() {
     const [selected, setSelected] = useState(0);
     const [favoriteNetworks, setNetworks] = useState([]);
 
+
     useEffect(() => {
         if (selected === 0) {
             const loadNetworks = async () => {
@@ -45,10 +46,10 @@ export default function Networks() {
                 </TouchableOpacity>
                 <View className="flex-1 ml-3 flex-row justify-around">
                     <TouchableOpacity activeOpacity={1} onPress={() => setSelected(1)}>
-                        <Text style={{color: selected !== 1 ? "rgba(76,76,76,0.76)" : "#000000", fontSize: selected !== 1 ? 22 : 24}} className="text-text mt-3 dark:text-dark-text font-extrabold">Friends</Text>
+                        <Text style={{color: selected !== 1 ? "rgba(76,76,76,0.76)" : "#000000", fontSize: selected !== 1 ? 22 : 24}} className=" mt-3 font-extrabold">Friends</Text>
                     </TouchableOpacity>
                     <TouchableOpacity activeOpacity={1} onPress={() => setSelected(2)}>
-                        <Text style={{color: selected !== 2 ? "rgba(76,76,76,0.76)" : "#000000", fontSize: selected !== 2 ? 22 : 24}} className="text-text mt-3 dark:text-dark-text font-extrabold">Explore</Text>
+                        <Text style={{color: selected !== 2 ? "rgba(76,76,76,0.76)" : "#000000", fontSize: selected !== 2 ? 22 : 24}} className="mt-3 font-extrabold">Explore</Text>
                     </TouchableOpacity>
                 </View>
             </View>
