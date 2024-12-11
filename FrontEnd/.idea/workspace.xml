@@ -5,11 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
+      <change afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/service/ProfileService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/networks/controller/NetworkController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/networks/controller/NetworkController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/networks/service/NetworkService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/networks/service/NetworkService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/controller/ProfileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/controller/ProfileController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/repository/ProfileRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/repository/ProfileRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile]/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile]/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/_layout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/_layout.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/chat/[receiver].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chat/[receiver].jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/chat/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chat/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/networks/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/networks/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/Entries/Chat.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Entries/Chat.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/WebSocketProvider.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/WebSocketProvider.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/networks/[Network].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/networks/[Network].jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/networks/create.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/networks/create.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/Entries/Network.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Entries/Network.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/notes.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -164,7 +171,9 @@
       <workItem from="1733580254879" duration="97000" />
       <workItem from="1733604031264" duration="11509000" />
       <workItem from="1733762136784" duration="7334000" />
-      <workItem from="1733932162663" duration="5113000" />
+      <workItem from="1733932162663" duration="20447000" />
+      <workItem from="1733955204322" duration="9000" />
+      <workItem from="1733955247191" duration="240000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />

@@ -1,6 +1,6 @@
-import {FlatList, Keyboard, Platform, Pressable, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {Alert, FlatList, Keyboard, Platform, Pressable, Text, TextInput, TouchableOpacity, View} from "react-native";
 import "../../../../global.css"
-import {router, useLocalSearchParams, useNavigation, useRouter} from "expo-router";
+import {router, useLocalSearchParams, useNavigation, useRouter, useSegments} from "expo-router";
 import {Image} from "expo-image";
 import {useEffect, useLayoutEffect, useRef, useState} from "react";
 import * as SecureStore from "expo-secure-store";
@@ -17,6 +17,8 @@ export default function Profile() {
 
     const [showInput, setShowInput] = useState(false);
     const input = useRef(null);
+
+    const segments = useSegments();
 
     const [profileInfos, setProfileInfos] = useState({
         name: "Loading...",
@@ -74,23 +76,24 @@ export default function Profile() {
             headerTitle: profile !== SecureStore.getItem("username") ? profile : "Profile",
         });
         fetchData();
-    }, []);
+    }, [segments]);
 
     return (
         <>
             <View className="bg-primary dark:bg-dark-primary w-full h-full">
                 <TextInput ref={input} style={{display: !showInput ? "none" : "flex"}} placeholder="Type in an username" autoCapitalize="none" className="rounded-xl mt-4 p-2 w-3/4 hidden bg-primary dark:bg-dark-primary dark:text-dark-text text-text mx-auto mb-4 border-4 border-accent" onSubmitEditing={(e) => {
-                    router.replace(`/${e.nativeEvent.text}`);
+                    router.navigate(`/${e.nativeEvent.text}`);
                     input.current.clear();
                     handleAddBar();
                 }}/>
                 <Text className="text-text dark:text-dark-text text-center font-bold mt-7 text-4xl">{profileInfos.name}</Text>
                 <View className="justify-between flex-row mt-10">
                     <View className="ml-3 overflow-hidden">
-                        <View className="flex-row items-center justify-center mb-1.5 border-4 border-accent bg-white/55 rounded-xl">
-                            <Ionicons size={14} name={"aperture"}/>
-                            <Text className="font-bold text-lg text-center text-text dark:text-dark-text"> {profileInfos.score}</Text>
-                        </View>
+                        <TouchableOpacity onPress={() => Alert.alert("Score", "The score is calculated based on the amount of likes you have received on your posts.",
+                            [{text: "OK"}])} activeOpacity={0.75} className="flex-row items-center justify-center mb-1.5 bg-accent rounded-xl">
+                            <Ionicons size={14} color="black" name={"aperture"}/>
+                            <Text className="font-bold text-lg text-center text-dark-text"> {profileInfos.score}</Text>
+                        </TouchableOpacity>
                         <FlatList scrollEnabled={false} data={[
                             {id: "age", value: `${profileInfos.name?.split(" ")[0]}, ${calculateAge(new Date(profileInfos?.dateOfBirth))}`},
                             {id: "location", value: profileInfos.location},

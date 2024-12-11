@@ -62,7 +62,7 @@ export default function CreateNetwork() {
                 name: name.current,
                 description: description.current,
                 private: isPrivate,
-                members: currentMembers
+                members: isPrivate ? currentMembers : []
             })
         });
 
@@ -121,7 +121,7 @@ export default function CreateNetwork() {
                         })}
                     </View>
                 </View>
-                <TouchableOpacity activeOpacity={0.9} onPress={() => createNetwork()} className="w-full h-10 bg-accent dark:bg-dark-accent mt-5 p-2 rounded-lg">
+                <TouchableOpacity activeOpacity={0.9} onPress={() => createNetwork()} className="w-full bg-accent dark:bg-dark-accent mt-5 p-2.5 rounded-lg">
                     <Text className="text-dark-text font-bold text-center">Create Network</Text>
                 </TouchableOpacity>
             </View>

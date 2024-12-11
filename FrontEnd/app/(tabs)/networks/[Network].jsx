@@ -5,17 +5,20 @@ import {
     Animated,
     Easing,
     FlatList,
-    Keyboard,
+    Keyboard, Modal,
     Platform,
     Pressable, StyleSheet,
     TextInput,
     TouchableOpacity,
-    View
+    View,
+    Text, Share, Alert
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 import WebSocketProvider from "../../../components/WebSocketProvider";
 import NetworkMessage from "../../../components/Entries/NetworkMessage";
+import * as SecureStorage from "expo-secure-store";
+import {Image} from "expo-image";
 
 export default function Network() {
 
@@ -30,6 +33,8 @@ export default function Network() {
     const input = useRef(null);
     const message = useRef("");
 
+    const ip = Platform.OS === 'android' ? '10.0.2.2' : '192.168.0.178';
+
     //seperate Messages from Chat.jsx and Network.jsx
     //only save messages from favorite networks
     //check if network is private and you have access to it
@@ -38,7 +43,7 @@ export default function Network() {
 
         navigator.setOptions({
             headerLeft: () => <TouchableOpacity className="ml-2" onPress={() => router.back()}><Ionicons name="arrow-back" size={24} color="black"/></TouchableOpacity>,
-            headerRight: () => <TouchableOpacity className="mr-2" onPress={() => alert("open Modal and add 3 full rounded buttons in a row with icons. Below list all user")}><Ionicons name="people" size={24} color="black"/></TouchableOpacity>,
+            headerRight: () => <TouchableOpacity className="mr-2" onPress={() => setModalVisible(true)}><Ionicons name="people" size={24} color="black"/></TouchableOpacity>,
             headerTitle: name,
         });
 
@@ -70,6 +75,20 @@ export default function Network() {
             }
         }
         loadNetworks();
+
+        const loadMember = async () => {
+            const receivedData = await fetch(`http://${ip}:8080/networks/${Network}/member`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${SecureStorage.getItem("token")}`,
+                    "Application-Type": "application/json"
+                }
+            });
+            if (receivedData.ok) {
+                member.current = await receivedData.json();
+            }
+        }
+        loadMember();
 
         ws.messageReceived.addListener("networkMessageReceived", async (e) => {
             if (e.detail.networkId !== Network) {
@@ -116,14 +135,17 @@ export default function Network() {
 
             addMessage((prevMessages) => [...prevMessages, {isSender: true, content: message, timestamp: new Date().toString()}]);
 
-            /*
-            let loadedMessages = await asyncStorage.getItem(`networks/${Network}`) || [];
-            if (loadedMessages.length !== 0) {loadedMessages = JSON.parse(loadedMessages);}
-            await asyncStorage.setItem(`networks/${Network}`, JSON.stringify([...loadedMessages, {
-                isSender: true,
-                content: message,
-                timestamp: new Date().toString()
-            }]));*/
+            if (JSON.parse(await asyncStorage.getItem("networks")).find((network) => Number.parseInt(network.networkId) === Number.parseInt(Network))) {
+                let loadedMessages = await asyncStorage.getItem(`networks/${Network}`) || [];
+                if (loadedMessages.length !== 0) {
+                    loadedMessages = JSON.parse(loadedMessages);
+                }
+                await asyncStorage.setItem(`networks/${Network}`, JSON.stringify([...loadedMessages, {
+                    isSender: true,
+                    content: message,
+                    timestamp: new Date().toString()
+                }]));
+            }
         }
         catch (e) {
             console.error(e);
@@ -172,6 +194,9 @@ export default function Network() {
         }
     });
 
+    const [isModalVisible, setModalVisible] = useState(false);
+    const member = useRef([]);
+
     return(
         <View className="h-full w-full bg-primary dark:bg-dark-primary">
             <View className="mb-14 h-fit">
@@ -188,10 +213,76 @@ export default function Network() {
                             (e) => {
                                 sendMessage(e.nativeEvent.text);
                             }
-                        } className="bg-white dark:bg-dark-primary/50 w-fit mr-16 dark:text-dark-text text-text border-gray-700/80 active:bg-gray-600/10 rounded-lg border-4 font-medium h-10 p-0.5 pl-2.5" placeholder="Type a message" onChangeText={(text) => message.current = text}></TextInput>
+                        } className="bg-white dark:bg-dark-primary/50 w-fit mr-16 dark:text-dark-text text-text border-gray-700/80 active:bg-gray-600/10 rounded-lg dark:border-black border-4 font-medium h-10 p-0.5 pl-2.5" placeholder="Type a message" onChangeText={(text) => message.current = text}></TextInput>
                         <TouchableOpacity className="absolute right-0 bottom-0 m-1.5 mr-5" activeOpacity={0.7} onPress={() => sendMessage(message.current)}>
                             <Ionicons name={"send"} size={24}></Ionicons>
                         </TouchableOpacity>
+                        <Modal animationType="slide" presentationStyle="formSheet" visible={isModalVisible} onRequestClose={() => setModalVisible(false)}>
+                            <View className="h-full w-full dark:bg-dark-primary">
+                                <Text className="text-center text-text dark:text-dark-text font-bold text-2xl mt-3">Member</Text>
+                                <View className="flex-row justify-center items-center mt-7 mb-6">
+                                    <TouchableOpacity onPress={() => {
+                                        Alert.prompt("Add User", "Enter the username of the user you want to add to the network", [
+                                            {text: "Cancel"},
+                                            {text: "Add", onPress: async (text) => {
+                                                const response = await fetch(`http://${ip}:8080/networks/${Network}/add`, {
+                                                    method: "POST",
+                                                    headers: {
+                                                        "Application-Type": "application/json",
+                                                        "Authorization": `Bearer ${SecureStorage.getItem("token")}`
+                                                    },
+                                                    body: JSON.stringify({memberId: text})
+                                                });
+
+                                                if (response.ok) {
+                                                    const parsedResponse = await response.json();
+                                                    if (!parsedResponse.ok) {
+                                                        Alert.alert("Error adding user");
+                                                    }
+                                                    else {
+                                                        Alert.alert("User added");
+                                                    }
+                                                }
+                                                Alert.alert("User added");
+                                                }},
+                                        ]);
+                                    }} activeOpacity={0.65} className="rounded-full bg-accent p-5">
+                                        <Ionicons name={"add"} size={24} color={"#FFFFFF"}></Ionicons>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity activeOpacity={0.65} onPress={() => {
+                                        Share.share({
+                                            message: "Check out this network!",
+                                            title: "Check out this network!",
+                                            text: "Check out this network!",
+                                            url: `https://facelinked.net/networks/${Network}`,
+                                            dialogTitle: "Check out this network!"
+                                        });
+                                    }} className="rounded-full ml-11 mr-11 bg-accent p-5">
+                                        <Ionicons name={"share-outline"} size={24} color={"#FFFFFF"}></Ionicons>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity activeOpacity={0.65} className="rounded-full bg-accent p-5">
+                                        <Ionicons name={"search"} size={24} color={"#FFFFFF"}></Ionicons>
+                                    </TouchableOpacity>
+                                </View>
+                                <FlatList data={member.current} renderItem={(item) =>
+                                    <View>
+                                        <TouchableOpacity onPress={() => {
+                                            setModalVisible(false);
+                                            router.navigate(`/${item.item.memberId}`);
+                                        }} activeOpacity={0.4} className="flex-row justify-between items-center p-3">
+                                            <Image source={{uri: item.item.memberProfilePicturePath}} style={{width: 45, height: 45, borderRadius: 45}}></Image>
+                                            <Text className="text-text mr-14 dark:text-dark-text font-bold text-lg">{item.item.memberName} ({item.item.memberId})</Text>
+                                            <TouchableOpacity onPress={() => {
+                                                Alert.alert("User removed");
+                                            }} activeOpacity={0.65} className="rounded-full bg-accent p-2">
+                                                <Ionicons name={"trash"} size={16} color={"#FFFFFF"}></Ionicons>
+                                            </TouchableOpacity>
+                                        </TouchableOpacity>
+                                        <View className="border-b border-gray-700/80"></View>
+                                    </View>
+                                }></FlatList>
+                            </View>
+                        </Modal>
                     </View>
                 </Animated.View>
             </View>
