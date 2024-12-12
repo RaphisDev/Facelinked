@@ -20,25 +20,20 @@ public class NetworkService {
        return networkRepository.save(network).getId();
     }
 
-    public boolean isPrivate(String networkId) {
-        return networkRepository.findById(Long.parseLong(networkId)).isPrivate();
-    }
-
-    public boolean isMemberOfNetwork(String networkId, String memberId) {
-        return networkRepository.findById(Long.parseLong(networkId)).getMembers().stream().anyMatch(member -> member.getMemberId().equals(memberId));
-    }
-    public boolean isCreatorOfNetwork(String networkId, String creatorId) {
-        return networkRepository.findById(Long.parseLong(networkId)).getCreatorId().equals(creatorId);
-    }
-
-    public void addUser(List<NetworkMember> members, String networkId) {
-        Network network = networkRepository.findById(Long.parseLong(networkId));
+    public void addUser(List<NetworkMember> members, Network network) {
         members.addAll(network.getMembers());
         network.setMembers(members);
         networkRepository.save(network);
     }
 
-    public List<NetworkMember> getMembers(String networkId) {
-        return networkRepository.findById(Long.parseLong(networkId)).getMembers();
+    public Network getNetwork(String networkId) {
+        return networkRepository.findById(Long.parseLong(networkId));
+    }
+
+    public void removeUser(List<NetworkMember> members, Network networkResponseEntity) {
+        var userToRemove = networkResponseEntity.getMembers();
+        userToRemove.removeIf(member -> members.stream().anyMatch(m -> m.getMemberId().equals(member.getMemberId())));
+        networkResponseEntity.setMembers(userToRemove);
+        networkRepository.save(networkResponseEntity);
     }
 }

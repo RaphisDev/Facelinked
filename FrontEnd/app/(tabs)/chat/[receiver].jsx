@@ -9,7 +9,7 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import {router, useLocalSearchParams, useNavigation} from "expo-router";
+import {router, useLocalSearchParams, useNavigation, useRouter} from "expo-router";
 import Message from "../../../components/Entries/Message";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import StompJs from "@stomp/stompjs";

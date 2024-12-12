@@ -8,7 +8,6 @@ import net.orion.facelinked.networks.Network;
 import net.orion.facelinked.networks.NetworkMember;
 import net.orion.facelinked.networks.repository.NetworkRequest;
 import net.orion.facelinked.networks.service.NetworkService;
-import net.orion.facelinked.profile.Profile;
 import net.orion.facelinked.profile.service.ProfileService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +40,9 @@ public class NetworkController {
 
         if (network.getMembers() != null) {
             network.getMembers().forEach(member -> {
+                if (network.getMembers().stream().filter(existingMember -> existingMember.getMemberId().equals(member.getMemberId())).count() > 1) {
+                    throw new IllegalArgumentException("User already in network");
+                }
                 var user = profileService.findByUsername(member.getMemberId());
                 member.setMemberProfilePicturePath(user.getProfilePicturePath());
                 member.setMemberName(user.getName());
@@ -64,8 +66,10 @@ public class NetworkController {
             throw new IllegalArgumentException("User not authenticated");
         }
         var sender = senderDetails.getName();
-        if (networkService.isPrivate(message.getReceiver())) {
-            if (!networkService.isMemberOfNetwork(message.getReceiver(), sender)) {
+        var network = networkService.getNetwork(message.getReceiver());
+
+        if (network.isPrivate()) {
+            if (network.getMembers().stream().noneMatch(member -> member.getMemberId().equals(sender))) {
                 throw new IllegalArgumentException("User not authorized to send message");
             }
         }
@@ -80,35 +84,41 @@ public class NetworkController {
         //save to database
     }
 
-    @GetMapping("/{networkId}/member")
-    public ResponseEntity<List<NetworkMember>> getMembers(@PathVariable String networkId, @AuthenticationPrincipal UserDetails userDetails) {
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
+    @GetMapping(value="/{networkId}", produces = "application/json")
+    public ResponseEntity<Network> getNetwork(@PathVariable String networkId, @AuthenticationPrincipal UserDetails userDetails) {
+
         var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
 
-        if (networkService.isPrivate(networkId)) {
-            if (!networkService.isMemberOfNetwork(networkId, sender)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        var networkResponseEntity = networkService.getNetwork(networkId);
+        if (networkResponseEntity.isPrivate()) {
+            if(networkResponseEntity.getMembers().stream().noneMatch(member -> member.getMemberId().equals(sender))) {
+                throw new IllegalArgumentException("User not authorized to view network");
             }
         }
-
-        return ResponseEntity.ok(networkService.getMembers(networkId));
+        return ResponseEntity.ok(networkResponseEntity);
     }
 
-    @PostMapping(value = "{network}/add", consumes = "application/json")
+    @PostMapping("{network}/add")
     public void AddUser(@PathVariable String network, @RequestBody List<NetworkMember> members, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             throw new IllegalArgumentException("User not authenticated");
         }
         var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
 
-        if (!networkService.isCreatorOfNetwork(network, sender)) {
+        var networkResponseEntity = networkService.getNetwork(network);
+
+        if (!networkResponseEntity.getCreatorId().equals(sender)) {
             throw new IllegalArgumentException("User not authorized to add user");
+        }
+        if (!networkResponseEntity.isPrivate()) {
+            throw new IllegalArgumentException("Network is not private");
         }
 
         if (members != null) {
             members.forEach(member -> {
+                if (networkResponseEntity.getMembers().stream().anyMatch(existingMember -> existingMember.getMemberId().equals(member.getMemberId()))) {
+                    throw new IllegalArgumentException("User already in network");
+                }
                 var user = profileService.findByUsername(member.getMemberId());
                 member.setMemberProfilePicturePath(user.getProfilePicturePath());
                 member.setMemberName(user.getName());
@@ -117,6 +127,25 @@ public class NetworkController {
         else {
             throw new IllegalArgumentException("No members to add");
         }
-        networkService.addUser(members, network);
+        networkService.addUser(members, networkResponseEntity);
+    }
+
+    @PostMapping(value = "{network}/remove", consumes = "application/json")
+    public void RemoveUser(@PathVariable String network, @RequestBody List<NetworkMember> members, @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            throw new IllegalArgumentException("User not authenticated");
+        }
+        var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
+
+        var networkResponseEntity = networkService.getNetwork(network);
+
+        if (!networkResponseEntity.getCreatorId().equals(sender)) {
+            throw new IllegalArgumentException("User not authorized to remove user");
+        }
+        if (!networkResponseEntity.isPrivate()) {
+            throw new IllegalArgumentException("Network is not private");
+        }
+
+        networkService.removeUser(members, networkResponseEntity);
     }
 }

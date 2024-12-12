@@ -72,12 +72,13 @@ class WebsocketController{
                             }
                         } else {
                             await asyncStorage.setItem("chats", JSON.stringify(loadedChats.map((chat) => {
-                                if (chat.username === parsedMessage.senderId) {
+                                if (chat.username === parsedMessage.senderId) {console.log("chat", parsedMessage.senderId);
                                     return {
                                         ...chat,
                                         unread: true
                                     }
                                 }
+
                                 return chat;
                             })));
                             this.messageReceived.emit("newMessageReceived");

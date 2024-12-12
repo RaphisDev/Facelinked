@@ -36,6 +36,14 @@ export default function CreateNetwork() {
     }, []);
 
     function addMember(member) {
+        if (member === SecureStore.getItem("username")) {
+            alert("You cannot add yourself to a network.");
+            return;
+        }
+        if (members.find((m) => m.memberId === member)) {
+            alert("This member is already in the network.");
+            return;
+        }
         setMembers([...members, {memberId: member}]);
     }
 

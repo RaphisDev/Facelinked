@@ -28,9 +28,10 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
             if (networkId == null) {
                 throw new IllegalArgumentException("Network id not found");
             }
+            var network = networkService.getNetwork(networkId);
 
-            if (networkService.isPrivate(networkId)) {
-                if (!networkService.isMemberOfNetwork(networkId, principalName)) {
+            if (network.isPrivate()) {
+                if (network.getMembers().stream().noneMatch(member -> member.getMemberId().equals(principalName))) {
                     throw new IllegalArgumentException("User not authorized to send message");
                 }
             }
