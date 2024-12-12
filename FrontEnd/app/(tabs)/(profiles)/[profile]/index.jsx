@@ -109,10 +109,10 @@ export default function Profile() {
                     </View>
                 </View>
                     <View className="flex-row justify-center mt-5" style={{display: profile === SecureStore.getItem("username") || profile === undefined ? "none" : "flex"}}>
-                    <TouchableOpacity onPress={() => router.navigate(`/chat/${profile}`)} activeOpacity={0.6} className="mr-16 border-accent border-4 rounded-xl p-2">
+                    <TouchableOpacity onPress={() => router.navigate(`/chat/${profile}`)} activeOpacity={0.6} className="mr-16 border-accent bg-accent border-4 rounded-xl p-2">
                         <Text>Message</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity activeOpacity={0.6} className="border-accent border-4 rounded-xl p-2">
+                    <TouchableOpacity activeOpacity={0.6} className="border-accent bg-accent border-4 rounded-xl p-2">
                       <Text>Add friend</Text>
                     </TouchableOpacity>
                 </View>
