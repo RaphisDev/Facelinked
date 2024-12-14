@@ -11,7 +11,7 @@ export default function Chat(props) {
     const router = useRouter();
 
     return (
-        <TouchableOpacity activeOpacity={0.9} onPress={async () => {
+        <TouchableOpacity activeOpacity={0.9} onLongPress={() => router.navigate(`/${props.username}`)} onPress={async () => {
             router.navigate(`/chat/${props.username}`);
             let chats = await asyncStorage.getItem("chats") || [];
             if (chats.length !== 0) {

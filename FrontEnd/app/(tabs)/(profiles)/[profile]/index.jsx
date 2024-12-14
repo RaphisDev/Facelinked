@@ -45,11 +45,13 @@ export default function Profile() {
                 }
             });
             if (data.ok){
-                setProfileInfos(await data.json());
+                const profileInfos = await data.json();
+                setProfileInfos(profileInfos);
+                await SecureStore.setItemAsync('profile', JSON.stringify(profileInfos));
             }
         }
         catch (error) {
-            console.error("Error fetching data: ", error);
+            setProfileInfos(await SecureStore.getItemAsync('profile').then(JSON.parse));
         }
     }
 

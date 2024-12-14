@@ -7,7 +7,7 @@ import Chat from "../../../components/Entries/Chat";
 import WebSocketProvider from "../../../components/WebSocketProvider";
 import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import {useNavigation, useSegments} from "expo-router";
+import {router, useLocalSearchParams, useNavigation, useSegments} from "expo-router";
 
 global.TextEncoder = TextEncoder;
 

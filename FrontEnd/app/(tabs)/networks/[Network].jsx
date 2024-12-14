@@ -146,8 +146,10 @@ export default function Network() {
                     timestamp: new Date().toString()
                 })
             });
+            const username = SecureStorage.getItem("username");
+            const profilePicture = SecureStorage.getItem("profilePicture");
 
-            addMessage((prevMessages) => [...prevMessages, {isSender: true, content: message, timestamp: new Date().toString()}]);
+            addMessage((prevMessages) => [...prevMessages, {sender: username, profilePicturePath: profilePicture, content: message, timestamp: new Date().toString()}]);
 
             if (JSON.parse(await asyncStorage.getItem("networks")).find((network) => Number.parseInt(network.networkId) === Number.parseInt(Network))) {
                 let loadedMessages = await asyncStorage.getItem(`networks/${Network}`) || [];
@@ -155,7 +157,8 @@ export default function Network() {
                     loadedMessages = JSON.parse(loadedMessages);
                 }
                 await asyncStorage.setItem(`networks/${Network}`, JSON.stringify([...loadedMessages, {
-                    isSender: true,
+                    sender: username,
+                    profilePicturePath: profilePicture,
                     content: message,
                     timestamp: new Date().toString()
                 }]));
@@ -249,7 +252,7 @@ export default function Network() {
         <View className="h-full w-full bg-primary dark:bg-dark-primary">
             <View className="mb-14 h-fit">
                 <FlatList ref={messageList} onContentSizeChange={() => messageList.current.scrollToEnd()} data={messages} renderItem={(item) =>
-                    <NetworkMessage content={item.item.content} isSender={item.item.isSender} timestamp={item.item.timestamp}/>}
+                    <NetworkMessage content={item.item.content} sender={item.item.sender} profilePicturePath={item.item.profilePicturePath} timestamp={item.item.timestamp}/>}
                           keyExtractor={(item, index) => index.toString()}>
                 </FlatList>
             </View>
@@ -289,10 +292,13 @@ export default function Network() {
                                         <Ionicons name={"search"} size={24} color={"#FFFFFF"}></Ionicons>
                                     </TouchableOpacity>
                                 </View>
-                                {(currentNetwork.current?.private && currentNetwork.current.creatorId === SecureStorage.getItem('username')) && <TouchableOpacity onPress={() => {
-                                    Alert.prompt("Add User", "Enter the username of the user you want to add to the network", [
-                                        {text: "Cancel"},
-                                        {text: "Add", onPress: async (text) => {
+                                {(currentNetwork.current?.private && currentNetwork.current.creatorId === SecureStorage.getItem('username')) &&
+                                    <View className="flex-row justify-between">
+                                        <Text className="text-center text-text dark:text-dark-text self-start font-bold text-xl ml-2 mt-3">Members</Text>
+                                        <TouchableOpacity onPress={() => {
+                                             Alert.prompt("Add User", "Enter the username of the user you want to add to the network", [
+                                            {text: "Cancel"},
+                                            {text: "Add", onPress: async (text) => {
                                                 if (text.length <= 3) {
                                                     Alert.alert("Username too short");
                                                     return;
@@ -321,9 +327,10 @@ export default function Network() {
                                                 }
                                             }},
                                     ]);
-                                }} activeOpacity={0.65} className="rounded-full bg-accent p-2 ml-1 w-20">
+                                }} activeOpacity={0.65} className="rounded-full bg-accent p-2 mr-2 self-end w-20">
                                     <Ionicons name={"add"} size={24} className="text-center" color={"#FFFFFF"}></Ionicons>
-                                </TouchableOpacity>}
+                                    </TouchableOpacity>
+                                </View>}
                                 <FlatList data={member} renderItem={(item) =>
                                     <View>
                                         <TouchableOpacity onPress={() => {

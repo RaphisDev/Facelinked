@@ -4,7 +4,7 @@ import {
     FlatList, Keyboard,
     KeyboardAvoidingView,
     Platform,
-    Pressable, StyleSheet,
+    Pressable, StyleSheet, Text,
     TextInput,
     TouchableOpacity,
     View
@@ -30,12 +30,17 @@ export default function ChatRoom() {
     const messageList = useRef(null);
 
     const navigation = useNavigation("../../");
+    const router = useRouter();
 
     const ws = new WebSocketProvider();
 
     useEffect(() => {
         navigation.setOptions({
-            headerTitle: receiver,
+            headerTitle: () => (
+                <Pressable onPress={() => {
+                    router.navigate(`/${receiver}`);
+                }}><Text className="font-medium text-xl">{receiver}</Text></Pressable>
+            ),
             headerLeft: () => (
                 <TouchableOpacity className="ml-2.5" onPress={() => {
                     router.back();

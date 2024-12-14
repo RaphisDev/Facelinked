@@ -65,8 +65,21 @@ export default function Login() {
                 if (response.ok) {
                     const data = await response.json();
                     const token = data.token;
-                    await SecureStore.setItemAsync("token", token);
-                    router.replace("/home");
+
+                    const profile = await fetch(`http://${ip}:8080/profile/${data.username}`, {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
+                    });
+                    if (profile.ok) {
+                        const profileJson = await profile.json();
+                        await SecureStore.setItemAsync("token", token);
+                        await SecureStore.setItemAsync("username", data.username);
+                        await SecureStore.setItemAsync("profilePicture", profileJson.profilePicturePath);
+                        await SecureStore.setItemAsync("profile", JSON.stringify(profileJson));
+                        router.replace("/home");
+                    }
                 } else {
                     alert("Wrong email or password");
                 }

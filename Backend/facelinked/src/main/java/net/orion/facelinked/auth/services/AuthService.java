@@ -57,6 +57,7 @@ public class AuthService
 
         return AuthenticationResponse.builder()
                 .token(jwtToken)
+                .username(user.getUserName())
                 .build();
     }
 }
