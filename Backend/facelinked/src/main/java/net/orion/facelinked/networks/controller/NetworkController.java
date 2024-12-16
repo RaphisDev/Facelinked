@@ -7,6 +7,7 @@ import net.orion.facelinked.chats.controller.MessageRequest;
 import net.orion.facelinked.networks.Network;
 import net.orion.facelinked.networks.NetworkMember;
 import net.orion.facelinked.networks.repository.NetworkRequest;
+import net.orion.facelinked.networks.repository.NetworkUpdateRequest;
 import net.orion.facelinked.networks.service.NetworkService;
 import net.orion.facelinked.profile.service.ProfileService;
 import org.springframework.http.HttpStatus;
@@ -96,6 +97,22 @@ public class NetworkController {
             }
         }
         return ResponseEntity.ok(networkResponseEntity);
+    }
+
+    @PostMapping("{network}/update")
+    public void Update(@PathVariable String network, @RequestBody NetworkUpdateRequest networkUpdateRequest, @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            throw new IllegalArgumentException("User not authenticated");
+        }
+        var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
+
+        var networkResponseEntity = networkService.getNetwork(network);
+
+        if (!networkResponseEntity.getCreatorId().equals(sender)) {
+            throw new IllegalArgumentException("User not authorized to update network");
+        }
+
+        networkService.update(networkResponseEntity, networkUpdateRequest);
     }
 
     @PostMapping("{network}/add")

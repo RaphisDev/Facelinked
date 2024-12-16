@@ -2,6 +2,7 @@ import {Stack, Tabs, useGlobalSearchParams, useLocalSearchParams, useNavigation,
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {Pressable, Text, TouchableOpacity} from "react-native";
 import * as SecureStore from "expo-secure-store";
+import StateManager from "../../components/StateManager";
 
 
 export default function TabsLayout() {
@@ -14,6 +15,12 @@ export default function TabsLayout() {
                 (e) => {
                     if (e.target?.split("-")[0] === "(profiles)" && route?.profile !== SecureStore.getItem("username") && route?.profile !== undefined) {
                         router.navigate(`/${SecureStore.getItem("username")}`);
+                    }
+                    if (e.target?.split("-")[0] === "chat") {
+                        const stateManager = new StateManager();
+                        if (!stateManager.chatOpened) {
+                            router.replace("/chat");
+                        }
                     }
                 }
             }}>

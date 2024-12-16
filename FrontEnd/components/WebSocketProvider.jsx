@@ -3,7 +3,7 @@ import * as StompJs from "@stomp/stompjs";
 import * as SecureStorage from "expo-secure-store";
 import {Platform, AppState} from "react-native";
 import {EventEmitter} from "expo";
-import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
+import asyncStorage from "@react-native-async-storage/async-storage";
 
 let webSocketInstance = null;
 
@@ -40,20 +40,33 @@ class WebsocketController{
                 },
                 onConnect: async () => {
                     const lastTimeDisconnected = await asyncStorage.getItem("lastTimeDisconnected");
+                    const username = SecureStorage.getItem("username");
 
-                    let chats = await asyncStorage.getItem("chats") || [];
-                    if (chats.length !== 0) {
-                        chats = JSON.parse(chats);
+                    const getMessages = async (sender) => {
+                        let loadedMessages = await asyncStorage.getItem(`messages/${sender}`) || [];
+                        if (loadedMessages.length !== 0) {
+                            loadedMessages = JSON.parse(loadedMessages);
+                        }
+                        return loadedMessages;
                     }
-                    const saveChats = async (parsedMessage, loadedChats) => {
+                    const getChats = async () => {
+                        let loadedChats = await asyncStorage.getItem("chats") || [];
+                        if (loadedChats.length !== 0) {
+                            loadedChats = JSON.parse(loadedChats);
+                        }
+                        return loadedChats;
+                    }
 
-                        if (parsedMessage.senderId === username) {
+                    const saveChats = async (senderId, loadedChats) => {
+
+                        if (senderId === username) {
                             return;
                         }
 
-                        if (loadedChats.find((chat) => chat.username !== parsedMessage.senderId) || loadedChats.length === 0) {
+                        //new Chat or already chatted => update unread
+                        if (loadedChats.find((chat) => chat.username !== senderId) || loadedChats.length === 0) {
 
-                            const profile = await fetch(`http://${ip}:8080/profile/${parsedMessage.senderId}`, {
+                            const profile = await fetch(`http://${ip}:8080/profile/${senderId}`, {
                                 method: "GET",
                                 headers: {
                                     "Authorization": `Bearer ${SecureStorage.getItem("token")}`
@@ -72,7 +85,7 @@ class WebsocketController{
                             }
                         } else {
                             await asyncStorage.setItem("chats", JSON.stringify(loadedChats.map((chat) => {
-                                if (chat.username === parsedMessage.senderId) {console.log("chat", parsedMessage.senderId);
+                                if (chat.username === senderId) {
                                     return {
                                         ...chat,
                                         unread: true
@@ -84,12 +97,8 @@ class WebsocketController{
                             this.messageReceived.emit("newMessageReceived");
                         }
                     }
-                    const username = SecureStorage.getItem("username");
                     const saveMessages = async (message) => {
-                        let loadedMessages = await asyncStorage.getItem(`messages/${message.senderId}`) || [];
-                        if (loadedMessages.length !== 0) {
-                            loadedMessages = JSON.parse(loadedMessages);
-                        }
+                        const loadedMessages = await getMessages(message.senderId);
 
                         if (loadedMessages.find((msg) => msg.timestamp === message.timestamp)) {
                             return;
@@ -100,7 +109,19 @@ class WebsocketController{
                             timestamp: message.timestamp
                         }]));
                     }
+                    const validateMessage = async (parsedMessage) => {
+                        const loadedMessages = await getMessages(parsedMessage.senderId);
 
+                        if (loadedMessages.find((msg) => msg.timestamp === parsedMessage.timestamp)) {
+                            return;
+                        }
+                        const loadedChats = await getChats();
+
+                        await saveChats(parsedMessage.senderId, loadedChats);
+                        await saveMessages(parsedMessage);
+                    }
+
+                    //get messages from server
                     if (lastTimeDisconnected) {
                         const messages = await fetch(`http://${ip}:8080/messages/afterDate?date=${encodeURIComponent(lastTimeDisconnected)}`, {
                             method: "GET",
@@ -113,16 +134,9 @@ class WebsocketController{
                         if (messages.ok) {
                             const parsedMessages = await messages.json();
 
-                            let loadedMessages = await asyncStorage.getItem(`messages/${parsedMessages.senderId}`) || [];
-                            if (loadedMessages.length !== 0) {
-                                loadedMessages = JSON.parse(loadedMessages);
-                            }
                             parsedMessages.forEach((message) => {
-                                if (loadedMessages.find((msg) => msg.timestamp === message.timestamp)) {
-                                    return;
-                                }
-                                saveMessages(message)
-                                saveChats(message, chats);
+
+                                validateMessage(message);
                             });
                         }
                         else {
@@ -139,9 +153,11 @@ class WebsocketController{
 
                         if (messages.ok) {
                             const parsedMessages = await messages.json();
+                            const loadedChats = await getChats();
+
                             parsedMessages.forEach((message) => {
                                 saveMessages(message)
-                                saveChats(message, chats);
+                                saveChats(message.senderId, loadedChats);
                             });
                         }
                         else {
@@ -160,21 +176,15 @@ class WebsocketController{
                             }
                         });
 
-                        let loadedMessages = await asyncStorage.getItem(`messages/${parsedMessage.senderId}`) || [];
-                        if (loadedMessages.length !== 0) {
-                            loadedMessages = JSON.parse(loadedMessages);
-                        }
+                        const loadedMessages = await getMessages(parsedMessage.senderId);
                         await asyncStorage.setItem(`messages/${parsedMessage.senderId}`, JSON.stringify([...loadedMessages, {
                             isSender: false,
                             content: parsedMessage.content,
                             timestamp: parsedMessage.timestamp
                         }]));
 
-                        let loadedChats = await asyncStorage.getItem("chats") || [];
-                        if (loadedChats.length !== 0) {
-                            loadedChats = JSON.parse(loadedChats);
-                        }
-                        saveChats(parsedMessage, loadedChats);
+                        const loadedChats = await getChats();
+                        await saveChats(parsedMessage.senderId, loadedChats);
                     });
                     await asyncStorage.setItem("lastTimeDisconnected", new Date().toString());
                 },

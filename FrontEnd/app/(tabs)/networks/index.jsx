@@ -30,7 +30,7 @@ export default function Networks() {
             case 0:
                 return <>
                     <FlatList contentContainerStyle={{gap: 7}} style={{paddingTop: 15, marginLeft: 15, marginRight: 15}} data={favoriteNetworks}
-                              renderItem={(items) => <Network id={items.item.networkId} network={items.item.name} description={items.item.description} creator={items.item.creator} isPrivate={items.item.private}/>}/>
+                              renderItem={(items) => <Network id={items.item.networkId} network={items.item.name} description={items.item.description} creator={items.item.creatorId} isPrivate={items.item.private}/>}/>
                 </>;
             case 1:
                 return <></>;

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import net.orion.facelinked.networks.Network;
 import net.orion.facelinked.networks.NetworkMember;
 import net.orion.facelinked.networks.repository.NetworkRepository;
+import net.orion.facelinked.networks.repository.NetworkUpdateRequest;
 import net.orion.facelinked.profile.Profile;
 import net.orion.facelinked.profile.service.ProfileService;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,12 @@ public class NetworkService {
         var userToRemove = networkResponseEntity.getMembers();
         userToRemove.removeIf(member -> members.stream().anyMatch(m -> m.getMemberId().equals(member.getMemberId())));
         networkResponseEntity.setMembers(userToRemove);
+        networkRepository.save(networkResponseEntity);
+    }
+
+    public void update(Network networkResponseEntity, NetworkUpdateRequest networkUpdateRequest) {
+        networkResponseEntity.setName(networkUpdateRequest.getName());
+        networkResponseEntity.setDescription(networkUpdateRequest.getDescription());
         networkRepository.save(networkResponseEntity);
     }
 }

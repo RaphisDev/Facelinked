@@ -225,7 +225,7 @@ export default function Network() {
             })));
         }
         else {
-            await AsyncStorage.setItem("networks", JSON.stringify([...loadedNetworks, {networkId: currentNetwork.current.networkId, name: currentNetwork.current.name, description: currentNetwork.current.description, creator: currentNetwork.current.creatorId, private: currentNetwork.current.private, members: member}]));
+            await AsyncStorage.setItem("networks", JSON.stringify([...loadedNetworks, {networkId: currentNetwork.current.networkId, name: currentNetwork.current.name, description: currentNetwork.current.description, creatorId: currentNetwork.current.creatorId, private: currentNetwork.current.private, members: member}]));
         }
     }
     async function removeUser(user) {
@@ -250,7 +250,7 @@ export default function Network() {
 
     return(
         <View className="h-full w-full bg-primary dark:bg-dark-primary">
-            <View className="mb-14 h-fit">
+            <View className="mt-2 h-full">
                 <FlatList ref={messageList} onContentSizeChange={() => messageList.current.scrollToEnd()} data={messages} renderItem={(item) =>
                     <NetworkMessage content={item.item.content} sender={item.item.sender} profilePicturePath={item.item.profilePicturePath} timestamp={item.item.timestamp}/>}
                           keyExtractor={(item, index) => index.toString()}>
@@ -270,7 +270,7 @@ export default function Network() {
                         </TouchableOpacity>
                         <Modal animationType="slide" presentationStyle="formSheet" visible={isModalVisible} onRequestClose={() => setModalVisible(false)}>
                             <View className="h-full w-full dark:bg-dark-primary">
-                                <Text className="text-center text-text dark:text-dark-text font-bold text-2xl mt-3">Member</Text>
+                                <Text className="text-center text-text dark:text-dark-text font-bold text-2xl mt-3">{currentNetwork.current?.name}</Text>
                                 <View className="flex-row justify-center items-center mt-7 mb-6">
                                     <TouchableOpacity onPress={() => {
                                         setIsFavorite(prevState => {setFavorite(!prevState); return !prevState;});
@@ -295,41 +295,89 @@ export default function Network() {
                                 {(currentNetwork.current?.private && currentNetwork.current.creatorId === SecureStorage.getItem('username')) &&
                                     <View className="flex-row justify-between">
                                         <Text className="text-center text-text dark:text-dark-text self-start font-bold text-xl ml-2 mt-3">Members</Text>
-                                        <TouchableOpacity onPress={() => {
-                                             Alert.prompt("Add User", "Enter the username of the user you want to add to the network", [
-                                            {text: "Cancel"},
-                                            {text: "Add", onPress: async (text) => {
-                                                if (text.length <= 3) {
-                                                    Alert.alert("Username too short");
-                                                    return;
-                                                }
-                                                const response = await fetch(`http://${ip}:8080/networks/${Network}/add`, {
-                                                    method: "POST",
-                                                    headers: {
-                                                        "Content-Type": "application/json",
-                                                        "Authorization": `Bearer ${SecureStorage.getItem("token")}`
-                                                    },
-                                                    body: JSON.stringify([{memberId: text}])
-                                                });
+                                        <View className="self-end flex-row">
+                                            <TouchableOpacity activeOpacity={0.65} onPress={() =>
+                                                Alert.prompt("Update Network", "Enter the new name of the network", [
+                                                    {text: "Cancel"},
+                                                    {text: "Update", onPress: async (text) => {
+                                                            if (text.length <= 3) {
+                                                                Alert.alert("Too short");
+                                                                return;
+                                                            }
+                                                            Alert.prompt("Update Network", "Enter the new description of the network", [
+                                                                {text: "Cancel"},
+                                                                {text: "Update", onPress: async (description) => {
+                                                                        if (description.length <= 3) {
+                                                                            Alert.alert("Too short");
+                                                                            return;
+                                                                        }
+                                                                        const response = await fetch(`http://${ip}:8080/networks/${Network}/update`, {
+                                                                            method: "POST",
+                                                                            headers: {
+                                                                                "Content-Type": "application/json",
+                                                                                "Authorization": `Bearer ${SecureStorage.getItem("token")}`
+                                                                            },
+                                                                            body: JSON.stringify({name: text, description: description})
+                                                                        });
 
-                                                if (response.ok) {
-                                                    const receivedData = await fetch(`http://${ip}:8080/networks/${Network}`, {
-                                                        method: "GET",
-                                                        headers: {
-                                                            "Authorization": `Bearer ${SecureStorage.getItem("token")}`,
-                                                            "Application-Type": "application/json"
-                                                        }
-                                                    });
-                                                    const data = await receivedData.json();
-                                                    setMember(data.members);
+                                                                        if (response.ok) {
+                                                                            navigator.setOptions({
+                                                                                headerTitle: text
+                                                                            });
+                                                                            currentNetwork.current = {networkId: currentNetwork.current.networkId, name: text, description: description, creatorId: currentNetwork.current.creatorId, private: currentNetwork.current.private};
 
-                                                    Alert.alert("User added");
-                                                }
-                                            }},
-                                    ]);
-                                }} activeOpacity={0.65} className="rounded-full bg-accent p-2 mr-2 self-end w-20">
-                                    <Ionicons name={"add"} size={24} className="text-center" color={"#FFFFFF"}></Ionicons>
-                                    </TouchableOpacity>
+                                                                            await AsyncStorage.setItem("networks", JSON.stringify(JSON.parse(await AsyncStorage.getItem("networks")).map((network) => {
+                                                                                if (Number.parseInt(network.networkId) === Number.parseInt(Network)) {
+                                                                                    return {networkId: currentNetwork.current.networkId, name: text, description: description, creatorId: currentNetwork.current.creatorId, private: currentNetwork.current.private, members: member};
+                                                                                }
+                                                                                return network;
+                                                                            })));
+                                                                            Alert.alert("Change approved!");
+                                                                            setModalVisible(false);
+                                                                        }
+                                                                    }
+                                                                },
+                                                            ]);
+                                                        }},
+                                                ])} className="rounded-full bg-accent mr-2 p-2">
+                                                <Ionicons name={"create-outline"} className="text-center" size={24} color={"#FFFFFF"}></Ionicons>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity onPress={() => {
+                                                Alert.prompt("Add User", "Enter the username of the user you want to add to the network", [
+                                                    {text: "Cancel"},
+                                                    {text: "Add", onPress: async (text) => {
+                                                            if (text.length <= 3) {
+                                                                Alert.alert("Username too short");
+                                                                return;
+                                                            }
+                                                            const response = await fetch(`http://${ip}:8080/networks/${Network}/add`, {
+                                                                method: "POST",
+                                                                headers: {
+                                                                    "Content-Type": "application/json",
+                                                                    "Authorization": `Bearer ${SecureStorage.getItem("token")}`
+                                                                },
+                                                                body: JSON.stringify([{memberId: text}])
+                                                            });
+
+                                                            if (response.ok) {
+                                                                const receivedData = await fetch(`http://${ip}:8080/networks/${Network}`, {
+                                                                    method: "GET",
+                                                                    headers: {
+                                                                        "Authorization": `Bearer ${SecureStorage.getItem("token")}`,
+                                                                        "Application-Type": "application/json"
+                                                                    }
+                                                                });
+                                                                const data = await receivedData.json();
+                                                                setMember(data.members);
+
+                                                                Alert.alert("User added");
+                                                            }
+                                                        }},
+                                                ]);
+                                            }} activeOpacity={0.65} className="rounded-full bg-accent p-2 mr-2 w-20">
+                                                <Ionicons name={"add"} size={24} className="text-center" color={"#FFFFFF"}></Ionicons>
+                                            </TouchableOpacity>
+                                        </View>
                                 </View>}
                                 <FlatList data={member} renderItem={(item) =>
                                     <View>
@@ -342,7 +390,12 @@ export default function Network() {
                                                 <Text className="text-text dark:text-dark-text font-bold text-lg ml-3">{item.item.memberName}</Text>
                                             </View>
                                             {(currentNetwork.current.private && currentNetwork.current.creatorId === SecureStorage.getItem("username") && item.item.memberId !== SecureStorage.getItem("username")) && <TouchableOpacity onPress={async() => {
-                                                removeUser(item.item.memberId);
+                                                Alert.alert(`Are you sure you want to remove ${item.item.memberId}?`, "This action cannot be undone.", [
+                                                    {text: "Cancel"},
+                                                    {text: "Remove", onPress: async () => {
+                                                        await removeUser(item.item.memberId);
+                                                    }}
+                                                ]);
                                             }} activeOpacity={0.65} className="rounded-full bg-accent p-2">
                                                 <Ionicons name={"trash"} size={16} color={"#FFFFFF"}></Ionicons>
                                             </TouchableOpacity>}

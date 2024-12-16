@@ -8,6 +8,7 @@ import WebSocketProvider from "../../../components/WebSocketProvider";
 import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {router, useLocalSearchParams, useNavigation, useSegments} from "expo-router";
+import StateManager from "../../../components/StateManager";
 
 global.TextEncoder = TextEncoder;
 
@@ -22,6 +23,8 @@ export default function Chats() {
     const segments = useSegments();
 
     const navigation = useNavigation("../../");
+
+    const stateManager = new StateManager();
 
     async function addChat(username) {
         input.current.clear();
@@ -71,6 +74,7 @@ export default function Chats() {
         ws.messageReceived.addListener("newMessageReceived", () => {
             loadChats();
         });
+        stateManager.setState(true);
 
         return() => {
             ws.messageReceived.removeAllListeners("newMessageReceived");

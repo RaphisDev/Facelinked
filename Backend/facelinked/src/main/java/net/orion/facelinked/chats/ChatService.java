@@ -16,6 +16,7 @@ public class ChatService {
         chatRepository.save(message);
     }
 
+    //doesnt always work
     public List<ChatMessage> findByTimestampAfter(String timestamp, String senderId) {
         return chatRepository.findByTimestampAfterAndReceiverId(timestamp, senderId);
     }

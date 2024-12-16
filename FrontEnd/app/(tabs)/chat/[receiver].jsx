@@ -17,6 +17,7 @@ import * as SecureStorage from "expo-secure-store";
 import {useEffect, useRef, useState} from "react";
 import WebSocketProvider from "../../../components/WebSocketProvider";
 import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
+import StateManager from "../../../components/StateManager";
 
 export default function ChatRoom() {
 
@@ -31,6 +32,7 @@ export default function ChatRoom() {
 
     const navigation = useNavigation("../../");
     const router = useRouter();
+    const stateManager = new StateManager();
 
     const ws = new WebSocketProvider();
 
@@ -43,7 +45,12 @@ export default function ChatRoom() {
             ),
             headerLeft: () => (
                 <TouchableOpacity className="ml-2.5" onPress={() => {
-                    router.back();
+                    if (stateManager.chatOpened) {
+                        router.back();
+                    }
+                    else {
+                        router.replace("/chat");
+                    }
                     navigation.setOptions({
                         headerTitle: "Chats",
                         headerLeft: () => (
