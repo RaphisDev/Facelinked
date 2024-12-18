@@ -1,4 +1,4 @@
-package net.orion.facelinked.networks.repository;
+package net.orion.facelinked.networks.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

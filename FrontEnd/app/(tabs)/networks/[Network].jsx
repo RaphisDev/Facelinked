@@ -51,10 +51,6 @@ export default function Network() {
             const loadedMessages = await asyncStorage.getItem(`networks/${Network}`) || null;
             if (loadedMessages !== null) {
                 addMessage(JSON.parse(loadedMessages));
-
-                if (messageList.current !== null) {
-                    messageList.current.scrollToEnd();
-                }
             }
         }
         loadMessages();
@@ -250,8 +246,8 @@ export default function Network() {
 
     return(
         <View className="h-full w-full bg-primary dark:bg-dark-primary">
-            <View className="mt-2 h-full">
-                <FlatList ref={messageList} onContentSizeChange={() => messageList.current.scrollToEnd()} data={messages} renderItem={(item) =>
+            <View className="h-full">
+                <FlatList ref={messageList} contentContainerStyle={{gap: 4}} style={{paddingTop: 5, marginBottom: 50}} onContentSizeChange={() => messageList.current.scrollToEnd()} data={messages} renderItem={(item) =>
                     <NetworkMessage content={item.item.content} sender={item.item.sender} profilePicturePath={item.item.profilePicturePath} timestamp={item.item.timestamp}/>}
                           keyExtractor={(item, index) => index.toString()}>
                 </FlatList>

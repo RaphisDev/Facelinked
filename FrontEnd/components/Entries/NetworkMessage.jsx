@@ -8,9 +8,9 @@ export default function NetworkMessage(props) {
 
     return (
         <View className="w-full">
-            <View className="bg-dark-primary dark:bg-[#6C757D] rounded-lg h-30 justify-center m-1.5">
+            <View className="bg-dark-primary dark:bg-[#6C757D] rounded-xl justify-center mr-1.5 ml-1.5">
                 <TouchableOpacity activeOpacity={0.65} onPress={() => router.navigate(`/${props.sender}`)} className="flex flex-row ml-2 mt-2 mb-3">
-                    <Image source={{uri: props.profilePicturePath}} style={{width: 37, height: 37, borderRadius: 23}}/>
+                    <Image source={{uri: props.profilePicturePath}} style={{width: 30, height: 30, borderRadius: 15}}/>
                     <Text className="font-bold text-lg text-dark-text self-center ml-2">{props.sender}</Text>
                 </TouchableOpacity>
                 <Text style={{color: "#FFFFFF"}} className="text-xl ml-2 mr-16">{props.content}</Text>

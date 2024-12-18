@@ -28,7 +28,6 @@ public class ChatController {
     private ChatService chatService;
     private SimpMessagingTemplate template;
 
-    //For Networks, let user that joined a network connect the websocket
     @MessageMapping("/chat")
     public void send(MessageRequest message, Principal senderDetails) {
 

@@ -6,8 +6,7 @@ import net.orion.facelinked.chats.ChatMessage;
 import net.orion.facelinked.chats.controller.MessageRequest;
 import net.orion.facelinked.networks.Network;
 import net.orion.facelinked.networks.NetworkMember;
-import net.orion.facelinked.networks.repository.NetworkRequest;
-import net.orion.facelinked.networks.repository.NetworkUpdateRequest;
+import net.orion.facelinked.networks.NetworkMessage;
 import net.orion.facelinked.networks.service.NetworkService;
 import net.orion.facelinked.profile.service.ProfileService;
 import org.springframework.http.HttpStatus;
@@ -75,14 +74,24 @@ public class NetworkController {
             }
         }
 
-        //also secure getting messages from database
+        var senderProfile = new NetworkMember();
+        var user = profileService.findByUsername(sender);
+        senderProfile.setMemberProfilePicturePath(user.getProfilePicturePath());
+        senderProfile.setMemberName(user.getName());
+        senderProfile.setMemberId(sender);
+
+        networkService.sendMessage(NetworkMessage.builder()
+                .content(message.getContent())
+                .timestamp(message.getTimestamp())
+                .senderId(senderProfile)
+                .networkId(message.getReceiver())
+                .build());
+
         messagingTemplate.convertAndSend("/networks/" + message.getReceiver(), ChatMessage.builder().
                 senderId(sender).
                 content(message.getContent()).
                 timestamp(message.getTimestamp()).
                 build());
-
-        //save to database
     }
 
     @GetMapping(value="/{networkId}", produces = "application/json")

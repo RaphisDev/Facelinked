@@ -3,10 +3,10 @@ package net.orion.facelinked.networks.service;
 import lombok.AllArgsConstructor;
 import net.orion.facelinked.networks.Network;
 import net.orion.facelinked.networks.NetworkMember;
+import net.orion.facelinked.networks.NetworkMessage;
+import net.orion.facelinked.networks.repository.NetworkMessageRepository;
 import net.orion.facelinked.networks.repository.NetworkRepository;
-import net.orion.facelinked.networks.repository.NetworkUpdateRequest;
-import net.orion.facelinked.profile.Profile;
-import net.orion.facelinked.profile.service.ProfileService;
+import net.orion.facelinked.networks.controller.NetworkUpdateRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +16,7 @@ import java.util.List;
 public class NetworkService {
 
     private NetworkRepository networkRepository;
+    private NetworkMessageRepository networkMessageRepository;
 
     public Long createNetwork(Network network) {
        return networkRepository.save(network).getId();
@@ -42,5 +43,9 @@ public class NetworkService {
         networkResponseEntity.setName(networkUpdateRequest.getName());
         networkResponseEntity.setDescription(networkUpdateRequest.getDescription());
         networkRepository.save(networkResponseEntity);
+    }
+
+    public void sendMessage(NetworkMessage build) {
+        networkMessageRepository.save(build);
     }
 }
