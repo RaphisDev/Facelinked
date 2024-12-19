@@ -63,7 +63,6 @@ class WebsocketController{
                             return;
                         }
 
-                        //new Chat or already chatted => update unread
                         if (loadedChats.find((chat) => chat.username !== senderId) || loadedChats.length === 0) {
 
                             const profile = await fetch(`http://${ip}:8080/profile/${senderId}`, {
@@ -121,7 +120,35 @@ class WebsocketController{
                         await saveMessages(parsedMessage);
                     }
 
-                    //get messages from server
+                    const receiveNetworkMessages = async () => {
+                        let networks = await asyncStorage.getItem("networks") || [];
+                        if (networks.length !== 0) {
+                            networks = JSON.parse(networks);
+                        }
+                        for (const network in networks) {
+                            const id = networks[network].networkId
+                            this.stompClient.subscribe(`/networks/${id}`, async (message) => {
+                                const parsedMessage = JSON.parse(message.body);
+                                if (parsedMessage.senderId.memberId === username) {
+                                    return;
+                                }
+                                this.messageReceived.emit("networkMessageReceived", {
+                                    detail: {
+                                        networkId: id,
+                                        content: parsedMessage.content,
+                                        sender: parsedMessage.senderId.memberId,
+                                        senderProfileName: parsedMessage.senderId.memberName,
+                                        senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath,
+                                        timestamp: parsedMessage.timestamp
+                                    }
+                                });
+                                let loadedMessages = await asyncStorage.getItem(`networks/${id}`) || [];
+                                if (loadedMessages.length !== 0) {loadedMessages = JSON.parse(loadedMessages);}
+                                await asyncStorage.setItem(`networks/${id}`, JSON.stringify([...loadedMessages, {networkId: id, content: parsedMessage.content, sender: parsedMessage.senderId.memberId, senderProfileName: parsedMessage.senderId.memberName, senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath, timestamp: parsedMessage.timestamp}]));
+                            });
+                        }
+                    }
+
                     if (lastTimeDisconnected) {
                         const messages = await fetch(`http://${ip}:8080/messages/afterDate?date=${encodeURIComponent(lastTimeDisconnected)}`, {
                             method: "GET",
@@ -186,6 +213,7 @@ class WebsocketController{
                         const loadedChats = await getChats();
                         await saveChats(parsedMessage.senderId, loadedChats);
                     });
+                    receiveNetworkMessages();
                     await asyncStorage.setItem("lastTimeDisconnected", new Date().toString());
                 },
             });

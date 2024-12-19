@@ -59,12 +59,24 @@ export default function Network() {
             const loadedNetworks = await asyncStorage.getItem("networks") || null;
             if (loadedNetworks !== null) {
                 const parsedNetworks = JSON.parse(loadedNetworks);
-                //favorite networks should be subscribed in the background
                 if (!parsedNetworks.find((network) => Number.parseInt(network.networkId) === Number.parseInt(Network))) {
+                    const receivedMessages = await fetch(`http://${ip}:8080/networks/${Network}/messages`, {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${SecureStorage.getItem("token")}`,
+                            "Application-Type": "application/json"
+                        }
+                    });
+                    if (receivedMessages.ok) {
+                        const data = await receivedMessages.json();
+                        addMessage(data.map((message) => {
+                            return {senderProfilePicturePath: message.senderId.memberProfilePicturePath, sender: message.senderId.memberId, content: message.content, timestamp: message.timestamp};
+                        }));
+                    }
                     if (ws.stompClient.connected) {
                         ws.stompClient.subscribe(`/networks/${Network}`, async (message) => {
                             const parsedMessage = JSON.parse(message.body);
-                            alert(parsedMessage.content);
+                            addMessage((prevMessages) => [...prevMessages, {sender: parsedMessage.senderId.memberId, senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath, content: parsedMessage.content, timestamp: parsedMessage.timestamp}]);
                         });
                     }
                 }
@@ -106,10 +118,6 @@ export default function Network() {
             }
 
             addMessage((prevMessages) => [...prevMessages, e.detail]);
-
-            let loadedMessages = await asyncStorage.getItem(`networks/${Network}`) || [];
-            if (loadedMessages.length !== 0) {loadedMessages = JSON.parse(loadedMessages);}
-            await asyncStorage.setItem(`networks/${Network}`, JSON.stringify([...loadedMessages, e.detail]));
         });
 
         return () => {
@@ -145,7 +153,7 @@ export default function Network() {
             const username = SecureStorage.getItem("username");
             const profilePicture = SecureStorage.getItem("profilePicture");
 
-            addMessage((prevMessages) => [...prevMessages, {sender: username, profilePicturePath: profilePicture, content: message, timestamp: new Date().toString()}]);
+            addMessage((prevMessages) => [...prevMessages, {sender: username, senderProfilePicturePath: profilePicture, content: message, timestamp: new Date().toString()}]);
 
             if (JSON.parse(await asyncStorage.getItem("networks")).find((network) => Number.parseInt(network.networkId) === Number.parseInt(Network))) {
                 let loadedMessages = await asyncStorage.getItem(`networks/${Network}`) || [];
@@ -154,7 +162,7 @@ export default function Network() {
                 }
                 await asyncStorage.setItem(`networks/${Network}`, JSON.stringify([...loadedMessages, {
                     sender: username,
-                    profilePicturePath: profilePicture,
+                    senderProfilePicturePath: profilePicture,
                     content: message,
                     timestamp: new Date().toString()
                 }]));
@@ -248,7 +256,7 @@ export default function Network() {
         <View className="h-full w-full bg-primary dark:bg-dark-primary">
             <View className="h-full">
                 <FlatList ref={messageList} contentContainerStyle={{gap: 4}} style={{paddingTop: 5, marginBottom: 50}} onContentSizeChange={() => messageList.current.scrollToEnd()} data={messages} renderItem={(item) =>
-                    <NetworkMessage content={item.item.content} sender={item.item.sender} profilePicturePath={item.item.profilePicturePath} timestamp={item.item.timestamp}/>}
+                    <NetworkMessage content={item.item.content} sender={item.item.sender} senderProfilePicturePath={item.item.senderProfilePicturePath} timestamp={item.item.timestamp}/>}
                           keyExtractor={(item, index) => index.toString()}>
                 </FlatList>
             </View>
@@ -266,7 +274,57 @@ export default function Network() {
                         </TouchableOpacity>
                         <Modal animationType="slide" presentationStyle="formSheet" visible={isModalVisible} onRequestClose={() => setModalVisible(false)}>
                             <View className="h-full w-full dark:bg-dark-primary">
-                                <Text className="text-center text-text dark:text-dark-text font-bold text-2xl mt-3">{currentNetwork.current?.name}</Text>
+                                <View className="flex-row self-center">
+                                    <Text className="text-center text-text dark:text-dark-text font-bold text-2xl mt-3">{currentNetwork.current?.name}</Text>
+                                    {currentNetwork.current?.creatorId === SecureStorage.getItem('username') &&
+                                    <TouchableOpacity activeOpacity={0.65} onPress={() =>
+                                        Alert.prompt("Update Network", "Enter the new name of the network", [
+                                            {text: "Cancel"},
+                                            {text: "Update", onPress: async (text) => {
+                                                    if (text.length <= 3) {
+                                                        Alert.alert("Too short");
+                                                        return;
+                                                    }
+                                                    Alert.prompt("Update Network", "Enter the new description of the network", [
+                                                        {text: "Cancel"},
+                                                        {text: "Update", onPress: async (description) => {
+                                                                if (description.length <= 3) {
+                                                                    Alert.alert("Too short");
+                                                                    return;
+                                                                }
+                                                                const response = await fetch(`http://${ip}:8080/networks/${Network}/update`, {
+                                                                    method: "POST",
+                                                                    headers: {
+                                                                        "Content-Type": "application/json",
+                                                                        "Authorization": `Bearer ${SecureStorage.getItem("token")}`
+                                                                    },
+                                                                    body: JSON.stringify({name: text, description: description})
+                                                                });
+
+                                                                if (response.ok) {
+                                                                    navigator.setOptions({
+                                                                        headerTitle: text
+                                                                    });
+                                                                    currentNetwork.current = {networkId: currentNetwork.current.networkId, name: text, description: description, creatorId: currentNetwork.current.creatorId, private: currentNetwork.current.private};
+
+                                                                    await AsyncStorage.setItem("networks", JSON.stringify(JSON.parse(await AsyncStorage.getItem("networks")).map((network) => {
+                                                                        if (Number.parseInt(network.networkId) === Number.parseInt(Network)) {
+                                                                            return {networkId: currentNetwork.current.networkId, name: text, description: description, creatorId: currentNetwork.current.creatorId, private: currentNetwork.current.private, members: member};
+                                                                        }
+                                                                        return network;
+                                                                    })));
+                                                                    Alert.alert("Change approved!");
+                                                                    setModalVisible(false);
+                                                                }
+                                                            }
+                                                        },
+                                                    ]);
+                                                }},
+                                        ])} className="self-center ml-2 dark:bg-white dark:rounded-full dark:p-1">
+                                        <Ionicons name={"create-outline"} size={24} color={"#000000"}></Ionicons>
+                                    </TouchableOpacity>
+                                    }
+                                </View>
                                 <View className="flex-row justify-center items-center mt-7 mb-6">
                                     <TouchableOpacity onPress={() => {
                                         setIsFavorite(prevState => {setFavorite(!prevState); return !prevState;});
@@ -292,52 +350,6 @@ export default function Network() {
                                     <View className="flex-row justify-between">
                                         <Text className="text-center text-text dark:text-dark-text self-start font-bold text-xl ml-2 mt-3">Members</Text>
                                         <View className="self-end flex-row">
-                                            <TouchableOpacity activeOpacity={0.65} onPress={() =>
-                                                Alert.prompt("Update Network", "Enter the new name of the network", [
-                                                    {text: "Cancel"},
-                                                    {text: "Update", onPress: async (text) => {
-                                                            if (text.length <= 3) {
-                                                                Alert.alert("Too short");
-                                                                return;
-                                                            }
-                                                            Alert.prompt("Update Network", "Enter the new description of the network", [
-                                                                {text: "Cancel"},
-                                                                {text: "Update", onPress: async (description) => {
-                                                                        if (description.length <= 3) {
-                                                                            Alert.alert("Too short");
-                                                                            return;
-                                                                        }
-                                                                        const response = await fetch(`http://${ip}:8080/networks/${Network}/update`, {
-                                                                            method: "POST",
-                                                                            headers: {
-                                                                                "Content-Type": "application/json",
-                                                                                "Authorization": `Bearer ${SecureStorage.getItem("token")}`
-                                                                            },
-                                                                            body: JSON.stringify({name: text, description: description})
-                                                                        });
-
-                                                                        if (response.ok) {
-                                                                            navigator.setOptions({
-                                                                                headerTitle: text
-                                                                            });
-                                                                            currentNetwork.current = {networkId: currentNetwork.current.networkId, name: text, description: description, creatorId: currentNetwork.current.creatorId, private: currentNetwork.current.private};
-
-                                                                            await AsyncStorage.setItem("networks", JSON.stringify(JSON.parse(await AsyncStorage.getItem("networks")).map((network) => {
-                                                                                if (Number.parseInt(network.networkId) === Number.parseInt(Network)) {
-                                                                                    return {networkId: currentNetwork.current.networkId, name: text, description: description, creatorId: currentNetwork.current.creatorId, private: currentNetwork.current.private, members: member};
-                                                                                }
-                                                                                return network;
-                                                                            })));
-                                                                            Alert.alert("Change approved!");
-                                                                            setModalVisible(false);
-                                                                        }
-                                                                    }
-                                                                },
-                                                            ]);
-                                                        }},
-                                                ])} className="rounded-full bg-accent mr-2 p-2">
-                                                <Ionicons name={"create-outline"} className="text-center" size={24} color={"#FFFFFF"}></Ionicons>
-                                            </TouchableOpacity>
                                             <TouchableOpacity onPress={() => {
                                                 Alert.prompt("Add User", "Enter the username of the user you want to add to the network", [
                                                     {text: "Cancel"},
@@ -396,7 +408,9 @@ export default function Network() {
                                                 <Ionicons name={"trash"} size={16} color={"#FFFFFF"}></Ionicons>
                                             </TouchableOpacity>}
                                         </TouchableOpacity>
-                                        <View className="border-b border-gray-700/80"></View>
+                                        <View className="w-11/12 self-center">
+                                            <View className="border-b border-gray-700/80"></View>
+                                        </View>
                                     </View>
                                 }></FlatList>
                             </View>

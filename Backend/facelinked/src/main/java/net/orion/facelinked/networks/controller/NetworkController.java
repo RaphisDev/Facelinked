@@ -87,11 +87,24 @@ public class NetworkController {
                 .networkId(message.getReceiver())
                 .build());
 
-        messagingTemplate.convertAndSend("/networks/" + message.getReceiver(), ChatMessage.builder().
-                senderId(sender).
+        messagingTemplate.convertAndSend("/networks/" + message.getReceiver(), NetworkMessage.builder().
+                senderId(senderProfile).
                 content(message.getContent()).
                 timestamp(message.getTimestamp()).
                 build());
+    }
+    @GetMapping("/{networkId}/messages")
+    public ResponseEntity<List<NetworkMessage>> getMessages(@PathVariable String networkId, @AuthenticationPrincipal UserDetails userDetails) {
+        var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
+
+        var network = networkService.getNetwork(networkId);
+        if (network.isPrivate()) {
+            if (network.getMembers().stream().noneMatch(member -> member.getMemberId().equals(sender))) {
+                throw new IllegalArgumentException("User not authorized to view messages");
+            }
+        }
+
+        return ResponseEntity.ok(networkService.getMessages(networkId));
     }
 
     @GetMapping(value="/{networkId}", produces = "application/json")

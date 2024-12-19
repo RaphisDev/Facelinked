@@ -7,6 +7,8 @@ import net.orion.facelinked.networks.NetworkMessage;
 import net.orion.facelinked.networks.repository.NetworkMessageRepository;
 import net.orion.facelinked.networks.repository.NetworkRepository;
 import net.orion.facelinked.networks.controller.NetworkUpdateRequest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,5 +49,10 @@ public class NetworkService {
 
     public void sendMessage(NetworkMessage build) {
         networkMessageRepository.save(build);
+    }
+
+    public List<NetworkMessage> getMessages(String networkId) {
+        var pageable = PageRequest.of(0, 20); //test with 2 messages
+        return networkMessageRepository.findTopByNetworkIdOrderByTimestampDesc(networkId, pageable);
     }
 }
