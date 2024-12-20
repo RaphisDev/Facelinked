@@ -64,7 +64,15 @@ export default function Profile() {
     }
 
     function handleAddBar() {
-        setShowInput(shown => !shown);
+        setShowInput(shown => {
+            if (shown) {
+                Keyboard.dismiss();
+            }
+            else {
+                input.current.focus();
+            }
+            return !shown
+        });
     }
 
     useLayoutEffect(() => {
@@ -86,6 +94,10 @@ export default function Profile() {
         <>
             <View className="bg-primary dark:bg-dark-primary w-full h-full">
                 <TextInput ref={input} style={{display: !showInput ? "none" : "flex"}} placeholder="Type in an username" autoCapitalize="none" className="rounded-xl mt-4 p-2 w-3/4 hidden bg-primary dark:bg-dark-primary dark:text-dark-text text-text mx-auto mb-4 border-4 border-accent" onSubmitEditing={(e) => {
+                    if (e.nativeEvent.text.trim().length === 0) {
+                        handleAddBar()
+                        return;
+                    }
                     router.navigate(`/${e.nativeEvent.text}`);
                     input.current.clear();
                     handleAddBar();

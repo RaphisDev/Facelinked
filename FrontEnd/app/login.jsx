@@ -109,11 +109,11 @@ export default function Login() {
                                   }
                               }} onChangeText={p => setPassword(p)} className="dark:text-dark-text text-text border-gray-700/80 active:bg-gray-600/10 rounded-lg border-4 font-medium text-lg p-0.5 pl-2.5 mb-4" type="password" placeholder="Enter your password"/>
 
-                              <TouchableOpacity activeOpacity={0.6} className="rounded-lg min-w-20 self-center border-2 border-secText p-2 bg-dark-primary dark:bg-primary" onPress={loginEmail}><Text className="text-center text-dark-text dark:text-text font-bold">Login</Text></TouchableOpacity>
+                              <TouchableOpacity activeOpacity={0.6} className="rounded-lg min-w-20 self-center p-2 bg-dark-primary dark:bg-primary" onPress={loginEmail}><Text className="text-center text-dark-text dark:text-text font-bold">Login</Text></TouchableOpacity>
                             </View>
                             <Text className="dark:text-dark-text text-text self-center text-center font-bold text-lg mt-5">or</Text>
-                            <TouchableOpacity className="self-center min-w-40 rounded-lg border-2 border-secText p-2 mt-5 bg-dark-primary dark:bg-primary" onPress={loginGoogle}><Text className="text-center text-dark-text dark:text-text font-bold">Login with Google</Text></TouchableOpacity>
-                            <TouchableOpacity className="self-center min-w-40 rounded-lg border-2 border-secText p-2 mt-5 bg-dark-primary dark:bg-primary" onPress={loginApple}><Text className="text-center text-dark-text dark:text-text font-bold">Login with Apple</Text></TouchableOpacity>
+                            <TouchableOpacity className="self-center min-w-40 rounded-lg p-2 mt-5 bg-dark-primary dark:bg-primary" onPress={loginGoogle}><Text className="text-center text-dark-text dark:text-text font-bold">Login with Google</Text></TouchableOpacity>
+                            <TouchableOpacity className="self-center min-w-40 rounded-lg p-2 mt-5 bg-dark-primary dark:bg-primary" onPress={loginApple}><Text className="text-center text-dark-text dark:text-text font-bold">Login with Apple</Text></TouchableOpacity>
                         </View>
                     </View>
                 </View>

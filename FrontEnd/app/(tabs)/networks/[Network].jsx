@@ -36,9 +36,6 @@ export default function Network() {
 
     const ip = Platform.OS === 'android' ? '10.0.2.2' : '192.168.0.178';
 
-    //only save messages from favorite networks
-    //check if network is private and you have access to it
-
     useEffect(() => {
 
         navigator.setOptions({
@@ -60,25 +57,28 @@ export default function Network() {
             if (loadedNetworks !== null) {
                 const parsedNetworks = JSON.parse(loadedNetworks);
                 if (!parsedNetworks.find((network) => Number.parseInt(network.networkId) === Number.parseInt(Network))) {
-                    const receivedMessages = await fetch(`http://${ip}:8080/networks/${Network}/messages`, {
-                        method: "GET",
-                        headers: {
-                            "Authorization": `Bearer ${SecureStorage.getItem("token")}`,
-                            "Application-Type": "application/json"
-                        }
-                    });
-                    if (receivedMessages.ok) {
-                        const data = await receivedMessages.json();
-                        addMessage(data.map((message) => {
-                            return {senderProfilePicturePath: message.senderId.memberProfilePicturePath, sender: message.senderId.memberId, content: message.content, timestamp: message.timestamp};
-                        }));
-                    }
                     if (ws.stompClient.connected) {
                         ws.stompClient.subscribe(`/networks/${Network}`, async (message) => {
                             const parsedMessage = JSON.parse(message.body);
                             addMessage((prevMessages) => [...prevMessages, {sender: parsedMessage.senderId.memberId, senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath, content: parsedMessage.content, timestamp: parsedMessage.timestamp}]);
                         });
                     }
+                }
+                const receivedMessages = await fetch(`http://${ip}:8080/networks/${Network}/messages`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${SecureStorage.getItem("token")}`,
+                        "Application-Type": "application/json"
+                    }
+                });
+                if (receivedMessages.ok) {
+                    const data = await receivedMessages.json();
+                    addMessage(prevState => [...prevState, ...data.map((message) => {
+                        if (prevState.some(currentMessages => currentMessages.timestamp === message.timestamp)) {
+                            return null;
+                        }
+                        return {senderProfilePicturePath: message.senderId.memberProfilePicturePath, sender: message.senderId.memberId, content: message.content, timestamp: message.timestamp};
+                    }).filter((message) => message !== null)]);
                 }
             }
         }
@@ -109,11 +109,15 @@ export default function Network() {
                     })));
                 }
             }
+            else {
+                Alert.alert("Network not found or you have no access to it");
+                router.navigate("/networks");
+            }
         }
         loadNetwork();
 
         ws.messageReceived.addListener("networkMessageReceived", async (e) => {
-            if (e.detail.networkId !== Network) {
+            if (Number.parseInt(e.detail.networkId) !== Number.parseInt(Network)) {
                 return;
             }
 
@@ -278,18 +282,28 @@ export default function Network() {
                                     <Text className="text-center text-text dark:text-dark-text font-bold text-2xl mt-3">{currentNetwork.current?.name}</Text>
                                     {currentNetwork.current?.creatorId === SecureStorage.getItem('username') &&
                                     <TouchableOpacity activeOpacity={0.65} onPress={() =>
-                                        Alert.prompt("Update Network", "Enter the new name of the network", [
+                                        Alert.prompt("Update Network", "Enter a new name for the network\n Leave out for no change", [
                                             {text: "Cancel"},
                                             {text: "Update", onPress: async (text) => {
-                                                    if (text.length <= 3) {
-                                                        Alert.alert("Too short");
+                                                    if (text.trim().length === 0) {
+                                                        text = currentNetwork.current.name;
+                                                    }
+                                                    else if (text.length <= 3) {
+                                                        Alert.alert("Name too short");
                                                         return;
                                                     }
-                                                    Alert.prompt("Update Network", "Enter the new description of the network", [
+                                                    Alert.prompt("Update Network", "Enter a new description \n Leave out for no change", [
                                                         {text: "Cancel"},
                                                         {text: "Update", onPress: async (description) => {
-                                                                if (description.length <= 3) {
-                                                                    Alert.alert("Too short");
+                                                                if (description.trim().length === 0) {
+                                                                    if (text === currentNetwork.current.name) {
+                                                                        Alert.alert("No change applied");
+                                                                        return;
+                                                                    }
+                                                                    description = currentNetwork.current.description;
+                                                                }
+                                                                else if (description.length <= 3) {
+                                                                    Alert.alert("Description too short");
                                                                     return;
                                                                 }
                                                                 const response = await fetch(`http://${ip}:8080/networks/${Network}/update`, {
@@ -320,8 +334,8 @@ export default function Network() {
                                                         },
                                                     ]);
                                                 }},
-                                        ])} className="self-center ml-2 dark:bg-white dark:rounded-full dark:p-1">
-                                        <Ionicons name={"create-outline"} size={24} color={"#000000"}></Ionicons>
+                                        ])} className="self-center ml-1 mt-2">
+                                        <Ionicons name={"create-outline"} size={22} color={"#285FF5"}></Ionicons>
                                     </TouchableOpacity>
                                     }
                                 </View>

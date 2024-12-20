@@ -1,5 +1,5 @@
 import "../../../global.css"
-import {FlatList, Platform, TextInput, TouchableOpacity, View} from "react-native";
+import {FlatList, Keyboard, Platform, TextInput, TouchableOpacity, View} from "react-native";
 import {useEffect, useLayoutEffect, useRef, useState} from "react";
 import * as SecureStorage from "expo-secure-store";
 import {TextEncoder} from 'text-encoding';
@@ -53,7 +53,15 @@ export default function Chats() {
     const ws = new WebSocketProvider();
 
     function handleAddBar() {
-        setShowInput(shown => !shown);
+        setShowInput(shown => {
+            if (shown) {
+                Keyboard.dismiss();
+            }
+            else {
+                input.current.focus();
+            }
+            return !shown
+        });
     }
 
     useEffect(() => {
@@ -85,6 +93,10 @@ export default function Chats() {
     return (
         <View className="h-full w-full bg-primary dark:bg-dark-primary">
             <TextInput ref={input} style={{display: !showInput ? "none" : "flex"}} placeholder="Enter username to add a chat" autoCapitalize="none" className="rounded-xl mt-4 p-2 w-3/4 hidden bg-primary dark:bg-dark-primary dark:text-dark-text text-text mx-auto mb-4 border-4 border-accent" onSubmitEditing={(e) => {
+                if (e.nativeEvent.text.trim().length === 0) {
+                    handleAddBar()
+                    return;
+                }
                 addChat(e.nativeEvent.text);
             }}/>
             <FlatList columnWrapperStyle={{ justifyContent: 'flex-start', gap: 8, marginLeft: 8 }}

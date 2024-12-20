@@ -6,8 +6,8 @@ export default function Settings() {
         <View className="bg-primary dark:bg-dark-primary">
            <ScrollView className="h-full w-full mt-4">
                <View className="self-center items-center">
-                   <Text className="text-xl">Developed by </Text>
-                   <Text className="text-xl font-bold">Raphael Templer</Text>
+                   <Text className="text-xl dark:text-dark-text">Developed by </Text>
+                   <Text className="text-xl dark:text-dark-text font-bold">Raphael Templer</Text>
                </View>
            </ScrollView>
         </View>
