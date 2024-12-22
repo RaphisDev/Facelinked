@@ -7,7 +7,7 @@ export default function Network(props) {
     const router = useRouter();
 
     return (
-        <TouchableOpacity activeOpacity={0.9} style={{ marginLeft: 15, marginRight: 15}} onPress={() => router.navigate(`/networks/${props.id}?name=${props.network}`)}>
+        <TouchableOpacity activeOpacity={0.9} style={{ marginLeft: 15, marginRight: 15, paddingBottom: 7}} onPress={() => router.navigate(`/networks/${props.id}?name=${props.network}`)}>
             <View className="rounded-xl bg-dark-primary/90 dark:bg-[#6C757D]" style={{ height: 90 }}>
                 <Text className="text-dark-text text-xl font-bold mt-2 text-center">{props.network}</Text>
                 <Text className="text-dark-text mt-1 text-center">{props.description}</Text>

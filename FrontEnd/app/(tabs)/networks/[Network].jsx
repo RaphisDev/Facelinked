@@ -259,7 +259,7 @@ export default function Network() {
     return(
         <View className="h-full w-full bg-primary dark:bg-dark-primary">
             <View className="h-full">
-                <FlatList ref={messageList} contentContainerStyle={{gap: 4}} style={{paddingTop: 5, marginBottom: 50}} onContentSizeChange={() => messageList.current.scrollToEnd()} data={messages} renderItem={(item) =>
+                <FlatList ref={messageList} style={{marginTop: 5, marginBottom: 50}} onContentSizeChange={() => messageList.current.scrollToEnd()} data={messages} renderItem={(item) =>
                     <NetworkMessage content={item.item.content} sender={item.item.sender} senderProfilePicturePath={item.item.senderProfilePicturePath} timestamp={item.item.timestamp}/>}
                           keyExtractor={(item, index) => index.toString()}>
                 </FlatList>

@@ -29,7 +29,7 @@ export default function Networks() {
         switch (selected) {
             case 0:
                 return <>
-                    <FlatList contentContainerStyle={{gap: 7}} style={{paddingTop: 15}} data={favoriteNetworks}
+                    <FlatList style={{marginTop: 7}} data={favoriteNetworks}
                               renderItem={(items) => <Network id={items.item.networkId} network={items.item.name} description={items.item.description} creator={items.item.creatorId} isPrivate={items.item.private}/>}/>
                 </>;
             case 1:

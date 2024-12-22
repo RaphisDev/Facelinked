@@ -7,7 +7,7 @@ export default function NetworkMessage(props) {
     const router = useRouter();
 
     return (
-        <View className="w-full">
+        <View className="w-full pb-2">
             <View className="bg-dark-primary dark:bg-[#6C757D] rounded-xl justify-center mr-1.5 ml-1.5">
                 <TouchableOpacity activeOpacity={0.65} onPress={() => router.navigate(`/${props.sender}`)} className="flex flex-row ml-2 mt-2 mb-3">
                     <Image source={{uri: props.senderProfilePicturePath}} style={{width: 25, marginTop: 3, aspectRatio: "18/19", borderRadius: 11}}/>
