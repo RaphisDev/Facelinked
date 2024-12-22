@@ -9,8 +9,6 @@ import java.util.List;
 
 @Repository
 public interface NetworkMessageRepository extends MongoRepository<NetworkMessage, String> {
-    public List<NetworkMessage> findByTimestampAfterAndNetworkId(String timestamp, String networkId);
 
-    //get last n messages from network, when scrolling up get more n messages
-    public List<NetworkMessage> findTopByNetworkIdOrderByTimestampDesc(String networkId, Pageable pageable);
+    List<NetworkMessage> findTopByNetworkIdOrderByIdDesc(String networkId, Pageable pageable);
 }

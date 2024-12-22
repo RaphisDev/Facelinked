@@ -132,18 +132,18 @@ export default function Profile() {
                       <Text className="text-dark-text font-semibold">Add friend</Text>
                     </TouchableOpacity>
                 </View>
-                {(profile === SecureStore.getItem("username") || profile === undefined) &&
                     <View>
                         <View className="flex-row mt-10 justify-between mb-2">
                             <Text className="text-center text-text dark:text-dark-text self-start font-bold text-2xl ml-4 mt-3">Posts</Text>
+                            {(profile === SecureStore.getItem("username") || profile === undefined) &&
                             <TouchableOpacity activeOpacity={0.65} className="rounded-full self-end bg-accent p-2 mr-2 w-20">
                                 <Ionicons name={"add"} size={24} className="text-center" color={"#FFFFFF"}></Ionicons>
-                            </TouchableOpacity>
+                            </TouchableOpacity>}
                         </View>
                         <FlatList data={[{ifNoPosts: "display: No posts yet"}]} style={{width :"100%", height: "100%"}} renderItem={() => <View className="self-center mt-14">
                             <Text className="text-text dark:text-dark-text font-semibold text-xl">No posts yet</Text>
                         </View>}/>
-                    </View>}
+                    </View>
             </View>
         </>
     );

@@ -85,16 +85,18 @@ export default function ChatRoom() {
 
             addMessage((prevMessages) => [...prevMessages, e.detail]);
 
-            let loadedChats = await asyncStorage.getItem("chats") || [];
-            if (loadedChats.length !== 0) {
-                loadedChats = JSON.parse(loadedChats);
-            }
-            await asyncStorage.setItem("chats", JSON.stringify(loadedChats.map((chat) => {
-                if (chat.username === receiver) {
-                    return {...chat, unread: false};
+            setTimeout(async () => {
+                let loadedChats = await asyncStorage.getItem("chats") || [];
+                if (loadedChats.length !== 0) {
+                    loadedChats = JSON.parse(loadedChats);
                 }
-                return chat;
-            })));
+                await asyncStorage.setItem("chats", JSON.stringify(loadedChats.map((chat) => {
+                    if (chat.username === receiver) {
+                        return {...chat, unread: false};
+                    }
+                    return chat;
+                })));
+            }, 1000);
         });
 
         return () => {
@@ -164,7 +166,7 @@ export default function ChatRoom() {
 
             let loadedChats = await asyncStorage.getItem("chats") || [];
             if (loadedChats.length !== 0) {loadedChats = JSON.parse(loadedChats);}
-            if(loadedChats.find((chat) => chat.username !== receiver) || loadedChats.length === 0) {
+            if(!loadedChats.find((chat) => chat.username === receiver) || loadedChats.length === 0) {
                 const ip = Platform.OS === "android" ? "10.0.2.2" : "192.168.0.178";
                 const profile = await fetch(`http://${ip}:8080/profile/${receiver}`, {
                     method: "GET",

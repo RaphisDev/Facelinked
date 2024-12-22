@@ -53,6 +53,6 @@ public class NetworkService {
 
     public List<NetworkMessage> getMessages(String networkId) {
         var pageable = PageRequest.of(0, 20); //test with 2 messages
-        return networkMessageRepository.findTopByNetworkIdOrderByTimestampDesc(networkId, pageable);
+        return networkMessageRepository.findTopByNetworkIdOrderByIdDesc(networkId, pageable);
     }
 }

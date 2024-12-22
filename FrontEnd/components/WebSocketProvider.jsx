@@ -39,7 +39,7 @@ class WebsocketController{
                     }
                 },
                 onConnect: async () => {
-                    const lastTimeDisconnected = await asyncStorage.getItem("lastTimeDisconnected");
+                    const lastMessageId = await asyncStorage.getItem("lastMessageId");
                     const username = SecureStorage.getItem("username");
 
                     const getMessages = async (sender) => {
@@ -99,25 +99,18 @@ class WebsocketController{
                     const saveMessages = async (message) => {
                         const loadedMessages = await getMessages(message.senderId);
 
-                        if (loadedMessages.find((msg) => msg.timestamp === message.timestamp)) {
-                            return;
-                        }
                         await asyncStorage.setItem(`messages/${message.senderId}`, JSON.stringify([...loadedMessages, {
                             isSender: username === message.senderId,
                             content: message.content,
                             timestamp: message.timestamp
                         }]));
                     }
-                    const validateMessage = async (parsedMessage) => {
-                        const loadedMessages = await getMessages(parsedMessage.senderId);
-
-                        if (loadedMessages.find((msg) => msg.timestamp === parsedMessage.timestamp)) {
-                            return;
-                        }
+                    const processMessage = async (parsedMessage) => {
                         const loadedChats = await getChats();
 
                         await saveChats(parsedMessage.senderId, loadedChats);
                         await saveMessages(parsedMessage);
+                        await asyncStorage.setItem("lastMessageId", parsedMessage.id);
                     }
 
                     const receiveNetworkMessages = async () => {
@@ -149,8 +142,8 @@ class WebsocketController{
                         }
                     }
 
-                    if (lastTimeDisconnected) {
-                        const messages = await fetch(`http://${ip}:8080/messages/afterDate?date=${encodeURIComponent(lastTimeDisconnected)}`, {
+                    if (lastMessageId) {
+                        const messages = await fetch(`http://${ip}:8080/messages/afterId?id=${encodeURIComponent(lastMessageId)}`, {
                             method: "GET",
                             headers: {
                                 "Application-Type": "application/json",
@@ -162,8 +155,7 @@ class WebsocketController{
                             const parsedMessages = await messages.json();
 
                             parsedMessages.forEach((message) => {
-
-                                validateMessage(message);
+                                processMessage(message);
                             });
                         }
                         else {
@@ -212,9 +204,9 @@ class WebsocketController{
 
                         const loadedChats = await getChats();
                         await saveChats(parsedMessage.senderId, loadedChats);
+                        await asyncStorage.setItem("lastMessageId", parsedMessage.id);
                     });
                     receiveNetworkMessages();
-                    await asyncStorage.setItem("lastTimeDisconnected", new Date().toString());
                 },
             });
             this.stompClient.activate();

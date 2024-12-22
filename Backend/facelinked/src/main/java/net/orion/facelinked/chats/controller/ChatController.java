@@ -40,7 +40,7 @@ public class ChatController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
 
-        chatService.saveToDatabase(ChatMessage.builder()
+        var id = chatService.saveToDatabase(ChatMessage.builder()
                 .content(message.getContent())
                 .timestamp(message.getTimestamp())
                 .senderId(sender)
@@ -49,14 +49,15 @@ public class ChatController {
 
         template.convertAndSendToUser(message.getReceiver(), "/queue/messages",
                 ChatMessage.builder()
+                .id(id)
                 .content(message.getContent())
                 .timestamp((message.getTimestamp()))
                 .senderId(sender)
                 .build());
     }
 
-    @GetMapping("/afterDate")
-    public ResponseEntity<List<ChatMessage>> getChat(@AuthenticationPrincipal UserDetails userDetails, @RequestParam String date) {
+    @GetMapping("/afterId")
+    public ResponseEntity<List<ChatMessage>> getChat(@AuthenticationPrincipal UserDetails userDetails, @RequestParam String id) {
 
         if (userDetails == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
@@ -67,7 +68,7 @@ public class ChatController {
         if (senderId == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        return ResponseEntity.ok(chatService.findByTimestampAfter(date, senderId));
+        return ResponseEntity.ok(chatService.findByIdAfter(id, senderId));
     }
 
     @GetMapping("/all")

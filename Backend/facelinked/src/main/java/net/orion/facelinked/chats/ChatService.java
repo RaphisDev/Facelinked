@@ -12,13 +12,14 @@ public class ChatService {
 
     private ChatRepository chatRepository;
 
-    public void saveToDatabase(ChatMessage message) {
-        chatRepository.save(message);
+    public String saveToDatabase(ChatMessage message) {
+        var result = chatRepository.save(message);
+        return result.getId();
     }
 
     //doesnt always work
-    public List<ChatMessage> findByTimestampAfter(String timestamp, String senderId) {
-        return chatRepository.findByTimestampAfterAndReceiverId(timestamp, senderId);
+    public List<ChatMessage> findByIdAfter(String id, String senderId) {
+        return chatRepository.findByIdGreaterThanAndReceiverId(id, senderId);
     }
 
     public List<ChatMessage> findBySenderOrReceiverId(String senderId) {
