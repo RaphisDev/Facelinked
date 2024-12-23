@@ -21,7 +21,7 @@ export default function Index() {
             } else {
                 router.replace("/register");
             }
-       })
+       }, 1500)
     }, []);
 
     return (
