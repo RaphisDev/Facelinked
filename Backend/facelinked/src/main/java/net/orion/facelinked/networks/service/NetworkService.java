@@ -56,16 +56,12 @@ public class NetworkService {
         return networkMessageRepository.findTopByNetworkIdOrderByIdDesc(networkId, pageable);
     }
 
-    public void favorite(String network, boolean b, String sender) {
+    public void favorite(String network, boolean b) {
         var networkResponseEntity = networkRepository.findById(Long.parseLong(network));
         if (networkResponseEntity == null) {
             throw new IllegalArgumentException("Network not found");
         }
-        if(networkResponseEntity.isPrivate()) {
-            if (networkResponseEntity.getMembers().stream().noneMatch(member -> member.getMemberId().equals(sender))) {
-                throw new IllegalArgumentException("User not authorized to favorite network");
-            }
-        }
+    
         if (networkResponseEntity.getMemberCount() <= 0 && !b) {
             return;
         }
