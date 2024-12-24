@@ -191,11 +191,8 @@ public class NetworkController {
     }
 
     @PostMapping("{network}/favorite")
-    public void favorite(@PathVariable String network, @AuthenticationPrincipal UserDetails userDetails, @RequestParam boolean b) {
-        if (userDetails == null) {
-            throw new IllegalArgumentException("User not authenticated");
-        }
-        var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
-        networkService.favorite(network, b, sender);
+    public void favorite(@PathVariable String network, @RequestParam boolean b) {
+
+        networkService.favorite(network, b);
     }
 }
