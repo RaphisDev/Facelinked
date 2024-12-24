@@ -21,4 +21,5 @@ public class NetworkRequest {
     @NotEmpty
     private boolean isPrivate;
     private List<NetworkMember> members;
+    private String networkPicturePath;
 }

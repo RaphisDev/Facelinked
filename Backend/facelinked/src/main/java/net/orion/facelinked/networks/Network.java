@@ -24,4 +24,6 @@ public class Network {
     private boolean isPrivate;
     @Convert(converter = MemberAttributeConverter.class)
     private List<NetworkMember> members;
+    private String networkPicturePath;
+    private Integer memberCount;
 }

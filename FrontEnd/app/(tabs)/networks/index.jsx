@@ -29,13 +29,23 @@ export default function Networks() {
         switch (selected) {
             case 0:
                 return <>
-                    <FlatList style={{marginTop: 7}} data={favoriteNetworks}
-                              renderItem={(items) => <Network id={items.item.networkId} network={items.item.name} description={items.item.description} creator={items.item.creatorId} isPrivate={items.item.private}/>}/>
+                    <FlatList style={{marginTop: 8}} data={favoriteNetworks}
+                              renderItem={(items) => <Network id={items.item.networkId} network={items.item.name} description={items.item.description} member={items.item.memberCount} isPrivate={items.item.private}/>}/>
                 </>;
             case 1:
-                return <></>;
+                //get friends networks
+                const friendsNetworks = [];
+                return <>
+                    <FlatList style={{marginTop: 8}} data={friendsNetworks}
+                              renderItem={(items) => <Network id={items.item.networkId} network={items.item.name} description={items.item.description} creator={items.item.creatorId} isPrivate={items.item.private}/>}/>
+                </>;
             case 2:
-                return <></>;
+                //get explore networks
+                const exploreNetworks = [];
+                return <>
+                    <FlatList style={{marginTop: 8}} data={exploreNetworks}
+                              renderItem={(items) => <Network id={items.item.networkId} network={items.item.name} description={items.item.description} member={items.item.memberCount} isPrivate={items.item.private}/>}/>
+                </>;
         }
     }
     return (

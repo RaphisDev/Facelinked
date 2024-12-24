@@ -1,4 +1,15 @@
-import {Alert, FlatList, Keyboard, Platform, Pressable, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {
+    Alert, Dimensions,
+    FlatList,
+    Keyboard,
+    Platform,
+    Pressable,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
+} from "react-native";
 import "../../../../global.css"
 import {router, useLocalSearchParams, useNavigation, useRouter, useSegments} from "expo-router";
 import {Image} from "expo-image";
@@ -93,57 +104,59 @@ export default function Profile() {
     return (
         <>
             <View className="bg-primary dark:bg-dark-primary w-full h-full">
-                <TextInput ref={input} style={{display: !showInput ? "none" : "flex"}} placeholder="Type in an username" autoCapitalize="none" className="rounded-xl mt-4 p-2 w-3/4 hidden bg-primary dark:bg-dark-primary dark:text-dark-text text-text mx-auto mb-4 border-4 border-accent" onSubmitEditing={(e) => {
-                    if (e.nativeEvent.text.trim().length === 0) {
-                        handleAddBar()
-                        return;
-                    }
-                    router.navigate(`/${e.nativeEvent.text}`);
-                    input.current.clear();
-                    handleAddBar();
-                }}/>
-                <Text className="text-text dark:text-dark-text text-center font-bold mt-7 text-4xl">{profileInfos.name}</Text>
-                <View className="justify-between flex-row mt-10">
-                    <View className="ml-3 overflow-hidden w-52">
-                        <TouchableOpacity onPress={() => Alert.alert("Score", "The score is calculated based on the amount of likes you have received on your posts.",
-                            [{text: "OK"}])} activeOpacity={0.75} className="flex-row items-center justify-center self-center w-[117] mr-5 mb-1.5 bg-accent rounded-xl">
-                            <Ionicons size={14} color="black" name={"aperture"}/>
-                            <Text className="font-bold text-lg text-center text-dark-text"> {profileInfos.score}</Text>
-                        </TouchableOpacity>
-                        <FlatList scrollEnabled={false} data={[
-                            {id: "age", value: `${profileInfos.name?.split(" ")[0]}, ${calculateAge(new Date(profileInfos?.dateOfBirth))}`},
-                            {id: "location", value: profileInfos.location},
-                            {id: "hobbies", value: profileInfos.hobbies},
-                            {id: "relationshipStatus", value: profileInfos.inRelationship ? "in Relationship" : "Single"},
-                            {id: "partner", value: profileInfos.partner},
-                        ]} renderItem={({item}) => <Text className="text-xl font-medium text-text dark:text-dark-text" style={{display: item.id === "partner" ? profileInfos.inRelationship ?
-                                "flex" : "none" : "flex"}} id={item.id}>{item.value}</Text>}/>
+                <ScrollView>
+                    <TextInput ref={input} style={{display: !showInput ? "none" : "flex"}} placeholder="Type in an username" autoCapitalize="none" className="rounded-xl mt-4 p-2 w-3/4 hidden bg-primary dark:bg-dark-primary dark:text-dark-text text-text mx-auto mb-4 border-4 border-accent" onSubmitEditing={(e) => {
+                        if (e.nativeEvent.text.trim().length === 0) {
+                            handleAddBar()
+                            return;
+                        }
+                        router.navigate(`/${e.nativeEvent.text}`);
+                        input.current.clear();
+                        handleAddBar();
+                    }}/>
+                    <Text className="text-text dark:text-dark-text text-center font-bold mt-7 text-4xl">{profileInfos.name}</Text>
+                    <View className="justify-between flex-row mt-10">
+                        <View className="ml-3 overflow-hidden w-52">
+                            <TouchableOpacity onPress={() => Alert.alert("Score", "The score is calculated based on the amount of likes you have received on your posts.",
+                                [{text: "OK"}])} activeOpacity={0.75} className="flex-row items-center justify-center self-center min-w-[95] mr-5 mb-2.5 bg-accent rounded-xl">
+                                <Ionicons size={14} color="black" name={"aperture"} className="ml-3"/>
+                                <Text className="font-bold text-lg text-center text-dark-text mr-3"> {profileInfos.score}</Text>
+                            </TouchableOpacity>
+                            <FlatList scrollEnabled={false} data={[
+                                {id: "age", value: `${profileInfos.name?.split(" ")[0]}, ${calculateAge(new Date(profileInfos?.dateOfBirth))}`},
+                                {id: "location", value: profileInfos.location},
+                                {id: "hobbies", value: profileInfos.hobbies},
+                                {id: "relationshipStatus", value: profileInfos.inRelationship ? "in Relationship" : "Single"},
+                                {id: "partner", value: profileInfos.partner},
+                            ]} renderItem={({item}) => <Text className="text-xl font-medium text-text dark:text-dark-text" style={{display: item.id === "partner" ? profileInfos.inRelationship ?
+                                    "flex" : "none" : "flex"}} id={item.id}>{item.value}</Text>}/>
+                        </View>
+                        <View className="h-64 aspect-[16/19] mr-3 rounded-3xl overflow-hidden">
+                            <Image style={{ width: '100%', height: '100%', objectFit: "cover", position: "static", borderRadius: 24 }}
+                                   alt="Profile picture" source={{uri: profileInfos.profilePicturePath}}/>
+                        </View>
                     </View>
-                    <View className="h-64 aspect-[16/19] mr-3 rounded-3xl overflow-hidden">
-                        <Image style={{ width: '100%', height: '100%', objectFit: "cover", position: "static", borderRadius: 24 }}
-                               alt="Profile picture" source={{uri: profileInfos.profilePicturePath}}/>
-                    </View>
-                </View>
                     <View className="flex-row justify-center mt-5" style={{display: profile === SecureStore.getItem("username") || profile === undefined ? "none" : "flex"}}>
-                    <TouchableOpacity onPress={() => router.navigate(`/chat/${profile}`)} activeOpacity={0.6} className="mr-16 border-accent bg-accent border-4 rounded-xl p-2">
-                        <Text className="text-dark-text font-semibold">Message</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity activeOpacity={0.6} className="border-accent bg-accent border-4 rounded-xl p-2">
-                      <Text className="text-dark-text font-semibold">Add friend</Text>
-                    </TouchableOpacity>
-                </View>
+                        <TouchableOpacity onPress={() => router.navigate(`/chat/${profile}`)} activeOpacity={0.6} className="mr-16 border-accent bg-accent border-4 rounded-xl p-2">
+                            <Text className="text-dark-text font-semibold">Message</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity activeOpacity={0.6} className="border-accent bg-accent border-4 rounded-xl p-2">
+                            <Text className="text-dark-text font-semibold">Add friend</Text>
+                        </TouchableOpacity>
+                    </View>
                     <View>
                         <View className="flex-row mt-10 justify-between mb-2">
                             <Text className="text-center text-text dark:text-dark-text self-start font-bold text-2xl ml-4 mt-3">Posts</Text>
                             {(profile === SecureStore.getItem("username") || profile === undefined) &&
-                            <TouchableOpacity activeOpacity={0.65} className="rounded-full self-end bg-accent p-2 mr-2 w-20">
-                                <Ionicons name={"add"} size={24} className="text-center" color={"#FFFFFF"}></Ionicons>
-                            </TouchableOpacity>}
+                                <TouchableOpacity activeOpacity={0.65} className="rounded-full self-end bg-accent p-2 mr-2 w-20">
+                                    <Ionicons name={"add"} size={24} className="text-center" color={"#FFFFFF"}></Ionicons>
+                                </TouchableOpacity>}
                         </View>
-                        <FlatList data={[{ifNoPosts: "display: No posts yet"}]} style={{width :"100%", height: "100%"}} renderItem={() => <View className="self-center mt-14">
-                            <Text className="text-text dark:text-dark-text font-semibold text-xl">No posts yet</Text>
-                        </View>}/>
                     </View>
+                    <FlatList scrollEnabled={false} ListEmptyComponent={<Text className="text-text dark:text-dark-text self-center mt-14 font-semibold text-xl">No posts yet</Text>}
+                              onEndReached={() => console.log("load more posts. adjust onEndReachedThreshold")} data={[]}
+                              style={{width :"100%", height: "100%"}} renderItem={() => <View className="bg-accent p-5"></View>}/>
+                </ScrollView>
             </View>
         </>
     );

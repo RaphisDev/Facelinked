@@ -83,7 +83,7 @@ export default function CreateNetwork() {
             if (networks.length !== 0) {
                 networks = JSON.parse(networks);
             }
-            await AsyncStorage.setItem("networks", JSON.stringify([...networks, {networkId: parsedData.id, name: name.current, description: description.current, creator: parsedData.creatorId, private: isPrivate, members: parsedData.members}]));
+            await AsyncStorage.setItem("networks", JSON.stringify([...networks, {networkId: parsedData.id, name: name.current, description: description.current, creator: parsedData.creatorId, private: isPrivate, memberCount: 1, members: parsedData.members}]));
             router.back();
         }
     }

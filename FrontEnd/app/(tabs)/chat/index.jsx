@@ -101,7 +101,8 @@ export default function Chats() {
             }}/>
             <FlatList columnWrapperStyle={{ justifyContent: 'flex-start', gap: 8, marginLeft: 8 }}
                       contentContainerStyle={{ gap: 10 }} style={{ marginTop: 20}}
-                       numColumns={3} data={chats} renderItem={({ item }) => <Chat {...item} />}/>
+                      ListEmptyComponent={<Text className="text-text dark:text-dark-text text-center mt-5">No chats found</Text>}
+                      numColumns={3} data={chats} renderItem={({ item }) => <Chat {...item} />}/>
         </View>
     )
 }

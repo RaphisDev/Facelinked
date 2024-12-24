@@ -55,6 +55,8 @@ public class NetworkController {
                 creatorId(sender).
                 isPrivate(network.isPrivate()).
                 members(network.getMembers()).
+                networkPicturePath(network.getNetworkPicturePath()).
+                memberCount(1).
                 build());
 
         return ResponseEntity.ok(NetworkResponse.builder().id(id).members(network.getMembers()).creatorId(sender).build());
@@ -186,5 +188,14 @@ public class NetworkController {
         }
 
         networkService.removeUser(members, networkResponseEntity);
+    }
+
+    @PostMapping("{network}/favorite")
+    public void favorite(@PathVariable String network, @AuthenticationPrincipal UserDetails userDetails, @RequestParam boolean b) {
+        if (userDetails == null) {
+            throw new IllegalArgumentException("User not authenticated");
+        }
+        var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
+        networkService.favorite(network, b, sender);
     }
 }

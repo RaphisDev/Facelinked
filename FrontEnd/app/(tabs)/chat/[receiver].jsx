@@ -204,7 +204,7 @@ export default function ChatRoom() {
     return(
         <View className="h-full w-full bg-primary dark:bg-dark-primary">
             <View className="mb-14 h-fit">
-                <FlatList ref={messageList} onContentSizeChange={() => messageList.current.scrollToEnd()} data={messages} renderItem={(item) =>
+                <FlatList ref={messageList} ListEmptyComponent={<Text className="text-text dark:text-dark-text text-center mt-5">Start a conversation with {receiver}</Text>} onContentSizeChange={() => messageList.current.scrollToEnd()} data={messages} renderItem={(item) =>
                     <Message content={item.item.content} isSender={item.item.isSender} timestamp={item.item.timestamp}/>}
                           keyExtractor={(item, index) => index.toString()}>
                 </FlatList>
