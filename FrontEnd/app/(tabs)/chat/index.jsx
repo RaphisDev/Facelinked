@@ -1,5 +1,5 @@
 import "../../../global.css"
-import {FlatList, Keyboard, Platform, TextInput, TouchableOpacity, View} from "react-native";
+import {FlatList, Keyboard, Platform, TextInput, TouchableOpacity, View, Text} from "react-native";
 import {useEffect, useLayoutEffect, useRef, useState} from "react";
 import * as SecureStorage from "expo-secure-store";
 import {TextEncoder} from 'text-encoding';
@@ -9,6 +9,7 @@ import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncSto
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {router, useLocalSearchParams, useNavigation, useSegments} from "expo-router";
 import StateManager from "../../../components/StateManager";
+import ip from "../../../components/AppManager";
 
 global.TextEncoder = TextEncoder;
 
@@ -35,7 +36,7 @@ export default function Chats() {
         }
 
         const ip = Platform.OS === "android" ? "10.0.2.2" : "192.168.0.178";
-        const profile = await fetch(`http://${ip}:8080/profile/${username}`, {
+        const profile = await fetch(`${ip}/profile/${username}`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${SecureStorage.getItem("token")}`

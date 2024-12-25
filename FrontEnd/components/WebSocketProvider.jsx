@@ -4,10 +4,10 @@ import * as SecureStorage from "expo-secure-store";
 import {Platform, AppState} from "react-native";
 import {EventEmitter} from "expo";
 import asyncStorage from "@react-native-async-storage/async-storage";
+import {webSocketIp} from "./AppManager";
+import ip from "./AppManager";
 
 let webSocketInstance = null;
-
-const ip = Platform.OS === "android" ? "10.0.2.2" : "192.168.0.178";
 
 //Todo: global.textencoding???
 
@@ -19,13 +19,13 @@ class WebsocketController{
     constructor() {
         if(!webSocketInstance) {
             this.stompClient = new StompJs.Client({
-                brokerURL: `ws://${ip}:8080/ws`,
+                brokerURL: `${webSocketIp}/ws`,
                 forceBinaryWSFrames: true,
                 appendMissingNULLonIncoming: true,
                 heartbeatOutgoing: 10000,
                 heartbeatIncoming: 10000,
                 webSocketFactory: () => {
-                    return new WebSocket(`ws://${ip}:8080/ws`, [], {
+                    return new WebSocket(`${webSocketIp}/ws`, [], {
                         headers: {
                             "Authorization": `Bearer ${SecureStorage.getItem("token")}`
                         }
@@ -65,7 +65,7 @@ class WebsocketController{
 
                         if (loadedChats.find((chat) => chat.username !== senderId) || loadedChats.length === 0) {
 
-                            const profile = await fetch(`http://${ip}:8080/profile/${senderId}`, {
+                            const profile = await fetch(`${ip}/profile/${senderId}`, {
                                 method: "GET",
                                 headers: {
                                     "Authorization": `Bearer ${SecureStorage.getItem("token")}`
@@ -143,7 +143,7 @@ class WebsocketController{
                     }
 
                     if (lastMessageId) {
-                        const messages = await fetch(`http://${ip}:8080/messages/afterId?id=${encodeURIComponent(lastMessageId)}`, {
+                        const messages = await fetch(`${ip}/messages/afterId?id=${encodeURIComponent(lastMessageId)}`, {
                             method: "GET",
                             headers: {
                                 "Application-Type": "application/json",
@@ -162,7 +162,7 @@ class WebsocketController{
                             alert("Network error. Please check your internet connection.");
                         }
                     } else {
-                        const messages = await fetch(`http://${ip}:8080/messages/all`, {
+                        const messages = await fetch(`${ip}/messages/all`, {
                             method: "GET",
                             headers: {
                                 "Application-Type": "application/json",

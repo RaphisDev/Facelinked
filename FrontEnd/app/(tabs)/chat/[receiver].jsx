@@ -18,6 +18,7 @@ import {useEffect, useRef, useState} from "react";
 import WebSocketProvider from "../../../components/WebSocketProvider";
 import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 import StateManager from "../../../components/StateManager";
+import ip from "../../../components/AppManager";
 
 export default function ChatRoom() {
 
@@ -167,8 +168,7 @@ export default function ChatRoom() {
             let loadedChats = await asyncStorage.getItem("chats") || [];
             if (loadedChats.length !== 0) {loadedChats = JSON.parse(loadedChats);}
             if(!loadedChats.find((chat) => chat.username === receiver) || loadedChats.length === 0) {
-                const ip = Platform.OS === "android" ? "10.0.2.2" : "192.168.0.178";
-                const profile = await fetch(`http://${ip}:8080/profile/${receiver}`, {
+                const profile = await fetch(`${ip}/profile/${receiver}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${SecureStorage.getItem("token")}`

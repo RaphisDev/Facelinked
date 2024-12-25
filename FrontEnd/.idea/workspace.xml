@@ -5,18 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
-      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/networks/Network.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/networks/Network.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/networks/controller/NetworkController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/networks/controller/NetworkController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/networks/controller/NetworkRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/networks/controller/NetworkRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/networks/service/NetworkService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/networks/service/NetworkService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/AppManager.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile]/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile]/index.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/chat/[receiver].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chat/[receiver].jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/chat/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chat/index.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/networks/[Network].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/networks/[Network].jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/networks/create.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/networks/create.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/networks/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/networks/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/Entries/Network.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Entries/Network.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/login.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/login.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/register.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/register.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/WebSocketProvider.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/WebSocketProvider.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/notes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/notes.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -196,6 +193,10 @@
       <workItem from="1734985679837" duration="17369000" />
       <workItem from="1735003335605" duration="271000" />
       <workItem from="1735003674990" duration="46000" />
+      <workItem from="1735062808397" duration="277000" />
+      <workItem from="1735083709355" duration="870000" />
+      <workItem from="1735132274137" duration="4963000" />
+      <workItem from="1735141126878" duration="944000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />

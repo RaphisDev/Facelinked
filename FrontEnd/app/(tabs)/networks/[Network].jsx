@@ -20,6 +20,7 @@ import NetworkMessage from "../../../components/Entries/NetworkMessage";
 import * as SecureStorage from "expo-secure-store";
 import {Image} from "expo-image";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import ip from "../../../components/AppManager";
 
 export default function Network() {
 
@@ -34,8 +35,6 @@ export default function Network() {
     const input = useRef(null);
     const message = useRef("");
     const [DataCollapse, setDataCollapse] = useState(true);
-
-    const ip = Platform.OS === 'android' ? '10.0.2.2' : '192.168.0.178';
 
     useEffect(() => {
 
@@ -65,7 +64,7 @@ export default function Network() {
                         });
                     }
                 }
-                const receivedMessages = await fetch(`http://${ip}:8080/networks/${Network}/messages`, {
+                const receivedMessages = await fetch(`${ip}/networks/${Network}/messages`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${SecureStorage.getItem("token")}`,
@@ -86,7 +85,7 @@ export default function Network() {
         loadNetworks();
 
         const loadNetwork = async () => {
-            const receivedData = await fetch(`http://${ip}:8080/networks/${Network}`, {
+            const receivedData = await fetch(`${ip}/networks/${Network}`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${SecureStorage.getItem("token")}`,
@@ -238,7 +237,7 @@ export default function Network() {
         else {
             await AsyncStorage.setItem("networks", JSON.stringify([...loadedNetworks, {networkId: currentNetwork.current.networkId, name: currentNetwork.current.name, description: currentNetwork.current.description, creatorId: currentNetwork.current.creatorId, memberCount: currentNetwork.current.memberCount + 1, networkPicturePath: currentNetwork.current.networkPicturePath, private: currentNetwork.current.private, members: member}]));
         }
-        await fetch(`http://${ip}:8080/networks/${Network}/favorite?b=${encodeURIComponent(shouldFavorite)}`, {
+        await fetch(`${ip}/networks/${Network}/favorite?b=${encodeURIComponent(shouldFavorite)}`, {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${SecureStorage.getItem("token")}`,
@@ -246,7 +245,7 @@ export default function Network() {
         });
     }
     async function removeUser(user) {
-        const response = await fetch(`http://${ip}:8080/networks/${Network}/remove`, {
+        const response = await fetch(`${ip}/networks/${Network}/remove`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -319,7 +318,7 @@ export default function Network() {
                                                         Alert.alert("Description too short");
                                                         return;
                                                     }
-                                                    const response = await fetch(`http://${ip}:8080/networks/${Network}/update`, {
+                                                    const response = await fetch(`${ip}/networks/${Network}/update`, {
                                                         method: "POST",
                                                         headers: {
                                                             "Content-Type": "application/json",
@@ -389,7 +388,7 @@ export default function Network() {
                                                     Alert.alert("User not found");
                                                     return;
                                                 }
-                                                const response = await fetch(`http://${ip}:8080/networks/${Network}/add`, {
+                                                const response = await fetch(`${ip}/networks/${Network}/add`, {
                                                     method: "POST",
                                                     headers: {
                                                         "Content-Type": "application/json",
@@ -399,7 +398,7 @@ export default function Network() {
                                                 });
 
                                                 if (response.ok) {
-                                                    const receivedData = await fetch(`http://${ip}:8080/networks/${Network}`, {
+                                                    const receivedData = await fetch(`${ip}/networks/${Network}`, {
                                                         method: "GET",
                                                         headers: {
                                                             "Authorization": `Bearer ${SecureStorage.getItem("token")}`,
@@ -470,7 +469,7 @@ export default function Network() {
                             </TouchableOpacity>
                         </Animated.View>
                         <Animated.View style={{ transform: [{translateY: translateY2 }]}}>
-                            <View className="border-t-2 border-gray-700/80 mt-4">
+                            <View className="mt-4">
                                 <Text className="text-center text-text dark:text-dark-text font-semibold text-lg mt-3">Description</Text>
                                 <Text className="text-center text-text dark:text-dark-text mt-0.5">{currentNetwork.current?.description}</Text>
                                 <View className="flex-row justify-center items-center mt-3.5">

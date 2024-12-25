@@ -3,6 +3,7 @@ import "../global.css"
 import React, {useRef, useState} from "react";
 import {Redirect, router} from "expo-router";
 import * as SecureStore from "expo-secure-store";
+import ip from "../components/AppManager";
 //import * as AppleAuthentication from "expo-apple-authentication";
 
 export default function Login() {
@@ -49,9 +50,8 @@ export default function Login() {
             setPassword("");
             setEmail("");
 
-            const ip = Platform.OS === 'android' ? '10.0.2.2' : '192.168.0.178';
             try {
-                const response = await fetch(`http://${ip}:8080/auth/authenticate`, {
+                const response = await fetch(`${ip}/auth/authenticate`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -66,7 +66,7 @@ export default function Login() {
                     const data = await response.json();
                     const token = data.token;
 
-                    const profile = await fetch(`http://${ip}:8080/profile/${data.username}`, {
+                    const profile = await fetch(`${ip}/profile/${data.username}`, {
                         method: "GET",
                         headers: {
                             "Authorization": `Bearer ${token}`

@@ -18,6 +18,7 @@ import * as SecureStore from "expo-secure-store";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as SecureStorage from "expo-secure-store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import ip from "../../../../components/AppManager";
 
 export default function Profile() {
 
@@ -49,8 +50,7 @@ export default function Profile() {
             if(profile === undefined) {
                 profile = await SecureStore.getItemAsync('username');
             }
-            const ip = Platform.OS === 'android' ? '10.0.2.2' : '192.168.0.178';
-            const data = await fetch(`http://${ip}:8080/profile/${profile}`, {
+            const data = await fetch(`${ip}/profile/${profile}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Bearer ' + await SecureStore.getItemAsync('token'),

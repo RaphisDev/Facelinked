@@ -4,6 +4,7 @@ import {useNavigation, useRouter} from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import ip from "../../../components/AppManager";
 
 export default function CreateNetwork() {
 
@@ -59,8 +60,7 @@ export default function CreateNetwork() {
         let currentMembers = members;
         currentMembers = [...currentMembers, {memberId: await SecureStore.getItemAsync("username")}];
 
-        const ip = Platform.OS === "android" ? "10.0.2.2" : "192.168.0.178";
-        const data = await fetch(`http://${ip}:8080/networks/create`, {
+        const data = await fetch(`${ip}/networks/create`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
