@@ -29,22 +29,25 @@ export default function Networks() {
         switch (selected) {
             case 0:
                 return <>
-                    <FlatList style={{marginTop: 8}} data={favoriteNetworks}
-                              renderItem={(items) => <Network id={items.item.networkId} network={items.item.name} description={items.item.description} member={items.item.memberCount} isPrivate={items.item.private}/>}/>
+                    <FlatList ListEmptyComponent={<Text className="text-text mt-6 dark:text-dark-text text-center">No favorite networks</Text>}
+                        style={{marginTop: 8}} data={favoriteNetworks}
+                              renderItem={(items) => <Network id={items.item.networkId} network={items.item.name} networkPicturePath={items.item.networkPicturePath} description={items.item.description} member={items.item.memberCount} isPrivate={items.item.private}/>}/>
                 </>;
             case 1:
                 //get friends networks
                 const friendsNetworks = [];
                 return <>
-                    <FlatList style={{marginTop: 8}} data={friendsNetworks}
-                              renderItem={(items) => <Network id={items.item.networkId} network={items.item.name} description={items.item.description} creator={items.item.creatorId} isPrivate={items.item.private}/>}/>
+                    <FlatList ListEmptyComponent={() => <Text className="text-text mt-6 dark:text-dark-text text-center">No networks by friends</Text>}
+                        style={{marginTop: 8}} data={friendsNetworks}
+                              renderItem={(items) => <Network id={items.item.networkId} network={items.item.name} networkPicturePath={items.item.networkPicturePath} description={items.item.description} creator={items.item.creatorId} isPrivate={items.item.private}/>}/>
                 </>;
             case 2:
                 //get explore networks
                 const exploreNetworks = [];
                 return <>
-                    <FlatList style={{marginTop: 8}} data={exploreNetworks}
-                              renderItem={(items) => <Network id={items.item.networkId} network={items.item.name} description={items.item.description} member={items.item.memberCount} isPrivate={items.item.private}/>}/>
+                    <FlatList ListEmptyComponent={() => <Text className="text-text mt-6 dark:text-dark-text text-center">No networks to explore</Text>}
+                        style={{marginTop: 8}} data={exploreNetworks}
+                              renderItem={(items) => <Network id={items.item.networkId} network={items.item.name} NetworkPicturePath={items.item.networkPicturePath} description={items.item.description} member={items.item.memberCount} isPrivate={items.item.private}/>}/>
                 </>;
         }
     }

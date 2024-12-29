@@ -24,7 +24,9 @@ export default function TabsLayout() {
                     }
                 }
             }}>
-                <Tabs.Screen name="home/index" options={{headerTitle: () => <Pressable onPress={() => router.replace("/home", {animationEnabled: false})}><Text className="font-courier text-xl">FaceLinked</Text></Pressable>,
+                <Tabs.Screen name="home/index" options={{headerTitle: () => <Pressable onPress={() => router.replace("/home", {animationEnabled: false})}>
+                        <Text className="font-courier text-xl">FriendsLinked</Text>
+                </Pressable>,
                     headerTitleAlign: "center",
                     tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "home-sharp" : "home-outline"} size={30}/>,
                 }}/>

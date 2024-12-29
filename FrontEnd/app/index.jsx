@@ -27,7 +27,7 @@ export default function Index() {
     return (
         <View className="w-full h-full bg-primary dark:bg-dark-primary justify-center">
             <Image source={require("../assets/images/icon.png")} style={{width: 140, height: 140, alignSelf: "center", borderRadius: 40}}/>
-            <Text className="text-xl font-medium text-center text-text dark:text-dark-text mt-48">Made by Orion</Text>
+            <Text className="text-2xl font-semibold text-center text-text dark:text-dark-text mt-48">Made by Orion</Text>
         </View>
     );
 }

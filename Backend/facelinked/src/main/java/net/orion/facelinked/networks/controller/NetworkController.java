@@ -9,6 +9,7 @@ import net.orion.facelinked.networks.NetworkMember;
 import net.orion.facelinked.networks.NetworkMessage;
 import net.orion.facelinked.networks.service.NetworkService;
 import net.orion.facelinked.profile.service.ProfileService;
+import net.orion.facelinked.profile.service.StorageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -29,6 +30,7 @@ public class NetworkController {
     private NetworkService networkService;
     private UserService userService;
     private SimpMessagingTemplate messagingTemplate;
+    private StorageService storageService;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/create")
@@ -194,5 +196,12 @@ public class NetworkController {
     public void favorite(@PathVariable String network, @RequestParam boolean b) {
 
         networkService.favorite(network, b);
+    }
+
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @GetMapping("/upload")
+    private ResponseEntity<String> BucketUrl()
+    {
+        return ResponseEntity.ok(storageService.generatePresignedUrl());
     }
 }

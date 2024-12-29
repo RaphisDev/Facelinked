@@ -32,8 +32,6 @@ export default function Profile() {
     const [showInput, setShowInput] = useState(false);
     const input = useRef(null);
 
-    const segments = useSegments();
-
     const [profileInfos, setProfileInfos] = useState({
         name: "Loading...",
         score: 0,
@@ -99,7 +97,7 @@ export default function Profile() {
             headerTitle: profile !== SecureStore.getItem("username") ? profile : "Profile",
         });
         fetchData();
-    }, [segments]);
+    }, [profile]);
 
     return (
         <>

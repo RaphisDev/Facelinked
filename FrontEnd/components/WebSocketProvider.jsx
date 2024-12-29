@@ -16,6 +16,11 @@ class WebsocketController{
     stompClient = null;
     messageReceived = new EventEmitter();
 
+    reset ()  {
+        this.stompClient.deactivate();
+        webSocketInstance = null;
+    }
+
     constructor() {
         if(!webSocketInstance) {
             this.stompClient = new StompJs.Client({
@@ -112,6 +117,21 @@ class WebsocketController{
                         await saveMessages(parsedMessage);
                         await asyncStorage.setItem("lastMessageId", parsedMessage.id);
                     }
+                    const processOldMessages = async (parsedMessage) => {
+                        const loadedChats = await getChats();
+
+                        await saveChats(parsedMessage.senderId, loadedChats);
+
+                        const messageUserName = parsedMessage.senderId === username ? parsedMessage.receiverId : parsedMessage.senderId;
+
+                        const loadedMessages = await getMessages(messageUserName);
+                        await asyncStorage.setItem(`messages/${messageUserName}`, JSON.stringify([...loadedMessages, {
+                            isSender: username === parsedMessage.senderId,
+                            content: parsedMessage.content,
+                            timestamp: parsedMessage.timestamp
+                        }]));
+                        await asyncStorage.setItem("lastMessageId", parsedMessage.id);
+                    }
 
                     const receiveNetworkMessages = async () => {
                         let networks = await asyncStorage.getItem("networks") || [];
@@ -154,9 +174,9 @@ class WebsocketController{
                         if (messages.ok) {
                             const parsedMessages = await messages.json();
 
-                            parsedMessages.forEach((message) => {
-                                processMessage(message);
-                            });
+                            for (const message of parsedMessages) {
+                                await processMessage(message);
+                            }
                         }
                         else {
                             alert("Network error. Please check your internet connection.");
@@ -172,12 +192,10 @@ class WebsocketController{
 
                         if (messages.ok) {
                             const parsedMessages = await messages.json();
-                            const loadedChats = await getChats();
 
-                            parsedMessages.forEach((message) => {
-                                saveMessages(message)
-                                saveChats(message.senderId, loadedChats);
-                            });
+                            for (const message of parsedMessages) {
+                                await processOldMessages(message);
+                            }
                         }
                         else {
                             alert("Network error. Please check your internet connection.");

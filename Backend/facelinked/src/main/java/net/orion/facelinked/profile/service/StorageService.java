@@ -37,6 +37,6 @@ public class StorageService {
 
             PresignedPutObjectRequest presignedRequest = presigner.presignPutObject(r -> r.putObjectRequest(putObjectRequest).signatureDuration(Duration.ofMinutes(1)));
             return presignedRequest.url().toString();
-            }
+        }
     }
 }

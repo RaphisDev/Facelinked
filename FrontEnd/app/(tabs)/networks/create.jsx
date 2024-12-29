@@ -5,10 +5,21 @@ import * as SecureStore from "expo-secure-store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ip from "../../../components/AppManager";
+import {Image} from "expo-image";
+import * as ImagePicker from "expo-image-picker";
 
 export default function CreateNetwork() {
 
     const memberInput = useRef(null);
+    const [isPrivate, setIsPrivate] = useState(false);
+    const [members, setMembers] = useState([]);
+    const name = useRef("");
+    const description = useRef("");
+    const [imageUri, setImage] = useState(undefined);
+    const image = useRef(null);
+    const [isCreating, setCreating] = useState(false);
+
+    const router = useRouter();
 
     function toggleSwitch() {
         setIsPrivate(previousState => !previousState);
@@ -57,6 +68,32 @@ export default function CreateNetwork() {
             alert("Please add at least one member to a private network.");
             return;
         }
+        let url = ""; //url of aws s3 default network icon or no one
+        setCreating(true);
+
+        if (image.current !== null) {
+            const bucketUrl = await fetch(`${ip}/networks/upload`, {
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + SecureStore.getItem("token")
+                }
+            });
+            if (!bucketUrl.ok) {
+                alert("Failed to upload image. Please try again later.");
+                return;
+            }
+            url = await bucketUrl.text();
+
+            await fetch(url, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                },
+                body: image.current,
+            });
+        }
+        //const compressedImage = await ImageManipulator.manipulateAsync(imageUri, [], { compress: 0.5 });
+
         let currentMembers = members;
         currentMembers = [...currentMembers, {memberId: await SecureStore.getItemAsync("username")}];
 
@@ -70,7 +107,8 @@ export default function CreateNetwork() {
                 name: name.current,
                 description: description.current,
                 private: isPrivate,
-                members: isPrivate ? currentMembers : []
+                members: isPrivate ? currentMembers : [],
+                networkPicturePath: url.split('?')[0]
             })
         });
 
@@ -83,17 +121,10 @@ export default function CreateNetwork() {
             if (networks.length !== 0) {
                 networks = JSON.parse(networks);
             }
-            await AsyncStorage.setItem("networks", JSON.stringify([...networks, {networkId: parsedData.id, name: name.current, description: description.current, creator: parsedData.creatorId, private: isPrivate, memberCount: 1, members: parsedData.members}]));
+            await AsyncStorage.setItem("networks", JSON.stringify([...networks, {networkId: parsedData.id, name: name.current, description: description.current, creator: parsedData.creatorId, private: isPrivate, memberCount: 1, members: parsedData.members, networkPicturePath: url.split('?')[0]}]));
             router.back();
         }
     }
-
-    const [isPrivate, setIsPrivate] = useState(false);
-    const [members, setMembers] = useState([]);
-    const name = useRef("");
-    const description = useRef("");
-
-    const router = useRouter();
 
     return (
         <View className="w-full h-full bg-primary dark:bg-dark-primary">
@@ -129,7 +160,25 @@ export default function CreateNetwork() {
                         })}
                     </View>
                 </View>
-                <TouchableOpacity activeOpacity={0.9} onPress={() => createNetwork()} className="w-full bg-accent dark:bg-dark-accent mt-5 p-2.5 rounded-lg">
+                <View>
+                    <TouchableOpacity onPress={async () => {
+                        const result = await ImagePicker.launchImageLibraryAsync({
+                            allowsEditing: true,
+                            aspect: [1, 1],
+                            quality: 0.8,
+                            mediaTypes: ImagePicker.MediaTypeOptions.Images, //deprecated
+                        });
+
+                        if (!result.canceled) {
+                            image.current = result.assets[0];
+                            setImage(result.assets[0].uri);
+                        }
+                    }} className="w-1/2 self-center mt-4 bg-gray-700 flex-row justify-center items-center p-1.5 rounded-lg">
+                        <Ionicons name={"image"} size={24} color={"white"} style={{alignSelf: "center"}}/>
+                        <Text className="text-dark-text ml-1 font-bold text-center">Upload Image</Text>
+                    </TouchableOpacity>
+                </View>
+                <TouchableOpacity disabled={isCreating} activeOpacity={0.9} onPress={() => createNetwork()} className="w-full bg-accent dark:bg-dark-accent mt-5 p-2.5 rounded-lg">
                     <Text className="text-dark-text font-bold text-center">Create Network</Text>
                 </TouchableOpacity>
             </View>

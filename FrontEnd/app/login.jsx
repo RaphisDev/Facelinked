@@ -78,7 +78,7 @@ export default function Login() {
                         await SecureStore.setItemAsync("username", data.username);
                         await SecureStore.setItemAsync("profilePicture", profileJson.profilePicturePath);
                         await SecureStore.setItemAsync("profile", JSON.stringify(profileJson));
-                        router.replace("/home");
+                        router.replace("/");
                     }
                 } else {
                     alert("Wrong email or password");

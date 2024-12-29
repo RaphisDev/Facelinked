@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "FaceLinked",
-    "slug": "FaceLinked",
+    "name": "FriendsLinked",
+    "slug": "FriendsLinked",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -21,7 +21,7 @@
     "ios": {
       "usesAppleSignIn": true,
       "supportsTablet": true,
-      "bundleIdentifier": "com.FaceLinked.Frontend"
+      "bundleIdentifier": "com.friendsLinked.app"
     },
     "android": {
       "softwareKeyboardLayoutMode": "pan",
@@ -29,7 +29,7 @@
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.FaceLinked.Frontend"
+      "package": "com.friendsLinked.app"
     },
     "web": {
       "bundler": "metro",

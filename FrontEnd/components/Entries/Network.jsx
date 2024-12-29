@@ -11,7 +11,7 @@ export default function Network(props) {
         <TouchableOpacity activeOpacity={0.9} style={{ marginLeft: 15, marginRight: 15, paddingBottom: 7}} onPress={() => router.navigate(`/networks/${props.id}?name=${props.network}`)}>
             <View className="rounded-xl bg-dark-primary/90 dark:bg-[#6C757D]" style={{ height: 90 }}>
                 <View className="flex-row w-full h-full">
-                    <Image style={{height: 51, width: 51, marginLeft: 18.5, alignSelf: "center", borderRadius: 10}} source={require("../../assets/images/icon.png")}/>
+                    <Image style={{height: 51, width: 51, marginLeft: 18.5, alignSelf: "center", borderRadius: 10}} source={{uri: props.networkPicturePath}}/>
                     <View className="flex-1" style={{marginRight: 50}}>
                         <Text className="text-dark-text text-xl font-bold mt-2 text-center">{props.network}</Text>
                         <Text className="text-dark-text mt-1 text-center">{props.description}</Text>
