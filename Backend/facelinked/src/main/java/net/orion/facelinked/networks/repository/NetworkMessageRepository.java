@@ -10,5 +10,7 @@ import java.util.List;
 @Repository
 public interface NetworkMessageRepository extends MongoRepository<NetworkMessage, String> {
 
-    List<NetworkMessage> findTopByNetworkIdOrderByIdDesc(String networkId, Pageable pageable);
+    List<NetworkMessage> findFirst20ByNetworkIdOrderByIdDesc(String networkId);
+
+    List<NetworkMessage> findByIdGreaterThanAndNetworkId(String idIsGreaterThan, String networkId);
 }

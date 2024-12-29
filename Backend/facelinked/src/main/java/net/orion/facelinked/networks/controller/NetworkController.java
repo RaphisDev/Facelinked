@@ -84,7 +84,7 @@ public class NetworkController {
         senderProfile.setMemberName(user.getName());
         senderProfile.setMemberId(sender);
 
-        networkService.sendMessage(NetworkMessage.builder()
+        var savedMessage = networkService.sendMessage(NetworkMessage.builder()
                 .content(message.getContent())
                 .timestamp(message.getTimestamp())
                 .senderId(senderProfile)
@@ -92,6 +92,7 @@ public class NetworkController {
                 .build());
 
         messagingTemplate.convertAndSend("/networks/" + message.getReceiver(), NetworkMessage.builder().
+                id(savedMessage.getId()).
                 senderId(senderProfile).
                 content(message.getContent()).
                 timestamp(message.getTimestamp()).
@@ -109,6 +110,20 @@ public class NetworkController {
         }
 
         return ResponseEntity.ok(networkService.getMessages(networkId));
+    }
+
+    @GetMapping("/{networkId}/afterId")
+    public ResponseEntity<List<NetworkMessage>> getMessages(@PathVariable String networkId, @RequestParam String id, @AuthenticationPrincipal UserDetails userDetails) {
+        var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
+
+        var network = networkService.getNetwork(networkId);
+        if (network.isPrivate()) {
+            if (network.getMembers().stream().noneMatch(member -> member.getMemberId().equals(sender))) {
+                throw new IllegalArgumentException("User not authorized to view messages");
+            }
+        }
+
+        return ResponseEntity.ok(networkService.getMessagesAfterId(networkId, id));
     }
 
     @GetMapping(value="/{networkId}", produces = "application/json")

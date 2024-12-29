@@ -4,7 +4,7 @@ import Network from "../../../components/Entries/Network";
 import {useEffect, useRef, useState} from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {useLocalSearchParams, useRouter, useSegments} from "expo-router";
+import {router, useLocalSearchParams, useRouter, useSegments} from "expo-router";
 
 export default function Networks() {
 

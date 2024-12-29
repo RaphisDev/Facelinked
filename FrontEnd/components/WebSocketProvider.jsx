@@ -142,6 +142,7 @@ class WebsocketController{
                             const id = networks[network].networkId
                             this.stompClient.subscribe(`/networks/${id}`, async (message) => {
                                 const parsedMessage = JSON.parse(message.body);
+
                                 if (parsedMessage.senderId.memberId === username) {
                                     return;
                                 }
@@ -158,6 +159,7 @@ class WebsocketController{
                                 let loadedMessages = await asyncStorage.getItem(`networks/${id}`) || [];
                                 if (loadedMessages.length !== 0) {loadedMessages = JSON.parse(loadedMessages);}
                                 await asyncStorage.setItem(`networks/${id}`, JSON.stringify([...loadedMessages, {networkId: id, content: parsedMessage.content, sender: parsedMessage.senderId.memberId, senderProfileName: parsedMessage.senderId.memberName, senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath, timestamp: parsedMessage.timestamp}]));
+                                await asyncStorage.setItem(`lastNetworkMessageId/${id}`, parsedMessage.id);
                             });
                         }
                     }

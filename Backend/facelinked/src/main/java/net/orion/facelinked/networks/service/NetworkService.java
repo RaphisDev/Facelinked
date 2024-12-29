@@ -1,6 +1,7 @@
 package net.orion.facelinked.networks.service;
 
 import lombok.AllArgsConstructor;
+import net.orion.facelinked.chats.ChatMessage;
 import net.orion.facelinked.networks.Network;
 import net.orion.facelinked.networks.NetworkMember;
 import net.orion.facelinked.networks.NetworkMessage;
@@ -47,13 +48,12 @@ public class NetworkService {
         networkRepository.save(networkResponseEntity);
     }
 
-    public void sendMessage(NetworkMessage build) {
-        networkMessageRepository.save(build);
+    public NetworkMessage sendMessage(NetworkMessage build) {
+        return networkMessageRepository.save(build);
     }
 
     public List<NetworkMessage> getMessages(String networkId) {
-        var pageable = PageRequest.of(0, 20); //test with 2 messages
-        return networkMessageRepository.findTopByNetworkIdOrderByIdDesc(networkId, pageable);
+        return networkMessageRepository.findFirst20ByNetworkIdOrderByIdDesc(networkId).reversed();
     }
 
     public void favorite(String network, boolean b) {
@@ -71,5 +71,10 @@ public class NetworkService {
             networkResponseEntity.setMemberCount(networkResponseEntity.getMemberCount() - 1);
         }
         networkRepository.save(networkResponseEntity);
+    }
+
+    public List<NetworkMessage> getMessagesAfterId(String networkId, String id) {
+
+        return networkMessageRepository.findByIdGreaterThanAndNetworkId(id, networkId);
     }
 }

@@ -17,7 +17,6 @@ public class ChatService {
         return result.getId();
     }
 
-    //doesnt always work
     public List<ChatMessage> findByIdAfter(String id, String senderId) {
         return chatRepository.findByIdGreaterThanAndReceiverId(id, senderId);
     }

@@ -14,17 +14,16 @@ import {
     Text, Share, Alert
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 import WebSocketProvider from "../../../components/WebSocketProvider";
 import NetworkMessage from "../../../components/Entries/NetworkMessage";
 import * as SecureStorage from "expo-secure-store";
 import {Image} from "expo-image";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import asyncStorage from "@react-native-async-storage/async-storage";
 import ip from "../../../components/AppManager";
 
 export default function Network() {
 
-    const {Network, name} = useLocalSearchParams();
+    const {Network} = useLocalSearchParams();
 
     const navigator = useNavigation("../../");
     const router = useRouter();
@@ -35,54 +34,9 @@ export default function Network() {
     const input = useRef(null);
     const message = useRef("");
     const [DataCollapse, setDataCollapse] = useState(true);
+    const initializedMessages = useRef(false);
 
     useEffect(() => {
-
-        navigator.setOptions({
-            headerLeft: () => <TouchableOpacity className="ml-2" onPress={() => router.back()}><Ionicons name="arrow-back" size={24} color="black"/></TouchableOpacity>,
-            headerRight: () => <TouchableOpacity className="mr-2" onPress={() => setModalVisible(true)}><Ionicons name="people" size={24} color="black"/></TouchableOpacity>,
-            headerTitle: name,
-        });
-
-        const loadMessages = async () => {
-            const loadedMessages = await asyncStorage.getItem(`networks/${Network}`) || null;
-            if (loadedMessages !== null) {
-                addMessage(JSON.parse(loadedMessages));
-            }
-        }
-        loadMessages();
-
-        const loadNetworks = async () => {
-            const loadedNetworks = await asyncStorage.getItem("networks") || null;
-            if (loadedNetworks !== null) {
-                const parsedNetworks = JSON.parse(loadedNetworks);
-                if (!parsedNetworks.find((network) => Number.parseInt(network.networkId) === Number.parseInt(Network))) {
-                    if (ws.stompClient.connected) {
-                        ws.stompClient.subscribe(`/networks/${Network}`, async (message) => {
-                            const parsedMessage = JSON.parse(message.body);
-                            addMessage((prevMessages) => [...prevMessages, {sender: parsedMessage.senderId.memberId, senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath, content: parsedMessage.content, timestamp: parsedMessage.timestamp}]);
-                        });
-                    }
-                }
-                const receivedMessages = await fetch(`${ip}/networks/${Network}/messages`, {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `Bearer ${SecureStorage.getItem("token")}`,
-                        "Application-Type": "application/json"
-                    }
-                });
-                if (receivedMessages.ok) {
-                    const data = await receivedMessages.json();
-                    addMessage(prevState => [...prevState, ...data.map((message) => {
-                        if (prevState.some(currentMessages => currentMessages.id === message.id)) {
-                            return null;
-                        }
-                        return {senderProfilePicturePath: message.senderId.memberProfilePicturePath, sender: message.senderId.memberId, content: message.content, timestamp: message.timestamp};
-                    }).filter((message) => message !== null)]);
-                }
-            }
-        }
-        loadNetworks();
 
         const loadNetwork = async () => {
             const receivedData = await fetch(`${ip}/networks/${Network}`, {
@@ -96,6 +50,12 @@ export default function Network() {
                 const data = await receivedData.json();
                 setMember(data.members);
                 currentNetwork.current = {networkId: data.id, name: data.name, description: data.description, creatorId: data.creatorId, private: data.private, memberCount: data.memberCount, networkPicturePath: data.networkPicturePath};
+
+                navigator.setOptions({
+                    headerLeft: () => <TouchableOpacity className="ml-2" onPress={() => router.back()}><Ionicons name="arrow-back" size={24} color="black"/></TouchableOpacity>,
+                    headerRight: () => <TouchableOpacity className="mr-2" onPress={() => setModalVisible(true)}><Ionicons name="people" size={24} color="black"/></TouchableOpacity>,
+                    headerTitle: currentNetwork.current?.name,
+                });
 
                 let loadedNetworks = await asyncStorage.getItem("networks") || [];
                 if (loadedNetworks.length !== 0) {loadedNetworks = JSON.parse(loadedNetworks);}
@@ -115,6 +75,71 @@ export default function Network() {
             }
         }
         loadNetwork();
+
+        const loadMessages = async () => {
+            const loadedMessages = await asyncStorage.getItem(`networks/${Network}`) || null;
+            if (loadedMessages !== null) {
+                addMessage(JSON.parse(loadedMessages));
+            }
+        }
+        loadMessages();
+
+        const receiveNetworkMessages = async () => {
+            let parsedNetworks = await asyncStorage.getItem("networks") || [];
+            if (parsedNetworks.length !== 0) {
+                parsedNetworks = JSON.parse(parsedNetworks);
+            }
+
+            if (!parsedNetworks.find((network) => Number.parseInt(network.networkId) === Number.parseInt(Network)) || parsedNetworks.length === 0) {
+                if (ws.stompClient.connected) {
+                    ws.stompClient.subscribe(`/networks/${Network}`, async (message) => {
+                        const parsedMessage = JSON.parse(message.body);
+                        if (parsedMessage.senderId.memberId === SecureStorage.getItem("username")) {return;}
+                        addMessage((prevMessages) => [...prevMessages, {sender: parsedMessage.senderId.memberId, senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath, content: parsedMessage.content, timestamp: parsedMessage.timestamp}]);
+                    });
+
+                    const receivedMessages = await fetch(`${ip}/networks/${Network}/messages`, {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${SecureStorage.getItem("token")}`,
+                            "Application-Type": "application/json"
+                        }
+                    });
+                    if (receivedMessages.ok) {
+                        const data = await receivedMessages.json();
+                        addMessage(prevState => [...prevState, ...data.map((message) => {
+                            return {senderProfilePicturePath: message.senderId.memberProfilePicturePath, sender: message.senderId.memberId, content: message.content, timestamp: message.timestamp};
+                        })]);
+                    }
+                }
+            }
+            else {
+                const receivedMessages = await fetch(`${ip}/networks/${Network}/afterId?id=${encodeURIComponent(await asyncStorage.getItem(`lastNetworkMessageId/${Network}`))}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${SecureStorage.getItem("token")}`,
+                        "Application-Type": "application/json"
+                    }
+                });
+
+                if (receivedMessages.ok) {
+                    const data = await receivedMessages.json();
+
+                    addMessage(prevState => [...prevState, ...data.map((message) => {
+                        return {senderProfilePicturePath: message.senderId.memberProfilePicturePath, sender: message.senderId.memberId, content: message.content, timestamp: message.timestamp};
+                    })]);
+
+                    await asyncStorage.setItem(`lastNetworkMessageId/${Network}`, data[data.length - 1].id);
+
+                    let messages = await asyncStorage.getItem(`networks/${Network}`) || [];
+                    if (messages.length !== 0) {messages = JSON.parse(messages);}
+                    await asyncStorage.setItem(`networks/${Network}`, JSON.stringify([...messages, ...data.map((message) => {
+                        return {senderProfilePicturePath: message.senderId.memberProfilePicturePath, sender: message.senderId.memberId, content: message.content, timestamp: message.timestamp};
+                    })]));
+                }
+            }
+        }
+        receiveNetworkMessages();
 
         ws.messageReceived.addListener("networkMessageReceived", async (e) => {
             if (Number.parseInt(e.detail.networkId) !== Number.parseInt(Network)) {
@@ -227,15 +252,17 @@ export default function Network() {
     const [isFavorite, setIsFavorite] = useState(false);
 
     async function setFavorite(shouldFavorite) {
-        let loadedNetworks = await AsyncStorage.getItem("networks") || [];
+        let loadedNetworks = await asyncStorage.getItem("networks") || [];
         if (loadedNetworks.length !== 0) {loadedNetworks = JSON.parse(loadedNetworks);}
         if (!shouldFavorite) {
-            await AsyncStorage.setItem("networks", JSON.stringify(loadedNetworks.filter((network) => {
+            await asyncStorage.setItem("networks", JSON.stringify(loadedNetworks.filter((network) => {
                 return Number.parseInt(network.networkId) !== Number.parseInt(Network);
             })));
+            await asyncStorage.removeItem(`networks/${Network}`);
+            await asyncStorage.removeItem(`lastNetworkMessageId/${Network}`);
         }
         else {
-            await AsyncStorage.setItem("networks", JSON.stringify([...loadedNetworks, {networkId: currentNetwork.current.networkId, name: currentNetwork.current.name, description: currentNetwork.current.description, creatorId: currentNetwork.current.creatorId, memberCount: currentNetwork.current.memberCount + 1, networkPicturePath: currentNetwork.current.networkPicturePath, private: currentNetwork.current.private, members: member}]));
+            await asyncStorage.setItem("networks", JSON.stringify([...loadedNetworks, {networkId: currentNetwork.current.networkId, name: currentNetwork.current.name, description: currentNetwork.current.description, creatorId: currentNetwork.current.creatorId, memberCount: currentNetwork.current.memberCount + 1, networkPicturePath: currentNetwork.current.networkPicturePath, private: currentNetwork.current.private, members: member}]));
         }
         await fetch(`${ip}/networks/${Network}/favorite?b=${encodeURIComponent(shouldFavorite)}`, {
             method: "POST",
@@ -270,7 +297,36 @@ export default function Network() {
     return(
         <View className="h-full w-full bg-primary dark:bg-dark-primary">
             <View className="h-full">
-                <FlatList onStartReached={() => console.log("load more messages. adjust onStartReachedThreshold")} ref={messageList} style={{marginTop: 5, marginBottom: 50}} onContentSizeChange={() => messageList.current.scrollToEnd()} data={messages} renderItem={(item) =>
+                <FlatList onStartReached={async () => {
+                    if (messages.length >= 20 && initializedMessages.current) {
+                        /*const loadedNetworks = await asyncStorage.getItem("networks") || null;
+                        if (loadedNetworks !== null) {
+                            const parsedNetworks = JSON.parse(loadedNetworks);
+                            if (!parsedNetworks.find((network) => Number.parseInt(network.networkId) === Number.parseInt(Network))) {
+                                if (ws.stompClient.connected) {
+                                    const receivedMessages = await fetch(`${ip}/networks/${Network}/messages/all`, {
+                                        method: "GET",
+                                        headers: {
+                                            "Authorization": `Bearer ${SecureStorage.getItem("token")}`,
+                                            "Application-Type": "application/json"
+                                        }
+                                    });
+                                    if (receivedMessages.ok) {
+                                        const data = await receivedMessages.json();
+                                        addMessage(prevState => [...prevState, ...data.map((message) => {
+                                            return {
+                                                senderProfilePicturePath: message.senderId.memberProfilePicturePath,
+                                                sender: message.senderId.memberId,
+                                                content: message.content,
+                                                timestamp: message.timestamp
+                                            };
+                                        })]);
+                                    }
+                                }
+                            }
+                        }    */
+                    }
+                }} ref={messageList} style={{marginTop: 5, marginBottom: 50}} onContentSizeChange={() => messageList.current.scrollToEnd()} data={messages} renderItem={(item) =>
                     <NetworkMessage content={item.item.content} sender={item.item.sender} senderProfilePicturePath={item.item.senderProfilePicturePath} timestamp={item.item.timestamp}/>}
                           keyExtractor={(item, index) => index.toString()}>
                 </FlatList>
@@ -283,7 +339,7 @@ export default function Network() {
                             (e) => {
                                 sendMessage(e.nativeEvent.text);
                             }
-                        } className="bg-white dark:bg-dark-primary/50 w-fit mr-16 dark:text-dark-text text-text border-gray-700/80 active:bg-gray-600/10 rounded-lg dark:border-black border-4 font-medium h-10 p-0.5 pl-2.5" placeholder="Type a message" onChangeText={(text) => message.current = text}></TextInput>
+                        } className="bg-white dark:bg-gray-700 w-fit mr-16 dark:text-dark-text text-text border-gray-700/80 active:bg-gray-600/10 rounded-lg dark:border-black/30 border-4 font-medium h-10 p-0.5 pl-2.5" placeholder="Type a message" onChangeText={(text) => message.current = text}></TextInput>
                         <TouchableOpacity className="absolute right-0 bottom-0 m-1.5 mr-5" activeOpacity={0.7} onPress={() => sendMessage(message.current)}>
                             <Ionicons name={"send"} size={24}></Ionicons>
                         </TouchableOpacity>
@@ -333,7 +389,7 @@ export default function Network() {
                                                         });
                                                         currentNetwork.current = {networkId: currentNetwork.current.networkId, name: text, description: description, creatorId: currentNetwork.current.creatorId, private: currentNetwork.current.private};
 
-                                                        await AsyncStorage.setItem("networks", JSON.stringify(JSON.parse(await AsyncStorage.getItem("networks")).map((network) => {
+                                                        await asyncStorage.setItem("networks", JSON.stringify(JSON.parse(await asyncStorage.getItem("networks")).map((network) => {
                                                             if (Number.parseInt(network.networkId) === Number.parseInt(Network)) {
                                                                 return {networkId: currentNetwork.current.networkId, name: text, description: description, creatorId: currentNetwork.current.creatorId, private: currentNetwork.current.private, members: member};
                                                             }

@@ -16,7 +16,7 @@ import StompJs from "@stomp/stompjs";
 import * as SecureStorage from "expo-secure-store";
 import {useEffect, useRef, useState} from "react";
 import WebSocketProvider from "../../../components/WebSocketProvider";
-import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
+import asyncStorage from "@react-native-async-storage/async-storage";
 import StateManager from "../../../components/StateManager";
 import ip from "../../../components/AppManager";
 
@@ -217,7 +217,7 @@ export default function ChatRoom() {
                             (e) => {
                                 sendMessage(e.nativeEvent.text);
                             }
-                        } className="bg-white dark:bg-dark-primary/50 w-fit mr-16 h-10 dark:text-dark-text text-text border-gray-700/80 dark:border-black dark:active:bg-primary/5 active:bg-gray-600/10 rounded-lg border-4 font-medium p-0.5 pl-2.5" placeholder="Type a message" onChangeText={(text) => message.current = text}></TextInput>
+                        } className="bg-white dark:bg-gray-700 w-fit mr-16 h-10 dark:text-dark-text text-text border-gray-700/80 dark:border-black/30 dark:active:bg-primary/5 active:bg-gray-600/10 rounded-lg border-4 font-medium p-0.5 pl-2.5" placeholder="Type a message" onChangeText={(text) => message.current = text}></TextInput>
                         <TouchableOpacity className="absolute right-0 bottom-0 m-1.5 mr-5" activeOpacity={0.7} onPress={() => sendMessage(message.current)}>
                             <Ionicons name={"send"} size={24}></Ionicons>
                         </TouchableOpacity>

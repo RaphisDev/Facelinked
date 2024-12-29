@@ -8,7 +8,7 @@ export default function Network(props) {
     const router = useRouter();
 
     return (
-        <TouchableOpacity activeOpacity={0.9} style={{ marginLeft: 15, marginRight: 15, paddingBottom: 7}} onPress={() => router.navigate(`/networks/${props.id}?name=${props.network}`)}>
+        <TouchableOpacity activeOpacity={0.9} style={{ marginLeft: 15, marginRight: 15, paddingBottom: 7}} onPress={() => router.navigate(`/networks/${props.id}`)}>
             <View className="rounded-xl bg-dark-primary/90 dark:bg-[#6C757D]" style={{ height: 90 }}>
                 <View className="flex-row w-full h-full">
                     <Image style={{height: 51, width: 51, marginLeft: 18.5, alignSelf: "center", borderRadius: 10}} source={{uri: props.networkPicturePath}}/>
