@@ -56,6 +56,10 @@ public class NetworkService {
         return networkMessageRepository.findFirst20ByNetworkIdOrderByIdDesc(networkId).reversed();
     }
 
+    public List<NetworkMessage> getAdditionalMessages(String networkId) {
+        return networkMessageRepository.findByNetworkId(networkId).reversed();
+    }
+
     public void favorite(String network, boolean b) {
         var networkResponseEntity = networkRepository.findById(Long.parseLong(network));
         if (networkResponseEntity == null) {
@@ -74,7 +78,6 @@ public class NetworkService {
     }
 
     public List<NetworkMessage> getMessagesAfterId(String networkId, String id) {
-
         return networkMessageRepository.findByIdGreaterThanAndNetworkId(id, networkId);
     }
 }

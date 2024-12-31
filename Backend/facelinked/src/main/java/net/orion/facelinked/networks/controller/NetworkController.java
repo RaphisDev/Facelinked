@@ -99,7 +99,7 @@ public class NetworkController {
                 build());
     }
     @GetMapping("/{networkId}/messages")
-    public ResponseEntity<List<NetworkMessage>> getMessages(@PathVariable String networkId, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<List<NetworkMessage>> getMessages(@PathVariable String networkId, @AuthenticationPrincipal UserDetails userDetails, @RequestParam(required = false) boolean additional) {
         var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
 
         var network = networkService.getNetwork(networkId);
@@ -108,7 +108,9 @@ public class NetworkController {
                 throw new IllegalArgumentException("User not authorized to view messages");
             }
         }
-
+        if (additional) {
+            return ResponseEntity.ok(networkService.getAdditionalMessages(networkId));
+        }
         return ResponseEntity.ok(networkService.getMessages(networkId));
     }
 

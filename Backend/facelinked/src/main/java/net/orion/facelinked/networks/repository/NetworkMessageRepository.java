@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Repository
@@ -13,4 +14,6 @@ public interface NetworkMessageRepository extends MongoRepository<NetworkMessage
     List<NetworkMessage> findFirst20ByNetworkIdOrderByIdDesc(String networkId);
 
     List<NetworkMessage> findByIdGreaterThanAndNetworkId(String idIsGreaterThan, String networkId);
+
+    List<NetworkMessage> findByNetworkId(String networkId);
 }

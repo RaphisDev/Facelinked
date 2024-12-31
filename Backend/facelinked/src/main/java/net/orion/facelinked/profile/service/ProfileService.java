@@ -6,6 +6,7 @@ import net.orion.facelinked.profile.repository.ProfileRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -22,5 +23,9 @@ public class ProfileService {
 
     public void save(Profile build) {
         profileRepository.save(build);
+    }
+
+    public Optional<List<Profile>> searchByUsername(String username) {
+        return profileRepository.searchTop5ByNameContainsIgnoreCase(username);
     }
 }

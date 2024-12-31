@@ -22,15 +22,14 @@ import ip from "../../../../components/AppManager";
 
 export default function Profile() {
 
-
-    //Posts
-    //Pressing on tab icon goes back to your profile or swiping right
     const navigation = useNavigation();
     let {profile} = useLocalSearchParams();
     const router = useRouter();
 
     const [showInput, setShowInput] = useState(false);
     const input = useRef(null);
+    const [isSearching, setIsSearching] = useState(false);
+    const [searchResults, setSearchResults] = useState([]);
 
     const [profileInfos, setProfileInfos] = useState({
         name: "Loading...",
@@ -76,9 +75,11 @@ export default function Profile() {
         setShowInput(shown => {
             if (shown) {
                 Keyboard.dismiss();
+                setIsSearching(false);
             }
             else {
                 input.current.focus();
+                setSearchResults([]);
             }
             return !shown
         });
@@ -102,16 +103,65 @@ export default function Profile() {
     return (
         <>
             <View className="bg-primary dark:bg-dark-primary w-full h-full">
-                <ScrollView>
-                    <TextInput ref={input} style={{display: !showInput ? "none" : "flex"}} placeholder="Type in an username" autoCapitalize="none" className="rounded-xl mt-4 p-2 w-3/4 hidden bg-primary dark:bg-dark-primary dark:text-dark-text text-text mx-auto mb-4 border-4 border-accent" onSubmitEditing={(e) => {
-                        if (e.nativeEvent.text.trim().length === 0) {
-                            handleAddBar()
-                            return;
-                        }
-                        router.navigate(`/${e.nativeEvent.text}`);
-                        input.current.clear();
+                <TextInput onEndEditing={(t) => {
+                    if (t.nativeEvent.text.trim().length === 0 && showInput) {
                         handleAddBar();
-                    }}/>
+                    }
+                }} autoCorrect={false} ref={input} style={{display: !showInput ? "none" : "flex"}} onChangeText={(text) => {
+                    if (text.trim().length > 0) {
+                        setIsSearching(true);
+                    }
+                    else {
+                        setIsSearching(false);
+                    }
+
+                    if (text.length >= 2 && text.length % 2 === 0) {
+                        fetch(`${ip}/profile/search/${text}`, {
+                            method: 'GET',
+                            headers: {
+                                "Authorization": `Bearer ${SecureStore.getItem("token")}`
+                            }
+                        }).then(async (res) => {
+                            if (res.ok) {
+                                return res.json();
+                            }
+                            else {
+                                return [];
+                            }
+                        }).then((data) => {
+                            setSearchResults(data.filter((item) => item.username !== SecureStore.getItem("username")));
+                        })
+                    }
+                    else if (text.length < 2) {
+                        setSearchResults([]);
+                    }
+                }} placeholder="Type in an username" autoCapitalize="none" className="rounded-xl mt-4 p-2 w-3/4 hidden bg-primary dark:bg-dark-primary dark:text-dark-text text-text mx-auto mb-4 border-4 border-accent" onSubmitEditing={(e) => {
+                    if (e.nativeEvent.text.trim().length > 0 && searchResults.length > 0 && isSearching) {
+                        input.current.focus();
+                    }
+                }}/>
+                <View style={{display: isSearching ? "flex" : "none"}} className="h-full w-full bg-primary dark:bg-dark-primary">
+                    <FlatList data={searchResults} ListEmptyComponent={() => <Text className="text-center text-xl font-semibold mt-10">No results</Text>} renderItem={(item) =>
+                        <View>
+                        <TouchableOpacity onPress={() => {
+                            router.navigate(`/${item.item.username}`);
+                            input.current.clear();
+                            handleAddBar();
+                        }} activeOpacity={0.4} className="flex-row justify-between items-center p-3">
+                            <View className="flex-row items-center">
+                                <Image source={{uri: item.item.profilePicturePath}} style={{width: 42, height: 42, borderRadius: 21}}></Image>
+                                <View className="flex-col ml-3">
+                                    <Text className="text-text dark:text-dark-text font-bold text-lg">{item.item.name}</Text>
+                                    <Text className="text-text dark:text-dark-text text-sm">@{item.item.username}</Text>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+                        <View className="w-11/12 self-center">
+                            <View className="border-b border-gray-700/80"></View>
+                        </View>
+                    </View>}/>
+                </View>
+                <ScrollView>
                     <Text className="text-text dark:text-dark-text text-center font-bold mt-7 text-4xl">{profileInfos.name}</Text>
                     <View className="justify-between flex-row mt-10">
                         <View className="ml-3 overflow-hidden w-52">

@@ -34,7 +34,9 @@ export default function Network() {
     const input = useRef(null);
     const message = useRef("");
     const [DataCollapse, setDataCollapse] = useState(true);
+
     const initializedMessages = useRef(false);
+    const loadingAdditionalMessages = useRef(false);
 
     useEffect(() => {
 
@@ -80,6 +82,9 @@ export default function Network() {
             const loadedMessages = await asyncStorage.getItem(`networks/${Network}`) || null;
             if (loadedMessages !== null) {
                 addMessage(JSON.parse(loadedMessages));
+                setTimeout(() => {
+                    initializedMessages.current = true;
+                }, 1000);
             }
         }
         loadMessages();
@@ -110,6 +115,9 @@ export default function Network() {
                         addMessage(prevState => [...prevState, ...data.map((message) => {
                             return {senderProfilePicturePath: message.senderId.memberProfilePicturePath, sender: message.senderId.memberId, content: message.content, timestamp: message.timestamp};
                         })]);
+                        setTimeout(() => {
+                            initializedMessages.current = true;
+                        }, 1000);
                     }
                 }
             }
@@ -297,14 +305,14 @@ export default function Network() {
     return(
         <View className="h-full w-full bg-primary dark:bg-dark-primary">
             <View className="h-full">
-                <FlatList onStartReached={async () => {
-                    if (messages.length >= 20 && initializedMessages.current) {
-                        /*const loadedNetworks = await asyncStorage.getItem("networks") || null;
+                <FlatList onStartReachedThreshold={0.4} onStartReached={async () => {
+                    if (messages.length === 20 && initializedMessages.current) {
+                        const loadedNetworks = await asyncStorage.getItem("networks") || null;
                         if (loadedNetworks !== null) {
                             const parsedNetworks = JSON.parse(loadedNetworks);
                             if (!parsedNetworks.find((network) => Number.parseInt(network.networkId) === Number.parseInt(Network))) {
                                 if (ws.stompClient.connected) {
-                                    const receivedMessages = await fetch(`${ip}/networks/${Network}/messages/all`, {
+                                    const receivedMessages = await fetch(`${ip}/networks/${Network}/messages?additional=${encodeURIComponent(true)}`, {
                                         method: "GET",
                                         headers: {
                                             "Authorization": `Bearer ${SecureStorage.getItem("token")}`,
@@ -312,8 +320,9 @@ export default function Network() {
                                         }
                                     });
                                     if (receivedMessages.ok) {
+                                        loadingAdditionalMessages.current = true;
                                         const data = await receivedMessages.json();
-                                        addMessage(prevState => [...prevState, ...data.map((message) => {
+                                        addMessage([...data.map((message) => {
                                             return {
                                                 senderProfilePicturePath: message.senderId.memberProfilePicturePath,
                                                 sender: message.senderId.memberId,
@@ -321,12 +330,22 @@ export default function Network() {
                                                 timestamp: message.timestamp
                                             };
                                         })]);
+                                        setTimeout(() => {
+                                            if (messageList.current !== null && messages.length >= 20) {
+                                                messageList.current.scrollToIndex({index: 23, animated: false});
+                                            }
+                                        }, 100);
+                                        setTimeout(() => {
+                                            loadingAdditionalMessages.current = false;
+                                        }, 1000);
                                     }
                                 }
                             }
-                        }    */
+                        }
                     }
-                }} ref={messageList} style={{marginTop: 5, marginBottom: 50}} onContentSizeChange={() => messageList.current.scrollToEnd()} data={messages} renderItem={(item) =>
+                }} ref={messageList} style={{marginTop: 5, marginBottom: 50}} onContentSizeChange={(size) => {
+                    if(!loadingAdditionalMessages.current) {messageList.current.scrollToEnd()}
+                    }} data={messages} renderItem={(item) =>
                     <NetworkMessage content={item.item.content} sender={item.item.sender} senderProfilePicturePath={item.item.senderProfilePicturePath} timestamp={item.item.timestamp}/>}
                           keyExtractor={(item, index) => index.toString()}>
                 </FlatList>

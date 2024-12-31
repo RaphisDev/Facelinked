@@ -14,6 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/profile")
 @RequiredArgsConstructor
@@ -28,6 +30,17 @@ public class ProfileController {
     private ResponseEntity<Profile> GetProfile(@PathVariable String username) {
         var profile = profileService.findByUsername(username);
         return ResponseEntity.ok(profile);
+    }
+
+    @ResponseStatus(HttpStatus.FOUND)
+    @GetMapping("/search/{username}")
+    private ResponseEntity<List<Profile>> SearchProfile(@PathVariable String username) {
+        var profile = profileService.searchByUsername(username);
+        if(profile.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        System.out.println(profile.get());
+        return ResponseEntity.ok(profile.get());
     }
 
     //To-Do: Also delete User
