@@ -36,6 +36,9 @@ export default function Profile() {
     const postInputText = useRef("");
     const cachedPosts = useRef([]);
 
+    const token = useRef("");
+    const username = useRef("");
+
     const [profileInfos, setProfileInfos] = useState({
         name: "Loading...",
         score: 0,
@@ -50,30 +53,42 @@ export default function Profile() {
     async function fetchData() {
         try {
             if(profile === undefined) {
-                profile = await SecureStore.getItemAsync('username');
+                profile = username.current;
             }
             const data = await fetch(`${ip}/profile/${profile}`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': 'Bearer ' + await SecureStore.getItemAsync('token'),
+                    'Authorization': 'Bearer ' + token.current,
                     'Content-Type': 'application/json'
                 }
             });
             if (data.ok){
                 const profileInfos = await data.json();
                 setProfileInfos(profileInfos);
-                await SecureStore.setItemAsync('profile', JSON.stringify(profileInfos));
+                if (Platform.OS === "web") {
+                    localStorage.setItem('profile', JSON.stringify(profileInfos));
+                }
+                else {
+                    SecureStore.setItem('profile', JSON.stringify(profileInfos));
+                }
             }
         }
         catch (error) {
-            setProfileInfos(await SecureStore.getItemAsync('profile').then(JSON.parse));
+            let profile;
+            if (Platform.OS === "web") {
+                profile = JSON.parse(localStorage.getItem('profile'));
+            }
+            else {
+                profile = JSON.parse(SecureStore.getItem('profile'));
+            }
+            setProfileInfos(profile);
         }
 
         try {
             const data = await fetch(`${ip}/profile/posts/last5/${profile}`, {
                 method: 'GET',
                 headers: {
-                    "Authorization": `Bearer ${SecureStore.getItem("token")}`
+                    "Authorization": `Bearer ${token.current}`
                 }
             });
             if (data.ok) {
@@ -112,10 +127,19 @@ export default function Profile() {
     }, [navigation]);
 
     useEffect( () => {
-        if(!profile){ profile = SecureStore.getItem("username");}
+        if (Platform.OS === "web") {
+            token.current = localStorage.getItem("token");
+            username.current = localStorage.getItem("username");
+
+        }
+        else {
+            token.current = SecureStore.getItem("token");
+            username.current = SecureStore.getItem("username");
+        }
+        if(!profile){ profile = username.current;}
 
         navigation.setOptions({
-            headerTitle: profile !== SecureStore.getItem("username") ? profile : "Profile",
+            headerTitle: profile !== username.current ? profile : "Profile",
         });
         fetchData();
     }, [profile]);
@@ -140,7 +164,7 @@ export default function Profile() {
         const data = await fetch(`${ip}/profile/post`, {
             method: 'POST',
             headers: {
-                "Authorization": `Bearer ${SecureStore.getItem("token")}`,
+                "Authorization": `Bearer ${token.current}`,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
@@ -148,12 +172,33 @@ export default function Profile() {
                 content: [],
             })
         });
+        if (profile === undefined) {
+            profile = username.current;
+        }
 
         if (!data.ok) {
             Alert.alert("Error", "An error occurred while sending your post. Please try again later.", [{text: "OK"}]);
-            setPosts(prevState => prevState.filter(item => item.title !== title));
+            setPosts(prevState => prevState.slice(1));
+        }
+        else {
+            const postData = await fetch(`${ip}/profile/posts/all/${profile}`, {
+                method: 'GET',
+                headers: {
+                    "Authorization": `Bearer ${token.current}`
+                }
+            });
+            if (postData.ok) {
+                const posts = await postData.json();
+                setPosts(posts);
+            }
         }
     }
+
+    const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
+        const paddingToBottom = 20;
+        return layoutMeasurement.height + contentOffset.y >=
+            contentSize.height - paddingToBottom;
+    };
 
     return (
         <>
@@ -174,7 +219,7 @@ export default function Profile() {
                         fetch(`${ip}/profile/search/${text}`, {
                             method: 'GET',
                             headers: {
-                                "Authorization": `Bearer ${SecureStore.getItem("token")}`
+                                "Authorization": `Bearer ${token.current}`
                             }
                         }).then(async (res) => {
                             if (res.ok) {
@@ -184,7 +229,7 @@ export default function Profile() {
                                 return [];
                             }
                         }).then((data) => {
-                            setSearchResults(data.filter((item) => item.username !== SecureStore.getItem("username")));
+                            setSearchResults(data.filter((item) => item.username !== username.current));
                         })
                     }
                     else if (text.length < 2) {
@@ -216,7 +261,25 @@ export default function Profile() {
                         </View>
                     </View>}/>
                 </View>
-                <ScrollView ref={scrollView}>
+                <ScrollView scrollEventThrottle={400} ref={scrollView} onScroll={async ({nativeEvent}) => {
+                    if (isCloseToBottom(nativeEvent)) {
+                        if (posts.length === 5) {
+                            if (profile === undefined) {
+                                profile = username.current;
+                            }
+                            const data = await fetch(`${ip}/profile/posts/all/${profile}`, {
+                                method: 'GET',
+                                headers: {
+                                    "Authorization": `Bearer ${token.current}`
+                                }
+                            });
+                            if (data.ok) {
+                                const posts = await data.json();
+                                setPosts(posts);
+                            }
+                        }
+                    }
+                }}>
                     <Text className="text-text dark:text-dark-text text-center font-bold mt-7 text-4xl">{profileInfos.name}</Text>
                     <View className="justify-between flex-row mt-10">
                         <View className="ml-3 overflow-hidden w-52">
@@ -239,7 +302,7 @@ export default function Profile() {
                                    alt="Profile picture" source={{uri: profileInfos.profilePicturePath}}/>
                         </View>
                     </View>
-                    <View className="flex-row justify-center mt-5" style={{display: profile === SecureStore.getItem("username") || profile === undefined ? "none" : "flex"}}>
+                    <View className="flex-row justify-center mt-5" style={{display: profile === username.current || profile === undefined ? "none" : "flex"}}>
                         <TouchableOpacity onPress={() => router.navigate(`/chat/${profile}`)} activeOpacity={0.6} className="mr-16 border-accent bg-accent border-4 rounded-xl p-2">
                             <Text className="text-dark-text font-semibold">Message</Text>
                         </TouchableOpacity>
@@ -250,7 +313,7 @@ export default function Profile() {
                     <View>
                         <View className="flex-row mt-10 justify-between mb-4">
                             <Text className="text-center text-text dark:text-dark-text self-start font-bold text-2xl ml-4 mt-3">Posts</Text>
-                            {(profile === SecureStore.getItem("username") || profile === undefined) &&
+                            {(profile === username.current || profile === undefined) &&
                                 <TouchableOpacity onPress={createPost} activeOpacity={0.65} className="rounded-full self-end bg-accent p-2 mr-2 w-20">
                                     <Ionicons name={"add"} size={24} className="text-center" color={"#FFFFFF"}></Ionicons>
                                 </TouchableOpacity>}

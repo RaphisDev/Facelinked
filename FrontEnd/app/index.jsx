@@ -9,6 +9,9 @@ import {Image} from "expo-image";
 export default function Index() {
 
     async function signedIn() {
+        if (Platform.OS === "web") {
+            return localStorage.getItem("token") != null;
+        }
         const token = await SecureStore.getItemAsync("token");
         return token != null;
     }

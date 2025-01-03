@@ -23,10 +23,15 @@ export default function Settings() {
                                  text: "Log out",
                                  onPress: async () => {
                                      await asyncStorage.clear();
-                                     await SecureStore.deleteItemAsync("token");
-                                     await SecureStore.deleteItemAsync("username");
-                                     await SecureStore.deleteItemAsync("profilePicture");
-                                     await SecureStore.deleteItemAsync("profile");
+                                     if (Platform.OS === "web") {
+                                         localStorage.clear();
+                                     }
+                                     else {
+                                         await SecureStore.deleteItemAsync("token");
+                                         await SecureStore.deleteItemAsync("username");
+                                         await SecureStore.deleteItemAsync("profilePicture");
+                                         await SecureStore.deleteItemAsync("profile");
+                                     }
                                      new WebSocketProvider().reset();
                                      router.replace("/");
                                  }

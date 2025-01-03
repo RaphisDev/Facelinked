@@ -19,6 +19,7 @@ import WebSocketProvider from "../../../components/WebSocketProvider";
 import asyncStorage from "@react-native-async-storage/async-storage";
 import StateManager from "../../../components/StateManager";
 import ip from "../../../components/AppManager";
+import * as SecureStore from "expo-secure-store";
 
 export default function ChatRoom() {
 
@@ -80,7 +81,14 @@ export default function ChatRoom() {
         loadMessages();
 
         ws.messageReceived.addListener("messageReceived", async (e) => {
-            if (e.detail.sender !== receiver && e.detail.sender !== SecureStorage.getItem("username")) {
+            let username;
+            if (Platform.OS === "web") {
+                username = localStorage.getItem("token");
+            }
+            else {
+                username = SecureStore.getItem("token");
+            }
+            if (e.detail.sender !== receiver && e.detail.sender !== username) {
                 return;
             }
 
@@ -168,10 +176,17 @@ export default function ChatRoom() {
             let loadedChats = await asyncStorage.getItem("chats") || [];
             if (loadedChats.length !== 0) {loadedChats = JSON.parse(loadedChats);}
             if(!loadedChats.find((chat) => chat.username === receiver) || loadedChats.length === 0) {
+                let token;
+                if (Platform.OS === "web") {
+                    token = localStorage.getItem("token");
+                }
+                else {
+                    token = SecureStore.getItem("token");
+                }
                 const profile = await fetch(`${ip}/profile/${receiver}`, {
                     method: "GET",
                     headers: {
-                        "Authorization": `Bearer ${SecureStorage.getItem("token")}`
+                        "Authorization": `Bearer ${token}`
                     }
                 });
                 if (profile.ok) {

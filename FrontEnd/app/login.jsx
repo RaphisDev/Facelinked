@@ -74,10 +74,19 @@ export default function Login() {
                     });
                     if (profile.ok) {
                         const profileJson = await profile.json();
-                        await SecureStore.setItemAsync("token", token);
-                        await SecureStore.setItemAsync("username", data.username);
-                        await SecureStore.setItemAsync("profilePicture", profileJson.profilePicturePath);
-                        await SecureStore.setItemAsync("profile", JSON.stringify(profileJson));
+
+                        if (Platform.OS === "web") {
+                            localStorage.setItem("token", token);
+                            localStorage.setItem("username", data.username);
+                            localStorage.setItem("profilePicture", profileJson.profilePicturePath);
+                            localStorage.setItem("profile", JSON.stringify(profileJson));
+                        }
+                        else {
+                            await SecureStore.setItemAsync("token", token);
+                            await SecureStore.setItemAsync("username", data.username);
+                            await SecureStore.setItemAsync("profilePicture", profileJson.profilePicturePath);
+                            await SecureStore.setItemAsync("profile", JSON.stringify(profileJson));
+                        }
                         router.replace("/");
                     }
                 } else {
@@ -98,7 +107,7 @@ export default function Login() {
                 <Text className="text-center font-bold text-text dark:text-dark-text text-5xl">Login</Text>
                 <View className="p-7">
                     <View className="w-full h-full">
-                        <View className="h-[55%%] self-center flex-wrap justify-center items-centers">
+                        <View className="h-[55%%] self-center flex-wrap justify-center items-center">
                             <View className="border-2 border-black dark:border-white w-3/4 p-5 rounded-xl">
                               <Text className="dark:text-dark-text text-text font-bold text-lg">Email</Text>
                               <TextInput value={email} textContentType="emailAddress" autoComplete="email" onChangeText={e => setEmail(e)} className="dark:text-dark-text text-text border-gray-700/80 border-4 rounded-lg active:bg-gray-600/10 font-medium text-lg p-0.5 pl-2.5 mb-1 min-w-full max-w-full" type="email" placeholder="Enter your email"/>

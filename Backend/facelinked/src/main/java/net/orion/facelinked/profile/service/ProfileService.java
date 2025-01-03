@@ -37,7 +37,7 @@ public class ProfileService {
     }
 
     public List<Post> getPosts(String username) {
-        return postRepository.findByUsername(username);
+        return postRepository.findByUsernameOrderByIdDesc(username);
     }
 
     public List<Post> getLast5Posts(String username) {

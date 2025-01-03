@@ -21,6 +21,9 @@ export default function CreateNetwork() {
 
     const router = useRouter();
 
+    const token = useRef("");
+    const username = useRef("");
+
     function toggleSwitch() {
         setIsPrivate(previousState => !previousState);
         if (isPrivate) {
@@ -34,6 +37,15 @@ export default function CreateNetwork() {
     const navigator = useNavigation("../../");
 
     useEffect(() => {
+        if (Platform.OS === "web") {
+            token.current = localStorage.getItem("token");
+            username.current = localStorage.getItem("username");
+        }
+        else {
+            token.current = SecureStore.getItem("token");
+            username.current = SecureStore.getItem("username");
+        }
+
         navigator.setOptions({
             headerLeft: () => <TouchableOpacity className="ml-2" onPress={() => router.back()}><Ionicons name="arrow-back" size={24} color="black"/></TouchableOpacity>,
         });
@@ -48,7 +60,7 @@ export default function CreateNetwork() {
     }, []);
 
     function addMember(member) {
-        if (member === SecureStore.getItem("username")) {
+        if (member === username.current) {
             alert("You cannot add yourself to a network.");
             return;
         }
@@ -75,7 +87,7 @@ export default function CreateNetwork() {
             const bucketUrl = await fetch(`${ip}/networks/upload`, {
                 method: "GET",
                 headers: {
-                    "Authorization": "Bearer " + SecureStore.getItem("token")
+                    "Authorization": "Bearer " + token.current
                 }
             });
             if (!bucketUrl.ok) {
@@ -95,13 +107,13 @@ export default function CreateNetwork() {
         //const compressedImage = await ImageManipulator.manipulateAsync(imageUri, [], { compress: 0.5 });
 
         let currentMembers = members;
-        currentMembers = [...currentMembers, {memberId: await SecureStore.getItemAsync("username")}];
+        currentMembers = [...currentMembers, {memberId: username.current}];
 
         const data = await fetch(`${ip}/networks/create`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": "Bearer " + SecureStore.getItem("token")
+                "Authorization": "Bearer " + token.current
             },
             body: JSON.stringify({
                 name: name.current,

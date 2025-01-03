@@ -8,6 +8,17 @@ export default function Index() {
 
     const [selected, setSelected] = useState(0);
 
+    const Tabs = () => {
+        switch (selected) {
+            case 0:
+                return (
+                    <Text className="text-text dark:text-dark-text text-2xl font-semibold text-center mt-20">In Progress</Text>
+                )
+            case 1:
+                return null
+        }
+    }
+
     return (
         <View className="w-full h-full bg-primary dark:bg-dark-primary">
             <View className="flex flex-row justify-around items-center">
@@ -20,6 +31,7 @@ export default function Index() {
                     </TouchableOpacity>
                 </View>
             </View>
+            {Tabs()}
         </View>
     )
 }

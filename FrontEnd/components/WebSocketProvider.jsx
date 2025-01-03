@@ -6,6 +6,7 @@ import {EventEmitter} from "expo";
 import asyncStorage from "@react-native-async-storage/async-storage";
 import {webSocketIp} from "./AppManager";
 import ip from "./AppManager";
+import * as SecureStore from "expo-secure-store";
 
 let webSocketInstance = null;
 
@@ -22,6 +23,14 @@ class WebsocketController{
     }
 
     constructor() {
+        let token;
+        if (Platform.OS === "web") {
+            token = localStorage.getItem("token");
+        }
+        else {
+            token = SecureStore.getItem("token");
+        }
+
         if(!webSocketInstance) {
             this.stompClient = new StompJs.Client({
                 brokerURL: `${webSocketIp}/ws`,
@@ -32,7 +41,7 @@ class WebsocketController{
                 webSocketFactory: () => {
                     return new WebSocket(`${webSocketIp}/ws`, [], {
                         headers: {
-                            "Authorization": `Bearer ${SecureStorage.getItem("token")}`
+                            "Authorization": `Bearer ${token}`
                         }
                     });
                 },
@@ -45,7 +54,13 @@ class WebsocketController{
                 },
                 onConnect: async () => {
                     const lastMessageId = await asyncStorage.getItem("lastMessageId");
-                    const username = SecureStorage.getItem("username");
+                    let username;
+                    if (Platform.OS === "web") {
+                        username = localStorage.getItem("username");
+                    }
+                    else {
+                        username = SecureStore.getItem("username");
+                    }
 
                     const getMessages = async (sender) => {
                         let loadedMessages = await asyncStorage.getItem(`messages/${sender}`) || [];
@@ -73,7 +88,7 @@ class WebsocketController{
                             const profile = await fetch(`${ip}/profile/${senderId}`, {
                                 method: "GET",
                                 headers: {
-                                    "Authorization": `Bearer ${SecureStorage.getItem("token")}`
+                                    "Authorization": `Bearer ${token}`
                                 }
                             });
                             if (profile.ok) {
@@ -169,7 +184,7 @@ class WebsocketController{
                             method: "GET",
                             headers: {
                                 "Application-Type": "application/json",
-                                "Authorization": `Bearer ${SecureStorage.getItem("token")}`
+                                "Authorization": `Bearer ${token}`
                             }
                         });
 
@@ -188,7 +203,7 @@ class WebsocketController{
                             method: "GET",
                             headers: {
                                 "Application-Type": "application/json",
-                                "Authorization": `Bearer ${SecureStorage.getItem("token")}`
+                                "Authorization": `Bearer ${token}`
                             }
                         });
 
