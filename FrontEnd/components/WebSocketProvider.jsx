@@ -37,7 +37,7 @@ class WebsocketController{
                     });
                 },
                 onWebSocketError: () => {
-                    alert("Network error. Please check your internet connection.");
+                    //alert("Network error. Please check your internet connection.");
                     if (!this.stompClient.connected) {
                         this.stompClient.deactivate();
                         webSocketInstance = null;
@@ -62,7 +62,7 @@ class WebsocketController{
                         return loadedChats;
                     }
 
-                    const saveChats = async (senderId, loadedChats) => {
+                    const saveChats = async (senderId, loadedChats, newMessage) => {
 
                         if (senderId === username) {
                             return;
@@ -83,7 +83,7 @@ class WebsocketController{
                                     name: profileJson.name,
                                     username: profileJson.username,
                                     image: profileJson.profilePicturePath,
-                                    unread: true
+                                    unread: !newMessage
                                 }]));
                                 this.messageReceived.emit("newMessageReceived");
                             }
@@ -113,14 +113,14 @@ class WebsocketController{
                     const processMessage = async (parsedMessage) => {
                         const loadedChats = await getChats();
 
-                        await saveChats(parsedMessage.senderId, loadedChats);
+                        await saveChats(parsedMessage.senderId, loadedChats, false);
                         await saveMessages(parsedMessage);
                         await asyncStorage.setItem("lastMessageId", parsedMessage.id);
                     }
                     const processOldMessages = async (parsedMessage) => {
                         const loadedChats = await getChats();
 
-                        await saveChats(parsedMessage.senderId, loadedChats);
+                        await saveChats(parsedMessage.senderId, loadedChats, true);
 
                         const messageUserName = parsedMessage.senderId === username ? parsedMessage.receiverId : parsedMessage.senderId;
 
@@ -223,7 +223,7 @@ class WebsocketController{
                         }]));
 
                         const loadedChats = await getChats();
-                        await saveChats(parsedMessage.senderId, loadedChats);
+                        await saveChats(parsedMessage.senderId, loadedChats, false);
                         await asyncStorage.setItem("lastMessageId", parsedMessage.id);
                     });
                     receiveNetworkMessages();

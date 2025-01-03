@@ -16,9 +16,8 @@ import {Image} from "expo-image";
 import {useEffect, useLayoutEffect, useRef, useState} from "react";
 import * as SecureStore from "expo-secure-store";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import * as SecureStorage from "expo-secure-store";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import ip from "../../../../components/AppManager";
+import Post from "../../../../components/Entries/Post";
 
 export default function Profile() {
 
@@ -30,6 +29,12 @@ export default function Profile() {
     const input = useRef(null);
     const [isSearching, setIsSearching] = useState(false);
     const [searchResults, setSearchResults] = useState([]);
+
+    const scrollView = useRef(null);
+    const [posts, setPosts] = useState([]);
+    const newPostInput = useRef(null);
+    const postInputText = useRef("");
+    const cachedPosts = useRef([]);
 
     const [profileInfos, setProfileInfos] = useState({
         name: "Loading...",
@@ -62,6 +67,21 @@ export default function Profile() {
         }
         catch (error) {
             setProfileInfos(await SecureStore.getItemAsync('profile').then(JSON.parse));
+        }
+
+        try {
+            const data = await fetch(`${ip}/profile/posts/last5/${profile}`, {
+                method: 'GET',
+                headers: {
+                    "Authorization": `Bearer ${SecureStore.getItem("token")}`
+                }
+            });
+            if (data.ok) {
+                const posts = await data.json();
+                setPosts(posts);
+            }
+        }
+        catch (error) {
         }
     }
 
@@ -99,6 +119,41 @@ export default function Profile() {
         });
         fetchData();
     }, [profile]);
+
+    function createPost() {
+        if (newPostInput.current) {
+            return;
+        }
+        setPosts(prevState => {cachedPosts.current = prevState ;return [{new: true}]});
+
+        setTimeout(() => {
+            scrollView.current.scrollToEnd();
+            newPostInput.current.focus();
+        })
+    }
+
+    async function sendPost() {
+        setPosts([{title: postInputText.current, content: [], likes: 0}, ...cachedPosts.current]);
+        const title = postInputText.current;
+        postInputText.current = "";
+
+        const data = await fetch(`${ip}/profile/post`, {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${SecureStore.getItem("token")}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                title: title,
+                content: [],
+            })
+        });
+
+        if (!data.ok) {
+            Alert.alert("Error", "An error occurred while sending your post. Please try again later.", [{text: "OK"}]);
+            setPosts(prevState => prevState.filter(item => item.title !== title));
+        }
+    }
 
     return (
         <>
@@ -161,7 +216,7 @@ export default function Profile() {
                         </View>
                     </View>}/>
                 </View>
-                <ScrollView>
+                <ScrollView ref={scrollView}>
                     <Text className="text-text dark:text-dark-text text-center font-bold mt-7 text-4xl">{profileInfos.name}</Text>
                     <View className="justify-between flex-row mt-10">
                         <View className="ml-3 overflow-hidden w-52">
@@ -193,20 +248,34 @@ export default function Profile() {
                         </TouchableOpacity>
                     </View>
                     <View>
-                        <View className="flex-row mt-10 justify-between mb-2">
+                        <View className="flex-row mt-10 justify-between mb-4">
                             <Text className="text-center text-text dark:text-dark-text self-start font-bold text-2xl ml-4 mt-3">Posts</Text>
                             {(profile === SecureStore.getItem("username") || profile === undefined) &&
-                                <TouchableOpacity activeOpacity={0.65} className="rounded-full self-end bg-accent p-2 mr-2 w-20">
+                                <TouchableOpacity onPress={createPost} activeOpacity={0.65} className="rounded-full self-end bg-accent p-2 mr-2 w-20">
                                     <Ionicons name={"add"} size={24} className="text-center" color={"#FFFFFF"}></Ionicons>
                                 </TouchableOpacity>}
                         </View>
                     </View>
-                    <FlatList scrollEnabled={false} ListEmptyComponent={<Text className="text-text dark:text-dark-text self-center mt-14 font-semibold text-xl">No posts yet</Text>}
-                              onEndReached={() => console.log("load more posts. adjust onEndReachedThreshold")} data={[]}
-                              style={{width :"100%", height: "100%"}} renderItem={() => <View className="bg-accent p-5"></View>}/>
+                    <FlatList scrollEnabled={false} ListEmptyComponent={<Text className="text-text dark:text-dark-text self-center mt-14 font-semibold text-xl">No posts yet</Text>} data={posts}
+                              style={{width :"100%", height: "100%"}} renderItem={(items) => {
+                                  if(items.item.new) {
+                                      return (
+                                          <View className="w-full pb-80">
+                                              <View className="bg-dark-primary dark:bg-[#6C757D] min-h-20 p-4 rounded-xl justify-center mr-1.5 ml-1.5">
+                                                  <TextInput onChangeText={(text) => {scrollView.current.scrollToEnd(); postInputText.current = text}} onKeyPress={(key) => {if (key.nativeEvent.key === "Enter" && postInputText.current.trim().length > 0) {
+                                                        sendPost();
+                                                  }
+                                                  else if (postInputText.current.trim().length === 0 && key.nativeEvent.key === "Enter") {
+                                                      setPosts(prevState => prevState.filter(item => !item.new));
+                                                  }}} ref={newPostInput} onEndEditing={() => setPosts(prevState => prevState.filter(item => !item.new))} multiline={true} placeholderTextColor="gray" placeholder="What's on your mind?" className="text-xl text-dark-text mb-1 ml-5"/>
+                                              </View>
+                                          </View>)
+                                  } else {
+                                      return <Post {...items.item}/>
+                                  }
+                              }}/>
                 </ScrollView>
             </View>
         </>
     );
 }
-

@@ -2,6 +2,7 @@ package net.orion.facelinked.profile.controller;
 
 import lombok.RequiredArgsConstructor;
 import net.orion.facelinked.auth.services.UserService;
+import net.orion.facelinked.profile.Post;
 import net.orion.facelinked.profile.Profile;
 import net.orion.facelinked.profile.ProfileRequest;
 import net.orion.facelinked.profile.service.ProfileService;
@@ -71,6 +72,34 @@ public class ProfileController {
                 .username(profile.getUsername()).name(profile.getName()).dateOfBirth(profile.getDateOfBirth())
                 .hobbies(profile.getHobbies()).score(0).inRelationship(profile.isInRelationship())
                 .partner(profile.getPartner()).location(profile.getLocation()).build());
+    }
+
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @PostMapping("/post")
+    public void Post(@RequestBody Post profile, @AuthenticationPrincipal UserDetails userDetails)
+    {
+        var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
+
+        profileService.savePost(Post.builder().
+                title(profile.getTitle()).
+                content(profile.getContent()).
+                username(sender).
+                likes(0).
+                build());
+    }
+
+    @ResponseStatus(HttpStatus.FOUND)
+    @GetMapping("/posts/all/{username}")
+    public ResponseEntity<List<Post>> GetPosts(@PathVariable String username)
+    {
+        return ResponseEntity.ok(profileService.getPosts(username));
+    }
+
+    @ResponseStatus(HttpStatus.FOUND)
+    @GetMapping("/posts/last5/{username}")
+    public ResponseEntity<List<Post>> GetLast5Posts(@PathVariable String username)
+    {
+        return ResponseEntity.ok(profileService.getLast5Posts(username));
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)

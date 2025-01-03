@@ -271,6 +271,10 @@ export default function Network() {
         }
         else {
             await asyncStorage.setItem("networks", JSON.stringify([...loadedNetworks, {networkId: currentNetwork.current.networkId, name: currentNetwork.current.name, description: currentNetwork.current.description, creatorId: currentNetwork.current.creatorId, memberCount: currentNetwork.current.memberCount + 1, networkPicturePath: currentNetwork.current.networkPicturePath, private: currentNetwork.current.private, members: member}]));
+            if (messages.length !== 0) {
+                await asyncStorage.setItem(`networks/${Network}`, JSON.stringify(messages));
+                //set last message id but first save id from every message
+            }
         }
         await fetch(`${ip}/networks/${Network}/favorite?b=${encodeURIComponent(shouldFavorite)}`, {
             method: "POST",
@@ -441,7 +445,7 @@ export default function Network() {
                                 message: "Check out this network!",
                                 title: "Check out this network!",
                                 text: "Check out this network!",
-                                url: `https://facelinked.net/networks/${Network}`,
+                                url: `https://friendslinked.de/networks/${Network}`,
                                 dialogTitle: "Check out this network!"
                             });
                         }} className="rounded-full ml-11 mr-11 bg-accent p-5">

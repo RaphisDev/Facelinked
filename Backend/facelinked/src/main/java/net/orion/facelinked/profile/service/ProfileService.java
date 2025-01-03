@@ -1,7 +1,9 @@
 package net.orion.facelinked.profile.service;
 
 import lombok.AllArgsConstructor;
+import net.orion.facelinked.profile.Post;
 import net.orion.facelinked.profile.Profile;
+import net.orion.facelinked.profile.repository.PostRepository;
 import net.orion.facelinked.profile.repository.ProfileRepository;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class ProfileService {
     private final ProfileRepository profileRepository;
+    private final PostRepository postRepository;
 
     public Profile findByUsername(String memberId) {
         return profileRepository.findByUsername(memberId).orElseThrow();
@@ -27,5 +30,17 @@ public class ProfileService {
 
     public Optional<List<Profile>> searchByUsername(String username) {
         return profileRepository.searchTop5ByNameContainsIgnoreCase(username);
+    }
+
+    public void savePost(Post post) {
+        postRepository.save(post);
+    }
+
+    public List<Post> getPosts(String username) {
+        return postRepository.findByUsername(username);
+    }
+
+    public List<Post> getLast5Posts(String username) {
+        return postRepository.findTop5ByUsernameOrderByIdDesc(username);
     }
 }
