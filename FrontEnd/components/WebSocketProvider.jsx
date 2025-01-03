@@ -77,7 +77,7 @@ class WebsocketController{
                         return loadedChats;
                     }
 
-                    const saveChats = async (senderId, loadedChats, newMessage) => {
+                    const saveChats = async (senderId, loadedChats, oldMessage) => {
 
                         if (senderId === username) {
                             return;
@@ -98,7 +98,7 @@ class WebsocketController{
                                     name: profileJson.name,
                                     username: profileJson.username,
                                     image: profileJson.profilePicturePath,
-                                    unread: !newMessage
+                                    unread: !oldMessage
                                 }]));
                                 this.messageReceived.emit("newMessageReceived");
                             }
@@ -107,7 +107,7 @@ class WebsocketController{
                                 if (chat.username === senderId) {
                                     return {
                                         ...chat,
-                                        unread: true
+                                        unread: oldMessage ? chat.unread : true
                                     }
                                 }
 

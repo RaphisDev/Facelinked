@@ -17,6 +17,7 @@ export default function Post(props) {
                     </TouchableOpacity>
                     <TouchableOpacity className="flex flex-row items-center">
                         <Ionicons name="chatbubble" color="white" size={20}/>
+                        <Text className="ml-1 text-dark-text text-lg">{props.comments === 0 ? "" : props.comments}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => Share.share({
                         message: "Check out this post!",

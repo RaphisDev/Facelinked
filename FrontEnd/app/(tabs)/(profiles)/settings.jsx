@@ -1,5 +1,5 @@
 import "../../../global.css"
-import {Alert, ScrollView, Text, TouchableOpacity, View} from "react-native";
+import {Alert, Platform, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import asyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import {useRouter} from "expo-router";

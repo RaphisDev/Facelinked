@@ -329,8 +329,8 @@ export default function Profile() {
                                                         sendPost();
                                                   }
                                                   else if (postInputText.current.trim().length === 0 && key.nativeEvent.key === "Enter") {
-                                                      setPosts(prevState => prevState.filter(item => !item.new));
-                                                  }}} ref={newPostInput} onEndEditing={() => setPosts(prevState => prevState.filter(item => !item.new))} multiline={true} placeholderTextColor="gray" placeholder="What's on your mind?" className="text-xl text-dark-text mb-1 ml-5"/>
+                                                      setPosts(cachedPosts.current);
+                                                  }}} ref={newPostInput} onEndEditing={() => setPosts(cachedPosts.current)} multiline={true} placeholderTextColor="gray" placeholder="What's on your mind?" className="text-xl text-dark-text mb-1.5 ml-5"/>
                                               </View>
                                           </View>)
                                   } else {
