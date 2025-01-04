@@ -13,6 +13,9 @@ export default function SettingsLayout() {
                 <Stack.Screen name="account" options={{headerTitle: "Account", headerBackTitle: "Settings"}}/>
                 <Stack.Screen name="legal" options={{headerTitle: "Legal", headerBackTitle: "Settings"}}/>
                 <Stack.Screen name="privacy" options={{headerTitle: "Privacy Policy", headerBackTitle: "Legal"}}/>
+                <Stack.Screen name="terms" options={{headerTitle: "Terms and Conditions", headerBackTitle: "Legal"}}/>
+                <Stack.Screen name="impressum" options={{headerTitle: "Impressum", headerBackTitle: "Legal"}}/>
+                <Stack.Screen name="credits" options={{headerTitle: "Credits", headerBackTitle: "Settings"}}/>
                 <Stack.Screen name="index" options={{headerTitle: "Settings", headerBackTitle: "Profile", headerLeft: () =>
                         <TouchableOpacity style={{marginLeft: -8}} onPress={() => router.back()}><Ionicons name="arrow-back" size={24}></Ionicons></TouchableOpacity>}}/>
             </Stack>

@@ -177,7 +177,7 @@ export default function CreateNetwork() {
                         const result = await ImagePicker.launchImageLibraryAsync({
                             allowsEditing: true,
                             aspect: [1, 1],
-                            quality: 0.8,
+                            quality: 0.2,
                             mediaTypes: ImagePicker.MediaTypeOptions.Images, //deprecated
                         });
 

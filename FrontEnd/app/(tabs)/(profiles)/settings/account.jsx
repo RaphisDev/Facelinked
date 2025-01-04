@@ -2,8 +2,10 @@ import {Alert, Platform, Text, TouchableOpacity, View} from "react-native";
 import asyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import WebSocketProvider from "../../../../components/WebSocketProvider";
+import {useRouter} from "expo-router";
 
 export default function AccountSettings() {
+    const router = useRouter();
     return (
         <View className="w-full h-full bg-primary dark:bg-dark-primary items-center">
             <TouchableOpacity activeOpacity={0.7} onPress={async () => {

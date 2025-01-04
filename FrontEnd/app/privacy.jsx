@@ -1,4 +1,4 @@
-import "../../../../global.css"
+import "../global.css"
 import {View, Text, ScrollView} from "react-native";
 
 export default function PrivacySettings() {
