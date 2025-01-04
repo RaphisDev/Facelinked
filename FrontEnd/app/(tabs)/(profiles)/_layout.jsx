@@ -11,7 +11,7 @@ export default function ProfileLayout() {
                 <Stack.Screen name="[profile]/index" options={{headerTitleAlign: "center",
                     headerLeft: () => <TouchableOpacity onPress={() => router.navigate("/settings")}><Ionicons name="settings-outline" size={25}/></TouchableOpacity>,
                 }}/>
-                <Stack.Screen name="settings" options={{headerTitle: "Settings", headerBackTitle: "Profile"}}/>
+                <Stack.Screen name="settings" options={{headerShown: false}}/>
             </Stack>
         </>
     );

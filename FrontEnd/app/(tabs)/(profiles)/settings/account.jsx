@@ -1,0 +1,38 @@
+import {Alert, Platform, Text, TouchableOpacity, View} from "react-native";
+import asyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
+import WebSocketProvider from "../../../../components/WebSocketProvider";
+
+export default function AccountSettings() {
+    return (
+        <View className="w-full h-full bg-primary dark:bg-dark-primary items-center">
+            <TouchableOpacity activeOpacity={0.7} onPress={async () => {
+                Alert.alert("Are you sure you want to log out?", "You will be logged out of your account", [
+                    {
+                        text: "Cancel",
+                        onPress: () => {}
+                    },
+                    {
+                        text: "Log out",
+                        onPress: async () => {
+                            await asyncStorage.clear();
+                            if (Platform.OS === "web") {
+                                localStorage.clear();
+                            }
+                            else {
+                                await SecureStore.deleteItemAsync("token");
+                                await SecureStore.deleteItemAsync("username");
+                                await SecureStore.deleteItemAsync("profilePicture");
+                                await SecureStore.deleteItemAsync("profile");
+                            }
+                            new WebSocketProvider().reset();
+                            router.replace("/");
+                        }
+                    }
+                ]);
+            }} className="bg-accent mt-4 p-0.5 w-28 rounded-lg">
+                <Text className="text-center text-xl font-semibold text-dark-text">Log out</Text>
+            </TouchableOpacity>
+        </View>
+    )
+}
