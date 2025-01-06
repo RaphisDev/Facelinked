@@ -1,6 +1,5 @@
 package net.orion.facelinked.profile;
 
-import jakarta.persistence.Entity;
 import lombok.Builder;
 import lombok.Data;
 

@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @Builder
 public class NetworkResponse {
-    private Long id;
+    private String id;
     private List<NetworkMember> members;
     private String creatorId;
 }

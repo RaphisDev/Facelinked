@@ -22,7 +22,7 @@ public class NetworkService {
     private NetworkRepository networkRepository;
     private NetworkMessageRepository networkMessageRepository;
 
-    public Long createNetwork(Network network) {
+    public String createNetwork(Network network) {
        return networkRepository.save(network).getId();
     }
 
@@ -33,7 +33,7 @@ public class NetworkService {
     }
 
     public Network getNetwork(String networkId) {
-        return networkRepository.findById(Long.parseLong(networkId));
+        return networkRepository.findById(networkId).orElseThrow(() -> new IllegalArgumentException("Network not found"));
     }
 
     public void removeUser(List<NetworkMember> members, Network networkResponseEntity) {
@@ -62,10 +62,7 @@ public class NetworkService {
     }
 
     public void favorite(String network, boolean b) {
-        var networkResponseEntity = networkRepository.findById(Long.parseLong(network));
-        if (networkResponseEntity == null) {
-            throw new IllegalArgumentException("Network not found");
-        }
+        var networkResponseEntity = networkRepository.findById(network).orElseThrow();
     
         if (networkResponseEntity.getMemberCount() <= 0 && !b) {
             return;

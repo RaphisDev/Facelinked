@@ -1,11 +1,11 @@
-FROM maven:3.8.4-openjdk-17 AS build
+FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
-RUN mvn clean install
+RUN mvn clean install -DskipTests
 
-FROM openjdk:17-alpine
+FROM eclipse-temurin:21
 WORKDIR /app
-COPY --from=build /app/target/aws-0.0.1-SNAPSHOT.jar ./aws.jar
+COPY --from=build /app/target/facelinked-0.0.1-SNAPSHOT.jar ./facelinked.jar
 EXPOSE 8080
 CMD ["java", "-jar", "aws.jar"]

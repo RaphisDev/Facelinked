@@ -27,16 +27,12 @@ public class AuthService
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("Email already in use");
         }
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("Username already in use");
-        }
 
         var user = User.builder()
                 .email(request.getEmail())
                 .name(request.getName())
-                .username(request.getUsername())
+                .userName(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
                 .build();
 
         userRepository.save(user);

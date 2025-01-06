@@ -1,12 +1,8 @@
 package net.orion.facelinked.profile;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
-import jakarta.persistence.Convert;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import lombok.*;
 import net.orion.facelinked.config.PrimaryKey;
-import net.orion.facelinked.networks.MemberAttributeConverter;
 import org.springframework.data.annotation.Id;
 
 import java.util.List;

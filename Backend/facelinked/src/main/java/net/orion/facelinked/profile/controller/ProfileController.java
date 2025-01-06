@@ -67,9 +67,6 @@ public class ProfileController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
 
-        if(profileService.existsByUsername(profile.getUsername())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
-        }
         profileService.save(Profile.builder().profilePicturePath(profile.getProfilePicturePath())
                 .username(profile.getUsername()).name(profile.getName()).dateOfBirth(profile.getDateOfBirth())
                 .hobbies(profile.getHobbies()).score(0).inRelationship(profile.isInRelationship())
