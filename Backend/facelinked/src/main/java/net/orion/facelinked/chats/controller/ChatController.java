@@ -5,6 +5,8 @@ import net.orion.facelinked.auth.repository.UserRepository;
 import net.orion.facelinked.auth.services.UserService;
 import net.orion.facelinked.chats.ChatMessage;
 import net.orion.facelinked.chats.ChatService;
+import net.orion.facelinked.config.AutoPrimaryKey;
+import net.orion.facelinked.config.PrimaryKey;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -40,24 +42,14 @@ public class ChatController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
 
-        var id = chatService.saveToDatabase(ChatMessage.builder()
-                .content(message.getContent())
-                .timestamp(message.getTimestamp())
-                .senderId(sender)
-                .receiverId(message.getReceiver())
-                .build());
+        var id = chatService.saveToDatabase(new ChatMessage(sender, message.getReceiver(), message.getContent(), message.getTimestamp(), new AutoPrimaryKey(null, System.currentTimeMillis())));
 
         template.convertAndSendToUser(message.getReceiver(), "/queue/messages",
-                ChatMessage.builder()
-                .id(id)
-                .content(message.getContent())
-                .timestamp((message.getTimestamp()))
-                .senderId(sender)
-                .build());
+               new ChatMessage(sender, message.getReceiver(), message.getContent(), message.getTimestamp(), new AutoPrimaryKey(null, id)));
     }
 
     @GetMapping("/afterId")
-    public ResponseEntity<List<ChatMessage>> getChat(@AuthenticationPrincipal UserDetails userDetails, @RequestParam String id) {
+    public ResponseEntity<List<ChatMessage>> getChat(@AuthenticationPrincipal UserDetails userDetails, @RequestParam Long id) {
 
         if (userDetails == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);

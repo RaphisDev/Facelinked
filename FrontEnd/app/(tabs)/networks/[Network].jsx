@@ -134,28 +134,42 @@ export default function Network() {
                 }
             }
             else {
-                const receivedMessages = await fetch(`${ip}/networks/${Network}/afterId?id=${encodeURIComponent(await asyncStorage.getItem(`lastNetworkMessageId/${Network}`))}`, {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `Bearer ${token.current}`,
-                        "Application-Type": "application/json"
+                if (await asyncStorage.getItem(`lastNetworkMessageId/${Network}`)) {
+                    const receivedMessages = await fetch(`${ip}/networks/${Network}/afterId?id=${encodeURIComponent(Number.parseInt(await asyncStorage.getItem(`lastNetworkMessageId/${Network}`)))}`, {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${token.current}`,
+                            "Application-Type": "application/json"
+                        }
+                    });
+
+                    if (receivedMessages.ok) {
+                        const data = await receivedMessages.json();
+
+                        addMessage(prevState => [...prevState, ...data.map((message) => {
+                            return {
+                                senderProfilePicturePath: message.senderId.memberProfilePicturePath,
+                                sender: message.senderId.memberId,
+                                content: message.content,
+                                timestamp: message.timestamp
+                            };
+                        })]);
+
+                        await asyncStorage.setItem(`lastNetworkMessageId/${Network}`, data[data.length - 1].millis.toString());
+
+                        let messages = await asyncStorage.getItem(`networks/${Network}`) || [];
+                        if (messages.length !== 0) {
+                            messages = JSON.parse(messages);
+                        }
+                        await asyncStorage.setItem(`networks/${Network}`, JSON.stringify([...messages, ...data.map((message) => {
+                            return {
+                                senderProfilePicturePath: message.senderId.memberProfilePicturePath,
+                                sender: message.senderId.memberId,
+                                content: message.content,
+                                timestamp: message.timestamp
+                            };
+                        })]));
                     }
-                });
-
-                if (receivedMessages.ok) {
-                    const data = await receivedMessages.json();
-
-                    addMessage(prevState => [...prevState, ...data.map((message) => {
-                        return {senderProfilePicturePath: message.senderId.memberProfilePicturePath, sender: message.senderId.memberId, content: message.content, timestamp: message.timestamp};
-                    })]);
-
-                    await asyncStorage.setItem(`lastNetworkMessageId/${Network}`, data[data.length - 1].id);
-
-                    let messages = await asyncStorage.getItem(`networks/${Network}`) || [];
-                    if (messages.length !== 0) {messages = JSON.parse(messages);}
-                    await asyncStorage.setItem(`networks/${Network}`, JSON.stringify([...messages, ...data.map((message) => {
-                        return {senderProfilePicturePath: message.senderId.memberProfilePicturePath, sender: message.senderId.memberId, content: message.content, timestamp: message.timestamp};
-                    })]));
                 }
             }
         }

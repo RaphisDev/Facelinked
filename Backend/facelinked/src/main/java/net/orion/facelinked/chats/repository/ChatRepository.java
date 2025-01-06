@@ -1,16 +1,23 @@
 package net.orion.facelinked.chats.repository;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import net.orion.facelinked.chats.ChatMessage;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
+import net.orion.facelinked.config.AutoPrimaryKey;
+import net.orion.facelinked.config.PrimaryKey;
+import org.socialsignin.spring.data.dynamodb.repository.DynamoDBCrudRepository;
+import org.socialsignin.spring.data.dynamodb.repository.EnableScan;
+import org.socialsignin.spring.data.dynamodb.repository.config.EnableDynamoDBRepositories;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@EnableScan
 @Repository
-public interface ChatRepository extends MongoRepository<ChatMessage, String> {
+public interface ChatRepository extends CrudRepository<ChatMessage, AutoPrimaryKey> {
 
-    public List<ChatMessage> findByReceiverIdOrSenderId(String receiverId, String senderId);
+    public List<ChatMessage> findByReceiverId(String receiverId);
+    public List<ChatMessage> findBySenderId(String senderId);
 
-    public List<ChatMessage> findByIdGreaterThanAndReceiverId(String idIsGreaterThan, String receiverId);
+    public List<ChatMessage> findByMillisGreaterThanAndReceiverId(Long idIsGreaterThan, String receiverId);
 }

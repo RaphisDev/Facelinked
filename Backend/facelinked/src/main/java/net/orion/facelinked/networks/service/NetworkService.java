@@ -1,6 +1,7 @@
 package net.orion.facelinked.networks.service;
 
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import net.orion.facelinked.chats.ChatMessage;
 import net.orion.facelinked.networks.Network;
 import net.orion.facelinked.networks.NetworkMember;
@@ -53,7 +54,7 @@ public class NetworkService {
     }
 
     public List<NetworkMessage> getMessages(String networkId) {
-        return networkMessageRepository.findFirst20ByNetworkIdOrderByIdDesc(networkId).reversed();
+        return networkMessageRepository.findFirst20ByNetworkIdOrderByMillisDesc(networkId).reversed();
     }
 
     public List<NetworkMessage> getAdditionalMessages(String networkId) {
@@ -77,7 +78,7 @@ public class NetworkService {
         networkRepository.save(networkResponseEntity);
     }
 
-    public List<NetworkMessage> getMessagesAfterId(String networkId, String id) {
-        return networkMessageRepository.findByIdGreaterThanAndNetworkId(id, networkId);
+    public List<NetworkMessage> getMessagesAfterId(String networkId, Long id) {
+        return networkMessageRepository.findByMillisGreaterThanAndNetworkId(id, networkId);
     }
 }

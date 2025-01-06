@@ -53,7 +53,7 @@ class WebsocketController{
                     }
                 },
                 onConnect: async () => {
-                    const lastMessageId = await asyncStorage.getItem("lastMessageId");
+                    const lastMessageId = Number.parseInt(await asyncStorage.getItem("lastMessageId")) || null;
                     let username;
                     if (Platform.OS === "web") {
                         username = localStorage.getItem("username");
@@ -130,7 +130,7 @@ class WebsocketController{
 
                         await saveChats(parsedMessage.senderId, loadedChats, false);
                         await saveMessages(parsedMessage);
-                        await asyncStorage.setItem("lastMessageId", parsedMessage.id);
+                        await asyncStorage.setItem("lastMessageId", parsedMessage.millis.toString());
                     }
                     const processOldMessages = async (parsedMessage) => {
                         const loadedChats = await getChats();
@@ -145,7 +145,7 @@ class WebsocketController{
                             content: parsedMessage.content,
                             timestamp: parsedMessage.timestamp
                         }]));
-                        await asyncStorage.setItem("lastMessageId", parsedMessage.id);
+                        await asyncStorage.setItem("lastMessageId", parsedMessage.millis.toString());
                     }
 
                     const receiveNetworkMessages = async () => {
@@ -174,7 +174,7 @@ class WebsocketController{
                                 let loadedMessages = await asyncStorage.getItem(`networks/${id}`) || [];
                                 if (loadedMessages.length !== 0) {loadedMessages = JSON.parse(loadedMessages);}
                                 await asyncStorage.setItem(`networks/${id}`, JSON.stringify([...loadedMessages, {networkId: id, content: parsedMessage.content, sender: parsedMessage.senderId.memberId, senderProfileName: parsedMessage.senderId.memberName, senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath, timestamp: parsedMessage.timestamp}]));
-                                await asyncStorage.setItem(`lastNetworkMessageId/${id}`, parsedMessage.id);
+                                await asyncStorage.setItem(`lastNetworkMessageId/${id}`, parsedMessage.millis.toString());
                             });
                         }
                     }
@@ -239,7 +239,7 @@ class WebsocketController{
 
                         const loadedChats = await getChats();
                         await saveChats(parsedMessage.senderId, loadedChats, false);
-                        await asyncStorage.setItem("lastMessageId", parsedMessage.id);
+                        await asyncStorage.setItem("lastMessageId", parsedMessage.millis.toString());
                     });
                     receiveNetworkMessages();
                 },

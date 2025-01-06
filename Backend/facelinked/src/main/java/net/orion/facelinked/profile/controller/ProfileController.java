@@ -2,6 +2,7 @@ package net.orion.facelinked.profile.controller;
 
 import lombok.RequiredArgsConstructor;
 import net.orion.facelinked.auth.services.UserService;
+import net.orion.facelinked.config.PrimaryKey;
 import net.orion.facelinked.profile.Post;
 import net.orion.facelinked.profile.Profile;
 import net.orion.facelinked.profile.ProfileRequest;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -82,8 +84,8 @@ public class ProfileController {
 
         profileService.savePost(Post.builder().
                 title(profile.getTitle()).
+                id(new PrimaryKey(sender, System.currentTimeMillis())).
                 content(profile.getContent()).
-                username(sender).
                 likes(0).
                 build());
     }

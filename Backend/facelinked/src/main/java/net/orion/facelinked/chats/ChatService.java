@@ -1,9 +1,13 @@
 package net.orion.facelinked.chats;
 
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import net.orion.facelinked.chats.repository.ChatRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -12,16 +16,20 @@ public class ChatService {
 
     private ChatRepository chatRepository;
 
-    public String saveToDatabase(ChatMessage message) {
+    public Long saveToDatabase(ChatMessage message) {
         var result = chatRepository.save(message);
-        return result.getId();
+        return result.getMillis();
     }
 
-    public List<ChatMessage> findByIdAfter(String id, String senderId) {
-        return chatRepository.findByIdGreaterThanAndReceiverId(id, senderId);
+    public List<ChatMessage> findByIdAfter(Long id, String senderId) {
+        return chatRepository.findByMillisGreaterThanAndReceiverId(id, senderId);
     }
 
     public List<ChatMessage> findBySenderOrReceiverId(String senderId) {
-        return chatRepository.findByReceiverIdOrSenderId(senderId, senderId);
+        var byReceiverId = chatRepository.findByReceiverId(senderId);
+        var modifiableList = new ArrayList<>(byReceiverId);
+        modifiableList.addAll(chatRepository.findBySenderId(senderId));
+        modifiableList.sort(Comparator.comparing(ChatMessage::getMillis));
+        return modifiableList;
     }
 }

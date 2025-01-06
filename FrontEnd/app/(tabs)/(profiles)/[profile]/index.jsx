@@ -148,7 +148,7 @@ export default function Profile() {
         if (newPostInput.current) {
             return;
         }
-        setPosts(prevState => {cachedPosts.current = prevState ;return [{new: true}]});
+        setPosts(prevState => {cachedPosts.current = prevState ;return [{new: true, millis: Date.now()}]});
 
         setTimeout(() => {
             scrollView.current.scrollToEnd();
@@ -157,7 +157,7 @@ export default function Profile() {
     }
 
     async function sendPost() {
-        setPosts([{title: postInputText.current, content: [], likes: 0}, ...cachedPosts.current]);
+        setPosts([{title: postInputText.current, content: [], likes: 0, millis: Date.now()}, ...cachedPosts.current]);
         const title = postInputText.current;
         postInputText.current = "";
 
@@ -319,7 +319,7 @@ export default function Profile() {
                                 </TouchableOpacity>}
                         </View>
                     </View>
-                    <FlatList scrollEnabled={false} ListEmptyComponent={<Text className="text-text dark:text-dark-text self-center mt-14 font-semibold text-xl">No posts yet</Text>} data={posts}
+                    <FlatList keyExtractor={(items) => items.millis} scrollEnabled={false} ListEmptyComponent={<Text className="text-text dark:text-dark-text self-center mt-14 font-semibold text-xl">No posts yet</Text>} data={posts}
                               style={{width :"100%", height: "100%"}} renderItem={(items) => {
                                   if(items.item.new) {
                                       return (

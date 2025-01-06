@@ -1,6 +1,7 @@
 package net.orion.facelinked.profile.service;
 
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import net.orion.facelinked.profile.Post;
 import net.orion.facelinked.profile.Profile;
 import net.orion.facelinked.profile.repository.PostRepository;
@@ -13,8 +14,8 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 public class ProfileService {
-    private final ProfileRepository profileRepository;
-    private final PostRepository postRepository;
+    private ProfileRepository profileRepository;
+    private PostRepository postRepository;
 
     public Profile findByUsername(String memberId) {
         return profileRepository.findByUsername(memberId).orElseThrow();
@@ -37,10 +38,10 @@ public class ProfileService {
     }
 
     public List<Post> getPosts(String username) {
-        return postRepository.findByUsernameOrderByIdDesc(username);
+        return postRepository.findByUserIdOrderByMillisDesc(username);
     }
 
     public List<Post> getLast5Posts(String username) {
-        return postRepository.findTop5ByUsernameOrderByIdDesc(username);
+        return postRepository.findTop5ByUserIdOrderByMillisDesc(username);
     }
 }

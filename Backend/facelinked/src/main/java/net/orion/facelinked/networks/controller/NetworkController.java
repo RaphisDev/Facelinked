@@ -84,7 +84,7 @@ public class NetworkController {
         senderProfile.setMemberName(user.getName());
         senderProfile.setMemberId(sender);
 
-        var savedMessage = networkService.sendMessage(NetworkMessage.builder()
+        /*var savedMessage = networkService.sendMessage(NetworkMessage.builder()
                 .content(message.getContent())
                 .timestamp(message.getTimestamp())
                 .senderId(senderProfile)
@@ -97,6 +97,8 @@ public class NetworkController {
                 content(message.getContent()).
                 timestamp(message.getTimestamp()).
                 build());
+
+         */
     }
     @GetMapping("/{networkId}/messages")
     public ResponseEntity<List<NetworkMessage>> getMessages(@PathVariable String networkId, @AuthenticationPrincipal UserDetails userDetails, @RequestParam(required = false) boolean additional) {
@@ -115,7 +117,7 @@ public class NetworkController {
     }
 
     @GetMapping("/{networkId}/afterId")
-    public ResponseEntity<List<NetworkMessage>> getMessages(@PathVariable String networkId, @RequestParam String id, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<List<NetworkMessage>> getMessages(@PathVariable String networkId, @RequestParam Long id, @AuthenticationPrincipal UserDetails userDetails) {
         var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
 
         var network = networkService.getNetwork(networkId);
