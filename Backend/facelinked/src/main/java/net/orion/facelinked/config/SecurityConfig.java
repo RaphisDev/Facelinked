@@ -43,7 +43,7 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("facelinked.com")
+                        .allowedOrigins("https://www.facelinked.com")
                         .allowedMethods("GET", "POST", "PUT", "DELETE");
             }
         };
