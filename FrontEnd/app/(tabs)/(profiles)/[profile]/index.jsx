@@ -38,6 +38,7 @@ export default function Profile() {
 
     const token = useRef("");
     const username = useRef("");
+    const profileName = useRef("");
 
     const [profileInfos, setProfileInfos] = useState({
         name: "Loading...",
@@ -52,10 +53,7 @@ export default function Profile() {
 
     async function fetchData() {
         try {
-            if(profile === undefined) {
-                profile = username.current;
-            }
-            const data = await fetch(`${ip}/profile/${profile}`, {
+            const data = await fetch(`${ip}/profile/${profileName.current}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Bearer ' + token.current,
@@ -85,7 +83,7 @@ export default function Profile() {
         }
 
         try {
-            const data = await fetch(`${ip}/profile/posts/last5/${profile}`, {
+            const data = await fetch(`${ip}/profile/posts/last5/${profileName.current}`, {
                 method: 'GET',
                 headers: {
                     "Authorization": `Bearer ${token.current}`
@@ -127,19 +125,19 @@ export default function Profile() {
     }, [navigation]);
 
     useEffect( () => {
+        profileName.current = profile;
         if (Platform.OS === "web") {
             token.current = localStorage.getItem("token");
             username.current = localStorage.getItem("username");
-
         }
         else {
             token.current = SecureStore.getItem("token");
             username.current = SecureStore.getItem("username");
         }
-        if(!profile){ profile = username.current;}
+        if(!profile){ profileName.current = username.current;}
 
         navigation.setOptions({
-            headerTitle: profile !== username.current ? profile : "Profile",
+            headerTitle: profileName.current !== username.current ? profileName.current : "Profile",
         });
         fetchData();
     }, [profile]);
@@ -172,16 +170,13 @@ export default function Profile() {
                 content: [],
             })
         });
-        if (profile === undefined) {
-            profile = username.current;
-        }
 
         if (!data.ok) {
             Alert.alert("Error", "An error occurred while sending your post. Please try again later.", [{text: "OK"}]);
             setPosts(prevState => prevState.slice(1));
         }
         else {
-            const postData = await fetch(`${ip}/profile/posts/all/${profile}`, {
+            const postData = await fetch(`${ip}/profile/posts/all/${profileName.current}`, {
                 method: 'GET',
                 headers: {
                     "Authorization": `Bearer ${token.current}`
@@ -264,10 +259,7 @@ export default function Profile() {
                 <ScrollView scrollEventThrottle={400} ref={scrollView} onScroll={async ({nativeEvent}) => {
                     if (isCloseToBottom(nativeEvent)) {
                         if (posts.length === 5) {
-                            if (profile === undefined) {
-                                profile = username.current;
-                            }
-                            const data = await fetch(`${ip}/profile/posts/all/${profile}`, {
+                            const data = await fetch(`${ip}/profile/posts/all/${profileName.current}`, {
                                 method: 'GET',
                                 headers: {
                                     "Authorization": `Bearer ${token.current}`
@@ -313,7 +305,7 @@ export default function Profile() {
                     <View>
                         <View className="flex-row mt-10 justify-between mb-4">
                             <Text className="text-center text-text dark:text-dark-text self-start font-bold text-2xl ml-4 mt-3">Posts</Text>
-                            {(profile === username.current || profile === undefined) &&
+                            {(profileName.current === username.current || profileName.current === undefined) &&
                                 <TouchableOpacity onPress={createPost} activeOpacity={0.65} className="rounded-full self-end bg-accent p-2 mr-2 w-20">
                                     <Ionicons name={"add"} size={24} className="text-center" color={"#FFFFFF"}></Ionicons>
                                 </TouchableOpacity>}

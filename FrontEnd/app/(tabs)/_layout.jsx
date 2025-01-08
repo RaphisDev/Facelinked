@@ -1,6 +1,6 @@
 import {Stack, Tabs, useGlobalSearchParams, useLocalSearchParams, useNavigation, useRouter} from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import {Pressable, Text, TouchableOpacity} from "react-native";
+import {Platform, Pressable, Text, TouchableOpacity} from "react-native";
 import * as SecureStore from "expo-secure-store";
 import StateManager from "../../components/StateManager";
 
@@ -13,13 +13,32 @@ export default function TabsLayout() {
         <>
             <Tabs screenOptions={{tabBarShowLabel: false}} screenListeners={{tabPress:
                 (e) => {
-                    if (e.target?.split("-")[0] === "(profiles)" && route?.profile !== SecureStore.getItem("username") && route?.profile !== undefined) {
-                        router.navigate(`/${SecureStore.getItem("username")}`);
+                    if (Platform.OS !== "web") {
+                        if (e.target === undefined) {
+                            router.navigate(`/${SecureStore.getItem("username")}`)
+                        }
+                        else if (e.target?.split("-")[0] === "(profiles)" && route?.profile !== SecureStore.getItem("username") && route?.profile !== undefined) {
+                            router.navigate(`/${SecureStore.getItem("username")}`);
+                        }
+                        else if (e.target?.split("-")[0] === "chat") {
+                            const stateManager = new StateManager();
+                            if (!stateManager.chatOpened) {
+                                router.replace("/chat");
+                            }
+                        }
                     }
-                    if (e.target?.split("-")[0] === "chat") {
-                        const stateManager = new StateManager();
-                        if (!stateManager.chatOpened) {
-                            router.replace("/chat");
+                    else {
+                        if (e.target === undefined) {
+                            router.navigate(`/${SecureStore.getItem("username")}`)
+                        }
+                        else if (e.target?.split("-")[0] === "(profiles)" && route?.profile !== localStorage.getItem("username") && route?.profile !== undefined) {
+                            router.navigate(`/${localStorage.getItem("username")}`);
+                        }
+                        else if (e.target?.split("-")[0] === "chat") {
+                            const stateManager = new StateManager();
+                            if (!stateManager.chatOpened) {
+                                router.replace("/chat");
+                            }
                         }
                     }
                 }
