@@ -37,13 +37,15 @@ public class SecurityConfig {
 
         return http.build();
     }
-    /*@Bean
+    @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-
+                registry.addMapping("/**")
+                        .allowedOrigins("facelinked.com")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE");
             }
         };
-    }*/
+    }
 }

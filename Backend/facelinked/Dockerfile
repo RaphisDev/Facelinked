@@ -8,4 +8,4 @@ FROM eclipse-temurin:21
 WORKDIR /app
 COPY --from=build /app/target/facelinked-0.0.1-SNAPSHOT.jar ./facelinked.jar
 EXPOSE 8080
-CMD ["java", "-jar", "aws.jar"]
+CMD ["java", "-jar", "facelinked.jar"]
