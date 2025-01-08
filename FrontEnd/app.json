@@ -21,7 +21,7 @@
     "ios": {
       "usesAppleSignIn": true,
       "supportsTablet": true,
-      "bundleIdentifier": "com.orion.facelinked"
+      "bundleIdentifier": "com.orion.friendslinked"
     },
     "android": {
       "softwareKeyboardLayoutMode": "pan",

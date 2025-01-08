@@ -476,7 +476,7 @@ export default function Network() {
                                 message: "Check out this network!",
                                 title: "Check out this network!",
                                 text: "Check out this network!",
-                                url: `https://friendslinked.de/networks/${Network}`,
+                                url: `https://facelinked.com/networks/${Network}`,
                                 dialogTitle: "Check out this network!"
                             });
                         }} className="rounded-full ml-11 mr-11 bg-accent p-5">

@@ -23,7 +23,7 @@ export default function Post(props) {
                         message: "Check out this post!",
                         title: "Check out this post!",
                         text: "Check out this post!",
-                        url: `https://friendslinked.de/${props.username}?post=${encodeURIComponent(props.id)}`,
+                        url: `https://facelinked.com/${props.username}?post=${encodeURIComponent(props.id)}`,
                         dialogTitle: "Check out this post!"
                     })} className="flex flex-row items-center">
                         <Ionicons name="share-outline" color="white" size={20}/>
