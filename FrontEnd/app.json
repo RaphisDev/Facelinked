@@ -19,7 +19,6 @@
       }
     },
     "ios": {
-      "usesAppleSignIn": true,
       "supportsTablet": true,
       "bundleIdentifier": "com.orion.friendslinked"
     },
