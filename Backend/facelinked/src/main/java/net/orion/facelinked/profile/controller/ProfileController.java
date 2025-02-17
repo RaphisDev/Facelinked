@@ -70,7 +70,7 @@ public class ProfileController {
         profileService.save(Profile.builder().profilePicturePath(profile.getProfilePicturePath())
                 .username(profile.getUsername()).name(profile.getName()).dateOfBirth(profile.getDateOfBirth())
                 .hobbies(profile.getHobbies()).score(0).inRelationship(profile.isInRelationship())
-                .partner(profile.getPartner()).location(profile.getLocation()).build());
+                .partner(profile.getPartner()).location(profile.getLocation()).searchName(profile.getUsername().toLowerCase()).build());
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)

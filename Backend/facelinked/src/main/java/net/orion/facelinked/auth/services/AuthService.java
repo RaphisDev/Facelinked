@@ -29,7 +29,7 @@ public class AuthService
         }
 
         var user = User.builder()
-                .email(request.getEmail())
+                .email(request.getEmail().toLowerCase())
                 .name(request.getName())
                 .userName(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))

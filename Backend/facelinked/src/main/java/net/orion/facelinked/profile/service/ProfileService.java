@@ -1,7 +1,6 @@
 package net.orion.facelinked.profile.service;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import net.orion.facelinked.profile.Post;
 import net.orion.facelinked.profile.Profile;
 import net.orion.facelinked.profile.repository.PostRepository;
@@ -30,7 +29,7 @@ public class ProfileService {
     }
 
     public Optional<List<Profile>> searchByUsername(String username) {
-        return profileRepository.searchTop5ByNameContainsIgnoreCase(username);
+        return profileRepository.searchTop5BySearchNameContains(username.toLowerCase());
     }
 
     public void savePost(Post post) {

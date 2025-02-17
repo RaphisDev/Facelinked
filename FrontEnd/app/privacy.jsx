@@ -33,7 +33,7 @@ export default function PrivacySettings() {
                         <Text className="mt-2">- In what situations and with which parties do we share personal information? We may share information in specific situations and with specific third parties. Learn more about when and with whom we share your personal information.</Text>
                         <Text className="mt-2">- How do we keep your information safe? We have adequate organizational and technical processes and procedures in place to protect your personal information. However, no electronic transmission over the internet or information storage technology can be guaranteed to be 100% secure, so we cannot promise or guarantee that hackers, cybercriminals, or other unauthorized third parties will not be able to defeat our security and improperly collect, access, steal, or modify your information. Learn more about how we keep your information safe.</Text>
                         <Text className="mt-2">- What are your rights? Depending on where you are located geographically, the applicable privacy law may mean you have certain rights regarding your personal information. Learn more about your privacy rights.</Text>
-                        <Text className="mt-2">- How do you exercise your rights? The easiest way to exercise your rights is by visiting Raphael.Templer@icloud.com, or by contacting us. We will consider and act upon any request in accordance with applicable data protection laws.</Text>
+                        <Text className="mt-2">- How do you exercise your rights? The easiest way to exercise your rights is by visiting bretter.schlaue83@icloud.com, or by contacting us. We will consider and act upon any request in accordance with applicable data protection laws.</Text>
                         <Text className="mt-2">- Want to learn more about what we do with any information we collect? Review the Privacy Notice in full.</Text>
 
                         <Text className="text-lg font-bold mt-4">TABLE OF CONTENTS</Text>
@@ -252,7 +252,7 @@ export default function PrivacySettings() {
                         <Text className="mt-2">In Short: We do not knowingly collect data from or market to children under 18 years of age.</Text>
 
                         <Text className="mt-2">
-                            We do not knowingly collect, solicit data from, or market to children under 18 years of age, nor do we knowingly sell such personal information. By using the Services, you represent that you are at least 18 or that you are the parent or guardian of such a minor and consent to such minor dependent’s use of the Services. If we learn that personal information from users less than 18 years of age has been collected, we will deactivate the account and take reasonable measures to promptly delete such data from our records. If you become aware of any data we may have collected from children under age 18, please contact us at Raphael.Templer@icloud.com.
+                            We do not knowingly collect, solicit data from, or market to children under 18 years of age, nor do we knowingly sell such personal information. By using the Services, you represent that you are at least 18 or that you are the parent or guardian of such a minor and consent to such minor dependent’s use of the Services. If we learn that personal information from users less than 18 years of age has been collected, we will deactivate the account and take reasonable measures to promptly delete such data from our records. If you become aware of any data we may have collected from children under age 18, please contact us at bretter.schlaue83@icloud.com.
                         </Text>
 
                         <Text className="text-lg font-bold mt-4">11. WHAT ARE YOUR PRIVACY RIGHTS?</Text>
@@ -294,7 +294,7 @@ export default function PrivacySettings() {
                         </Text>
 
                         <Text className="mt-2">
-                            If you have questions or comments about your privacy rights, you may email us at Raphael.Templer@icloud.com.
+                            If you have questions or comments about your privacy rights, you may email us at bretter.schlaue83@icloud.com.
                         </Text>
 
                         <Text className="text-lg font-bold mt-4">12. CONTROLS FOR DO-NOT-TRACK FEATURES</Text>
@@ -390,7 +390,7 @@ export default function PrivacySettings() {
                         <Text className="mt-2">Right to opt out of the collection of sensitive data and personal data collected through the operation of a voice or facial recognition feature (as permitted by applicable law, including Florida’s privacy law)</Text>
                         <Text className="mt-2 font-bold">How to Exercise Your Rights</Text>
                         <Text className="mt-2">
-                            To exercise these rights, you can contact us by visiting Raphael.Templer@icloud.com, by emailing us at Raphael.Templer@icloud.com, by mailing to the address mentioned in the Impressum, or by referring to the contact details at the bottom of this document.
+                            To exercise these rights, you can contact us by visiting bretter.schlaue83@icloud.com, by emailing us at bretter.schlaue83@icloud.com, by mailing to the address mentioned in the Impressum, or by referring to the contact details at the bottom of this document.
                         </Text>
                         <Text className="mt-2">
                             Under certain US state data protection laws, you can designate an authorized agent to make a request on your behalf. We may deny a request from an authorized agent that does not submit proof that they have been validly authorized to act on your behalf in accordance with applicable laws.
@@ -404,7 +404,7 @@ export default function PrivacySettings() {
                         </Text>
                         <Text className="mt-2 font-bold">Appeals</Text>
                         <Text className="mt-2">
-                            Under certain US state data protection laws, if we decline to take action regarding your request, you may appeal our decision by emailing us at Raphael.Templer@icloud.com. We will inform you in writing of any action taken or not taken in response to the appeal, including a written explanation of the reasons for the decisions. If your appeal is denied, you may submit a complaint to your state attorney general.
+                            Under certain US state data protection laws, if we decline to take action regarding your request, you may appeal our decision by emailing us at bretter.schlaue83@icloud.com. We will inform you in writing of any action taken or not taken in response to the appeal, including a written explanation of the reasons for the decisions. If your appeal is denied, you may submit a complaint to your state attorney general.
                         </Text>
                         <Text className="mt-2 font-bold">California "Shine The Light" Law</Text>
                         <Text className="mt-2">

@@ -1,6 +1,5 @@
 package net.orion.facelinked.profile.repository;
 
-import net.orion.facelinked.networks.NetworkMember;
 import net.orion.facelinked.profile.Profile;
 import org.socialsignin.spring.data.dynamodb.repository.EnableScan;
 import org.springframework.data.repository.CrudRepository;
@@ -15,5 +14,5 @@ public interface ProfileRepository extends CrudRepository<Profile, String>
 {
     boolean existsByUsername(String username);
 
-    Optional<List<Profile>> searchTop5ByNameContainsIgnoreCase(String name);
+    Optional<List<Profile>> searchTop5BySearchNameContains(String name);
 }

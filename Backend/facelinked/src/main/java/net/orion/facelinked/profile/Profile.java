@@ -41,4 +41,6 @@ public class Profile {
     Integer score;
     @DynamoDBAttribute(attributeName="friends")
     List<NetworkMember> friends;
+    @DynamoDBAttribute(attributeName="searchName")
+    String searchName;
 }

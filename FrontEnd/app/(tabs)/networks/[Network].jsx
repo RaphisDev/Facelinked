@@ -51,8 +51,14 @@ export default function Network() {
             token.current = SecureStore.getItem("token");
             username.current = SecureStore.getItem("username");
         }
+        navigator.setOptions({
+            headerLeft: () => <TouchableOpacity className="ml-2" onPress={() => router.back()}><Ionicons
+                name="arrow-back" size={24} color="black"/></TouchableOpacity>,
+            headerRight: () => <TouchableOpacity className="mr-2" onPress={() => setModalVisible(true)}><Ionicons
+                name="people" size={24} color="black"/></TouchableOpacity>,
+        });
 
-        const loadNetwork = async () => {
+            const loadNetwork = async () => {
             const receivedData = await fetch(`${ip}/networks/${Network}`, {
                 method: "GET",
                 headers: {
@@ -66,8 +72,6 @@ export default function Network() {
                 currentNetwork.current = {networkId: data.id, name: data.name, description: data.description, creatorId: data.creatorId, private: data.private, memberCount: data.memberCount, networkPicturePath: data.networkPicturePath};
 
                 navigator.setOptions({
-                    headerLeft: () => <TouchableOpacity className="ml-2" onPress={() => router.back()}><Ionicons name="arrow-back" size={24} color="black"/></TouchableOpacity>,
-                    headerRight: () => <TouchableOpacity className="mr-2" onPress={() => setModalVisible(true)}><Ionicons name="people" size={24} color="black"/></TouchableOpacity>,
                     headerTitle: currentNetwork.current?.name,
                 });
 
