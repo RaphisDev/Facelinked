@@ -7,7 +7,9 @@ import {useRouter} from "expo-router";
 export default function AccountSettings() {
     const router = useRouter();
     return (
-        <View className="w-full h-full bg-primary dark:bg-dark-primary items-center">
+        <View className="w-full h-full bg-primary dark:bg-black items-center">
+            <View className="w-5/6 mt-7 pb-5 pt-5 bg-white dark:bg-dark-primary self-center rounded-xl overflow-hidden items-center">
+                <Text className="text-2xl dark:text-dark-text font-semibold mb-7">Account</Text>
             <TouchableOpacity activeOpacity={0.7} onPress={async () => {
                 Alert.alert("Are you sure you want to log out?", "You will be logged out of your account", [
                     {
@@ -32,9 +34,10 @@ export default function AccountSettings() {
                         }
                     }
                 ]);
-            }} className="bg-accent mt-4 p-0.5 w-28 rounded-lg">
+            }} className="bg-accent p-0.5 w-28 rounded-lg">
                 <Text className="text-center text-xl font-semibold text-dark-text">Log out</Text>
             </TouchableOpacity>
+            </View>
         </View>
     )
 }

@@ -53,6 +53,17 @@ export default function Profile() {
 
     async function fetchData() {
         try {
+            if (username.current === profileName.current) {
+                let profile;
+                if (Platform.OS === "web") {
+                    profile = JSON.parse(localStorage.getItem('profile'));
+                }
+                else {
+                    profile = JSON.parse(SecureStore.getItem('profile'));
+                }
+                setProfileInfos(profile);
+            }
+
             const data = await fetch(`${ip}/profile/${profileName.current}`, {
                 method: 'GET',
                 headers: {
@@ -60,26 +71,19 @@ export default function Profile() {
                     'Content-Type': 'application/json'
                 }
             });
-            if (data.ok){
+            if (data.ok) {
                 const profileInfos = await data.json();
                 setProfileInfos(profileInfos);
-                if (Platform.OS === "web") {
-                    localStorage.setItem('profile', JSON.stringify(profileInfos));
-                }
-                else {
-                    SecureStore.setItem('profile', JSON.stringify(profileInfos));
+                if (profileName.current === username.current) {
+                    if (Platform.OS === "web") {
+                        localStorage.setItem('profile', JSON.stringify(profileInfos));
+                    } else {
+                        SecureStore.setItem('profile', JSON.stringify(profileInfos));
+                    }
                 }
             }
         }
         catch (error) {
-            let profile;
-            if (Platform.OS === "web") {
-                profile = JSON.parse(localStorage.getItem('profile'));
-            }
-            else {
-                profile = JSON.parse(SecureStore.getItem('profile'));
-            }
-            setProfileInfos(profile);
         }
 
         try {
@@ -111,7 +115,9 @@ export default function Profile() {
                 setIsSearching(false);
             }
             else {
-                input.current.focus();
+                setTimeout(() => {
+                    input.current.focus();
+                }, 100);
                 setSearchResults([]);
             }
             return !shown

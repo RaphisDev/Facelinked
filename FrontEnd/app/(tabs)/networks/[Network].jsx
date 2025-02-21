@@ -26,7 +26,7 @@ export default function Network() {
 
     const {Network} = useLocalSearchParams();
 
-    const navigator = useNavigation("../../");
+    const navigator = useNavigation("../");
     const router = useRouter();
     const ws = new WebSocketProvider();
 

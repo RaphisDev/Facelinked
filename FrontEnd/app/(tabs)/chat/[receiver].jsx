@@ -32,7 +32,7 @@ export default function ChatRoom() {
     const [messages, addMessage] = useState([]);
     const messageList = useRef(null);
 
-    const navigation = useNavigation("../../");
+    const navigation = useNavigation("../");
     const router = useRouter();
     const stateManager = new StateManager();
 

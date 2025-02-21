@@ -3,10 +3,10 @@ import {View, Text, ScrollView} from "react-native";
 
 export default function TermsAndConditionsSettings() {
     return (
-        <View className="bg-primary">
+        <View className="bg-primary min-h-screen">
             <View className="self-center w-full items-center">
-                <ScrollView>
-                    <View className="mx-8 mt-7">
+                <ScrollView className="w-full" style={{ height: '100vh' }}>
+                    <View className="mx-8 mt-7 pb-8">
                         <Text className="text-lg font-bold mt-4">TERMS AND CONDITIONS</Text>
 
                         <Text className="mt-2">Last updated January 04, 2025</Text>

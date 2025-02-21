@@ -5,20 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
-      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/auth/services/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/auth/services/AuthService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/auth/services/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/auth/services/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/Profile.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/Profile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/controller/ProfileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/controller/ProfileController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/repository/ProfileRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/repository/ProfileRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/service/ProfileService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/service/ProfileService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/app.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile]/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile]/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/account.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/account.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/credits.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/credits.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/privacy.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/privacy.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/terms.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/terms.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/chat/[receiver].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chat/[receiver].jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/networks/[Network].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/networks/[Network].jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/networks/_layout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/networks/_layout.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/networks/create.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/networks/create.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/login.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/login.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/privacy.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/privacy.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/register.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/register.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/terms.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/terms.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/notes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/notes.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -77,7 +77,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "editor.preferences.inline.completion",
+    "settings.editor.selected.configurable": "com.github.copilot.settings.ApplicationConfigurable",
     "ts.external.directory.path": "/Applications/WebStorm.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external",
     "vue.rearranger.settings.migration": "true"
   }
@@ -238,6 +238,11 @@
       <workItem from="1736366894174" duration="3878000" />
       <workItem from="1739823482402" duration="43000" />
       <workItem from="1739823542574" duration="3945000" />
+      <workItem from="1739827612295" duration="96000" />
+      <workItem from="1740149169277" duration="60000" />
+      <workItem from="1740161505478" duration="10958000" />
+      <workItem from="1740174592927" duration="17000" />
+      <workItem from="1740174664326" duration="4634000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />

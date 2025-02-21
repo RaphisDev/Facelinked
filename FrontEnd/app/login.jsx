@@ -107,7 +107,7 @@ export default function Login() {
                 <Text className="text-center font-bold text-text dark:text-dark-text text-5xl">Login</Text>
                 <View className="p-7">
                     <View className="w-full h-full">
-                        <View className="h-[55%%] self-center flex-wrap justify-center items-center">
+                        <View className="mt-20 self-center flex-wrap justify-center items-center">
                             <View className="border-2 border-black dark:border-white w-3/4 p-5 rounded-xl">
                               <Text className="dark:text-dark-text text-text font-bold text-lg">Email</Text>
                               <TextInput value={email} autoCapitalize="none" textContentType="emailAddress" autoComplete="email" onChangeText={e => setEmail(e)} className="dark:text-dark-text text-text border-gray-700/80 border-4 rounded-lg active:bg-gray-600/10 font-medium h-10 text-lg p-0.5 pl-2.5 mb-1 min-w-full max-w-full" type="email" placeholder="Enter your email"/>

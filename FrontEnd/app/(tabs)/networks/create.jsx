@@ -1,5 +1,5 @@
 import {TextInput, TouchableOpacity, View, Text, Switch, SwitchBase, SwitchComponent, Platform} from "react-native";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useLayoutEffect, useRef, useState} from "react";
 import {useNavigation, useRouter} from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -34,7 +34,7 @@ export default function CreateNetwork() {
         }
     }
 
-    const navigator = useNavigation("../../");
+    const navigator = useNavigation("../");
 
     useEffect(() => {
         if (Platform.OS === "web") {
