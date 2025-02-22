@@ -1,5 +1,6 @@
 import "../../../../global.css"
 import {View, Text, ScrollView} from "react-native";
+import {Link} from "expo-router";
 
 export default function TermsAndConditionsSettings() {
     return (
@@ -401,6 +402,8 @@ export default function TermsAndConditionsSettings() {
                         <Text className="mt-2">Phone: +4915257067475</Text>
                         <Text className="mt-2">bretter.schlaue83@icloud.com</Text>
 
+                        <Text className="mt-2">To see the CSAE, please visit the following link:</Text>
+                        <Link href={"https://sites.google.com/view/facelinked-csae/startseite"} className="text-blue-500 pb-52">https://sites.google.com/view/facelinked-csae/startseite</Link>
                     </View>
                 </ScrollView>
             </View>
