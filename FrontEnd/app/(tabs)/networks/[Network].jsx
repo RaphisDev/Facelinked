@@ -43,6 +43,7 @@ export default function Network() {
     const username = useRef("");
 
     useEffect(() => {
+        console.log(Network);
         if (Platform.OS === "web") {
             token.current = localStorage.getItem("token");
             username.current = localStorage.getItem("username");
@@ -77,10 +78,10 @@ export default function Network() {
 
                 let loadedNetworks = await asyncStorage.getItem("networks") || [];
                 if (loadedNetworks.length !== 0) {loadedNetworks = JSON.parse(loadedNetworks);}
-                if(loadedNetworks.find((network) => Number.parseInt(network.networkId) === Number.parseInt(Network))) {
+                if(loadedNetworks.find((network) =>network.networkId === Network)) {
                     setIsFavorite(true);
                     await asyncStorage.setItem("networks", JSON.stringify(loadedNetworks.map((network) => {
-                        if (Number.parseInt(network.networkId) === Number.parseInt(Network)) {
+                        if (network.networkId === Network) {
                             return {networkId: data.id, name: data.name, description: data.description, creatorId: data.creatorId, private: data.private, members: member.current, memberCount: data.memberCount, networkPicturePath: data.networkPicturePath};
                         }
                         return network;
@@ -111,7 +112,7 @@ export default function Network() {
                 parsedNetworks = JSON.parse(parsedNetworks);
             }
 
-            if (!parsedNetworks.find((network) => Number.parseInt(network.networkId) === Number.parseInt(Network)) || parsedNetworks.length === 0) {
+            if (!parsedNetworks.find((network) => network.networkId === Network) || parsedNetworks.length === 0) {
                 if (ws.stompClient.connected) {
                     ws.stompClient.subscribe(`/networks/${Network}`, async (message) => {
                         const parsedMessage = JSON.parse(message.body);
@@ -139,7 +140,7 @@ export default function Network() {
             }
             else {
                 if (await asyncStorage.getItem(`lastNetworkMessageId/${Network}`)) {
-                    const receivedMessages = await fetch(`${ip}/networks/${Network}/afterId?id=${encodeURIComponent(Number.parseInt(await asyncStorage.getItem(`lastNetworkMessageId/${Network}`)))}`, {
+                    const receivedMessages = await fetch(`${ip}/networks/${Network}/afterId?id=${encodeURIComponent(await asyncStorage.getItem(`lastNetworkMessageId/${Network}`))}`, {
                         method: "GET",
                         headers: {
                             "Authorization": `Bearer ${token.current}`,
@@ -180,7 +181,7 @@ export default function Network() {
         receiveNetworkMessages();
 
         ws.messageReceived.addListener("networkMessageReceived", async (e) => {
-            if (Number.parseInt(e.detail.networkId) !== Number.parseInt(Network)) {
+            if (e.detail.networkId !== Network) {
                 return;
             }
 
@@ -227,7 +228,7 @@ export default function Network() {
 
             addMessage((prevMessages) => [...prevMessages, {sender: username.current, senderProfilePicturePath: profilePicture, content: message, timestamp: new Date().toString()}]);
 
-            if (JSON.parse(await asyncStorage.getItem("networks")).find((network) => Number.parseInt(network.networkId) === Number.parseInt(Network))) {
+            if (JSON.parse(await asyncStorage.getItem("networks")).find((network) => network.networkId === Network)) {
                 let loadedMessages = await asyncStorage.getItem(`networks/${Network}`) || [];
                 if (loadedMessages.length !== 0) {
                     loadedMessages = JSON.parse(loadedMessages);
@@ -299,7 +300,7 @@ export default function Network() {
         if (loadedNetworks.length !== 0) {loadedNetworks = JSON.parse(loadedNetworks);}
         if (!shouldFavorite) {
             await asyncStorage.setItem("networks", JSON.stringify(loadedNetworks.filter((network) => {
-                return Number.parseInt(network.networkId) !== Number.parseInt(Network);
+                return network.networkId !== Network;
             })));
             await asyncStorage.removeItem(`networks/${Network}`);
             await asyncStorage.removeItem(`lastNetworkMessageId/${Network}`);
@@ -349,7 +350,7 @@ export default function Network() {
                         const loadedNetworks = await asyncStorage.getItem("networks") || null;
                         if (loadedNetworks !== null) {
                             const parsedNetworks = JSON.parse(loadedNetworks);
-                            if (!parsedNetworks.find((network) => Number.parseInt(network.networkId) === Number.parseInt(Network))) {
+                            if (!parsedNetworks.find((network) => network.networkId === Network)) {
                                 if (ws.stompClient.connected) {
                                     const receivedMessages = await fetch(`${ip}/networks/${Network}/messages?additional=${encodeURIComponent(true)}`, {
                                         method: "GET",
@@ -448,7 +449,7 @@ export default function Network() {
                                                         currentNetwork.current = {networkId: currentNetwork.current.networkId, name: text, description: description, creatorId: currentNetwork.current.creatorId, private: currentNetwork.current.private, memberCount: currentNetwork.current.memberCount, networkPicturePath: currentNetwork.current.networkPicturePath};
 
                                                         await asyncStorage.setItem("networks", JSON.stringify(JSON.parse(await asyncStorage.getItem("networks")).map((network) => {
-                                                            if (Number.parseInt(network.networkId) === Number.parseInt(Network)) {
+                                                            if (network.networkId === Network) {
                                                                 return {networkId: currentNetwork.current.networkId, name: text, description: description, creatorId: currentNetwork.current.creatorId, private: currentNetwork.current.private, members: member, memberCount: currentNetwork.current.memberCount, networkPicturePath: currentNetwork.current.networkPicturePath};
                                                             }
                                                             return network;

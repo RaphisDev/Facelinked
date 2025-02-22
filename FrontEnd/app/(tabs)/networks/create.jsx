@@ -15,7 +15,6 @@ export default function CreateNetwork() {
     const [members, setMembers] = useState([]);
     const name = useRef("");
     const description = useRef("");
-    const [imageUri, setImage] = useState(undefined);
     const image = useRef(null);
     const [isCreating, setCreating] = useState(false);
 
@@ -96,12 +95,15 @@ export default function CreateNetwork() {
             }
             url = await bucketUrl.text();
 
+            const response = await fetch(image.current.assets[0].uri);
+            const blob = await response.blob();
+
             await fetch(url, {
                 method: "PUT",
                 headers: {
-                    "Content-Type": "multipart/form-data"
+                    "Content-Type": blob.type
                 },
-                body: image.current,
+                body: blob,
             });
         }
         //const compressedImage = await ImageManipulator.manipulateAsync(imageUri, [], { compress: 0.5 });
@@ -178,12 +180,11 @@ export default function CreateNetwork() {
                             allowsEditing: true,
                             aspect: [1, 1],
                             quality: 0.2,
-                            mediaTypes: ImagePicker.MediaTypeOptions.Images, //deprecated
+                            mediaTypes: "images"
                         });
 
                         if (!result.canceled) {
-                            image.current = result.assets[0];
-                            setImage(result.assets[0].uri);
+                            image.current = result;
                         }
                     }} className="w-1/2 self-center mt-4 bg-gray-700 flex-row justify-center items-center p-1.5 rounded-lg">
                         <Ionicons name={"image"} size={24} color={"white"} style={{alignSelf: "center"}}/>
