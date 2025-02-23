@@ -43,7 +43,6 @@ public class ProfileController {
         if(profile.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        System.out.println(profile.get());
         return ResponseEntity.ok(profile.get());
     }
 

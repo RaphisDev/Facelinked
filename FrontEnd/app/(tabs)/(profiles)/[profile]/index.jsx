@@ -78,9 +78,13 @@ export default function Profile() {
             if (data.ok) {
                 const profileInfos = await data.json();
                 setProfileInfos(profileInfos);
-                if (profileInfos.friends) {
-                    setIsAdded(profileInfos.friends.some((friend) => friend.username === username.current));
-                } else { setIsAdded(false) }
+                if (Platform.OS === "web") {
+                    const profile = JSON.parse(localStorage.getItem('profile'));
+                    setIsAdded(profile.friends.some((friend) => friend.memberId === profileName.current));
+                } else {
+                    const profile = JSON.parse(SecureStore.getItem('profile'));
+                    setIsAdded(profile.friends.some((friend) => friend.memberId === profileName.current));
+                }
                 if (profileName.current === username.current) {
                     if (Platform.OS === "web") {
                         localStorage.setItem('profile', JSON.stringify(profileInfos));
@@ -221,8 +225,19 @@ export default function Profile() {
 
     async function AddFriend() {
         if(isAdded) {
-            setIsAdded(false);
-            removeFriend(profile);
+            Alert.alert(`Unfriend '${profileName.current}'?`, `Are you sure you want to remove '${profileName.current}' as a friend?`, [{
+                text: "Cancel"
+            }, {
+                text: "Unfriend", onPress: async () => {
+                    setIsAdded(false);
+                    await fetch(`${ip}/profile/friend/${profile}`, {
+                        method: 'DELETE',
+                        headers: {
+                            "Authorization": `Bearer ${token.current}`
+                        }
+                    });
+                }
+            }]);
             return
         }
         setIsAdded(true);
@@ -402,8 +417,8 @@ export default function Profile() {
                                     <Text className="text-text dark:text-dark-text text-sm">@{item.item.memberId}</Text>
                                 </View>
                             </View>
-                            {profile === undefined || profile === username.current && <TouchableOpacity onPress={async() => {
-                                Alert.alert(`Are you sure you want to remove ${item.item.memberId} as a friend?`, "", [
+                            {profileName.current === username.current && <TouchableOpacity onPress={async() => {
+                                Alert.alert(`Are you sure you want to remove '${item.item.memberId}' as a friend?`, "", [
                                     {text: "Cancel"},
                                     {text: "Remove", onPress: async () => {
                                             await removeFriend(item.item.memberId);
@@ -418,7 +433,7 @@ export default function Profile() {
                         </View>
                     </View>
                 }/>
-                {profile !== username.current && profile !== undefined && <TouchableOpacity onPress={() => AddFriend()} className="self-center rounded-2xl w-2/5 mt-11 p-1.5 bg-accent mb-20">
+                {profileName.current !== username.current && <TouchableOpacity onPress={() => AddFriend()} className="self-center rounded-2xl w-2/5 mt-11 p-1.5 bg-accent mb-20">
                     <Animated.View style={[{opacity: fadeAnim}]}>
                         <Ionicons name={isAdded ? "checkmark-sharp" : "add"} className="self-center" size={30} color="white"/>
                     </Animated.View>

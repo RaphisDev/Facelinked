@@ -37,7 +37,7 @@ public class Profile {
     @DynamoDBAttribute(attributeName="score")
     Integer score;
     @DynamoDBAttribute(attributeName="friends")
-    @DynamoDBTyped(DynamoDBMapperFieldModel.DynamoDBAttributeType.L)
+    @DynamoDBTypeConvertedJson
     List<NetworkMember> friends;
     @DynamoDBAttribute(attributeName="searchName")
     String searchName;
