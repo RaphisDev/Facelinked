@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -32,6 +33,10 @@ public class NetworkService {
         networkRepository.save(network);
     }
 
+    public List<Network> searchForNetwork(String searchName) {
+        return networkRepository.searchTop5BySearchNameContains(searchName);
+    }
+
     public Network getNetwork(String networkId) {
         return networkRepository.findById(networkId).orElseThrow(() -> new IllegalArgumentException("Network not found"));
     }
@@ -49,12 +54,14 @@ public class NetworkService {
         networkRepository.save(networkResponseEntity);
     }
 
-    public NetworkMessage sendMessage(NetworkMessage build) {
-        return networkMessageRepository.save(build);
+    public Long sendMessage(NetworkMessage build) {
+        var result = networkMessageRepository.save(build);
+        return result.getMillis();
     }
 
     public List<NetworkMessage> getMessages(String networkId) {
-        return networkMessageRepository.findFirst20ByNetworkIdOrderByMillisDesc(networkId).reversed();
+        //dont know a way rn to get latest 20 messages cause orderby isnt supported by dynamodb
+        return getAdditionalMessages(networkId);
     }
 
     public List<NetworkMessage> getAdditionalMessages(String networkId) {

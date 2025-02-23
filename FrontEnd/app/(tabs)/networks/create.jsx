@@ -47,13 +47,14 @@ export default function CreateNetwork() {
 
         navigator.setOptions({
             headerLeft: () => <TouchableOpacity className="ml-2" onPress={() => router.back()}><Ionicons name="arrow-back" size={24} color="black"/></TouchableOpacity>,
+            headerRight: () => null
         });
 
         return () => {
             navigator.setOptions({
                 headerLeft: () => <TouchableOpacity className="ml-2 mb-1" onPress={() => router.navigate("/networks/create")}>
                     <Ionicons name="add" size={25}/>
-                </TouchableOpacity>,
+                </TouchableOpacity>
             });
         }
     }, []);

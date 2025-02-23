@@ -3,6 +3,8 @@ package net.orion.facelinked.profile.controller;
 import lombok.RequiredArgsConstructor;
 import net.orion.facelinked.auth.services.UserService;
 import net.orion.facelinked.config.PrimaryKey;
+import net.orion.facelinked.networks.NetworkMember;
+import net.orion.facelinked.networks.NetworkMessage;
 import net.orion.facelinked.profile.Post;
 import net.orion.facelinked.profile.Profile;
 import net.orion.facelinked.profile.ProfileRequest;
@@ -16,8 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Controller
 @RequestMapping("/profile")
@@ -70,7 +71,7 @@ public class ProfileController {
         profileService.save(Profile.builder().profilePicturePath(profile.getProfilePicturePath())
                 .username(profile.getUsername()).name(profile.getName()).dateOfBirth(profile.getDateOfBirth())
                 .hobbies(profile.getHobbies()).score(0).inRelationship(profile.isInRelationship())
-                .partner(profile.getPartner()).location(profile.getLocation()).searchName(profile.getUsername().toLowerCase()).build());
+                .partner(profile.getPartner()).friends(Collections.emptyList()).location(profile.getLocation()).searchName(profile.getName().toLowerCase()).build());
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -99,6 +100,32 @@ public class ProfileController {
     public ResponseEntity<List<Post>> GetLast5Posts(@PathVariable String username)
     {
         return ResponseEntity.ok(profileService.getLast5Posts(username));
+    }
+
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @PostMapping("/friend/{username}")
+    public void AddFriend(@PathVariable String username, @AuthenticationPrincipal UserDetails userDetails)
+    {
+        var sender = userService.findByEmail(userDetails.getUsername());
+        var senderProfile = profileService.findByUsername(sender.getUserName());
+
+        var toAdd = profileService.findByUsername(username);
+        var member = new NetworkMember();
+        member.setMemberId(toAdd.getUsername());
+        member.setMemberName(toAdd.getName());
+        member.setMemberProfilePicturePath(toAdd.getProfilePicturePath());
+
+        profileService.addFriend(senderProfile, member);
+    }
+
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @DeleteMapping("/friend/{username}")
+    public void RemoveFriend(@PathVariable String username, @AuthenticationPrincipal UserDetails userDetails)
+    {
+        var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
+        var senderProfile = profileService.findByUsername(sender);
+
+        profileService.removeFriend(senderProfile, username);
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)

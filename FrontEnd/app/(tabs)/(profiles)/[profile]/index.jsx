@@ -1,7 +1,7 @@
 import {
-    Alert, Dimensions,
+    Alert, Animated, Dimensions,
     FlatList,
-    Keyboard,
+    Keyboard, Modal,
     Platform,
     Pressable,
     ScrollView,
@@ -40,6 +40,10 @@ export default function Profile() {
     const username = useRef("");
     const profileName = useRef("");
 
+    const [showModal, setShowModal] = useState(false);
+    const [isAdded, setIsAdded] = useState(false);
+    const fadeAnim = useRef(new Animated.Value(1)).current;
+
     const [profileInfos, setProfileInfos] = useState({
         name: "Loading...",
         score: 0,
@@ -74,6 +78,9 @@ export default function Profile() {
             if (data.ok) {
                 const profileInfos = await data.json();
                 setProfileInfos(profileInfos);
+                if (profileInfos.friends) {
+                    setIsAdded(profileInfos.friends.some((friend) => friend.username === username.current));
+                } else { setIsAdded(false) }
                 if (profileName.current === username.current) {
                     if (Platform.OS === "web") {
                         localStorage.setItem('profile', JSON.stringify(profileInfos));
@@ -201,6 +208,46 @@ export default function Profile() {
             contentSize.height - paddingToBottom;
     };
 
+    async function removeFriend(memberId) {
+        setProfileInfos(prevState => ({...prevState, friends: prevState.friends.filter((friend) => friend.memberId !== memberId)}));
+
+        await fetch(`${ip}/profile/friend/${memberId}`, {
+            method: 'DELETE',
+            headers: {
+                "Authorization": `Bearer ${token.current}`
+            }
+        });
+    }
+
+    async function AddFriend() {
+        if(isAdded) {
+            setIsAdded(false);
+            removeFriend(profile);
+            return
+        }
+        setIsAdded(true);
+
+        await fetch(`${ip}/profile/friend/${profile}`, {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${token.current}`
+            }
+        });
+
+        Animated.sequence([
+            Animated.timing(fadeAnim, {
+                toValue: 0,
+                duration: 100,
+                useNativeDriver: true
+            }),
+            Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 250,
+                useNativeDriver: true
+            })
+        ]).start();
+    }
+
     return (
         <>
             <View className="bg-primary dark:bg-dark-primary w-full h-full">
@@ -300,16 +347,19 @@ export default function Profile() {
                                    alt="Profile picture" source={{uri: profileInfos.profilePicturePath}}/>
                         </View>
                     </View>
-                    <View className="flex-row justify-center mt-5" style={{display: profile === username.current || profile === undefined ? "none" : "flex"}}>
-                        <TouchableOpacity onPress={() => router.navigate(`/chat/${profile}`)} activeOpacity={0.6} className="mr-16 border-accent bg-accent border-4 rounded-xl p-2">
-                            <Text className="text-dark-text font-semibold">Message</Text>
+                    <View className="flex-row justify-center mt-9">
+                        <TouchableOpacity style={{display: profile === username.current || profile === undefined ? "none" : "flex"}} onPress={() => router.navigate(`/chat/${profile}`)} activeOpacity={0.6} className="mr-16 border-accent bg-accent border-4 rounded-full p-3.5">
+                            <Ionicons name="chatbubble" color="white" size={25}/>
                         </TouchableOpacity>
-                        <TouchableOpacity activeOpacity={0.6} className="border-accent bg-accent border-4 rounded-xl p-2">
-                            <Text className="text-dark-text font-semibold">Add friend</Text>
+                        <TouchableOpacity style={{display: profile === username.current || profile === undefined ? "flex" : "none"}} onPress={() => Alert.alert("Edit Profile", "This feature is coming soon")} activeOpacity={0.6} className="mr-16 border-accent bg-accent border-4 rounded-full p-3.5">
+                            <Ionicons name={profile === username.current || profile === undefined ? "pencil" : "chatbox-outline"} color="white" size={25}/>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => setShowModal(true)} activeOpacity={0.6} className="border-accent bg-accent border-4 rounded-full p-3.5">
+                            <Ionicons name="people" color="white" size={25}></Ionicons>
                         </TouchableOpacity>
                     </View>
                     <View>
-                        <View className="flex-row mt-10 justify-between mb-4">
+                        <View className="flex-row mt-5 justify-between mb-4">
                             <Text className="text-center text-text dark:text-dark-text self-start font-bold text-2xl ml-4 mt-3">Posts</Text>
                             {(profileName.current === username.current || profileName.current === undefined) &&
                                 <TouchableOpacity onPress={createPost} activeOpacity={0.65} className="rounded-full self-end bg-accent p-2 mr-2 w-20">
@@ -337,6 +387,43 @@ export default function Profile() {
                               }}/>
                 </ScrollView>
             </View>
+            <Modal animationType="slide" visible={showModal} presentationStyle={"pageSheet"} onRequestClose={() => {setShowModal(false);}}>
+                <Text className="text-4xl text-center mt-4 font-bold">Friends</Text>
+                <FlatList className="mt-9" data={profileInfos.friends ? profileInfos.friends : []} renderItem={(item) =>
+                    <View>
+                        <TouchableOpacity onPress={() => {
+                            setShowModal(false);
+                            router.navigate(`/${item.item.memberId}`);
+                        }} activeOpacity={0.4} className="flex-row justify-between items-center p-3">
+                            <View className="flex-row items-center">
+                                <Image source={{uri: item.item.memberProfilePicturePath}} style={{width: 42, height: 42, borderRadius: 21}}></Image>
+                                <View className="flex-col ml-3">
+                                    <Text className="text-text dark:text-dark-text font-bold text-lg">{item.item.memberName}</Text>
+                                    <Text className="text-text dark:text-dark-text text-sm">@{item.item.memberId}</Text>
+                                </View>
+                            </View>
+                            {profile === undefined || profile === username.current && <TouchableOpacity onPress={async() => {
+                                Alert.alert(`Are you sure you want to remove ${item.item.memberId} as a friend?`, "", [
+                                    {text: "Cancel"},
+                                    {text: "Remove", onPress: async () => {
+                                            await removeFriend(item.item.memberId);
+                                        }}
+                                ]);
+                            }} activeOpacity={0.65} className="rounded-full bg-accent p-2">
+                                <Ionicons name={"close"} size={16} color={"#FFFFFF"}></Ionicons>
+                            </TouchableOpacity>}
+                        </TouchableOpacity>
+                        <View className="w-11/12 self-center">
+                            <View className="border-b border-gray-700/80"></View>
+                        </View>
+                    </View>
+                }/>
+                {profile !== username.current && profile !== undefined && <TouchableOpacity onPress={() => AddFriend()} className="self-center rounded-2xl w-2/5 mt-11 p-1.5 bg-accent mb-20">
+                    <Animated.View style={[{opacity: fadeAnim}]}>
+                        <Ionicons name={isAdded ? "checkmark-sharp" : "add"} className="self-center" size={30} color="white"/>
+                    </Animated.View>
+                </TouchableOpacity>}
+            </Modal>
         </>
     );
 }

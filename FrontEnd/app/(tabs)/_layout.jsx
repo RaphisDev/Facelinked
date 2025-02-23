@@ -54,9 +54,6 @@ export default function TabsLayout() {
                     headerLeft: () => <TouchableOpacity onPress={() => router.navigate("/networks/create")}>
                         <Ionicons className="ml-2 mb-1" name="add" size={25}/>
                     </TouchableOpacity>,
-                    headerRight: () => <TouchableOpacity>
-                        <Ionicons className="mr-4 mb-1" name="search" size={25}/>
-                    </TouchableOpacity>,
                     tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "git-merge-sharp" : "git-merge-outline"} size={30}/>
                 }}/>
                 <Tabs.Screen name="chat" options={{headerTitle: "Chats",

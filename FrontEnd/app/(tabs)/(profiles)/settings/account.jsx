@@ -11,6 +11,12 @@ export default function AccountSettings() {
             <View className="w-5/6 mt-7 pb-5 pt-5 bg-white dark:bg-dark-primary self-center rounded-xl overflow-hidden items-center">
                 <Text className="text-2xl dark:text-dark-text font-semibold mb-7">Account</Text>
             <TouchableOpacity activeOpacity={0.7} onPress={async () => {
+                if (Platform.OS === "web") {
+                    await asyncStorage.clear();
+                    localStorage.clear();
+                    new WebSocketProvider().reset();
+                    router.replace("/");
+                }
                 Alert.alert("Are you sure you want to log out?", "You will be logged out of your account", [
                     {
                         text: "Cancel",

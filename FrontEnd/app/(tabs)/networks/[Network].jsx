@@ -43,7 +43,6 @@ export default function Network() {
     const username = useRef("");
 
     useEffect(() => {
-        console.log(Network);
         if (Platform.OS === "web") {
             token.current = localStorage.getItem("token");
             username.current = localStorage.getItem("username");
@@ -192,9 +191,6 @@ export default function Network() {
             navigator.setOptions({
                 headerLeft: () => <TouchableOpacity className="ml-2 mb-1" onPress={() => router.navigate("/networks/create")}>
                     <Ionicons name="add" size={25}/>
-                </TouchableOpacity>,
-                headerRight: () => <TouchableOpacity>
-                    <Ionicons className="mr-4 mb-1" name="search" size={25}/>
                 </TouchableOpacity>,
                 headerTitle: "Networks",
             });
@@ -543,7 +539,10 @@ export default function Network() {
                             }} activeOpacity={0.4} className="flex-row justify-between items-center p-3">
                                 <View className="flex-row items-center">
                                     <Image source={{uri: item.item.memberProfilePicturePath}} style={{width: 42, height: 42, borderRadius: 21}}></Image>
-                                    <Text className="text-text dark:text-dark-text font-bold text-lg ml-3">{item.item.memberName}</Text>
+                                    <View className="flex-col ml-3">
+                                        <Text className="text-text dark:text-dark-text font-bold text-lg">{item.item.memberName}</Text>
+                                        <Text className="text-text dark:text-dark-text text-sm">@{item.item.memberId}</Text>
+                                    </View>
                                 </View>
                                 {(currentNetwork.current.private && currentNetwork.current.creatorId === username.current && item.item.memberId !== username.current) && <TouchableOpacity onPress={async() => {
                                     Alert.alert(`Are you sure you want to remove ${item.item.memberId}?`, "This action cannot be undone.", [

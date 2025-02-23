@@ -1,6 +1,7 @@
 import "../../global.css";
-import {Share, Text, TouchableOpacity, View} from "react-native";
+import {Platform, Share, Text, TouchableOpacity, View} from "react-native";
 import {Image} from "expo-image";
+import * as SecureStore from "expo-secure-store";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function Post(props) {
@@ -23,7 +24,7 @@ export default function Post(props) {
                         message: "Check out this post!",
                         title: "Check out this post!",
                         text: "Check out this post!",
-                        url: `https://facelinked.com/${props.username}?post=${encodeURIComponent(props.id)}`,
+                        url: `https://facelinked.com/${props.username === undefined ? Platform.OS === "web" ? localStorage.getItem("username") : SecureStore.getItem("username") : props.username}?post=${encodeURIComponent(props.id)}`,
                         dialogTitle: "Check out this post!"
                     })} className="flex flex-row items-center">
                         <Ionicons name="share-outline" color="white" size={20}/>

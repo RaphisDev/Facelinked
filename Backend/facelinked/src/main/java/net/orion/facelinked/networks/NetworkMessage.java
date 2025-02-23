@@ -37,7 +37,7 @@ public class NetworkMessage {
         id.setMillis(millis);
     }
     @DynamoDBAttribute(attributeName = "senderId")
-    //@Convert(converter = MemberAttributeConverter.class)
+    @DynamoDBTyped(DynamoDBMapperFieldModel.DynamoDBAttributeType.M)
     private NetworkMember senderId;
     @DynamoDBAttribute(attributeName = "networkId")
     private String networkId;

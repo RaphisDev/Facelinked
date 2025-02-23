@@ -14,8 +14,6 @@ import java.util.List;
 @EnableScan
 public interface NetworkMessageRepository extends CrudRepository<NetworkMessage, AutoPrimaryKey> {
 
-    List<NetworkMessage> findFirst20ByNetworkIdOrderByMillisDesc(String networkId);
-
     List<NetworkMessage> findByMillisGreaterThanAndNetworkId(Long idIsGreaterThan, String networkId);
 
     List<NetworkMessage> findByNetworkId(String networkId);

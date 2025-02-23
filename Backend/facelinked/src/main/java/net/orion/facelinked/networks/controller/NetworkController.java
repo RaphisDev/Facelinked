@@ -1,13 +1,16 @@
 package net.orion.facelinked.networks.controller;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import lombok.AllArgsConstructor;
 import net.orion.facelinked.auth.services.UserService;
 import net.orion.facelinked.chats.ChatMessage;
 import net.orion.facelinked.chats.controller.MessageRequest;
+import net.orion.facelinked.config.AutoPrimaryKey;
 import net.orion.facelinked.networks.Network;
 import net.orion.facelinked.networks.NetworkMember;
 import net.orion.facelinked.networks.NetworkMessage;
 import net.orion.facelinked.networks.service.NetworkService;
+import net.orion.facelinked.profile.Profile;
 import net.orion.facelinked.profile.service.ProfileService;
 import net.orion.facelinked.profile.service.StorageService;
 import org.springframework.http.HttpStatus;
@@ -59,6 +62,7 @@ public class NetworkController {
                 members(network.getMembers()).
                 networkPicturePath(network.getNetworkPicturePath()).
                 memberCount(1).
+                searchName(network.getName().toLowerCase()).
                 build());
 
         return ResponseEntity.ok(NetworkResponse.builder().id(id).members(network.getMembers()).creatorId(sender).build());
@@ -84,21 +88,10 @@ public class NetworkController {
         senderProfile.setMemberName(user.getName());
         senderProfile.setMemberId(sender);
 
-        /*var savedMessage = networkService.sendMessage(NetworkMessage.builder()
-                .content(message.getContent())
-                .timestamp(message.getTimestamp())
-                .senderId(senderProfile)
-                .networkId(message.getReceiver())
-                .build());
+        var millis = networkService.sendMessage(
+                new NetworkMessage(senderProfile, message.getReceiver(), message.getContent(), message.getTimestamp(), new AutoPrimaryKey(null, System.currentTimeMillis())));
 
-        messagingTemplate.convertAndSend("/networks/" + message.getReceiver(), NetworkMessage.builder().
-                id(savedMessage.getId()).
-                senderId(senderProfile).
-                content(message.getContent()).
-                timestamp(message.getTimestamp()).
-                build());
-
-         */
+        messagingTemplate.convertAndSend("/networks/" + message.getReceiver(), new NetworkMessage(senderProfile, message.getReceiver(), message.getContent(), message.getTimestamp(), new AutoPrimaryKey(null, millis)));
     }
     @GetMapping("/{networkId}/messages")
     public ResponseEntity<List<NetworkMessage>> getMessages(@PathVariable String networkId, @AuthenticationPrincipal UserDetails userDetails, @RequestParam(required = false) boolean additional) {
@@ -142,6 +135,21 @@ public class NetworkController {
             }
         }
         return ResponseEntity.ok(networkResponseEntity);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Network>> searchNetwork(@RequestParam String searchName, @AuthenticationPrincipal UserDetails userDetails) {
+        var networks = networkService.searchForNetwork(searchName.toLowerCase());
+        if (networks.stream().anyMatch(network -> network.isPrivate())) {
+            var user = profileService.findByUsername(userDetails.getUsername());
+            networks.removeIf(network -> {
+                if (network.isPrivate()) {
+                    return network.getMembers().stream().noneMatch(member -> member.getMemberId().equals(user.getUsername()));
+                }
+                return false;
+            });
+        }
+        return ResponseEntity.ok(networks);
     }
 
     @PostMapping("{network}/update")
