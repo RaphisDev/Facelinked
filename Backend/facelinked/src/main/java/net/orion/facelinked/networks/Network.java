@@ -25,7 +25,7 @@ public class Network {
     @DynamoDBAttribute(attributeName = "isPrivate")
     private boolean isPrivate;
     @DynamoDBAttribute(attributeName = "members")
-    @DynamoDBTypeConvertedJson
+    @DynamoDBTypeConverted(converter = NetworkMemberListConverter.class)
     private List<NetworkMember> members;
     @DynamoDBAttribute(attributeName = "networkPicturePath")
     private String networkPicturePath;

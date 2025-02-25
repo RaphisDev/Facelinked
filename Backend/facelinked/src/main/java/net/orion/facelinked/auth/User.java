@@ -29,6 +29,8 @@ public class User implements UserDetails
     String name;
     @DynamoDBAttribute(attributeName = "password")
     String password;
+    @DynamoDBAttribute(attributeName = "token")
+    List<String> deviceTokens;
 
     @DynamoDBIgnore
     @Override

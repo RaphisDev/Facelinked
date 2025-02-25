@@ -5,14 +5,51 @@ import React, {useEffect, useState} from "react";
 import * as SecureStore from "expo-secure-store";
 import WebSocketProvider from "../components/WebSocketProvider";
 import {Image} from "expo-image";
+import * as Device from "expo-device";
+import * as Notification from "expo-notifications";
+import ip from "../components/AppManager";
 
 export default function Index() {
+
+    async function requestPermission() {
+            if (Device.isDevice) {
+                const { status: existingStatus } = await Notification.getPermissionsAsync();
+                let finalStatus = existingStatus;
+
+                if (existingStatus !== 'granted') {
+                    const { status } = await Notification.requestPermissionsAsync();
+                    finalStatus = status;
+                }
+
+                if (finalStatus !== 'granted') {
+                    alert('You have to grant permission for notifications');
+                    return;
+                }
+                await Notification.getDevicePushTokenAsync().then((token) => {
+                    return token;
+                });
+            }
+    }
 
     async function signedIn() {
         if (Platform.OS === "web") {
             return localStorage.getItem("token") != null;
         }
         const token = await SecureStore.getItemAsync("token");
+
+        if (Notification.PermissionStatus.UNDETERMINED && token != null && Platform.OS === "ios" && Device.isDevice) {
+            const token = await requestPermission();
+            await fetch(`${ip}/messages/setDeviceToken`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${SecureStore.getItem("token")}`
+                },
+                body: JSON.stringify({
+                    token: token
+                })
+            });
+        }
         return token != null;
     }
 

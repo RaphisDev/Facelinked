@@ -1,5 +1,10 @@
 package net.orion.facelinked.chats.controller;
 
+import com.eatthepath.pushy.apns.ApnsClient;
+import com.eatthepath.pushy.apns.ApnsPushNotification;
+import com.eatthepath.pushy.apns.PushNotificationResponse;
+import com.eatthepath.pushy.apns.util.SimpleApnsPushNotification;
+import com.eatthepath.pushy.apns.util.concurrent.PushNotificationFuture;
 import lombok.AllArgsConstructor;
 import net.orion.facelinked.auth.repository.UserRepository;
 import net.orion.facelinked.auth.services.UserService;
@@ -18,7 +23,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 @Controller
 @AllArgsConstructor
@@ -26,6 +35,7 @@ import java.util.List;
 @RequestMapping("/messages")
 public class ChatController {
 
+    private final ApnsClient apnsClient;
     private UserService userService;
     private ChatService chatService;
     private SimpMessagingTemplate template;
@@ -46,7 +56,60 @@ public class ChatController {
 
         template.convertAndSendToUser(message.getReceiver(), "/queue/messages",
                new ChatMessage(sender, message.getReceiver(), message.getContent(), message.getTimestamp(), new AutoPrimaryKey(null, id)));
+
+        sendPushNotification(message.getReceiver(), message.getContent(), sender);
     }
+
+    public void sendPushNotification(String receiver, String message, String sender) {
+        var deviceTokens = userService.findByUsername(receiver).getDeviceTokens();
+        if (deviceTokens == null) {
+            return;
+        }
+
+        for (String token : deviceTokens) {
+            String payload = "{"
+                    + "\"aps\":{"
+                    + "\"alert\":{\"title\":\"" + sender + "\",\"body\":\"" + message + "\"},"
+                    //+ "\"mutable-content\":1"
+                    + "},"
+                    //+ "\"media-url\":\"" + mediaUrl + "\""
+                    + "}";
+
+            SimpleApnsPushNotification pushNotification = new SimpleApnsPushNotification(
+                    token, "com.orion.friendslinked", payload, Instant.now());
+
+            PushNotificationFuture<SimpleApnsPushNotification, PushNotificationResponse<SimpleApnsPushNotification>> future = apnsClient.sendNotification(pushNotification);
+
+            future.whenComplete((response, exception) -> {
+                if (exception != null) {
+                    System.err.println("Failed to send notification: " + exception.getMessage());
+                } else if (!response.isAccepted()) {
+                    System.err.println("Notification rejected by the device: " + response.getRejectionReason());
+                }
+            });
+        };
+    }
+
+    @PostMapping("/setDeviceToken")
+    public ResponseEntity<Void> setDeviceToken(@AuthenticationPrincipal UserDetails userDetails, @RequestBody String token) {
+
+        String sender = userDetails.getUsername();
+        var user = userService.findByEmail(sender);
+
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        var tokens = user.getDeviceTokens();
+        if (tokens == null) {
+            tokens = new ArrayList<>();
+        }
+        tokens.add(token);
+        user.setDeviceTokens(tokens);
+        userService.save(user);
+
+        return ResponseEntity.ok().build();
+    }
+
 
     @GetMapping("/afterId")
     public ResponseEntity<List<ChatMessage>> getChat(@AuthenticationPrincipal UserDetails userDetails, @RequestParam Long id) {

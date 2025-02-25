@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.orion.facelinked.networks.NetworkMember;
+import net.orion.facelinked.networks.NetworkMemberListConverter;
 
 import java.util.Date;
 import java.util.List;
@@ -37,7 +38,7 @@ public class Profile {
     @DynamoDBAttribute(attributeName="score")
     Integer score;
     @DynamoDBAttribute(attributeName="friends")
-    @DynamoDBTypeConvertedJson
+    @DynamoDBTypeConverted(converter = NetworkMemberListConverter.class)
     List<NetworkMember> friends;
     @DynamoDBAttribute(attributeName="searchName")
     String searchName;
