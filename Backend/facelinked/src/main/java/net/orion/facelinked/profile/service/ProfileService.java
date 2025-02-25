@@ -60,7 +60,7 @@ public class ProfileService {
 
     public void removeFriend(Profile user, String username) {
 
-        var newFriends = new ArrayList<>(user.getFriends());
+        var newFriends = user.getFriends();
         newFriends.removeIf(friend -> friend.getMemberId().equals(username));
         user.setFriends(newFriends);
 
