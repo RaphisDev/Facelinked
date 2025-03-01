@@ -53,6 +53,10 @@ export default function Network() {
             token.current = SecureStore.getItem("token");
             username.current = SecureStore.getItem("username");
         }
+        setTimeout(() => {
+            if (token.current === null) {router.replace("/")}
+        })
+
         navigator.setOptions({
             headerLeft: () => <TouchableOpacity className="ml-2" onPress={() => {
                 if (stateManager.networkOpened) {
@@ -396,13 +400,13 @@ export default function Network() {
             <Pressable className="h-full w-full" onPress={Keyboard.dismiss}></Pressable>
             <View className="bottom-0 absolute w-full">
                 <Animated.View className="bg-gray-100 dark:bg-gray-700" style={[styles.inputContainer, { transform: [{ translateY }] }]}>
-                    <View className="ml-0.5">
+                    <View className="ml-0.5 flex-row justify-around items-center">
                         <TextInput ref={input} autoCapitalize='none' onSubmitEditing={
                             (e) => {
                                 sendMessage(e.nativeEvent.text);
                             }
-                        } className="bg-white dark:bg-gray-700 w-fit mr-16 dark:text-dark-text text-text border-gray-700/80 active:bg-gray-600/10 rounded-lg dark:border-black/30 border-4 font-medium h-10 p-0.5 pl-2.5" placeholder="Type a message" onChangeText={(text) => message.current = text}></TextInput>
-                        <TouchableOpacity className="absolute right-0 bottom-0 m-1.5 mr-5" activeOpacity={0.7} onPress={() => sendMessage(message.current)}>
+                        } className="bg-white dark:bg-gray-700 w-11/12 dark:text-dark-text text-text border-gray-700/80 active:bg-gray-600/10 rounded-lg dark:border-black/30 border-4 font-medium h-10 p-0.5 pl-2.5" placeholder="Type a message" onChangeText={(text) => message.current = text}></TextInput>
+                        <TouchableOpacity className="ml-2.5" activeOpacity={0.7} onPress={() => sendMessage(message.current)}>
                             <Ionicons name={"send"} size={24}></Ionicons>
                         </TouchableOpacity>
                     </View>
@@ -410,6 +414,7 @@ export default function Network() {
             </View>
             <Modal animationType="slide" presentationStyle="formSheet" visible={isModalVisible} onRequestClose={() => setModalVisible(false)}>
                 <View className="h-full w-full dark:bg-dark-primary">
+                    {Platform.OS === "web" && <TouchableOpacity className="p-4 bg-gray-700 rounded-xl self-end mr-4 mt-4" onPress={() => setModalVisible(false)}><Ionicons size={23} color="white" name="close"/></TouchableOpacity>}
                     {currentNetwork.current?.creatorId === username.current &&
                         <TouchableOpacity activeOpacity={0.6} onPress={() =>
                             Alert.prompt("Update Network", "Enter a new name for the network\n Leave out for no change", [

@@ -10,6 +10,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import {router, useLocalSearchParams, useNavigation, useSegments} from "expo-router";
 import StateManager from "../../../components/StateManager";
 import ip from "../../../components/AppManager";
+import * as SecureStore from "expo-secure-store";
 
 global.TextEncoder = TextEncoder;
 
@@ -28,6 +29,12 @@ export default function Chats() {
     const ws = new WebSocketProvider();
 
     useEffect(() => {
+        setTimeout(() => {
+            if (Platform.OS === "web") {
+            if (localStorage.getItem("token") === null) {router.replace("/")}
+        } else { if (SecureStore.getItem("token") === null) {router.replace("/")}}
+        });
+
         navigation.setOptions({
             headerRight: () => <TouchableOpacity className="mr-3"><Ionicons name="search" size={25}/></TouchableOpacity>,
         })

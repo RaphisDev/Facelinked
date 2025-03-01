@@ -4,9 +4,18 @@ import asyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import {useRouter} from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import {useEffect} from "react";
 
 export default function Index() {
     const router = useRouter();
+
+    useEffect(() => {
+            setTimeout(() => {
+                if (Platform.OS === "web") {
+                    if (localStorage.getItem("token") === null) {router.replace("/")}
+                } else { if (SecureStore.getItem("token") === null) {router.replace("/")}}
+            });
+    }, []);
 
     return (
         <View className="bg-primary dark:bg-black w-full h-full">

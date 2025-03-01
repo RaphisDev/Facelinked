@@ -160,15 +160,20 @@ export default function Profile() {
             username.current = SecureStore.getItem("username");
         }
         if(!profile){ profileName.current = username.current;}
+        setTimeout(() => {
+            if (token.current === null) {router.replace("/")}
+        })
 
         navigation.setOptions({
             headerTitle: profileName.current !== username.current ? profileName.current : "Profile",
         });
+
         fetchData();
     }, [profile]);
 
     function createPost() {
         if (newPostInput.current) {
+            setPosts([...cachedPosts.current]);
             return;
         }
         setPosts(prevState => {cachedPosts.current = prevState ;return [{new: true, millis: Date.now()}]});
@@ -412,6 +417,7 @@ export default function Profile() {
             </View>
             <Modal animationType="slide" visible={showModal} presentationStyle={"pageSheet"} onRequestClose={() => {setShowModal(false);}}>
                 <View className="dark:bg-dark-primary h-full w-full">
+                    {Platform.OS === "web" && <TouchableOpacity className="p-4 bg-gray-700 rounded-xl self-end mr-4 mt-4" onPress={() => setShowModal(false)}><Ionicons size={23} color="white" name="close"/></TouchableOpacity>}
                     <Text className="text-4xl dark:text-dark-text text-center mt-6 font-bold">Friends ({profileInfos.friends?.length | 0})</Text>
                     <TextInput onChangeText={(text) => {
                         if (text.length >= 1) {

@@ -14,13 +14,11 @@
     },
     "android": {
       "softwareKeyboardLayoutMode": "pan",
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
-        "backgroundColor": "#285FF5",
-        "backgroundImage": "",
-        "monochromeImage": "./assets/images/icon.png"
-      },
       "package": "com.orion.facelinked",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/ic_launcher_foreground.png",
+        "backgroundColor": "#285FF5"
+      },
       "splash": {
         "image": "./assets/images/icon.png",
         "resizeMode": "contain",
@@ -30,7 +28,9 @@
     "web": {
       "bundler": "metro",
       "output": "single",
-      "favicon": "./assets/images/icon.png"
+      "favicon": "./assets/images/icon.png",
+      "description": "Chat, Connect, and Share with Friends",
+      "name": "Facelinked"
     },
     "plugins": [
       "expo-router",

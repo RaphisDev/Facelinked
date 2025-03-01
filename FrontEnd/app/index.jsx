@@ -54,7 +54,9 @@ export default function Index() {
     }
 
     useEffect(() => {
-        Appearance.setColorScheme("light");
+        if (Platform.OS !== "web") {
+            Appearance.setColorScheme("light");
+        }
 
         setTimeout(async () => {
             if (await signedIn()) {

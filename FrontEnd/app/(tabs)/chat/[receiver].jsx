@@ -39,6 +39,12 @@ export default function ChatRoom() {
     const ws = new WebSocketProvider();
 
     useEffect(() => {
+        setTimeout(() => {
+            if (Platform.OS === "web") {
+            if (localStorage.getItem("token") === null) {router.replace("/")}
+        } else { if (SecureStore.getItem("token") === null) {router.replace("/")}}
+        });
+
         navigation.setOptions({
             headerTitle: () => (
                 <Pressable onPress={() => {
@@ -228,13 +234,13 @@ export default function ChatRoom() {
             <Pressable className="h-full w-full" onPress={Keyboard.dismiss}></Pressable>
             <View className="bottom-0 absolute w-full">
                 <Animated.View className="bg-gray-100 dark:bg-gray-700" style={[styles.inputContainer, { transform: [{ translateY }] }]}>
-                    <View className="ml-0.5">
+                    <View className="ml-0.5 flex-row justify-around items-center">
                         <TextInput ref={input} autoCapitalize='none' onSubmitEditing={
                             (e) => {
                                 sendMessage(e.nativeEvent.text);
                             }
-                        } className="bg-white dark:bg-gray-700 w-fit mr-16 h-10 dark:text-dark-text text-text border-gray-700/80 dark:border-black/30 dark:active:bg-primary/5 active:bg-gray-600/10 rounded-lg border-4 font-medium p-0.5 pl-2.5" placeholder="Type a message" onChangeText={(text) => message.current = text}></TextInput>
-                        <TouchableOpacity className="absolute right-0 bottom-0 m-1.5 mr-5" activeOpacity={0.7} onPress={() => sendMessage(message.current)}>
+                        } className="bg-white dark:bg-gray-700 w-11/12 h-10 dark:text-dark-text text-text border-gray-700/80 dark:border-black/30 dark:active:bg-primary/5 active:bg-gray-600/10 rounded-lg border-4 font-medium p-0.5 pl-2.5" placeholder="Type a message" onChangeText={(text) => message.current = text}></TextInput>
+                        <TouchableOpacity className="ml-2.5" activeOpacity={0.7} onPress={() => sendMessage(message.current)}>
                             <Ionicons name={"send"} size={24}></Ionicons>
                         </TouchableOpacity>
                     </View>

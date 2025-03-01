@@ -1,9 +1,21 @@
 import "../../../../global.css"
-import {ScrollView, Text, View} from "react-native";
-import {Link} from "expo-router";
+import {Platform, ScrollView, Text, View} from "react-native";
+import {Link, useRouter} from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import {useEffect} from "react";
+import * as SecureStore from "expo-secure-store";
 
 export default function Credits() {
+    const router = useRouter();
+
+    useEffect(() => {
+        setTimeout(() => {
+            if (Platform.OS === "web") {
+                if (localStorage.getItem("token") === null) {router.replace("/")}
+            } else { if (SecureStore.getItem("token") === null) {router.replace("/")}}
+        });
+    }, []);
+
     return (
         <View className="bg-primary dark:bg-black h-full">
             <View className="self-center w-full items-center">

@@ -1,8 +1,20 @@
 import "../../../../global.css"
-import {View, Text, ScrollView} from "react-native";
-import {Link} from "expo-router";
+import {View, Text, ScrollView, Platform} from "react-native";
+import {Link, useRouter} from "expo-router";
+import {useEffect} from "react";
+import * as SecureStore from "expo-secure-store";
 
 export default function TermsAndConditionsSettings() {
+    const router = useRouter();
+
+    useEffect(() => {
+        setTimeout(() => {
+            if (Platform.OS === "web") {
+                if (localStorage.getItem("token") === null) {router.replace("/")}
+            } else { if (SecureStore.getItem("token") === null) {router.replace("/")}}
+        });
+    }, []);
+
     return (
         <View className="bg-primary min-h-screen">
             <View className="self-center w-full items-center">

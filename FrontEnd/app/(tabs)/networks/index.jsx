@@ -52,6 +52,10 @@ export default function Networks() {
         else {
             token.current = SecureStore.getItem("token");
         }
+        setTimeout(() => {
+            if (token.current === null) {router.replace("/")}
+        })
+
         stateManager.setNetworkState(true);
     });
 

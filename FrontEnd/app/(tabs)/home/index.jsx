@@ -1,8 +1,9 @@
-import {Pressable, Text, TouchableOpacity, View} from "react-native";
+import {Platform, Pressable, Text, TouchableOpacity, View} from "react-native";
 import "../../../global.css"
 import {router} from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import * as SecureStore from "expo-secure-store";
 
 export default function Index() {
 
@@ -18,6 +19,14 @@ export default function Index() {
                 return null
         }
     }
+
+    useEffect(() => {
+        setTimeout(() => {
+            if (Platform.OS === "web") {
+            if (localStorage.getItem("token") === null) {router.replace("/")}
+        } else { if (SecureStore.getItem("token") === null) {router.replace("/")}}
+        })
+    })
 
     return (
         <View className="w-full h-full bg-primary dark:bg-dark-primary">

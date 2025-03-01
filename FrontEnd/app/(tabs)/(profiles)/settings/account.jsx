@@ -3,9 +3,19 @@ import asyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import WebSocketProvider from "../../../../components/WebSocketProvider";
 import {useRouter} from "expo-router";
+import {useEffect} from "react";
 
 export default function AccountSettings() {
     const router = useRouter();
+
+    useEffect(() => {
+        setTimeout(() => {
+            if (Platform.OS === "web") {
+                if (localStorage.getItem("token") === null) {router.replace("/")}
+            } else { if (SecureStore.getItem("token") === null) {router.replace("/")}}
+        });
+    }, []);
+
     return (
         <View className="w-full h-full bg-primary dark:bg-black items-center">
             <View className="w-5/6 mt-7 pb-5 pt-5 bg-white dark:bg-dark-primary self-center rounded-xl overflow-hidden items-center">

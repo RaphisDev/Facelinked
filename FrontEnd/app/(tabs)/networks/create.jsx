@@ -44,6 +44,9 @@ export default function CreateNetwork() {
             token.current = SecureStore.getItem("token");
             username.current = SecureStore.getItem("username");
         }
+        setTimeout(() => {
+            if (token.current === null) {router.replace("/")}
+        });
 
         navigator.setOptions({
             headerLeft: () => <TouchableOpacity className="ml-2" onPress={() => router.back()}><Ionicons name="arrow-back" size={24} color="black"/></TouchableOpacity>,

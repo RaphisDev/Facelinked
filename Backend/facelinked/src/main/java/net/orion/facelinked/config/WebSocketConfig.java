@@ -60,7 +60,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").setHandshakeHandler(new HandshakeHandler());
+        registry.addEndpoint("/ws").setHandshakeHandler(new HandshakeHandler()).setAllowedOriginPatterns("wss://www.facelinked.com");
     }
 
     @Override
