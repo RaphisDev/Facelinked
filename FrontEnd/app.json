@@ -28,9 +28,12 @@
     "web": {
       "bundler": "metro",
       "output": "single",
-      "favicon": "./assets/images/icon.png",
+      "favicon": "./assets/images/icon-rounded.png",
       "description": "Chat, Connect, and Share with Friends",
-      "name": "Facelinked"
+      "name": "Facelinked",
+      "shortName": "Facelinked",
+      "backgroundColor": "#ffffff",
+      "themeColor": "#ffffff"
     },
     "plugins": [
       "expo-router",

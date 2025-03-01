@@ -14,5 +14,7 @@ public interface ProfileRepository extends CrudRepository<Profile, String>
 {
     boolean existsByUsername(String username);
 
-    Optional<List<Profile>> searchTop5BySearchNameContains(String name);
+    Optional<List<Profile>> searchTop7BySearchNameContains(String name);
+
+    Optional<List<Profile>> searchTop5ByUsernameContains(String username);
 }

@@ -39,11 +39,7 @@ class WebsocketController{
                 heartbeatOutgoing: 10000,
                 heartbeatIncoming: 10000,
                 webSocketFactory: () => {
-                    return new WebSocket(`${webSocketIp}/ws`, [], {
-                        headers: {
-                            "Authorization": `Bearer ${token}`
-                        }
-                    });
+                    return new WebSocket(`${webSocketIp}/ws`, [token]);
                 },
                 onWebSocketError: () => {
                     //alert("Network error. Please check your internet connection.");

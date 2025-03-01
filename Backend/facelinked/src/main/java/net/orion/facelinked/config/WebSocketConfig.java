@@ -32,8 +32,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         @Override
         protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler,
                                           Map<String, Object> attributes) {
+            var token = request.getHeaders().getFirst("Sec-WebSocket-Protocol");
+            System.out.println(token);
+            System.out.println(request.getHeaders());
+
+            //validate token
+            //set principal from token
 
             var principal = request.getPrincipal();
+
+            System.out.println(principal);
 
             if (principal != null) {
                 var username = userService.findByEmail(principal.getName()).getUserName();
@@ -60,7 +68,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").setHandshakeHandler(new HandshakeHandler()).setAllowedOriginPatterns("wss://www.facelinked.com");
+        registry.addEndpoint("/ws").setHandshakeHandler(new HandshakeHandler());
     }
 
     @Override

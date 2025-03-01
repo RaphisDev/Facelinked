@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -32,8 +33,13 @@ public class ProfileService {
         profileRepository.save(build);
     }
 
-    public Optional<List<Profile>> searchByUsername(String username) {
-        return profileRepository.searchTop5BySearchNameContains(username.toLowerCase());
+    public List<Profile> searchByName(String name) {
+        List<Profile> profilesByName = new ArrayList<>(profileRepository.searchTop7BySearchNameContains(name.toLowerCase()).orElseThrow());
+        if (profilesByName.size() < 5) {
+            profilesByName.addAll(profileRepository.searchTop5ByUsernameContains(name.toLowerCase()).orElseThrow());
+            return profilesByName.stream().distinct().collect(Collectors.toList());
+        }
+        return profilesByName;
     }
 
     public void savePost(Post post) {

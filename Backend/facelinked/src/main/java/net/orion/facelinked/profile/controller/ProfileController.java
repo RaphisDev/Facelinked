@@ -37,13 +37,13 @@ public class ProfileController {
     }
 
     @ResponseStatus(HttpStatus.FOUND)
-    @GetMapping("/search/{username}")
-    private ResponseEntity<List<Profile>> SearchProfile(@PathVariable String username) {
-        var profile = profileService.searchByUsername(username);
+    @GetMapping("/search/{name}")
+    private ResponseEntity<List<Profile>> SearchProfile(@PathVariable String name) {
+        var profile = profileService.searchByName(name);
         if(profile.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.ok(profile.get());
+        return ResponseEntity.ok(profile);
     }
 
     //To-Do: Also delete User
@@ -84,6 +84,7 @@ public class ProfileController {
                 id(new PrimaryKey(sender, System.currentTimeMillis())).
                 content(profile.getContent()).
                 likes(0).
+                comments(Collections.emptyList()).
                 build());
     }
 
