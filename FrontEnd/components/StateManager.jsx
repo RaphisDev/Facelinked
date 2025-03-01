@@ -2,6 +2,7 @@ let stateManagerInstance = null;
 
 class StateManager {
     chatOpened = false;
+    networkOpened = false;
 
     constructor() {
         if (!stateManagerInstance) {
@@ -10,8 +11,11 @@ class StateManager {
         return stateManagerInstance;
     }
 
-    setState(newState) {
+    setChatState(newState) {
         this.chatOpened = newState;
+    }
+    setNetworkState(newState) {
+        this.networkOpened = newState;
     }
 }
 

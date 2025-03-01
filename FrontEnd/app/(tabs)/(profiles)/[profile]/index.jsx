@@ -42,6 +42,7 @@ export default function Profile() {
 
     const [showModal, setShowModal] = useState(false);
     const [isAdded, setIsAdded] = useState(false);
+    const [friendsSearchResults, setFriendsSearchResults] = useState([]);
     const fadeAnim = useRef(new Animated.Value(1)).current;
 
     const [profileInfos, setProfileInfos] = useState({
@@ -78,11 +79,18 @@ export default function Profile() {
             if (data.ok) {
                 const profileInfos = await data.json();
                 setProfileInfos(profileInfos);
+                setFriendsSearchResults(profileInfos.friends ? profileInfos.friends : []);
                 if (Platform.OS === "web") {
                     const profile = JSON.parse(localStorage.getItem('profile'));
+                    if (!profile.friends) {
+                        setIsAdded(false);
+                    }
                     setIsAdded(profile.friends.some((friend) => friend.memberId === profileName.current));
                 } else {
                     const profile = JSON.parse(SecureStore.getItem('profile'));
+                    if (!profile.friends) {
+                        setIsAdded(false);
+                    }
                     setIsAdded(profile.friends.some((friend) => friend.memberId === profileName.current));
                 }
                 if (profileName.current === username.current) {
@@ -252,12 +260,12 @@ export default function Profile() {
         Animated.sequence([
             Animated.timing(fadeAnim, {
                 toValue: 0,
-                duration: 100,
+                duration: 0,
                 useNativeDriver: true
             }),
             Animated.timing(fadeAnim, {
                 toValue: 1,
-                duration: 250,
+                duration: 200,
                 useNativeDriver: true
             })
         ]).start();
@@ -403,41 +411,50 @@ export default function Profile() {
                 </ScrollView>
             </View>
             <Modal animationType="slide" visible={showModal} presentationStyle={"pageSheet"} onRequestClose={() => {setShowModal(false);}}>
-                <Text className="text-4xl text-center mt-4 font-bold">Friends</Text>
-                <FlatList className="mt-9" data={profileInfos.friends ? profileInfos.friends : []} renderItem={(item) =>
-                    <View>
-                        <TouchableOpacity onPress={() => {
-                            setShowModal(false);
-                            router.navigate(`/${item.item.memberId}`);
-                        }} activeOpacity={0.4} className="flex-row justify-between items-center p-3">
-                            <View className="flex-row items-center">
-                                <Image source={{uri: item.item.memberProfilePicturePath}} style={{width: 42, height: 42, borderRadius: 21}}></Image>
-                                <View className="flex-col ml-3">
-                                    <Text className="text-text dark:text-dark-text font-bold text-lg">{item.item.memberName}</Text>
-                                    <Text className="text-text dark:text-dark-text text-sm">@{item.item.memberId}</Text>
+                <View className="dark:bg-dark-primary h-full w-full">
+                    <Text className="text-4xl dark:text-dark-text text-center mt-6 font-bold">Friends ({profileInfos.friends?.length | 0})</Text>
+                    <TextInput onChangeText={(text) => {
+                        if (text.length >= 1) {
+                            setFriendsSearchResults(profileInfos.friends?.filter((friend) => friend.memberId.toLowerCase().includes(text.toLowerCase())));
+                        } else if (text.length === 0) {
+                            setFriendsSearchResults(profileInfos.friends ? profileInfos.friends : []);
+                        }
+                    }} className="rounded-xl mt-9 p-2 w-3/4 dark:bg-dark-primary dark:text-dark-text text-text mx-auto border-4 border-accent" placeholder="Search for a friend" autoCapitalize="none"/>
+                    <FlatList className="mt-4" data={friendsSearchResults} renderItem={(item) =>
+                        <View>
+                            <TouchableOpacity onPress={() => {
+                                setShowModal(false);
+                                router.navigate(`/${item.item.memberId}`);
+                            }} activeOpacity={0.4} className="flex-row justify-between items-center p-3">
+                                <View className="flex-row items-center">
+                                    <Image source={{uri: item.item.memberProfilePicturePath}} style={{width: 42, height: 42, borderRadius: 21}}></Image>
+                                    <View className="flex-col ml-3">
+                                        <Text className="text-text dark:text-dark-text font-bold text-lg">{item.item.memberName}</Text>
+                                        <Text className="text-text dark:text-dark-text text-sm">@{item.item.memberId}</Text>
+                                    </View>
                                 </View>
+                                {profileName.current === username.current && <TouchableOpacity onPress={async() => {
+                                    Alert.alert(`Are you sure you want to remove '${item.item.memberId}' as a friend?`, "", [
+                                        {text: "Cancel"},
+                                        {text: "Remove", onPress: async () => {
+                                                await removeFriend(item.item.memberId);
+                                            }}
+                                    ]);
+                                }} activeOpacity={0.65} className="rounded-full bg-accent p-2">
+                                    <Ionicons name={"close"} size={16} color={"#FFFFFF"}></Ionicons>
+                                </TouchableOpacity>}
+                            </TouchableOpacity>
+                            <View className="w-11/12 self-center">
+                                <View className="border-b border-gray-700/80"></View>
                             </View>
-                            {profileName.current === username.current && <TouchableOpacity onPress={async() => {
-                                Alert.alert(`Are you sure you want to remove '${item.item.memberId}' as a friend?`, "", [
-                                    {text: "Cancel"},
-                                    {text: "Remove", onPress: async () => {
-                                            await removeFriend(item.item.memberId);
-                                        }}
-                                ]);
-                            }} activeOpacity={0.65} className="rounded-full bg-accent p-2">
-                                <Ionicons name={"close"} size={16} color={"#FFFFFF"}></Ionicons>
-                            </TouchableOpacity>}
-                        </TouchableOpacity>
-                        <View className="w-11/12 self-center">
-                            <View className="border-b border-gray-700/80"></View>
                         </View>
-                    </View>
-                }/>
-                {profileName.current !== username.current && <TouchableOpacity onPress={() => AddFriend()} className="self-center rounded-2xl w-2/5 mt-11 p-1.5 bg-accent mb-20">
-                    <Animated.View style={[{opacity: fadeAnim}]}>
-                        <Ionicons name={isAdded ? "checkmark-sharp" : "add"} className="self-center" size={30} color="white"/>
-                    </Animated.View>
-                </TouchableOpacity>}
+                    }/>
+                    {profileName.current !== username.current && <TouchableOpacity onPress={() => AddFriend()} className="self-center rounded-2xl w-2/5 mt-11 p-1.5 bg-accent mb-20">
+                        <Animated.View style={[{opacity: fadeAnim}]}>
+                            <Ionicons name={isAdded ? "checkmark-sharp" : "add"} className="self-center" size={30} color="white"/>
+                        </Animated.View>
+                    </TouchableOpacity>}
+                </View>
             </Modal>
         </>
     );

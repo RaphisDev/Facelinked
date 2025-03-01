@@ -8,12 +8,15 @@ import {useFocusEffect, useLocalSearchParams, useNavigation, useRouter, useSegme
 import ip from "../../../components/AppManager";
 import {Image} from "expo-image";
 import * as SecureStore from "expo-secure-store";
+import StateManager from "../../../components/StateManager";
 
 export default function Networks() {
 
     const [selected, setSelected] = useState(0);
     const [favoriteNetworks, setNetworks] = useState([]);
     const segments = useSegments();
+
+    const stateManager = new StateManager();
 
     const [showInput, setShowInput] = useState(false);
     const input = useRef(null);
@@ -49,6 +52,7 @@ export default function Networks() {
         else {
             token.current = SecureStore.getItem("token");
         }
+        stateManager.setNetworkState(true);
     });
 
     function handleAddBar() {

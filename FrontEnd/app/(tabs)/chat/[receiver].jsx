@@ -166,12 +166,11 @@ export default function ChatRoom() {
                 destination: `/app/chat`,
                 body: JSON.stringify({
                     receiver: receiver,
-                    content: message,
-                    timestamp: new Date().toString()
+                    content: message
                 })
             });
 
-            addMessage((prevMessages) => [...prevMessages, {isSender: true, content: message, timestamp: new Date().toString()}]);
+            addMessage((prevMessages) => [...prevMessages, {isSender: true, content: message, millis: Date.now()}]);
 
             let loadedChats = await asyncStorage.getItem("chats") || [];
             if (loadedChats.length !== 0) {loadedChats = JSON.parse(loadedChats);}
@@ -192,15 +191,17 @@ export default function ChatRoom() {
                 if (profile.ok) {
                     const profileJson = await profile.json();
                     await asyncStorage.setItem("chats", JSON.stringify([...loadedChats, { name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath }]));
+                    loadedChats = [...loadedChats, { name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath }];
                 }
             }
+            await asyncStorage.setItem("chats", JSON.stringify([...loadedChats.filter(chat => chat.username === receiver), ...loadedChats.filter(chat => chat.username !== receiver)]));
 
             let loadedMessages = await asyncStorage.getItem(`messages/${receiver}`) || [];
             if (loadedMessages.length !== 0) {loadedMessages = JSON.parse(loadedMessages);}
             await asyncStorage.setItem(`messages/${receiver}`, JSON.stringify([...loadedMessages, {
                 isSender: true,
                 content: message,
-                timestamp: new Date().toString()
+                millis: Date.now()
             }]));
         }
         catch (e) {
@@ -220,7 +221,7 @@ export default function ChatRoom() {
         <View className="h-full w-full bg-primary dark:bg-dark-primary">
             <View className="mb-14 h-fit">
                 <FlatList ref={messageList} ListEmptyComponent={<Text className="text-text dark:text-dark-text text-center mt-5">Start a conversation with {receiver}</Text>} onContentSizeChange={() => messageList.current.scrollToEnd()} data={messages} renderItem={(item) =>
-                    <Message content={item.item.content} isSender={item.item.isSender} timestamp={item.item.timestamp}/>}
+                    <Message content={item.item.content} isSender={item.item.isSender} timestamp={new Date(item.item.millis).toLocaleString()}/>}
                           keyExtractor={(item, index) => index.toString()}>
                 </FlatList>
             </View>

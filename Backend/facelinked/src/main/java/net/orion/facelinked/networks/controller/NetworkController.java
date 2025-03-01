@@ -22,6 +22,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -44,14 +46,16 @@ public class NetworkController {
         var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
 
         if (network.getMembers() != null) {
-            network.getMembers().forEach(member -> {
-                if (network.getMembers().stream().filter(existingMember -> existingMember.getMemberId().equals(member.getMemberId())).count() > 1) {
+            var members = network.getMembers();
+            members.forEach(member -> {
+                if (network.getMembers().stream().anyMatch(existingMember -> existingMember.getMemberId().equals(member.getMemberId()))) {
                     throw new IllegalArgumentException("User already in network");
                 }
                 var user = profileService.findByUsername(member.getMemberId());
                 member.setMemberProfilePicturePath(user.getProfilePicturePath());
                 member.setMemberName(user.getName());
             });
+            network.setMembers(members);
         }
 
         var id = networkService.createNetwork(Network.builder().
@@ -59,7 +63,7 @@ public class NetworkController {
                 description(network.getDescription()).
                 creatorId(sender).
                 isPrivate(network.isPrivate()).
-                members(network.getMembers()).
+                members(network.getMembers() == null ? Collections.emptyList() : network.getMembers()).
                 networkPicturePath(network.getNetworkPicturePath()).
                 memberCount(1).
                 searchName(network.getName().toLowerCase()).
@@ -89,9 +93,9 @@ public class NetworkController {
         senderProfile.setMemberId(sender);
 
         var millis = networkService.sendMessage(
-                new NetworkMessage(senderProfile, message.getReceiver(), message.getContent(), message.getTimestamp(), new AutoPrimaryKey(null, System.currentTimeMillis())));
+                new NetworkMessage(senderProfile, message.getReceiver(), message.getContent(), new AutoPrimaryKey(null, System.currentTimeMillis())));
 
-        messagingTemplate.convertAndSend("/networks/" + message.getReceiver(), new NetworkMessage(senderProfile, message.getReceiver(), message.getContent(), message.getTimestamp(), new AutoPrimaryKey(null, millis)));
+        messagingTemplate.convertAndSend("/networks/" + message.getReceiver(), new NetworkMessage(senderProfile, message.getReceiver(), message.getContent(), new AutoPrimaryKey(null, millis)));
     }
     @GetMapping("/{networkId}/messages")
     public ResponseEntity<List<NetworkMessage>> getMessages(@PathVariable String networkId, @AuthenticationPrincipal UserDetails userDetails, @RequestParam(required = false) boolean additional) {
@@ -103,10 +107,14 @@ public class NetworkController {
                 throw new IllegalArgumentException("User not authorized to view messages");
             }
         }
+        
+        List<NetworkMessage> messages;
         if (additional) {
-            return ResponseEntity.ok(networkService.getAdditionalMessages(networkId));
+            messages = new ArrayList<>(networkService.getAdditionalMessages(networkId));
+        } else {
+            messages = new ArrayList<>(networkService.getMessages(networkId));
         }
-        return ResponseEntity.ok(networkService.getMessages(networkId));
+        return ResponseEntity.ok(messages);
     }
 
     @GetMapping("/{networkId}/afterId")
@@ -120,7 +128,7 @@ public class NetworkController {
             }
         }
 
-        return ResponseEntity.ok(networkService.getMessagesAfterId(networkId, id));
+        return ResponseEntity.ok(new ArrayList<>(networkService.getMessagesAfterId(networkId, id)));
     }
 
     @GetMapping(value="/{networkId}", produces = "application/json")
@@ -139,7 +147,7 @@ public class NetworkController {
 
     @GetMapping("/search")
     public ResponseEntity<List<Network>> searchNetwork(@RequestParam String searchName, @AuthenticationPrincipal UserDetails userDetails) {
-        var networks = networkService.searchForNetwork(searchName.toLowerCase());
+        var networks = new ArrayList<>(networkService.searchForNetwork(searchName.toLowerCase()));
         if (networks.stream().anyMatch(network -> network.isPrivate())) {
             var user = profileService.findByUsername(userDetails.getUsername());
             networks.removeIf(network -> {

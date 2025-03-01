@@ -37,23 +37,20 @@ public class NetworkMessage {
         id.setMillis(millis);
     }
     @DynamoDBAttribute(attributeName = "senderId")
-    @DynamoDBTyped(DynamoDBMapperFieldModel.DynamoDBAttributeType.M)
+    @DynamoDBTypeConverted(converter = NetworkMemberConverter.class)
     private NetworkMember senderId;
     @DynamoDBAttribute(attributeName = "networkId")
     private String networkId;
     @DynamoDBAttribute(attributeName = "content")
     private String content;
-    @DynamoDBAttribute(attributeName = "timestamp")
-    private String timestamp;
 
     public NetworkMessage() {
     }
 
-    public NetworkMessage(NetworkMember senderId, String networkId, String content, String timestamp, AutoPrimaryKey id) {
+    public NetworkMessage(NetworkMember senderId, String networkId, String content, AutoPrimaryKey id) {
         this.senderId = senderId;
         this.networkId = networkId;
         this.content = content;
-        this.timestamp = timestamp;
         this.id = id;
     }
 }

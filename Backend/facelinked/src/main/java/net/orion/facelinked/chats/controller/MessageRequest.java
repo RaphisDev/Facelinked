@@ -14,5 +14,4 @@ import java.util.Date;
 public class MessageRequest {
     private String receiver;
     private String content;
-    private String timestamp;
 }

@@ -14,8 +14,8 @@ export default function NetworkMessage(props) {
                     <Text className="font-bold text-lg text-dark-text self-center ml-2">{props.sender}</Text>
                 </TouchableOpacity>
                 <Text style={{color: "#FFFFFF"}} className="text-xl ml-2 mr-16">{props.content}</Text>
-                <Text className="pb-2" style={{color: "#FFFFFF", textAlign: "right", fontSize: 11, marginRight: 8}}>{props.timestamp?.split(202)[0] +
-                    props.timestamp?.split("GMT")[0].split(202)[1].slice(2)}</Text>
+                <Text className="pb-2" style={{color: "#FFFFFF", textAlign: "right", fontSize: 11, marginRight: 8}}>
+                    {props.timestamp}</Text>
             </View>
         </View>
     )

@@ -122,7 +122,7 @@ class WebsocketController{
                         await asyncStorage.setItem(`messages/${message.senderId}`, JSON.stringify([...loadedMessages, {
                             isSender: username === message.senderId,
                             content: message.content,
-                            timestamp: message.timestamp
+                            millis: message.millis,
                         }]));
                     }
                     const processMessage = async (parsedMessage) => {
@@ -143,7 +143,7 @@ class WebsocketController{
                         await asyncStorage.setItem(`messages/${messageUserName}`, JSON.stringify([...loadedMessages, {
                             isSender: username === parsedMessage.senderId,
                             content: parsedMessage.content,
-                            timestamp: parsedMessage.timestamp
+                            millis: parsedMessage.millis
                         }]));
                         await asyncStorage.setItem("lastMessageId", parsedMessage.millis.toString());
                     }
@@ -168,12 +168,13 @@ class WebsocketController{
                                         sender: parsedMessage.senderId.memberId,
                                         senderProfileName: parsedMessage.senderId.memberName,
                                         senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath,
-                                        timestamp: parsedMessage.timestamp
+                                        millis: parsedMessage.millis
                                     }
                                 });
                                 let loadedMessages = await asyncStorage.getItem(`networks/${id}`) || [];
                                 if (loadedMessages.length !== 0) {loadedMessages = JSON.parse(loadedMessages);}
-                                await asyncStorage.setItem(`networks/${id}`, JSON.stringify([...loadedMessages, {networkId: id, content: parsedMessage.content, sender: parsedMessage.senderId.memberId, senderProfileName: parsedMessage.senderId.memberName, senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath, timestamp: parsedMessage.timestamp}]));
+                                await asyncStorage.setItem(`networks/${id}`, JSON.stringify([...loadedMessages, {networkId: id, content: parsedMessage.content, sender: parsedMessage.senderId.memberId, senderProfileName: parsedMessage.senderId.memberName,
+                                    senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath, millis: parsedMessage.millis}]));
                                 await asyncStorage.setItem(`lastNetworkMessageId/${id}`, parsedMessage.millis.toString());
                             });
                         }
@@ -226,7 +227,7 @@ class WebsocketController{
                                 isSender: false,
                                 content: parsedMessage.content,
                                 sender: parsedMessage.senderId,
-                                timestamp: parsedMessage.timestamp
+                                millis: parsedMessage.millis
                             }
                         });
 
@@ -234,7 +235,7 @@ class WebsocketController{
                         await asyncStorage.setItem(`messages/${parsedMessage.senderId}`, JSON.stringify([...loadedMessages, {
                             isSender: false,
                             content: parsedMessage.content,
-                            timestamp: parsedMessage.timestamp
+                            millis: parsedMessage.millis
                         }]));
 
                         const loadedChats = await getChats();

@@ -47,17 +47,14 @@ public class ChatMessage
     private String receiverId;
     @DynamoDBAttribute(attributeName = "content")
     private String content;
-    @DynamoDBAttribute(attributeName = "timestamp")
-    private String timestamp;
 
     public ChatMessage() {
     }
 
-    public ChatMessage(String senderId, String receiverId, String content, String timestamp, AutoPrimaryKey id) {
+    public ChatMessage(String senderId, String receiverId, String content, AutoPrimaryKey id) {
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.content = content;
-        this.timestamp = timestamp;
         this.id = id;
     }
 }

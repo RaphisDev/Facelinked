@@ -16,9 +16,16 @@
       "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#285FF5",
+        "backgroundImage": "",
+        "monochromeImage": "./assets/images/icon.png"
       },
-      "package": "com.orion.facelinked"
+      "package": "com.orion.facelinked",
+      "splash": {
+        "image": "./assets/images/icon.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+      }
     },
     "web": {
       "bundler": "metro",

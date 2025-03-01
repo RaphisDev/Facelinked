@@ -36,7 +36,7 @@ export default function Chats() {
             let loadedChats = await asyncStorage.getItem("chats");
             if (loadedChats !== null) {
                 loadedChats = JSON.parse(loadedChats);
-                loadedChats.sort((a, b) => a.unread === b.unread ? 0 : a.unread ? 1 : -1);
+                loadedChats.sort((a, b) => a.unread === b.unread ? 0 : a.unread ? -1 : 1);
                 setChats(loadedChats);
             }
         }
@@ -45,7 +45,7 @@ export default function Chats() {
         ws.messageReceived.addListener("newMessageReceived", () => {
             loadChats();
         });
-        stateManager.setState(true);
+        stateManager.setChatState(true);
 
         return() => {
             ws.messageReceived.removeAllListeners("newMessageReceived");

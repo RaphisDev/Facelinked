@@ -2,6 +2,7 @@ package net.orion.facelinked.profile.service;
 
 import lombok.AllArgsConstructor;
 import net.orion.facelinked.networks.NetworkMember;
+import net.orion.facelinked.networks.NetworkMemberListConverter;
 import net.orion.facelinked.profile.Post;
 import net.orion.facelinked.profile.Profile;
 import net.orion.facelinked.profile.repository.PostRepository;
@@ -9,6 +10,7 @@ import net.orion.facelinked.profile.repository.ProfileRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +53,7 @@ public class ProfileService {
         if(user.getFriends().stream().anyMatch(friend -> friend.getMemberId().equals(toAdd.getMemberId()))) {
             return;
         }
-        var newFriends = user.getFriends();
+        var newFriends = new ArrayList<>(user.getFriends());
         newFriends.add(toAdd);
         user.setFriends(newFriends);
 
@@ -60,7 +62,7 @@ public class ProfileService {
 
     public void removeFriend(Profile user, String username) {
 
-        var newFriends = user.getFriends();
+        var newFriends = new ArrayList<>(user.getFriends());
         newFriends.removeIf(friend -> friend.getMemberId().equals(username));
         user.setFriends(newFriends);
 

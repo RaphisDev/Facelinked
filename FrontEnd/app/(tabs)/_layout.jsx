@@ -26,10 +26,16 @@ export default function TabsLayout() {
                                 router.replace("/chat");
                             }
                         }
+                        else if (e.target?.split("-")[0] === "networks") {
+                            const stateManager = new StateManager();
+                            if (!stateManager.networkOpened) {
+                                router.replace("/networks");
+                            }
+                        }
                     }
                     else {
                         if (e.target === undefined) {
-                            router.navigate(`/${SecureStore.getItem("username")}`)
+                            router.navigate(`/${localStorage.getItem("username")}`)
                         }
                         else if (e.target?.split("-")[0] === "(profiles)" && route?.profile !== localStorage.getItem("username") && route?.profile !== undefined) {
                             router.navigate(`/${localStorage.getItem("username")}`);
@@ -38,6 +44,12 @@ export default function TabsLayout() {
                             const stateManager = new StateManager();
                             if (!stateManager.chatOpened) {
                                 router.replace("/chat");
+                            }
+                        }
+                        else if (e.target?.split("-")[0] === "networks") {
+                            const stateManager = new StateManager();
+                            if (!stateManager.networkOpened) {
+                                router.replace("/networks");
                             }
                         }
                     }

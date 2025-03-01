@@ -2,6 +2,7 @@ package net.orion.facelinked.config;
 
 import lombok.AllArgsConstructor;
 import net.orion.facelinked.auth.repository.UserRepository;
+import net.orion.facelinked.auth.services.UserService;
 import net.orion.facelinked.networks.service.NetworkService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    private final UserService userService;
     private NetworkService networkService;
 
     public class HandshakeHandler extends DefaultHandshakeHandler {
@@ -34,7 +36,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             var principal = request.getPrincipal();
 
             if (principal != null) {
-                var username = userRepository.findByEmail(principal.getName()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)).getUserName();
+                var username = userService.findByEmail(principal.getName()).getUserName();
 
                 return new Principal() {
                     @Override
@@ -48,8 +50,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             }
         }
     }
-
-    private final UserRepository userRepository;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {

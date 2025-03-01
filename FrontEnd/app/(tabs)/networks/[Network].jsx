@@ -21,6 +21,7 @@ import {Image} from "expo-image";
 import asyncStorage from "@react-native-async-storage/async-storage";
 import ip from "../../../components/AppManager";
 import * as SecureStore from "expo-secure-store";
+import StateManager from "../../../components/StateManager";
 
 export default function Network() {
 
@@ -29,6 +30,7 @@ export default function Network() {
     const navigator = useNavigation("../");
     const router = useRouter();
     const ws = new WebSocketProvider();
+    const stateManager = new StateManager();
 
     const [messages, addMessage] = useState([]);
     const messageList = useRef(null);
@@ -52,7 +54,14 @@ export default function Network() {
             username.current = SecureStore.getItem("username");
         }
         navigator.setOptions({
-            headerLeft: () => <TouchableOpacity className="ml-2" onPress={() => router.back()}><Ionicons
+            headerLeft: () => <TouchableOpacity className="ml-2" onPress={() => {
+                if (stateManager.networkOpened) {
+                    router.back();
+                }
+                else {
+                    router.replace("/networks");
+                }
+            }}><Ionicons
                 name="arrow-back" size={24} color="black"/></TouchableOpacity>,
             headerRight: () => <TouchableOpacity className="mr-2" onPress={() => setModalVisible(true)}><Ionicons
                 name="people" size={24} color="black"/></TouchableOpacity>,
@@ -116,20 +125,20 @@ export default function Network() {
                     ws.stompClient.subscribe(`/networks/${Network}`, async (message) => {
                         const parsedMessage = JSON.parse(message.body);
                         if (parsedMessage.senderId.memberId === username.current) {return;}
-                        addMessage((prevMessages) => [...prevMessages, {sender: parsedMessage.senderId.memberId, senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath, content: parsedMessage.content, timestamp: parsedMessage.timestamp}]);
+                        addMessage((prevMessages) => [...prevMessages, {sender: parsedMessage.senderId.memberId, senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath, content: parsedMessage.content, millis: parsedMessage.millis}]);
                     });
 
                     const receivedMessages = await fetch(`${ip}/networks/${Network}/messages`, {
                         method: "GET",
                         headers: {
                             "Authorization": `Bearer ${token.current}`,
-                            "Application-Type": "application/json"
+                            "Content-Type": "application/json"
                         }
                     });
                     if (receivedMessages.ok) {
                         const data = await receivedMessages.json();
                         addMessage(prevState => [...prevState, ...data.map((message) => {
-                            return {senderProfilePicturePath: message.senderId.memberProfilePicturePath, sender: message.senderId.memberId, content: message.content, timestamp: message.timestamp};
+                            return {senderProfilePicturePath: message.senderId.memberProfilePicturePath, sender: message.senderId.memberId, content: message.content, millis: message.millis};
                         })]);
                         setTimeout(() => {
                             initializedMessages.current = true;
@@ -155,7 +164,7 @@ export default function Network() {
                                 senderProfilePicturePath: message.senderId.memberProfilePicturePath,
                                 sender: message.senderId.memberId,
                                 content: message.content,
-                                timestamp: message.timestamp
+                                millis: message.millis,
                             };
                         })]);
 
@@ -170,7 +179,7 @@ export default function Network() {
                                 senderProfilePicturePath: message.senderId.memberProfilePicturePath,
                                 sender: message.senderId.memberId,
                                 content: message.content,
-                                timestamp: message.timestamp
+                                millis: message.millis
                             };
                         })]));
                     }
@@ -211,7 +220,6 @@ export default function Network() {
                 body: JSON.stringify({
                     receiver: Network,
                     content: message,
-                    timestamp: new Date().toString()
                 })
             });
             let profilePicture = "";
@@ -222,18 +230,17 @@ export default function Network() {
                 profilePicture = SecureStore.getItem("profilePicture");
             }
 
-            addMessage((prevMessages) => [...prevMessages, {sender: username.current, senderProfilePicturePath: profilePicture, content: message, timestamp: new Date().toString()}]);
+            addMessage((prevMessages) => [...prevMessages, {sender: username.current, senderProfilePicturePath: profilePicture, content: message, millis: Date.now()}]);
 
-            if (JSON.parse(await asyncStorage.getItem("networks")).find((network) => network.networkId === Network)) {
+            if (JSON.parse(await asyncStorage.getItem("networks"))?.find((network) => network.networkId === Network)) {
                 let loadedMessages = await asyncStorage.getItem(`networks/${Network}`) || [];
                 if (loadedMessages.length !== 0) {
                     loadedMessages = JSON.parse(loadedMessages);
                 }
                 await asyncStorage.setItem(`networks/${Network}`, JSON.stringify([...loadedMessages, {
                     sender: username.current,
-                    senderProfilePicturePath: profilePicture,
                     content: message,
-                    timestamp: new Date().toString()
+                    millis: Date.now()
                 }]));
             }
         }
@@ -305,8 +312,8 @@ export default function Network() {
             await asyncStorage.setItem("networks", JSON.stringify([...loadedNetworks, {networkId: currentNetwork.current.networkId, name: currentNetwork.current.name, description: currentNetwork.current.description, creatorId: currentNetwork.current.creatorId, memberCount: currentNetwork.current.memberCount + 1, networkPicturePath: currentNetwork.current.networkPicturePath, private: currentNetwork.current.private, members: member}]));
             if (messages.length !== 0) {
                 await asyncStorage.setItem(`networks/${Network}`, JSON.stringify(messages));
-                //set last message id but first save id from every message
             }
+            await asyncStorage.setItem(`lastNetworkMessageId/${Network}`, Date.now().toString());
         }
         await fetch(`${ip}/networks/${Network}/favorite?b=${encodeURIComponent(shouldFavorite)}`, {
             method: "POST",
@@ -363,7 +370,7 @@ export default function Network() {
                                                 senderProfilePicturePath: message.senderId.memberProfilePicturePath,
                                                 sender: message.senderId.memberId,
                                                 content: message.content,
-                                                timestamp: message.timestamp
+                                                millis: message.millis,
                                             };
                                         })]);
                                         setTimeout(() => {
@@ -382,7 +389,7 @@ export default function Network() {
                 }} ref={messageList} style={{marginTop: 5, marginBottom: 50}} onContentSizeChange={(size) => {
                     if(!loadingAdditionalMessages.current) {messageList.current.scrollToEnd()}
                     }} data={messages} renderItem={(item) =>
-                    <NetworkMessage content={item.item.content} sender={item.item.sender} senderProfilePicturePath={item.item.senderProfilePicturePath} timestamp={item.item.timestamp}/>}
+                    <NetworkMessage content={item.item.content} sender={item.item.sender} senderProfilePicturePath={item.item.senderProfilePicturePath} timestamp={new Date(item.item.millis).toLocaleString()}/>}
                           keyExtractor={(item, index) => index.toString()}>
                 </FlatList>
             </View>
