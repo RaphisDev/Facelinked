@@ -421,7 +421,7 @@ export default function Profile() {
                     <Text className="text-4xl dark:text-dark-text text-center mt-6 font-bold">Friends ({profileInfos.friends?.length | 0})</Text>
                     <TextInput onChangeText={(text) => {
                         if (text.length >= 1) {
-                            setFriendsSearchResults(profileInfos.friends?.filter((friend) => friend.memberId.toLowerCase().includes(text.toLowerCase())));
+                            setFriendsSearchResults(profileInfos.friends?.filter((friend) => friend.memberName.toLowerCase().includes(text.toLowerCase())));
                         } else if (text.length === 0) {
                             setFriendsSearchResults(profileInfos.friends ? profileInfos.friends : []);
                         }
