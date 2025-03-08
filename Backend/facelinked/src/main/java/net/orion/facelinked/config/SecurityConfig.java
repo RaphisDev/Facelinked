@@ -35,6 +35,12 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(authorizeRequests -> {
             authorizeRequests.requestMatchers("/auth/**").permitAll();
+            authorizeRequests.requestMatchers("/ws/**").permitAll();
+            authorizeRequests.requestMatchers("/ws").permitAll();
+            authorizeRequests.requestMatchers(request ->
+                    request.getHeader("Upgrade") != null &&
+                            request.getHeader("Upgrade").equalsIgnoreCase("websocket")
+            ).permitAll();
             authorizeRequests.anyRequest().authenticated();
         });
         http.sessionManagement(managementSession -> {

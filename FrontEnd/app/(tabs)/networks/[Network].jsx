@@ -246,6 +246,10 @@ export default function Network() {
                     content: message,
                     millis: Date.now()
                 }]));
+
+                let loadedNetworks = await asyncStorage.getItem("networks") || [];
+                if (loadedNetworks.length !== 0) {loadedNetworks = JSON.parse(loadedNetworks);}
+                await asyncStorage.setItem("networks", JSON.stringify([...loadedNetworks.filter(network => network.networkId === Network), ...loadedNetworks.filter(network => network.networkId !== Network)]));
             }
         }
         catch (e) {

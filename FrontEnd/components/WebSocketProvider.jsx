@@ -46,6 +46,9 @@ class WebsocketController{
                     if (!this.stompClient.connected) {
                         this.stompClient.deactivate();
                         webSocketInstance = null;
+                        setTimeout(() => {
+                            this.stompClient.activate();
+                        }, 5000);
                     }
                 },
                 onConnect: async () => {
@@ -172,6 +175,10 @@ class WebsocketController{
                                 await asyncStorage.setItem(`networks/${id}`, JSON.stringify([...loadedMessages, {networkId: id, content: parsedMessage.content, sender: parsedMessage.senderId.memberId, senderProfileName: parsedMessage.senderId.memberName,
                                     senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath, millis: parsedMessage.millis}]));
                                 await asyncStorage.setItem(`lastNetworkMessageId/${id}`, parsedMessage.millis.toString());
+
+                                let loadedNetworks = await asyncStorage.getItem("networks") || [];
+                                if (loadedNetworks.length !== 0) {loadedNetworks = JSON.parse(loadedNetworks);}
+                                await asyncStorage.setItem("networks", JSON.stringify([...loadedNetworks.filter(network => network.networkId === id), ...loadedNetworks.filter(network => network.networkId !== id)]));
                             });
                         }
                     }

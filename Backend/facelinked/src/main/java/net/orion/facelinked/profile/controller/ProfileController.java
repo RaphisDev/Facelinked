@@ -52,7 +52,7 @@ public class ProfileController {
     private void Delete(@PathVariable String username)
     {
         //Only when user is authenticated
-        //profileRepository.delete(profileRepository.findByUsername(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+        //profileRepository.delete(profileRepository.findByUserName(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register")

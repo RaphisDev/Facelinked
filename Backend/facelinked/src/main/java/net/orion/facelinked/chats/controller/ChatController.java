@@ -36,8 +36,8 @@ import java.util.concurrent.Future;
 public class ChatController {
 
     private final ApnsClient apnsClient;
-    private UserService userService;
-    private ChatService chatService;
+    private final UserService userService;
+    private final ChatService chatService;
     private SimpMessagingTemplate template;
 
     @MessageMapping("/chat")
@@ -99,8 +99,6 @@ public class ChatController {
                         response.getRejectionReason().orElseThrow().contains("Unregistered")) {
                         removeInvalidToken(sender, token);
                     }
-                } else {
-                    System.out.println("Notification sent successfully to: " + token);
                 }
             });
         }
