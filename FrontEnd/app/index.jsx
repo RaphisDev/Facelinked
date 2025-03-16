@@ -37,7 +37,7 @@ export default function Index() {
         }
         const token = await SecureStore.getItemAsync("token");
 
-        if (Notification.PermissionStatus.UNDETERMINED && token != null && Platform.OS === "ios" && Device.isDevice) {
+        if (Notification.PermissionStatus.UNDETERMINED && token != null && Platform.OS === "ios" && Device.isDevice && localStorage.getItem("deviceToken") === null) {
             const token = await requestPermission();
             await fetch(`${ip}/messages/setDeviceToken`, {
                 method: "POST",
@@ -48,6 +48,27 @@ export default function Index() {
                 body: JSON.stringify({
                     token: token
                 })
+            }).then(status => {
+                if (status.ok) {
+                    localStorage.setItem("deviceToken", "true");
+                }
+            });
+        }
+        else if (Notification.PermissionStatus.GRANTED && token != null && Device.isDevice && localStorage.getItem("deviceToken") === null) {
+            const token = await Notification.getDevicePushTokenAsync();
+            await fetch(`${ip}/messages/setDeviceToken`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${SecureStore.getItem("token")}`
+                },
+                body: JSON.stringify({
+                    token: token
+                })
+            }).then(status => {
+                if (status.ok) {
+                    localStorage.setItem("deviceToken", "true");
+                }
             });
         }
         return token != null;

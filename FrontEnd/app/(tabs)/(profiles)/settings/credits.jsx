@@ -58,6 +58,10 @@ export default function Credits() {
                             <Ionicons name="link" size={16} className="mr-1" />
                             <Text>StompJs</Text>
                         </Link>
+                        <Link target="_blank" href="https://github.com/lucide-icons/lucide" className="mt-2 dark:text-dark-text flex flex-row items-center">
+                            <Ionicons name="link" size={16} className="mr-1" />
+                            <Text>Lucid Icons</Text>
+                        </Link>
                     </View>
                 </ScrollView>
             </View>

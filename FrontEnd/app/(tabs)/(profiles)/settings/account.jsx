@@ -36,10 +36,8 @@ export default function AccountSettings() {
                         text: "Log out",
                         onPress: async () => {
                             await asyncStorage.clear();
-                            if (Platform.OS === "web") {
-                                localStorage.clear();
-                            }
-                            else {
+                            localStorage.clear();
+                            if (Platform.OS !== "web") {
                                 await SecureStore.deleteItemAsync("token");
                                 await SecureStore.deleteItemAsync("username");
                                 await SecureStore.deleteItemAsync("profilePicture");
