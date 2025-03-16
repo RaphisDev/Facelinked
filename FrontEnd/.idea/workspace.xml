@@ -5,14 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
-      <change afterPath="$PROJECT_DIR$/app/register-temp.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/app.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/account.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/account.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/credits.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/credits.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/index.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/register.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/register.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,25 +50,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Node.js.index.jsx.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/raphaeltempler/Documents/Projects/FaceLinked/FrontEnd/app&quot;,
-    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;settings.bun&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/Applications/WebStorm.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Node.js.index.jsx.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "/Users/raphaeltempler/Documents/Projects/FaceLinked/FrontEnd/app",
+    "list.type.of.created.stylesheet": "CSS",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "editor.preferences.inline.completion",
+    "ts.external.directory.path": "C:\\Users\\Raphael\\AppData\\Local\\Programs\\WebStorm\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/app" />
@@ -85,17 +78,17 @@
       <recent name="D:\Projects\FaceLinked\FrontEnd\assets\images" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/assets/images" />
-      <recent name="$PROJECT_DIR$/android/app" />
-      <recent name="$PROJECT_DIR$/android" />
       <recent name="$PROJECT_DIR$/app/(tabs)/(profiles)/settings" />
       <recent name="$PROJECT_DIR$/dist" />
+      <recent name="$PROJECT_DIR$/app/(tabs)/home" />
+      <recent name="$PROJECT_DIR$/app/(tabs)/index" />
+      <recent name="$PROJECT_DIR$/app/(tabs)/networks/(topics)" />
     </key>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-WS-243.25659.40" />
+        <option value="bundled-js-predefined-d6986cc7102b-e768b9ed790e-JavaScript-WS-243.21565.180" />
       </set>
     </attachedChunks>
   </component>
@@ -232,42 +225,8 @@
       <workItem from="1736366894174" duration="3878000" />
       <workItem from="1739823482402" duration="43000" />
       <workItem from="1739823542574" duration="3945000" />
-      <workItem from="1739827612295" duration="96000" />
-      <workItem from="1740149169277" duration="60000" />
-      <workItem from="1740161505478" duration="10958000" />
-      <workItem from="1740174592927" duration="17000" />
-      <workItem from="1740174664326" duration="10861000" />
-      <workItem from="1740237701226" duration="6512000" />
-      <workItem from="1740245547255" duration="194000" />
-      <workItem from="1740246093031" duration="859000" />
-      <workItem from="1740248586846" duration="17627000" />
-      <workItem from="1740346432157" duration="2199000" />
-      <workItem from="1740349709103" duration="44000" />
-      <workItem from="1740511902816" duration="5871000" />
-      <workItem from="1740599354878" duration="7111000" />
-      <workItem from="1740674533314" duration="7205000" />
-      <workItem from="1740777288231" duration="49000" />
-      <workItem from="1740777344568" duration="1990000" />
-      <workItem from="1740789217620" duration="151000" />
-      <workItem from="1740790657806" duration="103000" />
-      <workItem from="1740791074615" duration="8000" />
-      <workItem from="1740791364081" duration="387000" />
-      <workItem from="1740792885699" duration="14000" />
-      <workItem from="1740828832427" duration="5676000" />
-      <workItem from="1740835807880" duration="12000" />
-      <workItem from="1740836181808" duration="12000" />
-      <workItem from="1740850128469" duration="4494000" />
-      <workItem from="1740854771381" duration="199000" />
-      <workItem from="1740855090599" duration="314000" />
-      <workItem from="1740857412341" duration="14354000" />
-      <workItem from="1740873407439" duration="207000" />
-      <workItem from="1741377346872" duration="12577000" />
-      <workItem from="1741394670747" duration="73000" />
-      <workItem from="1741394879062" duration="72000" />
-      <workItem from="1741896105309" duration="37000" />
-      <workItem from="1741896197367" duration="3873000" />
-      <workItem from="1742045580417" duration="14291000" />
-      <workItem from="1742062696318" duration="2072000" />
+      <workItem from="1742144443795" duration="129000" />
+      <workItem from="1742148297069" duration="7159000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />
