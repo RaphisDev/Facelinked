@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
+      <change afterPath="$PROJECT_DIR$/app/temp.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/register.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/register.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -65,7 +66,7 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "editor.preferences.inline.completion",
-    "ts.external.directory.path": "C:\\Users\\Raphael\\AppData\\Local\\Programs\\WebStorm\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
+    "ts.external.directory.path": "/Applications/WebStorm.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -78,17 +79,17 @@
       <recent name="D:\Projects\FaceLinked\FrontEnd\assets\images" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/app" />
       <recent name="$PROJECT_DIR$/app/(tabs)/(profiles)/settings" />
       <recent name="$PROJECT_DIR$/dist" />
       <recent name="$PROJECT_DIR$/app/(tabs)/home" />
       <recent name="$PROJECT_DIR$/app/(tabs)/index" />
-      <recent name="$PROJECT_DIR$/app/(tabs)/networks/(topics)" />
     </key>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-e768b9ed790e-JavaScript-WS-243.21565.180" />
+        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-WS-243.25659.40" />
       </set>
     </attachedChunks>
   </component>
@@ -227,6 +228,10 @@
       <workItem from="1739823542574" duration="3945000" />
       <workItem from="1742144443795" duration="129000" />
       <workItem from="1742148297069" duration="7159000" />
+      <workItem from="1742159110206" duration="83000" />
+      <workItem from="1742159253365" duration="347000" />
+      <workItem from="1742159747713" duration="430000" />
+      <workItem from="1742247411758" duration="3923000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />
