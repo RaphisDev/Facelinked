@@ -322,3 +322,509 @@ const HomePage = () => {
       </ScrollView>)
 }
 export default HomePage;
+
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Pressable, Image, Platform } from 'react-native';
+import { Eye, EyeOff, ArrowLeft, X, Mail, Lock, Heart, MapPin, Camera, ArrowRight, Users, Check } from 'lucide-react-native';
+import * as ImagePicker from 'expo-image-picker';
+
+const RegistrationPage = ({ navigateTo }) => {
+  const [step, setStep] = useState(1);
+  const [showPassword, setShowPassword] = useState(false);
+  const [acceptLegals, setAcceptLegals] = useState(false);
+
+  const [formData, setFormData] = useState({
+    name: '',
+    username: '',
+    email: '',
+    password: '',
+    relationship: null,
+    birthDate: { day: 15, month: 'March', year: 2025 },
+    location: '',
+    interests: '',
+    profilePicture: null
+  });
+
+  const totalSteps = 5;
+
+  const updateFormData = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+  };
+
+  const nextStep = () => {
+    if (step < totalSteps) {
+      setStep(step + 1);
+    } else {
+      // Submit form data and create account
+      console.log('Form submitted:', formData);
+      // Navigate to home or onboarding
+      navigateTo('home');
+    }
+  };
+
+  const prevStep = () => {
+    if (step > 1) {
+      setStep(step - 1);
+    }
+  };
+
+  const renderProgress = () => {
+    return (
+      <View className="w-full mb-8">
+        <View className="flex flex-row justify-between mb-2">
+          {Array.from({ length: totalSteps }).map((_, index) => (
+            <View
+              key={index}
+              className={`w-8 h-8 rounded-full flex items-center justify-center 
+                ${index + 1 === step ? 'bg-blue-500' : 
+                  index + 1 < step ? 'bg-green-400' : 'bg-gray-200'}`}
+            >
+              {index + 1 < step ? (
+                <Check size={16} color="white" />
+              ) : (
+                <Text className={index + 1 === step ? 'text-white' : 'text-gray-700'}>
+                  {index + 1}
+                </Text>
+              )}
+            </View>
+          ))}
+        </View>
+        <View className="w-full bg-gray-200 h-2 rounded-full">
+          <View
+            className="bg-blue-500 h-2 rounded-full"
+            style={{ width: `${(step / totalSteps) * 100}%` }}
+          />
+        </View>
+      </View>
+    );
+  };
+
+  const renderStepContent = () => {
+    switch(step) {
+      case 1:
+        return (
+          <View className="space-y-6">
+            <Text className="text-2xl font-semibold">Let's get started</Text>
+            <View className="space-y-4">
+              <View>
+                <Text className="block text-sm font-medium mb-1">Your Name</Text>
+                <TextInput
+                  placeholder="Enter your name"
+                  className="w-full p-3 border border-gray-300 rounded-lg bg-white/90"
+                  value={formData.name}
+                  onChangeText={(text) => updateFormData('name', text)}
+                />
+              </View>
+              <View>
+                <Text className="block text-sm font-medium mb-1">Choose a Username</Text>
+                <TextInput
+                  placeholder="Enter username"
+                  className="w-full p-3 border border-gray-300 rounded-lg bg-white/90"
+                  value={formData.username}
+                  onChangeText={(text) => updateFormData('username', text)}
+                />
+              </View>
+            </View>
+          </View>
+        );
+      case 2:
+        return (
+          <View className="space-y-6">
+            <Text className="text-2xl font-semibold">Your account details</Text>
+            <View className="space-y-4">
+              <View>
+                <Text className="block text-sm font-medium mb-1">Email</Text>
+                <View className="relative">
+                  <View className="absolute inset-y-0 left-0 justify-center pl-3 flex items-center pointer-events-none">
+                    <Mail size={18} className="text-gray-400" />
+                  </View>
+                  <TextInput
+                    placeholder="Enter your email"
+                    className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg bg-white/90"
+                    value={formData.email}
+                    onChangeText={(text) => updateFormData('email', text)}
+                    keyboardType="email-address"
+                  />
+                </View>
+              </View>
+              <View>
+                <Text className="block text-sm font-medium mb-1">Password</Text>
+                <View className="relative">
+                  <View className="absolute inset-y-0 left-0 justify-center pl-3 flex items-center pointer-events-none">
+                    <Lock size={18} className="text-gray-400" />
+                  </View>
+                  <TextInput
+                    secureTextEntry={!showPassword}
+                    placeholder="Enter your password"
+                    className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg bg-white/90"
+                    value={formData.password}
+                    onChangeText={(text) => updateFormData('password', text)}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 justify-center flex items-center"
+                  >
+                    {showPassword ? (
+                      <EyeOff size={18} className="text-gray-400" />
+                    ) : (
+                      <Eye size={18} className="text-gray-400" />
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View className="mt-6">
+                <View className="flex-row items-center">
+                  <View className="flex-1 h-px bg-gray-300" />
+                  <Text className="mx-2 text-gray-500 text-sm">Or continue with</Text>
+                  <View className="flex-1 h-px bg-gray-300" />
+                </View>
+
+                <View className="mt-6 flex flex-row space-x-3">
+                  <TouchableOpacity 
+                    className="flex-1 py-3 px-4 border border-gray-300 rounded-lg flex items-center flex-row justify-center bg-white"
+                  >
+                    <View className="w-5 h-5 bg-blue-500 rounded-full mr-2"></View>
+                    <Text>Google</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    className="flex-1 py-3 px-4 border border-gray-300 rounded-lg flex items-center flex-row justify-center bg-white"
+                  >
+                    <View className="w-5 h-5 bg-black rounded-full mr-2"></View>
+                    <Text>Apple</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </View>
+        );
+      case 3:
+        return (
+          <View className="space-y-6">
+            <Text className="text-2xl font-semibold">Tell us about yourself</Text>
+            <View className="space-y-6">
+              <View>
+                <Text className="text-lg font-medium mb-3">Are you in a relationship?</Text>
+                <View className="flex flex-row gap-4">
+                  <TouchableOpacity 
+                    className={`flex-1 p-3 border rounded-lg flex flex-row justify-center items-center ${formData.relationship === true ? 'bg-blue-100 border-blue-400' : 'border-gray-300'}`}
+                    onPress={() => updateFormData('relationship', true)}
+                  >
+                    <Heart size={16} className="mr-2"/>
+                    <Text>Yes</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    className={`flex-1 p-3 border rounded-lg flex flex-row justify-center items-center ${formData.relationship === false ? 'bg-blue-100 border-blue-400' : 'border-gray-300'}`}
+                    onPress={() => updateFormData('relationship', false)}
+                  >
+                    <Text>No</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View>
+                <Text className="text-lg font-medium mb-3">When were you born?</Text>
+                <View className="flex-row flex gap-2">
+                  {Platform.OS === 'web' && (
+                    <>
+                      <View className="flex-1">
+                        <Pressable className="p-3 border border-gray-300 rounded-lg bg-white text-center">
+                          <Text>{formData.birthDate.day}</Text>
+                        </Pressable>
+                      </View>
+                      <View className="flex-1">
+                        <Pressable className="p-3 border border-gray-300 rounded-lg bg-white text-center">
+                          <Text>{formData.birthDate.month}</Text>
+                        </Pressable>
+                      </View>
+                      <View className="flex-1">
+                        <Pressable className="p-3 border border-gray-300 rounded-lg bg-white text-center">
+                          <Text>{formData.birthDate.year}</Text>
+                        </Pressable>
+                      </View>
+                    </>
+                  )}
+                </View>
+              </View>
+            </View>
+          </View>
+        );
+      case 4:
+        return (
+          <View className="space-y-6">
+            <Text className="text-2xl font-semibold">Your profile details</Text>
+            <View className="space-y-4">
+              <View>
+                <Text className="block text-sm font-medium mb-1">Where are you from?</Text>
+                <View className="relative">
+                  <View className="absolute inset-y-0 left-0 justify-center pl-3 flex items-center pointer-events-none">
+                    <MapPin size={18} className="text-gray-400"/>
+                  </View>
+                  <TextInput
+                    placeholder="You live in"
+                    placeholderTextColor="gray"
+                    className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg bg-white/90"
+                    value={formData.location}
+                    onChangeText={(text) => updateFormData('location', text)}
+                  />
+                </View>
+              </View>
+              <View>
+                <Text className="block text-sm font-medium mb-1">What are your hobbies or interests?</Text>
+                <TextInput
+                  placeholder="football, reading, ..."
+                  placeholderTextColor="gray"
+                  className="w-full py-3 px-4 border border-gray-300 rounded-lg bg-white/90"
+                  value={formData.interests}
+                  onChangeText={(text) => updateFormData('interests', text)}
+                />
+              </View>
+            </View>
+          </View>
+        );
+      case 5:
+        return (
+          <View className="space-y-6">
+            <Text className="text-2xl font-semibold">Profile Picture</Text>
+            <View className="flex flex-col items-center">
+              <TouchableOpacity 
+                onPress={async () => {
+                  const result = await ImagePicker.launchImageLibraryAsync({
+                    allowsEditing: true,
+                    aspect: [1, 1],
+                    quality: 0.8,
+                  });
+
+                  if (!result.canceled) {
+                    updateFormData('profilePicture', result.assets[0].uri);
+                  }
+                }}
+                className="w-40 h-40 bg-gray-100 rounded-full overflow-hidden mb-4 relative"
+              >
+                {formData.profilePicture ? (
+                  <Image source={{uri: formData.profilePicture}} className="w-full h-full object-cover" />
+                ) : (
+                  <View className="absolute inset-0 flex border-dashed border-2 border-gray-300 rounded-full items-center justify-center">
+                    <Camera size={48} className="text-gray-400" />
+                  </View>
+                )}
+              </TouchableOpacity>
+              <Text className="text-sm text-gray-500">JPG, PNG or GIF. Max size 5MB.</Text>
+            </View>
+            <View className="mt-6 pt-6 border-t border-gray-300">
+              <View className="flex-row items-center">
+                <Pressable
+                  onPress={() => setAcceptLegals(!acceptLegals)}
+                  className="h-5 w-5 border border-gray-300 rounded flex items-center justify-center bg-white"
+                >
+                  {acceptLegals && (
+                    <View className="h-3 w-3 bg-blue-500 rounded"></View>
+                  )}
+                </Pressable>
+                <Text className="text-sm ml-2">
+                  You are 14 or older and accept the <Text className="text-blue-600 font-medium">Privacy Policy</Text> & <Text className="text-blue-600 font-medium">Terms and Conditions</Text>
+                </Text>
+              </View>
+            </View>
+          </View>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <View className="flex-1 bg-gradient-to-br from-blue-50 via-white to-blue-100">
+      {/* Header */}
+      <View className="p-4 flex-row items-center border-b border-gray-200 bg-white/70 backdrop-blur-md">
+        <TouchableOpacity
+          onPress={() => {
+            if (step > 1) {
+              prevStep();
+            } else {
+              navigateTo('login');
+            }
+          }}
+          className="p-2 rounded-full"
+        >
+          {step > 1 ? <ArrowLeft size={20} /> : <X size={20} />}
+        </TouchableOpacity>
+        <View className="flex-1 flex items-center">
+          <Text className="text-lg font-semibold">Welcome to Facelinked</Text>
+        </View>
+        <View style={{width: 32}}></View>
+      </View>
+
+      {/* Main Content */}
+      <ScrollView className="flex-1">
+        <View className="p-6 max-w-md mx-auto w-full">
+          {renderProgress()}
+          {renderStepContent()}
+        </View>
+      </ScrollView>
+
+      {/* Footer */}
+      <View className="p-6 border-t border-gray-200 bg-white/70 backdrop-blur-md">
+        <View className="max-w-md mx-auto w-full">
+          <TouchableOpacity
+            onPress={nextStep}
+            className={`w-full py-4 rounded-lg flex flex-row items-center justify-center gap-2 ${acceptLegals || step < 5 ? 'bg-gradient-to-r from-blue-500 to-blue-700' : 'bg-gray-300'}`}
+            disabled={step === 5 && !acceptLegals}
+          >
+            {step < totalSteps ? (
+              <>
+                <Text className="text-white font-medium">Continue</Text>
+                <ArrowRight size={16} color="white" />
+              </>
+            ) : (
+              <Text className="text-white font-medium">Confirm & Create Account</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+export default RegistrationPage;
+
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Pressable, Image } from 'react-native';
+import { Eye, EyeOff, Mail, Lock, ChevronRight, ArrowRight, Users } from 'lucide-react-native';
+
+const LoginPage = ({ navigateTo }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+
+  const handleLogin = () => {
+    // Implement login logic here
+    console.log('Login with:', email, password);
+    // Navigate to home after successful login
+    navigateTo('home');
+  };
+
+  return (
+    <ScrollView className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
+      {/* Header with Logo */}
+      <View className="pt-12 pb-6 px-6 flex items-center">
+        <View className="flex items-center space-y-2">
+          <View className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+            <Users className="h-8 w-8 text-white" />
+          </View>
+          <Text className="font-bold text-3xl bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">
+            Facelinked
+          </Text>
+        </View>
+      </View>
+
+      {/* Login Form */}
+      <View className="px-6 py-8">
+        <View className="backdrop-blur-sm bg-white/80 rounded-3xl shadow-xl border border-white/50 p-8">
+          <Text className="text-2xl font-bold text-gray-800 mb-6">Welcome back</Text>
+          
+          {/* Email Input */}
+          <View className="mb-5">
+            <Text className="block text-sm font-medium mb-2 text-gray-700">Email</Text>
+            <View className="relative">
+              <View className="absolute inset-y-0 left-0 justify-center pl-3 flex items-center pointer-events-none">
+                <Mail size={18} className="text-gray-400" />
+              </View>
+              <TextInput
+                placeholder="Enter your email"
+                value={email}
+                onChangeText={setEmail}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg bg-white/90"
+                keyboardType="email-address"
+              />
+            </View>
+          </View>
+
+          {/* Password Input */}
+          <View className="mb-5">
+            <Text className="block text-sm font-medium mb-2 text-gray-700">Password</Text>
+            <View className="relative">
+              <View className="absolute inset-y-0 left-0 justify-center pl-3 flex items-center pointer-events-none">
+                <Lock size={18} className="text-gray-400" />
+              </View>
+              <TextInput
+                placeholder="Enter your password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg bg-white/90"
+              />
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3 justify-center flex items-center"
+              >
+                {showPassword ? <EyeOff size={18} className="text-gray-400" /> : <Eye size={18} className="text-gray-400" />}
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Remember Me and Forgot Password */}
+          <View className="flex flex-row justify-between items-center mb-6">
+            <View className="flex flex-row items-center">
+              <Pressable
+                onPress={() => setRememberMe(!rememberMe)}
+                className="h-5 w-5 border border-gray-300 rounded flex items-center justify-center bg-white mr-2"
+              >
+                {rememberMe && (
+                  <View className="h-3 w-3 bg-blue-500 rounded"></View>
+                )}
+              </Pressable>
+              <Text className="text-sm text-gray-600">Remember me</Text>
+            </View>
+            <TouchableOpacity>
+              <Text className="text-sm text-blue-600 font-medium">Forgot password?</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Login Button */}
+          <TouchableOpacity
+            onPress={handleLogin}
+            className="w-full py-3 mb-5 rounded-lg bg-gradient-to-r from-blue-500 to-blue-700 shadow-md shadow-blue-200"
+          >
+            <Text className="text-white font-medium text-center">Login</Text>
+          </TouchableOpacity>
+
+          {/* Divider */}
+          <View className="flex flex-row items-center my-6">
+            <View className="flex-1 h-px bg-gray-300" />
+            <Text className="mx-4 text-gray-500 text-sm">Or continue with</Text>
+            <View className="flex-1 h-px bg-gray-300" />
+          </View>
+
+          {/* Social Login Buttons */}
+          <View className="flex flex-row space-x-4 mb-6">
+            <TouchableOpacity className="flex-1 py-3 px-4 border border-gray-300 rounded-lg flex items-center flex-row justify-center bg-white">
+              <View className="w-5 h-5 bg-blue-500 rounded-full mr-2"></View>
+              <Text>Google</Text>
+            </TouchableOpacity>
+            <TouchableOpacity className="flex-1 py-3 px-4 border border-gray-300 rounded-lg flex items-center flex-row justify-center bg-white">
+              <View className="w-5 h-5 bg-black rounded-full mr-2"></View>
+              <Text>Apple</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Register Link */}
+          <View className="flex flex-row justify-center">
+            <Text className="text-gray-600">Don't have an account?</Text>
+            <TouchableOpacity onPress={() => navigateTo('register')} className="ml-1">
+              <Text className="text-blue-600 font-medium">Register</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+
+      {/* Footer */}
+      <View className="py-8 px-6">
+        <Text className="text-center text-gray-500 text-sm">
+          &copy; 2025 Facelinked. All rights reserved.
+        </Text>
+      </View>
+    </ScrollView>
+  );
+};
+
+export default LoginPage;
+
