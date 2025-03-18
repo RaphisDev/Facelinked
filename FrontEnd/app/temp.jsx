@@ -8,6 +8,524 @@ import {
   Lock, 
   Eye, 
   EyeOff, 
+  MapPin, 
+  Camera, 
+  X, 
+  ArrowLeft, 
+  ArrowRight, 
+  Check,
+  Volleyball
+} from 'lucide-react';
+
+const AuthPages = () => {
+  const [activeTab, setActiveTab] = useState('login');
+  
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex flex-col">
+      {/* Header */}
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-white/70 shadow-sm py-4 px-6 flex justify-between items-center">
+        <div className="flex items-center space-x-2">
+          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+            <Users className="h-6 w-6 text-white"/>
+          </div>
+          <span className="font-bold text-2xl bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">Facelinked</span>
+        </div>
+      </header>
+      
+      <main className="flex-1 flex items-center justify-center p-6">
+        <div className="w-full max-w-md">
+          {/* Auth Card */}
+          <div className="backdrop-blur-sm bg-white/40 rounded-3xl shadow-xl border border-white/50 p-8">
+            {/* Tabs */}
+            <div className="flex mb-8 border-b border-gray-200">
+              <button 
+                onClick={() => setActiveTab('login')}
+                className={`pb-3 px-4 text-lg font-medium ${activeTab === 'login' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                Login
+              </button>
+              <button 
+                onClick={() => setActiveTab('register')}
+                className={`pb-3 px-4 text-lg font-medium ${activeTab === 'register' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                Register
+              </button>
+            </div>
+            
+            {/* Content */}
+            {activeTab === 'login' ? 
+              <LoginForm /> : 
+              <RegistrationFlow />
+            }
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+const LoginForm = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-center mb-8 bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">
+        Welcome Back
+      </h2>
+      
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium mb-1">Email</label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <Mail size={18} className="text-gray-400" />
+            </div>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+            />
+          </div>
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium mb-1">Password</label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <Lock size={18} className="text-gray-400" />
+            </div>
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your password"
+              className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+            />
+            <button 
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+        </div>
+        
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <input
+              id="remember-me"
+              type="checkbox"
+              className="h-4 w-4 border-gray-300 rounded text-blue-600 focus:ring-blue-500"
+            />
+            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+              Remember me
+            </label>
+          </div>
+          
+          <a href="#" className="text-sm font-medium text-blue-600 hover:text-blue-500">
+            Forgot password?
+          </a>
+        </div>
+      </div>
+      
+      <button className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-blue-500 to-blue-700 text-white font-medium hover:from-blue-600 hover:to-blue-800 shadow-md shadow-blue-200 transition duration-300">
+        Login
+      </button>
+      
+      <div className="relative mt-8">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-300"></div>
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="px-2 bg-white text-gray-500">Or continue with</span>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-3 mt-6">
+        <button className="py-3 px-4 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 transition">
+          <div className="w-5 h-5 bg-blue-500 rounded-full mr-2"></div>
+          Google
+        </button>
+        <button className="py-3 px-4 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 transition">
+          <div className="w-5 h-5 bg-black rounded-full mr-2"></div>
+          Apple
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const RegistrationFlow = () => {
+  const [step, setStep] = useState(1);
+  const [showPassword, setShowPassword] = useState(false);
+  const [acceptLegals, setAcceptLegals] = useState(false);
+  
+  const [formData, setFormData] = useState({
+    name: '',
+    username: '',
+    email: '',
+    password: '',
+    relationship: null,
+    birthDate: { day: 15, month: 'March', year: 2000 },
+    location: '',
+    interests: '',
+    profilePicture: null
+  });
+  
+  const totalSteps = 5;
+  
+  const updateFormData = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+  };
+  
+  const nextStep = () => {
+    if (step < totalSteps) {
+      setStep(step + 1);
+    }
+  };
+  
+  const prevStep = () => {
+    if (step > 1) {
+      setStep(step - 1);
+    }
+  };
+  
+  const stepTitles = [
+    "Getting Started",
+    "Account Details",
+    "About You",
+    "Profile Details",
+    "Profile Picture"
+  ];
+  
+  const renderProgress = () => {
+    return (
+      <div className="w-full mb-8">
+        <div className="flex justify-between mb-4">
+          {stepTitles.map((title, index) => (
+            <button 
+              key={index}
+              onClick={() => setStep(index + 1)}
+              disabled={index + 1 > step}
+              className={`flex flex-col items-center transition-all duration-300 ${index + 1 > step ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
+            >
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 transition-all duration-300
+                ${index + 1 === step ? 'bg-blue-500 text-white scale-110' : 
+                index + 1 < step ? 'bg-green-400 text-white' : 'bg-gray-200'}`}
+              >
+                {index + 1 < step ? <Check size={20} /> : index + 1}
+              </div>
+              <span className={`text-xs font-medium ${index + 1 === step ? 'text-blue-600' : 'text-gray-500'}`}>
+                {title}
+              </span>
+            </button>
+          ))}
+        </div>
+        <div className="w-full bg-gray-200 h-2 rounded-full">
+          <div
+            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+            style={{ width: `${(step / totalSteps) * 100}%` }}
+          />
+        </div>
+      </div>
+    );
+  };
+  
+  const renderStepContent = () => {
+    switch(step) {
+      case 1:
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">
+              Let's get started
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Your Name</label>
+                <input
+                  type="text"
+                  placeholder="Enter your name"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  value={formData.name}
+                  onChange={(e) => updateFormData('name', e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Choose a Username</label>
+                <input
+                  type="text"
+                  placeholder="Enter username"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  value={formData.username}
+                  onChange={(e) => updateFormData('username', e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+        );
+      case 2:
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">
+              Your account details
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Email</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <Mail size={18} className="text-gray-400" />
+                  </div>
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    value={formData.email}
+                    onChange={(e) => updateFormData('email', e.target.value)}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Password</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <Lock size={18} className="text-gray-400" />
+                  </div>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    value={formData.password}
+                    onChange={(e) => updateFormData('password', e.target.value)}
+                  />
+                  <button 
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+              <div className="mt-6">
+                <div className="flex items-center">
+                  <div className="flex-1 h-px bg-gray-300" />
+                  <span className="mx-2 text-gray-500 text-sm">Or continue with</span>
+                  <div className="flex-1 h-px bg-gray-300" />
+                </div>
+
+                <div className="mt-6 grid grid-cols-2 gap-3">
+                  <button className="py-3 px-4 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 transition">
+                    <div className="w-5 h-5 bg-blue-500 rounded-full mr-2"></div>
+                    Google
+                  </button>
+                  <button className="py-3 px-4 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 transition">
+                    <div className="w-5 h-5 bg-black rounded-full mr-2"></div>
+                    Apple
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      case 3:
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">
+              Tell us about yourself
+            </h2>
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-medium mb-3">Are you in a relationship?</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    className={`p-3 border rounded-lg flex justify-center items-center transition-all ${formData.relationship === true ? 'bg-blue-100 border-blue-400' : 'hover:bg-gray-50 border-gray-300'}`}
+                    onClick={() => updateFormData('relationship', true)}
+                  >
+                    <Heart className="w-5 h-5 mr-2" />
+                    Yes
+                  </button>
+                  <button
+                    className={`p-3 border rounded-lg flex justify-center items-center transition-all ${formData.relationship === false ? 'bg-blue-100 border-blue-400' : 'hover:bg-gray-50 border-gray-300'}`}
+                    onClick={() => updateFormData('relationship', false)}
+                  >
+                    No
+                  </button>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-medium mb-3">When were you born?</h3>
+                <div className="flex gap-2">
+                  <select
+                    className="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    value={formData.birthDate.day}
+                    onChange={(e) => updateFormData('birthDate', {
+                      ...formData.birthDate,
+                      day: parseInt(e.target.value)
+                    })}
+                  >
+                    {[...Array(31)].map((_, i) => (
+                      <option key={i + 1} value={i + 1}>{i + 1}</option>
+                    ))}
+                  </select>
+                  <select
+                    className="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    value={formData.birthDate.month}
+                    onChange={(e) => updateFormData('birthDate', {
+                      ...formData.birthDate,
+                      month: e.target.value
+                    })}
+                  >
+                    {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map((month) => (
+                      <option key={month} value={month}>{month}</option>
+                    ))}
+                  </select>
+                  <select
+                    className="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    value={formData.birthDate.year}
+                    onChange={(e) => updateFormData('birthDate', {
+                      ...formData.birthDate,
+                      year: parseInt(e.target.value)
+                    })}
+                  >
+                    {[...Array(100)].map((_, i) => (
+                      <option key={2025 - i} value={2025 - i}>{2025 - i}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      case 4:
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">
+              Your profile details
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Where are you from?</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <MapPin size={18} className="text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="You live in"
+                    className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    value={formData.location}
+                    onChange={(e) => updateFormData('location', e.target.value)}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">What are your hobbies or interests?</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <Volleyball size={18} className="text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="football, reading, ..."
+                    className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                    value={formData.interests}
+                    onChange={(e) => updateFormData('interests', e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      case 5:
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">
+              Profile Picture
+            </h2>
+            <div className="flex flex-col items-center">
+              <div
+                className="w-40 h-40 bg-gray-100 rounded-full overflow-hidden mb-4 relative cursor-pointer hover:opacity-90 transition-opacity"
+              >
+                {formData.profilePicture ? (
+                  <img src={formData.profilePicture} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="absolute inset-0 flex border-dashed border-2 border-gray-300 rounded-full items-center justify-center text-gray-400">
+                    <Camera size={48} />
+                  </div>
+                )}
+              </div>
+              <span className="text-sm text-gray-500">JPG, PNG or GIF. Max size 5MB.</span>
+            </div>
+            <div className="mt-6 pt-6 border-t border-gray-300">
+              <div className="flex items-center">
+                <input
+                  id="terms"
+                  type="checkbox"
+                  checked={acceptLegals}
+                  onChange={() => setAcceptLegals(!acceptLegals)}
+                  className="h-4 w-4 border-gray-300 rounded text-blue-600 focus:ring-blue-500"
+                />
+                <label htmlFor="terms" className="text-sm ml-2">
+                  You are 14 or older and accept the <a href="#" className="text-blue-600 font-medium">Privacy Policy</a> & <a href="#" className="text-blue-600 font-medium">Terms and Conditions</a>
+                </label>
+              </div>
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+  
+  return (
+    <div>
+      {renderProgress()}
+      {renderStepContent()}
+      
+      <div className="mt-8 flex justify-between">
+        {step > 1 ? (
+          <button 
+            onClick={prevStep}
+            className="flex items-center text-gray-600 hover:text-blue-600 transition-colors"
+          >
+            <ArrowLeft size={16} className="mr-1" />
+            Back
+          </button>
+        ) : (
+          <div></div>
+        )}
+        
+        <button
+          onClick={step < totalSteps ? nextStep : () => console.log('Create Account')}
+          className={`px-6 py-3 rounded-lg flex items-center text-white font-medium transition-colors ${
+            acceptLegals || step < totalSteps ? 'bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800' : 'bg-gray-400 cursor-not-allowed'
+          }`}
+          disabled={step === totalSteps && !acceptLegals}
+        >
+          {step < totalSteps ? (
+            <>
+              Continue
+              <ArrowRight size={16} className="ml-1" />
+            </>
+          ) : (
+            'Create Account'
+          )}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default AuthPages;
+
+import React, { useState } from 'react';
+import { 
+  ChevronRight, 
+  User, 
+  Users, 
+  Heart, 
+  Mail, 
+  Lock, 
+  Eye, 
+  EyeOff, 
   ArrowLeft, 
   ArrowRight, 
   Check, 
