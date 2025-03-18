@@ -1,4 +1,462 @@
 import React, { useState } from 'react';
+import { 
+  ChevronRight, 
+  User, 
+  Users, 
+  Heart, 
+  Mail, 
+  Lock, 
+  Eye, 
+  EyeOff, 
+  ArrowLeft, 
+  ArrowRight, 
+  Check, 
+  X, 
+  MapPin, 
+  Camera
+} from 'lucide-react';
+
+const AuthPages = () => {
+  const [showLogin, setShowLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  
+  // Registration flow state
+  const [step, setStep] = useState(1);
+  const [acceptLegals, setAcceptLegals] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    username: '',
+    email: '',
+    password: '',
+    relationship: null,
+    birthDate: { day: 15, month: 'March', year: 2000 },
+    location: '',
+    interests: '',
+    profilePicture: null
+  });
+
+  const totalSteps = 5;
+
+  const updateFormData = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+  };
+
+  const nextStep = () => {
+    if (step < totalSteps) {
+      setStep(step + 1);
+    } else {
+      console.log("Account creation with data:", formData);
+      // Here you would handle final submission
+    }
+  };
+
+  const prevStep = () => {
+    if (step > 1) {
+      setStep(step - 1);
+    }
+  };
+
+  const renderProgress = () => {
+    return (
+      <div className="w-full mb-8">
+        <div className="flex flex-row justify-between mb-2">
+          {Array.from({ length: totalSteps }).map((_, index) => (
+            <div
+              key={index}
+              className={`w-8 h-8 rounded-full flex items-center justify-center 
+                ${index + 1 === step ? 'bg-blue-500 text-white' :
+                index + 1 < step ? 'bg-green-400 text-white' : 'bg-gray-200'}`}
+            >
+              {index + 1 < step ? <Check size={16} /> : <span>{index + 1}</span>}
+            </div>
+          ))}
+        </div>
+        <div className="w-full bg-gray-200 h-2 rounded-full">
+          <div
+            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+            style={{ width: `${(step / totalSteps) * 100}%` }}
+          />
+        </div>
+      </div>
+    );
+  };
+
+  const renderStepContent = () => {
+    switch(step) {
+      case 1:
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold">Let's get started</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Your Name</label>
+                <input
+                  type="text"
+                  placeholder="Enter your name"
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                  value={formData.name}
+                  onChange={(e) => updateFormData('name', e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Choose a Username</label>
+                <input
+                  type="text"
+                  placeholder="Enter username"
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                  value={formData.username}
+                  onChange={(e) => updateFormData('username', e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+        );
+      case 2:
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold">Your account details</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Email</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <Mail size={18} className="text-gray-400" />
+                  </div>
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg"
+                    value={formData.email}
+                    onChange={(e) => updateFormData('email', e.target.value)}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Password</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <Lock size={18} className="text-gray-400" />
+                  </div>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg"
+                    value={formData.password}
+                    onChange={(e) => updateFormData('password', e.target.value)}
+                  />
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                    <button
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6">
+                <div className="flex items-center">
+                  <div className="flex-1 h-px bg-gray-300" />
+                  <span className="mx-2 text-gray-500 text-sm">Or continue with</span>
+                  <div className="flex-1 h-px bg-gray-300" />
+                </div>
+
+                <div className="mt-6 grid grid-cols-2 gap-3">
+                  <button className="py-3 px-4 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 transition">
+                    <div className="w-5 h-5 bg-blue-500 rounded-full mr-2"></div>
+                    Google
+                  </button>
+                  <button className="py-3 px-4 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 transition">
+                    <div className="w-5 h-5 bg-black rounded-full mr-2"></div>
+                    Apple
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      case 3:
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold">Tell us about yourself</h2>
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-medium mb-3">Are you in a relationship?</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    className={`p-3 border rounded-lg flex justify-center items-center ${formData.relationship ? 'bg-blue-100 border-blue-400' : 'hover:bg-gray-50 border-gray-300'}`}
+                    onClick={() => updateFormData('relationship', true)}
+                  >
+                    <Heart className="w-5 h-5 mr-2"/>
+                    Yes
+                  </button>
+                  <button
+                    className={`p-3 border rounded-lg flex justify-center items-center ${formData.relationship === false ? 'bg-blue-100 border-blue-400' : 'hover:bg-gray-50 border-gray-300'}`}
+                    onClick={() => updateFormData('relationship', false)}
+                  >
+                    No
+                  </button>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-medium mb-3">When were you born?</h3>
+                <div className="flex gap-2">
+                  <select
+                    className="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 text-center"
+                    value={formData.birthDate.day}
+                    onChange={(e) => updateFormData('birthDate', {
+                      ...formData.birthDate,
+                      day: parseInt(e.target.value)
+                    })}
+                  >
+                    {[...Array(31)].map((_, i) => (
+                      <option key={i + 1} value={i + 1}>{i + 1}</option>
+                    ))}
+                  </select>
+                  <select
+                    className="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 text-center"
+                    value={formData.birthDate.month}
+                    onChange={(e) => updateFormData('birthDate', {
+                      ...formData.birthDate,
+                      month: e.target.value
+                    })}
+                  >
+                    {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map((month) => (
+                      <option key={month} value={month}>{month}</option>
+                    ))}
+                  </select>
+                  <select
+                    className="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 text-center"
+                    value={formData.birthDate.year}
+                    onChange={(e) => updateFormData('birthDate', {
+                      ...formData.birthDate,
+                      year: parseInt(e.target.value)
+                    })}
+                  >
+                    {[...Array(90)].map((_, i) => (
+                      <option key={2025 - i} value={2025 - i}>{2025 - i}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      case 4:
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold">Your profile details</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Where are you from?</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <MapPin size={18} className="text-gray-400"/>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="You live in"
+                    className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg"
+                    value={formData.location}
+                    onChange={(e) => updateFormData('location', e.target.value)}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">What are your hobbies or interests?</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <Heart size={18} className="text-gray-400"/>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="football, reading, ..."
+                    className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg"
+                    value={formData.interests}
+                    onChange={(e) => updateFormData('interests', e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      case 5:
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold">Profile Picture</h2>
+            <div className="flex flex-col items-center">
+              <button 
+                onClick={() => {
+                  // This would involve a file picker in a real implementation
+                  const fakeImageUrl = "https://i.pravatar.cc/300";
+                  updateFormData('profilePicture', fakeImageUrl);
+                }}
+                className="w-40 h-40 bg-gray-100 rounded-full overflow-hidden mb-4 relative"
+              >
+                {formData.profilePicture ? (
+                  <img 
+                    src={formData.profilePicture} 
+                    alt="Profile"
+                    className="w-full h-full hover:opacity-65 object-cover"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex border-dashed border-2 hover:opacity-75 border-gray-300 rounded-full items-center justify-center text-gray-400">
+                    <Camera size={48}/>
+                  </div>
+                )}
+              </button>
+              <p className="text-sm text-gray-500">JPG, PNG or GIF. Max size 5MB.</p>
+            </div>
+            <div className="mt-6 pt-6 border-t border-gray-300">
+              <div className="flex items-center">
+                <button
+                  onClick={() => setAcceptLegals(!acceptLegals)}
+                  className="h-5 w-5 border border-gray-300 rounded flex items-center justify-center bg-white"
+                >
+                  {acceptLegals && (
+                    <div className="h-3 w-3 bg-blue-500 rounded"></div>
+                  )}
+                </button>
+                <label htmlFor="terms" className="text-sm ml-2">
+                  You are 14 or older and accept the <a href="#privacy" className="text-blue-600 font-medium">Privacy Policy</a> & <a href="#terms" className="text-blue-600 font-medium">Terms and Conditions</a>
+                </label>
+              </div>
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const renderLogin = () => {
+    return (
+      <div className="space-y-6 p-6">
+        <h2 className="text-2xl font-semibold text-center">Welcome back</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Email</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <Mail size={18} className="text-gray-400" />
+              </div>
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg"
+              />
+            </div>
+          </div>
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-sm font-medium">Password</label>
+              <a href="#forgot" className="text-sm text-blue-600 hover:text-blue-800">Forgot password?</a>
+            </div>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <Lock size={18} className="text-gray-400" />
+              </div>
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg"
+              />
+              <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                <button
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <button className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-lg font-medium hover:from-blue-600 hover:to-blue-800 shadow-md shadow-blue-200 transition duration-300">
+            Sign In
+          </button>
+          
+          <div className="flex items-center mt-4">
+            <div className="flex-1 h-px bg-gray-300" />
+            <span className="mx-2 text-gray-500 text-sm">Or continue with</span>
+            <div className="flex-1 h-px bg-gray-300" />
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3 mt-4">
+            <button className="py-3 px-4 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 transition">
+              <div className="w-5 h-5 bg-blue-500 rounded-full mr-2"></div>
+              Google
+            </button>
+            <button className="py-3 px-4 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 transition">
+              <div className="w-5 h-5 bg-black rounded-full mr-2"></div>
+              Apple
+            </button>
+          </div>
+          
+          <p className="text-center mt-6 text-gray-600">
+            Don't have an account? <button onClick={() => setShowLogin(false)} className="text-blue-600 font-medium hover:text-blue-800">Sign up</button>
+          </p>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center p-4">
+      <div className="backdrop-blur-sm bg-white/40 rounded-3xl shadow-xl border border-white/50 w-full max-w-md overflow-hidden">
+        
+        {showLogin ? (
+          renderLogin()
+        ) : (
+          <>
+            <div className="p-4 flex items-center border-b border-gray-200">
+              <button
+                onClick={() => {
+                  if (step > 1) {
+                    prevStep();
+                  } else {
+                    setShowLogin(true);
+                  }
+                }}
+                className="p-2 rounded-full hover:bg-gray-100"
+              >
+                {step > 1 ? <ArrowLeft size={20} /> : <X size={20} />}
+              </button>
+              <h1 className="text-lg font-semibold flex-1 text-center">Welcome to Facelinked</h1>
+              <div style={{width: 32}}></div>
+            </div>
+
+            <div className="p-6">
+              {renderProgress()}
+              {renderStepContent()}
+            </div>
+
+            <div className="p-6 border-t border-gray-200 bg-white">
+              <button
+                onClick={nextStep}
+                className="w-full py-4 bg-blue-500 text-white rounded-lg flex items-center justify-center gap-2 hover:bg-blue-600 transition-colors"
+                disabled={step === 5 && !acceptLegals}
+              >
+                {step < totalSteps ? (
+                  <>
+                    <span className="font-medium">Continue</span>
+                    <ArrowRight size={16} />
+                  </>
+                ) : (
+                  <span className="font-medium">Confirm & Create Account</span>
+                )}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default AuthPages;
+
+import React, { useState } from 'react';
 import {ChevronRight, User, Users, Heart, MessageCircle, MapPin, Menu, X, Share2} from 'lucide-react-native';
 import {ScrollView, Share} from "react-native";
 
