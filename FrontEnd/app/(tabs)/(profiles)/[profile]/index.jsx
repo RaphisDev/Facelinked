@@ -51,7 +51,6 @@ export default function Profile() {
         location: "Loading...",
         hobbies: "Loading...",
         inRelationship: false,
-        partner: "Loading...",
         profilePicturePath: "",
         dateOfBirth: new Date()
     });
@@ -159,7 +158,7 @@ export default function Profile() {
             token.current = SecureStore.getItem("token");
             username.current = SecureStore.getItem("username");
         }
-        if(!profile){ profileName.current = username.current;}
+        if(!profile || profile === "profile"){ profileName.current = username.current;}
         setTimeout(() => {
             if (token.current === null) {router.replace("/")}
         })
@@ -366,9 +365,7 @@ export default function Profile() {
                                 {id: "location", value: profileInfos.location},
                                 {id: "hobbies", value: profileInfos.hobbies},
                                 {id: "relationshipStatus", value: profileInfos.inRelationship ? "in Relationship" : "Single"},
-                                {id: "partner", value: profileInfos.partner},
-                            ]} renderItem={({item}) => <Text className="text-xl font-medium text-text dark:text-dark-text" style={{display: item.id === "partner" ? profileInfos.inRelationship ?
-                                    "flex" : "none" : "flex"}} id={item.id}>{item.value}</Text>}/>
+                            ]} renderItem={({item}) => <Text className="text-xl font-medium text-text dark:text-dark-text" id={item.id}>{item.value}</Text>}/>
                         </View>
                         <View className="h-64 aspect-[16/19] mr-3 rounded-3xl overflow-hidden">
                             <Image style={{ width: '100%', height: '100%', objectFit: "cover", position: "static", borderRadius: 24 }}

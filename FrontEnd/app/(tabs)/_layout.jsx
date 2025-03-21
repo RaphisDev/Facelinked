@@ -1,17 +1,68 @@
 import {Stack, Tabs, useGlobalSearchParams, useLocalSearchParams, useNavigation, useRouter} from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import {Platform, Pressable, Text, TouchableOpacity} from "react-native";
+import {Dimensions, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import * as SecureStore from "expo-secure-store";
 import StateManager from "../../components/StateManager";
+import CustomTabBar from "../../components/CustomTabBar";
+import {SafeAreaProvider, useSafeAreaInsets} from "react-native-safe-area-context";
+import {useEffect, useState} from "react";
+import WebSidebarStyles from "../../components/WebSidebarStyles";
 
+const MOBILE_WIDTH_THRESHOLD = 768;
+const SIDEBAR_WIDTH = 220;
+
+// A wrapper component that handles the layout for desktop/mobile
+function LayoutWrapper({ children }) {
+    const [dimensions, setDimensions] = useState(() => Dimensions.get('window'));
+    const isDesktop = dimensions.width > MOBILE_WIDTH_THRESHOLD;
+
+    useEffect(() => {
+        const subscription = Dimensions.addEventListener('change', ({ window }) => {
+            setDimensions(window);
+        });
+        return () => subscription.remove();
+    }, []);
+
+    return (
+        <View style={styles.rootContainer}>
+            {children}
+            {isDesktop && <View style={{ width: SIDEBAR_WIDTH }} />}
+        </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    rootContainer: {
+        flex: 1,
+        flexDirection: 'row',
+    },
+});
 
 export default function TabsLayout() {
     const router = useRouter();
     const route = useGlobalSearchParams();
 
+    const [dimensions, setDimensions] = useState(() => Dimensions.get('window'));
+    const isDesktop = dimensions.width > MOBILE_WIDTH_THRESHOLD;
+    const insets = useSafeAreaInsets();
+
+    useEffect(() => {
+        const subscription = Dimensions.addEventListener('change', ({ window }) => {
+            setDimensions(window);
+        });
+        return () => subscription.remove();
+    }, []);
+
     return (
         <>
-            <Tabs screenOptions={{tabBarShowLabel: false}} screenListeners={{tabPress:
+            <SafeAreaProvider>
+                <LayoutWrapper>
+            <Tabs screenOptions={{tabBarShowLabel: false, tabBarStyle: {display: "none"}, headerStyle: isDesktop ? {
+                    marginLeft: SIDEBAR_WIDTH,
+                } : {},
+                contentStyle: isDesktop ? {
+                    marginLeft: SIDEBAR_WIDTH,
+                } : {},}} screenListeners={{tabPress:
                 (e) => {
                     if (Platform.OS !== "web") {
                         if (e.target === undefined) {
@@ -54,7 +105,7 @@ export default function TabsLayout() {
                         }
                     }
                 }
-            }}>
+            }} tabBar={(props) => <CustomTabBar {...props}/>}>
                 <Tabs.Screen name="home/index" options={{headerTitle: () => <Pressable onPress={() => router.replace("/home", {animationEnabled: false})}>
                         <Text className="font-courier text-xl">Facelinked</Text>
                 </Pressable>,
@@ -77,6 +128,8 @@ export default function TabsLayout() {
                     tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "person-sharp" : "person-outline"} size={30}/>,
                 }}/>
             </Tabs>
+                </LayoutWrapper>
+            </SafeAreaProvider>
         </>
     );
 }
