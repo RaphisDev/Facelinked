@@ -373,11 +373,11 @@ export default function Profile() {
                         </View>
                     </View>
                     <View className="flex-row justify-center mt-9">
-                        <TouchableOpacity style={{display: profile === username.current || profile === undefined ? "none" : "flex"}} onPress={() => router.navigate(`/chat/${profile}`)} activeOpacity={0.6} className="mr-16 border-accent bg-accent border-4 rounded-full p-3.5">
+                        <TouchableOpacity style={{display: profileName.current === username.current ? "none" : "flex"}} onPress={() => router.navigate(`/chat/${profile}`)} activeOpacity={0.6} className="mr-16 border-accent bg-accent border-4 rounded-full p-3.5">
                             <Ionicons name="chatbubble" color="white" size={25}/>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{display: profile === username.current || profile === undefined ? "flex" : "none"}} onPress={() => Alert.alert("Edit Profile", "This feature is coming soon")} activeOpacity={0.6} className="mr-16 border-accent bg-accent border-4 rounded-full p-3.5">
-                            <Ionicons name={profile === username.current || profile === undefined ? "pencil" : "chatbox-outline"} color="white" size={25}/>
+                        <TouchableOpacity style={{display: profileName.current === username.current ? "flex" : "none"}} onPress={() => Alert.alert("Edit Profile", "This feature is coming soon")} activeOpacity={0.6} className="mr-16 border-accent bg-accent border-4 rounded-full p-3.5">
+                            <Ionicons name={profileName.current === username.current ? "pencil" : "chatbox-outline"} color="white" size={25}/>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => setShowModal(true)} activeOpacity={0.6} className="border-accent bg-accent border-4 rounded-full p-3.5">
                             <Ionicons name="people" color="white" size={25}></Ionicons>
@@ -386,7 +386,7 @@ export default function Profile() {
                     <View>
                         <View className="flex-row mt-5 justify-between mb-4">
                             <Text className="text-center text-text dark:text-dark-text self-start font-bold text-2xl ml-4 mt-3">Posts</Text>
-                            {(profileName.current === username.current || profileName.current === undefined) &&
+                            {profileName.current === username.current &&
                                 <TouchableOpacity onPress={createPost} activeOpacity={0.65} className="rounded-full self-end bg-accent p-2 mr-2 w-20">
                                     <Ionicons name={"add"} size={24} className="text-center" color={"#FFFFFF"}></Ionicons>
                                 </TouchableOpacity>}
@@ -403,7 +403,7 @@ export default function Profile() {
                                                   }
                                                   else if (postInputText.current.trim().length === 0 && key.nativeEvent.key === "Enter") {
                                                       setPosts(cachedPosts.current);
-                                                  }}} ref={newPostInput} onEndEditing={() => setPosts(cachedPosts.current)} multiline={true} placeholderTextColor="gray" placeholder="What's on your mind?" className="text-xl text-dark-text mb-1.5 ml-5"/>
+                                                  }}} ref={newPostInput} onEndEditing={() => setPosts(cachedPosts.current)} multiline={true} placeholderTextColor="gray" placeholder="What's on your mind?" className="text-xl text-dark-text outline-none mb-1.5 ml-5"/>
                                               </View>
                                           </View>)
                                   } else {

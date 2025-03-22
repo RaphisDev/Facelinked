@@ -23,9 +23,6 @@ import * as SecureStore from "expo-secure-store";
 
 export default function ChatRoom() {
 
-    //Todo: encrypt localStorage with key thats stored in secure storage
-    //Flatlist view not adapted view when keyboard is active
-
     const {receiver} = useLocalSearchParams();
     const message = useRef("");
     const input = useRef(null);
@@ -111,6 +108,11 @@ export default function ChatRoom() {
                     }
                     return chat;
                 })));
+                let NewLoadedChats = await asyncStorage.getItem("chats") || [];
+                if (NewLoadedChats.length !== 0) {
+                    NewLoadedChats = JSON.parse(NewLoadedChats);
+                }
+                ws.messageReceived.emit("unreadMessagesChanged", {unread: NewLoadedChats.filter((chat) => chat.unread).length});
             }, 1000);
         });
 

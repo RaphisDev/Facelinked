@@ -149,7 +149,9 @@ export default function Networks() {
                             handleAddBar();
                         }} activeOpacity={0.4} className="flex-row justify-between items-center p-3">
                             <View className="flex-row items-center">
-                                <Image source={{uri: item.item.networkPicturePath}} style={{width: 42, height: 42, borderRadius: 11}}></Image>
+                                <View style={{height: 42, width: 42, borderRadius: 10, overflow: 'hidden', backgroundColor: item.item.networkPicturePath ? 'transparent' : '#2A2A2A'}}>
+                                    {item.item.networkPicturePath && <Image style={{height: '100%', width: '100%'}} source={{uri: item.item.networkPicturePath}}/>}
+                                </View>
                                 <View className="flex-col ml-3">
                                     <Text className="text-text dark:text-dark-text font-bold text-lg">{item.item.name}</Text>
                                     <Text className="text-text dark:text-dark-text text-sm">{item.item.description}</Text>

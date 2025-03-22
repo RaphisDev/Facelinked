@@ -12,13 +12,8 @@ import StateManager from "../../../components/StateManager";
 import ip from "../../../components/AppManager";
 import * as SecureStore from "expo-secure-store";
 
-global.TextEncoder = TextEncoder;
-
-Object.assign(global, { WebSocket });
-
 export default function Chats() {
 
-    //Todo: new messages on top of chat list?
     const [chats, setChats] = useState([]);
     const segments = useSegments();
 

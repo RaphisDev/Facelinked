@@ -10,8 +10,6 @@ import * as SecureStore from "expo-secure-store";
 
 let webSocketInstance = null;
 
-//Todo: global.textencoding???
-
 class WebsocketController{
 
     stompClient = null;
@@ -38,10 +36,12 @@ class WebsocketController{
                 appendMissingNULLonIncoming: true,
                 heartbeatOutgoing: 10000,
                 heartbeatIncoming: 10000,
+                reconnectDelay: 5000,
+                connectionTimeout: 10000,
                 webSocketFactory: () => {
                     return new WebSocket(`${webSocketIp}/ws`, [token]);
                 },
-                onWebSocketError: () => {
+                onWebSocketError: (error) => {
                     //alert("Network error. Please check your internet connection.");
                     if (!this.stompClient.connected) {
                         this.stompClient.deactivate();
@@ -242,6 +242,10 @@ class WebsocketController{
                         }]));
 
                         const loadedChats = await getChats();
+                        this.messageReceived.emit("unreadMessagesChanged", {
+                            detail: { unread:  loadedChats.filter((chat) => chat.unread).length }
+                        });
+
                         await saveChats(parsedMessage.senderId, loadedChats, false);
                         await asyncStorage.setItem("lastMessageId", parsedMessage.millis.toString());
                     });

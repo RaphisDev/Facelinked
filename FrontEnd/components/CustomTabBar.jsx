@@ -19,7 +19,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
     const tabRoutes = [
         { name: 'home', label: 'Home', iconFocused: 'home-sharp', iconUnfocused: 'home-outline' },
         { name: 'networks', label: 'Networks', iconFocused: 'git-merge-sharp', iconUnfocused: 'git-merge-outline' },
-        { name: 'chat', label: 'Chats', iconFocused: 'chatbubbles-sharp', iconUnfocused: 'chatbubbles-outline' },
+        { name: 'chats', label: 'Chats', iconFocused: 'chatbubbles-sharp', iconUnfocused: 'chatbubbles-outline' },
         { name: 'profile', label: 'Profile', iconFocused: 'person-sharp', iconUnfocused: 'person-outline' }
     ];
 

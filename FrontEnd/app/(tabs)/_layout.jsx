@@ -5,8 +5,8 @@ import * as SecureStore from "expo-secure-store";
 import StateManager from "../../components/StateManager";
 import CustomTabBar from "../../components/CustomTabBar";
 import {SafeAreaProvider, useSafeAreaInsets} from "react-native-safe-area-context";
-import {useEffect, useState} from "react";
-import WebSidebarStyles from "../../components/WebSidebarStyles";
+import {useEffect, useRef, useState} from "react";
+import WebSocketProvider from "../../components/WebSocketProvider";
 
 const MOBILE_WIDTH_THRESHOLD = 768;
 const SIDEBAR_WIDTH = 220;
@@ -25,8 +25,8 @@ function LayoutWrapper({ children }) {
 
     return (
         <View style={styles.rootContainer}>
-            {children}
             {isDesktop && <View style={{ width: SIDEBAR_WIDTH }} />}
+            {children}
         </View>
     );
 }
@@ -45,12 +45,28 @@ export default function TabsLayout() {
     const [dimensions, setDimensions] = useState(() => Dimensions.get('window'));
     const isDesktop = dimensions.width > MOBILE_WIDTH_THRESHOLD;
     const insets = useSafeAreaInsets();
+    const unreadMessagesCount = useRef(0);
 
     useEffect(() => {
         const subscription = Dimensions.addEventListener('change', ({ window }) => {
             setDimensions(window);
         });
         return () => subscription.remove();
+    }, []);
+
+    const ws = new WebSocketProvider();
+
+    useEffect(() => {
+        ws.messageReceived.addListener(
+            "unreadMessagesChanged",
+            (event) => {
+                unreadMessagesCount.current = event.detail.unread;
+            }
+        );
+
+        return () => {
+            ws.messageReceived.removeAllListeners("unreadMessagesChanged");
+        };
     }, []);
 
     return (
@@ -119,9 +135,11 @@ export default function TabsLayout() {
                     </TouchableOpacity>,
                     tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "git-merge-sharp" : "git-merge-outline"} size={30}/>
                 }}/>
-                <Tabs.Screen name="chat" options={{headerTitle: "Chats",
+                <Tabs.Screen name="chats" options={{headerTitle: "Chats",
                     headerTitleAlign: "center",
                     tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "chatbubbles-sharp" : "chatbubble-outline"} size={30}/>,
+                    tabBarBadge: unreadMessagesCount.current > 0 ? unreadMessagesCount.current : null ,
+                    //tabBarBadgeStyle: { backgroundColor: 'blue', minWidth: 8, height: 8, borderRadius: 4 }
                 }}/>
 
                 <Tabs.Screen name="(profiles)" options={{headerShown: false,

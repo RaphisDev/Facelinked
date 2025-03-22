@@ -20,6 +20,11 @@ import {ChevronRight, User, Users, Heart, MessageCircle, MapPin, Menu, X, Share2
 import {Link} from "expo-router";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
+import {TextEncoder} from "text-encoding";
+
+global.TextEncoder = TextEncoder;
+
+Object.assign(global, { WebSocket });
 
 const Index = () => {
 
@@ -100,19 +105,44 @@ const Index = () => {
             } else {
                 setLoggedIn(true);
             }
-       }, 1000)
+       }, Platform.OS === "web" ? 0 : 1000);
     }, []);
 
     if (loggedIn) {
         return <HomePage />;
     }
     else {
+        if (Platform.OS === "web") {return <View className="bg-white"></View>}
         return (
-            <View className="w-full h-full bg-primary dark:bg-dark-primary justify-center">
-                <Image source={require("../assets/images/icon.png")}
-                       style={{width: 140, height: 140, alignSelf: "center", borderRadius: 40}}/>
-                <Text className="text-2xl font-semibold text-center text-text dark:text-dark-text mt-48">Made by
-                    Orion</Text>
+            <View className="w-full h-full bg-gradient-to-br from-blue-50 via-white to-blue-100 justify-center items-center">
+                <View className="backdrop-blur-md bg-white/60 rounded-3xl p-10 shadow-xl border border-white/50 flex flex-col items-center">
+                    <View className="relative mb-2">
+                        <Image
+                            source={require("../assets/images/icon.png")}
+                            style={{width: 150, height: 150, borderRadius: 40}}
+                            className="shadow-md"
+                        />
+                        <View className="absolute -bottom-2 -right-2 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                            <Volleyball size={20} color="white" />
+                        </View>
+                    </View>
+                    <Text className="text-3xl font-bold text-center bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text mt-6">
+                        Facelinked
+                    </Text>
+                    <Text className="text-lg text-gray-600 text-center mt-2 max-w-xs">
+                        Real connections. Real people.
+                    </Text>
+                    <View className="mt-8 flex-row items-center justify-center">
+                        <View className="h-1 w-1 bg-blue-400 rounded-full mr-1 opacity-70"></View>
+                        <View className="h-1 w-1 bg-blue-500 rounded-full mr-1 opacity-80"></View>
+                        <View className="h-1 w-1 bg-blue-600 rounded-full opacity-90"></View>
+                    </View>
+                    <View className="mt-5 bg-gradient-to-r from-blue-500/20 to-blue-600/20 px-4 py-2 rounded-full self-center">
+                        <Text className="text-sm text-center bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text font-semibold">
+                            crafted with ♥ by Orion
+                    </Text>
+                </View>
+            </View>
             </View>
         );
     }
@@ -266,7 +296,7 @@ const Footer = ({navigateTo, scrollContent}) => {
                                 <li><Pressable onPress={() => router.navigate('/about')} className="hover:text-blue-400">About Us</Pressable></li>
                                 <li><Pressable onPress={() => router.navigate('/privacy')} className="hover:text-blue-400">Privacy Policy</Pressable></li>
                                 <li><Pressable onPress={() => router.navigate('/terms')} className="hover:text-blue-400">Terms of Service</Pressable></li>
-                                <li><a href={"mailto://bretter.schlaue83@icloud.com"} className="hover:text-blue-400">Contact</a></li>
+                                <li><a href={"mailto:bretter.schlaue83@icloud.com"} className="hover:text-blue-400">Contact</a></li>
                             </ul>
                         </div>
 
@@ -276,7 +306,7 @@ const Footer = ({navigateTo, scrollContent}) => {
                             <div className="flex">
                                 <input type="email" placeholder="Your email"
                                        className="px-4 py-2 rounded-l-md w-full focus:outline-none text-gray-800"/>
-                                <a href={"mailto://bretter.schlaue83@icloud.com"} className="bg-blue-600 px-4 py-2 rounded-r-md hover:bg-blue-700">
+                                <a href={"mailto:bretter.schlaue83@icloud.com"} className="bg-blue-600 px-4 py-2 rounded-r-md hover:bg-blue-700">
                                     <ChevronRight className="h-5 w-5"/>
                                 </a>
                             </div>
@@ -299,7 +329,7 @@ const LandingPage = ({navigateTo, scrollContent}) => {
             <NavigationBar navigateTo={navigateTo} scrollContent={scrollContent} />
 
             {/* Hero Section with Glass Card */}
-            <View className="relative flex items-center justify-center py-20 px-4 overflow-hidden">
+            <View className="relative flex items-center justify-center py-20 px-4">
                 <View className="absolute inset-0 z-0">
                     <View
                         className="absolute top-0 left-1/4 w-64 h-64 rounded-full bg-blue-300/20 filter blur-3xl"></View>
@@ -378,7 +408,7 @@ const LandingPage = ({navigateTo, scrollContent}) => {
             </div>
 
             {/* How It Works - With Flowing Background */}
-            <div className="relative py-20 px-4 overflow-hidden">
+            <div className="relative py-20 px-4">
                 <div className="absolute inset-0 z-0">
                     <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-blue-200/30 filter blur-3xl"></div>
                     <div className="absolute bottom-0 left-0 w-96 h-96 rounded-full bg-blue-300/30 filter blur-3xl"></div>
@@ -591,8 +621,6 @@ const LoginPage = ({navigateTo, showPassword, setShowPassword, previousPage}) =>
 
     async function loginEmail(){
         if(formData.email.length > 0 && formData.password.length > 0){
-            setFormData({email: "", password: ""});
-
             try {
                 const response = await fetch(`${ip}/auth/authenticate`, {
                     method: "POST",
@@ -719,7 +747,7 @@ const LoginPage = ({navigateTo, showPassword, setShowPassword, previousPage}) =>
 
                 <View className="flex flex-row items-center justify-between">
                     <View className="flex flex-row items-center">
-                        <Pressable disabled={true} //TODO: Implement remember me (session based token)
+                        <Pressable disabled={true}
                             onPress={() => setRememberMe(prev => !prev)}
                             className="h-5 w-5 border border-gray-300 rounded flex items-center justify-center bg-white"
                         >
@@ -732,7 +760,7 @@ const LoginPage = ({navigateTo, showPassword, setShowPassword, previousPage}) =>
                         </Text>
                     </View>
                     <View className="text-sm">
-                        <Link href="mailto://bretter.schlaue83@icloud.com" className="text-sm font-medium text-blue-500 hover:text-blue-600 active:text-blue-400">
+                        <Link href="mailto:bretter.schlaue83@icloud.com" className="text-sm font-medium text-blue-500 hover:text-blue-600 active:text-blue-400">
                             Forgot password?
                         </Link>
                     </View>
@@ -1152,13 +1180,13 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
 
                                 <View className="mt-6 grid grid-cols-2 gap-3">
                                     <TouchableOpacity activeOpacity={0.8}
-                                        className="py-3 px-4 border border-gray-300 rounded-lg flex items-center justify-center text-gray-700 bg-white hover:bg-gray-50"
+                                        className="py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center text-gray-700 bg-white hover:bg-gray-50"
                                     >
                                         <View className="w-5 h-5 bg-blue-500 rounded-full mr-2"></View>
                                         Google
                                     </TouchableOpacity>
                                     <TouchableOpacity activeOpacity={0.8}
-                                        className="py-3 px-4 border border-gray-300 rounded-lg flex items-center justify-center text-gray-700 bg-white hover:bg-gray-50"
+                                        className="py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center text-gray-700 bg-white hover:bg-gray-50"
                                     >
                                         <View className="w-5 h-5 bg-black rounded-full mr-2"></View>
                                         Apple
