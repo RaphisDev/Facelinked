@@ -1,4 +1,15 @@
-import {Appearance, Platform, Pressable, Text, TouchableOpacity, View, Share, ScrollView, TextInput} from "react-native";
+import {
+    Appearance,
+    Platform,
+    Pressable,
+    Text,
+    TouchableOpacity,
+    View,
+    Share,
+    ScrollView,
+    TextInput,
+    SafeAreaView, StyleSheet, Linking
+} from "react-native";
 import "../global.css";
 import {router, useRouter} from "expo-router";
 import * as SecureStore from "expo-secure-store";
@@ -22,6 +33,7 @@ import RNDateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
 import {TextEncoder} from "text-encoding";
 import asyncStorage from "@react-native-async-storage/async-storage";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 global.TextEncoder = TextEncoder;
 
@@ -301,35 +313,84 @@ const LandingPage = ({navigateTo, scrollContent}) => {
         <ScrollView className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100" ref={scrollContent}>
             <NavigationBar navigateTo={navigateTo} scrollContent={scrollContent} />
 
-            <View className="relative flex items-center justify-center py-20 px-4">
-                <View className="absolute inset-0 z-0">
-                    <View
-                        className="absolute top-0 left-1/4 w-64 h-64 rounded-full bg-blue-300/20 filter blur-3xl"></View>
-                    <View
-                        className="absolute bottom-0 right-1/4 w-80 h-80 rounded-full bg-blue-400/20 filter blur-3xl"></View>
-                </View>
-
+            {Platform.OS !== "web" && (
+            <View className="flex-1 items-center justify-center min-h-screen py-16 px-4">
                 <View
-                    className="relative z-10 backdrop-blur-sm bg-white/40 rounded-3xl shadow-xl border border-white/50 p-14 max-w-4xl mx-auto text-center">
-                    <Text className="text-4xl text-center md:text-6xl font-bold text-gray-800 mb-8">
-                        Welcome to the <Text
-                        className="bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">new social media.</Text>
+                        className="relative z-10 backdrop-blur-sm bg-white/40 rounded-3xl shadow-xl border border-white/50 p-8 w-full max-w-4xl mx-auto flex-1 flex flex-col justify-between">
+                    <View className="flex-1 justify-center items-center">
+                    <Text style={{fontSize: 32, fontWeight: 'bold', textAlign: 'center', color: '#1f2937', marginBottom: 16}}>
+                            Welcome to <Text style={{color: '#2563eb'}}>Facelinked</Text>
                     </Text>
-                    <Text className="text-xl text-center text-gray-700 mb-10 max-w-2xl mx-auto">
+                        <Text style={{fontSize: 16, textAlign: 'center', color: '#4b5563', marginBottom: 90, maxWidth: 320, alignSelf: 'center'}}>
                         A platform designed for authentic connections, real friendships, and meaningful interactions.
                     </Text>
-                    <View className="flex flex-col sm:flex-row gap-5 justify-center">
-                        <Pressable onPress={() => navigateTo("register")}
-                                   className="px-8 py-4 rounded-full bg-gradient-to-r from-blue-500 to-blue-700 text-white font-medium text-lg hover:from-blue-600 hover:to-blue-800 shadow-lg shadow-blue-200/50 transition duration-300">
-                            Join Now
-                        </Pressable>
-                        <Pressable onPress={() => navigateTo("login")}
-                                   className="px-8 py-4 rounded-full backdrop-blur-md bg-white/70 border border-blue-200 text-blue-600 font-medium text-lg hover:bg-white transition duration-300">
-                            Login
-                        </Pressable>
+
+                        <View className="my-10 w-full items-center">
+
+                            <View className="backdrop-blur-md bg-white/70 p-6 rounded-3xl shadow-lg border border-white/50">
+                                <View className="flex flex-row justify-center gap-6">
+                                    {[
+                                        { icon: "chatbubble-outline", label: "Chat" },
+                                        { icon: "git-network-outline", label: "Connect" },
+                                        { icon: "heart-outline", label: "Share" }
+                                    ].map((item, index) => (
+                                        <View key={index} className="flex flex-col items-center">
+                                            <View className="h-18 w-18 rounded-full shadow-md overflow-hidden mb-2">
+                                                <View className="bg-gradient-to-br bg-blue-600 flex items-center justify-center p-4">
+                                                    <Ionicons name={item.icon} color="#ffffff" size={24} />
+                                        </View>
+                                    </View>
+                                            <Text style={{fontSize: 14, fontWeight: '600', color: '#4b5563'}}>{item.label}</Text>
+                                        </View>
+                                    ))}
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+
+                    <View className="flex flex-col gap-4 items-center w-full mt-auto">
+                            <TouchableOpacity activeOpacity={0.7} onPress={() => navigateTo("register")}
+                                style={{
+                                    backgroundColor: '#3b82f6',
+                                    paddingHorizontal: 32,
+                                    paddingVertical: 16,
+                                    borderRadius: 100,
+                                    shadowColor: '#93c5fd',
+                                    shadowOffset: {width: 0, height: 4},
+                                    shadowOpacity: 0.3,
+                                    shadowRadius: 6,
+                                    elevation: 4,
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    width: '100%'
+                                }}>
+                                <Text style={{color: 'white', fontWeight: '500', fontSize: 18, marginRight: 8}}>Join Now</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity activeOpacity={0.7} onPress={() => navigateTo("login")}
+                                style={{
+                                    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                                    paddingHorizontal: 32,
+                                    paddingVertical: 16,
+                                    borderRadius: 100,
+                                    borderWidth: 1,
+                                    borderColor: '#bfdbfe',
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    width: '100%'
+                                }}>
+                                <Text style={{color: '#2563eb', fontWeight: '500', fontSize: 18}}>Login</Text>
+                            </TouchableOpacity>
+                    </View>
+                    <View className="mt-8 flex-row items-center justify-center">
+                        <View className="h-1 w-1 bg-blue-400 rounded-full mr-1 opacity-70"></View>
+                        <View className="h-1 w-1 bg-blue-500 rounded-full mr-1 opacity-80"></View>
+                        <View className="h-1 w-1 bg-blue-600 rounded-full opacity-90"></View>
                     </View>
                 </View>
-            </View>
+            </View>)}
+
             {Platform.OS === "web" && ( <>
             <View className="relative flex items-center justify-center py-20 px-4">
                 <View className="absolute inset-0 z-0">

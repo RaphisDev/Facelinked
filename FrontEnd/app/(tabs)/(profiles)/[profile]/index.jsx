@@ -373,7 +373,7 @@ export default function Profile() {
                         </View>
                     </View>
                     <View className="flex-row justify-center mt-9">
-                        <TouchableOpacity style={{display: profileName.current === username.current ? "none" : "flex"}} onPress={() => router.navigate(`/chat/${profile}`)} activeOpacity={0.6} className="mr-16 border-accent bg-accent border-4 rounded-full p-3.5">
+                        <TouchableOpacity style={{display: profileName.current === username.current ? "none" : "flex"}} onPress={() => router.navigate(`/chats/${profile}`)} activeOpacity={0.6} className="mr-16 border-accent bg-accent border-4 rounded-full p-3.5">
                             <Ionicons name="chatbubble" color="white" size={25}/>
                         </TouchableOpacity>
                         <TouchableOpacity style={{display: profileName.current === username.current ? "flex" : "none"}} onPress={() => Alert.alert("Edit Profile", "This feature is coming soon")} activeOpacity={0.6} className="mr-16 border-accent bg-accent border-4 rounded-full p-3.5">
