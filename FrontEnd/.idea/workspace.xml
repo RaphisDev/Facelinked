@@ -5,8 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile]/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile]/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/index.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/(tabs)/chats/[username].jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/chats/[receiver].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chats/functional.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/chats/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chats/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/CustomTabBar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/CustomTabBar.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/Entries/Chat.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Entries/Chat.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
@@ -242,7 +244,7 @@
       <workItem from="1742655298956" duration="11154000" />
       <workItem from="1742685528004" duration="183000" />
       <workItem from="1742685805467" duration="4722000" />
-      <workItem from="1742734861270" duration="5005000" />
+      <workItem from="1742734861270" duration="6467000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />

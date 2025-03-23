@@ -75,7 +75,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
     return (
         <View style={[
             styles.bottomContainer,
-            { paddingBottom: insets.bottom }
+            { paddingBottom: insets.bottom - 20 }
         ]}>
             <View style={styles.bottomContent}>
                 {tabRoutes.map((route, index) => renderTab(route, index))}
