@@ -26,7 +26,6 @@ export default function Chats() {
     const isDesktop = windowWidth > MOBILE_WIDTH_THRESHOLD;
     const searchInputRef = useRef(null);
     
-    const navigation = useNavigation("../");
     const stateManager = new StateManager();
     const ws = new WebSocketProvider();
 
@@ -43,10 +42,6 @@ export default function Chats() {
             } else { 
                 if (SecureStore.getItemAsync("token") === null) {router.replace("/")}
             }
-        });
-
-        navigation.setOptions({
-            headerShown: false,
         });
 
         const loadChats = async () => {

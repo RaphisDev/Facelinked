@@ -18,7 +18,6 @@ import * as ImagePicker from "expo-image-picker";
 import ip from "../../../components/AppManager";
 import * as SecureStore from "expo-secure-store";
 import WebSocketProvider from "../../../components/WebSocketProvider";
-import StateManager from "../../../components/StateManager";
 import asyncStorage from "@react-native-async-storage/async-storage";
 import {Image} from "expo-image";
 import MessageEntry from "../../../components/Entries/Message.jsx";
@@ -44,9 +43,6 @@ export default function ChatRoom() {
 
     const flatListRef = useRef(null);
     const inputRef = useRef(null);
-    const navigation = useNavigation("../");
-    const navigationRoot = useNavigation();
-    const stateManager = new StateManager();
     const ws = new WebSocketProvider();
     const router = useRouter();
 
@@ -56,46 +52,41 @@ export default function ChatRoom() {
         setTimeout(() => {
             if (Platform.OS === "web") {
                 if (localStorage.getItem("token") === null) {router.replace("/")}
-            } else { if (SecureStore.getItem("token") === null) {router.replace("/")}}
-        });
-
-        navigation.setOptions({
-            headerTitle: () => (
-                <Pressable onPress={() => {
-                    router.navigate(`/${receiver}`);
-                }}><Text className="font-medium text-xl">{receiver}</Text></Pressable>
-            ),
-            headerLeft: () => (
-                <TouchableOpacity className="ml-2.5" onPress={() => {
-                    if (stateManager.chatOpened) {
-                        router.back();
-                    }
-                    else {
-                        router.replace("/chat");
-                    }
-                    navigation.setOptions({
-                        headerTitle: "Chats",
-                        headerLeft: () => (
-                            <></>),
-                    });
-                    ws.messageReceived.removeAllListeners("messageReceived");
-                }}>
-                    <Ionicons name={"arrow-back"} size={24}></Ionicons>
-                </TouchableOpacity>
-            )
-        }, []);
-
-        setTimeout(() => {
-            navigation.setOptions({
-                headerRight: () => (
-                    <></>)
-            });
+            } else {
+                if (SecureStore.getItem("token") === null) {router.replace("/")}}
         });
 
         const loadMessages = async () => {
             const loadedMessages = await asyncStorage.getItem(`messages/${receiver}`);
             if (loadedMessages !== null) {
                 setMessages(JSON.parse(loadedMessages));
+            }
+
+            let loadedChats = await asyncStorage.getItem("chats") || [];
+            if (loadedChats.length !== 0) {
+                loadedChats = JSON.parse(loadedChats);
+            }
+
+            if (loadedChats.filter((chat) => chat.username === receiver).length === 1) {
+                setUserData(loadedChats.filter((chat) => chat.username === receiver)[0])
+            } else {
+                let token;
+                if (Platform.OS === "web") {
+                    token = localStorage.getItem("token");
+                }
+                else {
+                    token = SecureStore.getItem("token");
+                }
+                const profile = await fetch(`${ip}/profile/${receiver}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+                if (profile.ok) {
+                    const profileJson = await profile.json();
+                    setUserData({ name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath });
+                }
             }
         }
         loadMessages();
@@ -135,11 +126,6 @@ export default function ChatRoom() {
 
         return () => {
             ws.messageReceived.removeAllListeners("messageReceived");
-            navigation.setOptions({
-                headerTitle: "Chats",
-                headerLeft: () => (
-                    <></>)
-            });
         }
     }, []);
 
@@ -229,7 +215,6 @@ export default function ChatRoom() {
         }
     }
 
-    // Improved keyboard event handling
     useEffect(() => {
         const keyboardShowListener = Platform.OS === 'ios' 
             ? Keyboard.addListener('keyboardWillShow', (e) => {
@@ -251,103 +236,11 @@ export default function ChatRoom() {
                 setKeyboardHeight(0);
               });
 
-        navigation.setOptions({headerShown: false});
-        
         return () => {
             keyboardShowListener.remove();
             keyboardHideListener.remove();
         };
     }, []);
-
-    useEffect(() => {
-        stateManager.setChatState(false);
-        return () => {
-            stateManager.setChatState(true);
-        };
-    }, []);
-
-    useEffect(() => {
-        navigation.setOptions({
-            headerShown: false,
-        });
-        navigationRoot.setOptions({ headerShown: false });
-    }, []);
-
-    useEffect(() => {
-        const loadMessages = async () => {
-            try {
-                let token = '';
-                if (Platform.OS === 'web') {
-                    token = localStorage.getItem('token');
-                } else {
-                    token = await SecureStore.getItemAsync('token');
-                }
-
-                if (!token) {
-                    router.replace('/');
-                    return;
-                }
-
-                // Fetch user data
-                const userResponse = await fetch(`${ip}/profile/${username}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (userResponse.ok) {
-                    const userData = await userResponse.json();
-                    setUserData(userData);
-                }
-
-                // Fetch messages
-                const messagesResponse = await fetch(`${ip}/messages/${username}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (messagesResponse.ok) {
-                    let messages = await messagesResponse.json();
-                    setMessages(messages);
-
-                    // Update chats storage to mark as read
-                    let chats = await asyncStorage.getItem('chats');
-                    if (chats) {
-                        chats = JSON.parse(chats);
-                        const updatedChats = chats.map(chat => {
-                            if (chat.username === username) {
-                                return { ...chat, unread: false };
-                            }
-                            return chat;
-                        });
-                        await asyncStorage.setItem('chats', JSON.stringify(updatedChats));
-                    }
-                }
-
-                setIsLoading(false);
-            } catch (error) {
-                console.error('Error loading messages:', error);
-                setIsLoading(false);
-            }
-        };
-
-        loadMessages();
-
-        // Listen for new messages
-        ws.messageReceived.addListener('newMessage', (message) => {
-            if (message.sender === username || message.receiver === username) {
-                setMessages(prevMessages => [...prevMessages, message]);
-                setTimeout(() => {
-                    flatListRef.current?.scrollToEnd({ animated: true });
-                }, 100);
-            }
-        });
-
-        return () => {
-            ws.messageReceived.removeAllListeners('newMessage');
-        };
-    }, [username, segments]);
 
     useEffect(() => {
         if (messages.length > 0 && flatListRef.current) {
@@ -456,7 +349,7 @@ export default function ChatRoom() {
                         className="flex-row items-center flex-1"
                     >
                         <Image
-                            source={{ uri: userData.profilePicturePath }}
+                            source={{ uri: userData.image }}
                             style={{ width: 44, height: 44, borderRadius: 22 }}
                             className="bg-gray-200"
                             cachePolicy="memory"

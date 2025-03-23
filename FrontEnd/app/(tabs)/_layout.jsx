@@ -111,7 +111,7 @@ export default function TabsLayout() {
                     </TouchableOpacity>,
                     tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "git-merge-sharp" : "git-merge-outline"} size={30}/>
                 }}/>
-                <Tabs.Screen name="chats" options={{headerTitle: "Chats",
+                <Tabs.Screen name="chats" options={{headerShown: false,
                     headerTitleAlign: "center",
                     tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "chatbubbles-sharp" : "chatbubble-outline"} size={30}/>,
                     tabBarBadge: unreadMessagesCount.current > 0 ? unreadMessagesCount.current : null ,
