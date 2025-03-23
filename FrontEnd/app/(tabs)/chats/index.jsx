@@ -13,7 +13,6 @@ import ip from "../../../components/AppManager";
 import * as SecureStore from "expo-secure-store";
 import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { BlurView } from "expo-blur";
 
 const MOBILE_WIDTH_THRESHOLD = 768;
 
@@ -130,8 +129,8 @@ export default function Chats() {
                 onPress={() => router.push('/networks')}
                 className="px-5 py-3 rounded-full bg-gradient-to-r from-blue-500 to-blue-700 shadow-md flex-row items-center"
             >
-                <Ionicons name="people" size={20} color="white" className="mr-2" />
-                <Text className="text-white font-medium">Find Friends</Text>
+                <Ionicons name="people" size={20} color="black" className="mr-2" />
+                <Text className="text-gray-800 font-medium">Find Friends</Text>
             </TouchableOpacity>
         </View>
     );

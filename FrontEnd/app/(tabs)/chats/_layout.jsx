@@ -5,7 +5,7 @@ export default function ChatsLayout() {
         <>
             <Stack>
                 <Stack.Screen name="index" options={{headerShown: false}}/>
-                <Stack.Screen name="[receiver]" options={{headerShown: false}}/>
+                <Stack.Screen name="[username]" options={{headerShown: false}}/>
             </Stack>
         </>
     );

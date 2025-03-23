@@ -87,18 +87,6 @@ export default function TabsLayout() {
                         else if (e.target?.split("-")[0] === "(profiles)" && route?.profile !== SecureStore.getItem("username") && route?.profile !== undefined) {
                             router.navigate(`/${SecureStore.getItem("username")}`);
                         }
-                        else if (e.target?.split("-")[0] === "chat") {
-                            const stateManager = new StateManager();
-                            if (!stateManager.chatOpened) {
-                                router.replace("/chat");
-                            }
-                        }
-                        else if (e.target?.split("-")[0] === "networks") {
-                            const stateManager = new StateManager();
-                            if (!stateManager.networkOpened) {
-                                router.replace("/networks");
-                            }
-                        }
                     }
                     else {
                         if (e.target === undefined) {
@@ -106,18 +94,6 @@ export default function TabsLayout() {
                         }
                         else if (e.target?.split("-")[0] === "(profiles)" && route?.profile !== localStorage.getItem("username") && route?.profile !== undefined) {
                             router.navigate(`/${localStorage.getItem("username")}`);
-                        }
-                        else if (e.target?.split("-")[0] === "chat") {
-                            const stateManager = new StateManager();
-                            if (!stateManager.chatOpened) {
-                                router.replace("/chat");
-                            }
-                        }
-                        else if (e.target?.split("-")[0] === "networks") {
-                            const stateManager = new StateManager();
-                            if (!stateManager.networkOpened) {
-                                router.replace("/networks");
-                            }
                         }
                     }
                 }

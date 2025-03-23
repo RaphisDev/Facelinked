@@ -9,7 +9,7 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-    Dimensions
+    Dimensions, Pressable
 } from "react-native";
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {useLocalSearchParams, useNavigation, useRouter, useSegments} from "expo-router";
@@ -38,39 +38,224 @@ export default function ChatRoom() {
     const [userData, setUserData] = useState({});
     const [isTyping, setIsTyping] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [profile, setProfile] = useState(null);
     const [keyboardHeight, setKeyboardHeight] = useState(0);
+    const [keyboardVisible, setKeyboardVisible] = useState(false);
+    const [selectedImages, setSelectedImages] = useState([]);
 
     const flatListRef = useRef(null);
-    const navigation = useNavigation();
+    const inputRef = useRef(null);
+    const navigation = useNavigation("../");
+    const navigationRoot = useNavigation();
     const stateManager = new StateManager();
     const ws = new WebSocketProvider();
     const router = useRouter();
 
-    const keyboardWillShow = (e) => {
-        if (Platform.OS !== 'web') {
-            setKeyboardHeight(e.endCoordinates.height);
-        }
-    };
-
-    const keyboardWillHide = () => {
-        setKeyboardHeight(0);
-    };
+    const {receiver} = useLocalSearchParams();
 
     useEffect(() => {
-        const keyboardWillShowSub = Keyboard.addListener(
-            'keyboardWillShow',
-            keyboardWillShow
-        );
-        const keyboardWillHideSub = Keyboard.addListener(
-            'keyboardWillHide',
-            keyboardWillHide
-        );
+        setTimeout(() => {
+            if (Platform.OS === "web") {
+                if (localStorage.getItem("token") === null) {router.replace("/")}
+            } else { if (SecureStore.getItem("token") === null) {router.replace("/")}}
+        });
+
+        navigation.setOptions({
+            headerTitle: () => (
+                <Pressable onPress={() => {
+                    router.navigate(`/${receiver}`);
+                }}><Text className="font-medium text-xl">{receiver}</Text></Pressable>
+            ),
+            headerLeft: () => (
+                <TouchableOpacity className="ml-2.5" onPress={() => {
+                    if (stateManager.chatOpened) {
+                        router.back();
+                    }
+                    else {
+                        router.replace("/chat");
+                    }
+                    navigation.setOptions({
+                        headerTitle: "Chats",
+                        headerLeft: () => (
+                            <></>),
+                    });
+                    ws.messageReceived.removeAllListeners("messageReceived");
+                }}>
+                    <Ionicons name={"arrow-back"} size={24}></Ionicons>
+                </TouchableOpacity>
+            )
+        }, []);
+
+        setTimeout(() => {
+            navigation.setOptions({
+                headerRight: () => (
+                    <></>)
+            });
+        });
+
+        const loadMessages = async () => {
+            const loadedMessages = await asyncStorage.getItem(`messages/${receiver}`);
+            if (loadedMessages !== null) {
+                setMessages(JSON.parse(loadedMessages));
+            }
+        }
+        loadMessages();
+
+        ws.messageReceived.addListener("messageReceived", async (e) => {
+            let username;
+            if (Platform.OS === "web") {
+                username = localStorage.getItem("token");
+            }
+            else {
+                username = SecureStore.getItem("token");
+            }
+            if (e.detail.sender !== receiver && e.detail.sender !== username) {
+                return;
+            }
+
+            setMessages((prevMessages) => [...prevMessages, e.detail]);
+
+            setTimeout(async () => {
+                let loadedChats = await asyncStorage.getItem("chats") || [];
+                if (loadedChats.length !== 0) {
+                    loadedChats = JSON.parse(loadedChats);
+                }
+                await asyncStorage.setItem("chats", JSON.stringify(loadedChats.map((chat) => {
+                    if (chat.username === receiver) {
+                        return {...chat, unread: false};
+                    }
+                    return chat;
+                })));
+                let NewLoadedChats = await asyncStorage.getItem("chats") || [];
+                if (NewLoadedChats.length !== 0) {
+                    NewLoadedChats = JSON.parse(NewLoadedChats);
+                }
+                ws.messageReceived.emit("unreadMessagesChanged", {unread: NewLoadedChats.filter((chat) => chat.unread).length});
+            }, 1000);
+        });
+
+        return () => {
+            ws.messageReceived.removeAllListeners("messageReceived");
+            navigation.setOptions({
+                headerTitle: "Chats",
+                headerLeft: () => (
+                    <></>)
+            });
+        }
+    }, []);
+
+    async function sendMessage(message) {
+        if (input.trim() === '' && selectedImages.length === 0) return;
+
+        try {
+            setMessages((prevMessages) => [...prevMessages, {isSender: true, content: message, millis: Date.now(), isOptimistic: true}]);
+
+            let imageURls = [];
+            if (selectedImages.length > 0) {
+                let token = '';
+                if (Platform.OS === "web") {
+                    token = localStorage.getItem("token");
+                } else {
+                    token = await SecureStore.getItemAsync("token");
+                }
+
+                for (const image of selectedImages) {
+                    const bucketResponse = await fetch(`${ip}/profile/upload`, {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                        }
+                    });
+                    if (bucketResponse.ok) {
+                        const url = await bucketResponse.text();
+
+                        const response = await fetch(image);
+                        const blob = await response.blob();
+
+                        await fetch(url, {
+                            method: "PUT",
+                            headers: {
+                                "Content-Type": blob.type
+                            },
+                            body: blob,
+                        });
+                        imageURls.push(url.split("?")[0]);
+                    }
+                }
+            }
+
+            ws.stompClient.publish({
+                destination: `/app/chat`,
+                body: JSON.stringify({
+                    receiver: receiver,
+                    content: message,
+                    images: imageURls
+                })
+            });
+
+            let loadedChats = await asyncStorage.getItem("chats") || [];
+            if (loadedChats.length !== 0) {loadedChats = JSON.parse(loadedChats);}
+            if(!loadedChats.find((chat) => chat.username === receiver) || loadedChats.length === 0) {
+                let token;
+                if (Platform.OS === "web") {
+                    token = localStorage.getItem("token");
+                }
+                else {
+                    token = SecureStore.getItem("token");
+                }
+                const profile = await fetch(`${ip}/profile/${receiver}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+                if (profile.ok) {
+                    const profileJson = await profile.json();
+                    await asyncStorage.setItem("chats", JSON.stringify([...loadedChats, { name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath }]));
+                    loadedChats = [...loadedChats, { name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath }];
+                }
+            }
+            await asyncStorage.setItem("chats", JSON.stringify([...loadedChats.filter(chat => chat.username === receiver), ...loadedChats.filter(chat => chat.username !== receiver)]));
+
+            let loadedMessages = await asyncStorage.getItem(`messages/${receiver}`) || [];
+            if (loadedMessages.length !== 0) {loadedMessages = JSON.parse(loadedMessages);}
+            await asyncStorage.setItem(`messages/${receiver}`, JSON.stringify([...loadedMessages, {
+                isSender: true,
+                content: message,
+                millis: Date.now()
+            }]));
+        }
+        catch (e) {
+            console.error(e);
+        }
+    }
+
+    // Improved keyboard event handling
+    useEffect(() => {
+        const keyboardShowListener = Platform.OS === 'ios' 
+            ? Keyboard.addListener('keyboardWillShow', (e) => {
+                setKeyboardVisible(true);
+                setKeyboardHeight(e.endCoordinates.height);
+              })
+            : Keyboard.addListener('keyboardDidShow', (e) => {
+                setKeyboardVisible(true);
+                setKeyboardHeight(e.endCoordinates.height);
+              });
+              
+        const keyboardHideListener = Platform.OS === 'ios'
+            ? Keyboard.addListener('keyboardWillHide', () => {
+                setKeyboardVisible(false);
+                setKeyboardHeight(0);
+              })
+            : Keyboard.addListener('keyboardDidHide', () => {
+                setKeyboardVisible(false);
+                setKeyboardHeight(0);
+              });
 
         navigation.setOptions({headerShown: false});
+        
         return () => {
-            keyboardWillShowSub.remove();
-            keyboardWillHideSub.remove();
+            keyboardShowListener.remove();
+            keyboardHideListener.remove();
         };
     }, []);
 
@@ -83,9 +268,10 @@ export default function ChatRoom() {
 
     useEffect(() => {
         navigation.setOptions({
-            title: userData.name,
+            headerShown: false,
         });
-    }, [userData]);
+        navigationRoot.setOptions({ headerShown: false });
+    }, []);
 
     useEffect(() => {
         const loadMessages = async () => {
@@ -163,90 +349,106 @@ export default function ChatRoom() {
         };
     }, [username, segments]);
 
-    const sendMessage = async () => {
-        if (input.trim() === '') return;
-
-        try {
-            let token = '';
-            if (Platform.OS === 'web') {
-                token = localStorage.getItem('token');
-            } else {
-                token = await SecureStore.getItemAsync('token');
-            }
-
-            if (!token) {
-                router.replace('/');
-                return;
-            }
-
-            const response = await fetch(`${ip}/messages/send`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    receiver: username,
-                    content: input
-                })
-            });
-
-            if (response.ok) {
-                setInput('');
-                Keyboard.dismiss();
-            }
-        } catch (error) {
-            console.error('Error sending message:', error);
+    useEffect(() => {
+        if (messages.length > 0 && flatListRef.current) {
+            setTimeout(() => {
+                flatListRef.current?.scrollToEnd({ animated: true });
+            }, 200);
         }
-    };
+    }, [messages, keyboardVisible]);
 
     const pickImage = async () => {
         try {
             const result = await ImagePicker.launchImageLibraryAsync({
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                allowsEditing: true,
-                aspect: [4, 3],
+                allowsMultipleSelection: true,
                 quality: 0.8,
             });
 
             if (!result.canceled) {
-                // Handle image sending logic here
-                console.log('Image selected:', result.assets[0].uri);
-                // sendImage(result.assets[0].uri);
+                setSelectedImages(result.assets.map(asset => asset.uri));
             }
         } catch (error) {
             console.error('Error picking image:', error);
         }
     };
 
+    const renderSelectedImages = () => {
+        if (selectedImages.length === 0) return null;
+        
+        return (
+            <View style={{ padding: 10, backgroundColor: '#f9fafb', borderTopWidth: 1, borderTopColor: '#e5e7eb' }}>
+                <FlatList
+                    horizontal
+                    data={selectedImages}
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={({ item, index }) => (
+                        <View style={{ marginRight: 10, position: 'relative' }}>
+                            <Image
+                                source={{ uri: item }}
+                                style={{ width: 70, height: 70, borderRadius: 8 }}
+                                contentFit="cover"
+                            />
+                            <TouchableOpacity
+                                style={{
+                                    position: 'absolute',
+                                    top: -5,
+                                    right: -5,
+                                    backgroundColor: 'rgba(0,0,0,0.5)',
+                                    borderRadius: 12,
+                                    width: 24,
+                                    height: 24,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                }}
+                                onPress={() => {
+                                    const newImages = [...selectedImages];
+                                    newImages.splice(index, 1);
+                                    setSelectedImages(newImages);
+                                }}
+                            >
+                                <Ionicons name="close" size={16} color="white" />
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                    showsHorizontalScrollIndicator={false}
+                />
+            </View>
+        );
+    };
+
     if (isLoading) {
         return (
-            <View className="flex-1 justify-center items-center">
-                <Text>Loading...</Text>
+            <View className="flex-1 justify-center items-center bg-white">
+                <Text className="text-gray-600 font-medium">Loading conversation...</Text>
             </View>
         );
     }
 
     return (
         <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             style={{ flex: 1 }}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
         >
             <View
-                className="flex-1 bg-gray-100"
+                className="flex-1 bg-gray-50"
                 style={{
                     paddingTop: Platform.OS !== 'web' ? insets.top : 0,
-                    marginLeft: isDesktop ? 220 : 0, // Add margin for sidebar on desktop
+                    marginLeft: isDesktop ? 220 : 0,
                 }}
             >
-                {/* Chat header */}
-                <View className="bg-white border-b border-gray-200 px-4 py-3 flex-row items-center">
+                {/* Chat header - enhanced styling */}
+                <View className="bg-white border-b border-gray-200 px-4 py-3 flex-row items-center shadow-sm">
                     <TouchableOpacity
                         onPress={() => router.back()}
-                        className="mr-3"
+                        className="mr-3 p-1"
+                        style={{
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderRadius: 20,
+                        }}
                     >
-                        <Ionicons name="arrow-back" size={24} color="#3B82F6" />
+                        <Ionicons name="arrow-back" size={22} color="#3B82F6" />
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -255,11 +457,12 @@ export default function ChatRoom() {
                     >
                         <Image
                             source={{ uri: userData.profilePicturePath }}
-                            style={{ width: 40, height: 40, borderRadius: 20 }}
+                            style={{ width: 44, height: 44, borderRadius: 22 }}
                             className="bg-gray-200"
+                            cachePolicy="memory"
                         />
                         <View className="ml-3">
-                            <Text className="font-bold text-gray-800">{userData.name}</Text>
+                            <Text className="font-bold text-gray-800 text-base">{userData.name}</Text>
                             {isTyping ? (
                                 <Text className="text-xs text-blue-500">typing...</Text>
                             ) : (
@@ -268,12 +471,17 @@ export default function ChatRoom() {
                         </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity className="w-10 h-10 rounded-full items-center justify-center">
-                        <Ionicons name="ellipsis-vertical" size={20} color="#64748B" />
+                    <TouchableOpacity 
+                        className="w-10 h-10 rounded-full items-center justify-center"
+                        style={{
+                            backgroundColor: 'rgba(100, 116, 139, 0.1)',
+                        }}
+                    >
+                        <Ionicons name="ellipsis-vertical" size={18} color="#64748B" />
                     </TouchableOpacity>
                 </View>
 
-                {/* Messages list */}
+                {/* Messages list with improved styling */}
                 <FlatList
                     ref={flatListRef}
                     data={messages}
@@ -284,7 +492,7 @@ export default function ChatRoom() {
                     contentContainerStyle={{
                         paddingHorizontal: 16,
                         paddingTop: 16,
-                        paddingBottom: 16,
+                        paddingBottom: keyboardVisible ? keyboardHeight + 80 : 100,
                     }}
                     onContentSizeChange={() => {
                         flatListRef.current?.scrollToEnd({ animated: false });
@@ -292,39 +500,48 @@ export default function ChatRoom() {
                     onLayout={() => {
                         flatListRef.current?.scrollToEnd({ animated: false });
                     }}
+                    showsVerticalScrollIndicator={false}
                 />
 
-                {/* Input area with safe area */}
+                {/* Fixed input area at bottom */}
                 <View
-                    className="bg-white border-t border-gray-200 p-2"
+                    className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200"
                     style={{
-                        marginBottom: Platform.OS !== 'web' && !isDesktop ? (
-                            Platform.OS === 'ios' ? Math.max(insets.bottom, 20) + 70 : 90
-                        ) : 0
+                        paddingBottom: Platform.OS === 'ios' ? Math.max(insets.bottom, 10) : 10,
+                        marginLeft: isDesktop ? 220 : 0,
+                        shadowColor: "#000",
+                        shadowOffset: { width: 0, height: -3 },
+                        shadowOpacity: 0.05,
+                        shadowRadius: 4,
+                        elevation: 3,
                     }}
                 >
-                    <View className="flex-row items-center bg-gray-100 rounded-full px-3 py-1">
+                    {renderSelectedImages()}
+                    
+                    <View className="flex-row items-center bg-gray-100 rounded-full px-3 mx-3 my-2">
                         <TouchableOpacity
                             onPress={pickImage}
-                            className="pr-2"
+                            className="pr-2 py-2"
                         >
                             <Ionicons name="image-outline" size={24} color="#64748B" />
                         </TouchableOpacity>
 
                         <TextInput
-                            className="flex-1 py-2 px-2 text-gray-700"
+                            ref={inputRef}
+                            className="flex-1 py-2 px-2 text-gray-700 max-h-24"
                             placeholder="Type a message..."
                             placeholderTextColor="#9CA3AF"
                             value={input}
                             onChangeText={setInput}
                             multiline
+                            style={{ fontSize: 16 }}
                         />
 
                         <TouchableOpacity
                             onPress={sendMessage}
-                            disabled={input.trim() === ''}
-                            className={`ml-2 h-9 w-9 rounded-full items-center justify-center ${
-                                input.trim() === '' ? 'bg-gray-300' : 'bg-blue-500'
+                            disabled={input.trim() === '' && selectedImages.length === 0}
+                            className={`ml-2 h-10 w-10 rounded-full items-center justify-center ${
+                                input.trim() === '' && selectedImages.length === 0 ? 'bg-gray-300' : 'bg-blue-500'
                             }`}
                         >
                             <Ionicons name="send" size={18} color="white" />
@@ -335,3 +552,4 @@ export default function ChatRoom() {
         </KeyboardAvoidingView>
     );
 }
+

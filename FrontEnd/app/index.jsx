@@ -316,36 +316,14 @@ const LandingPage = ({navigateTo, scrollContent}) => {
             {Platform.OS !== "web" && (
             <View className="flex-1 items-center justify-center min-h-screen py-16 px-4">
                 <View
-                        className="relative z-10 backdrop-blur-sm bg-white/40 rounded-3xl shadow-xl border border-white/50 p-8 w-full max-w-4xl mx-auto flex-1 flex flex-col justify-between">
-                    <View className="flex-1 justify-center items-center">
-                    <Text style={{fontSize: 32, fontWeight: 'bold', textAlign: 'center', color: '#1f2937', marginBottom: 16}}>
+                        className="relative z-10 backdrop-blur-sm mb-8 bg-white/40 rounded-3xl shadow-xl border border-white/50 p-8 w-full max-w-4xl mx-auto flex-1 flex flex-col justify-between">
+                    <View className="flex-1 justify-start mt-32 items-center">
+                    <Text style={{fontSize: 32, fontWeight: 'bold', textAlign: 'center', color: '#1f2937'}}>
                             Welcome to <Text style={{color: '#2563eb'}}>Facelinked</Text>
                     </Text>
-                        <Text style={{fontSize: 16, textAlign: 'center', color: '#4b5563', marginBottom: 90, maxWidth: 320, alignSelf: 'center'}}>
+                        <Text style={{fontSize: 16, textAlign: 'center', color: '#4b5563', maxWidth: 320, alignSelf: 'center', marginTop: 16}}>
                         A platform designed for authentic connections, real friendships, and meaningful interactions.
                     </Text>
-
-                        <View className="my-10 w-full items-center">
-
-                            <View className="backdrop-blur-md bg-white/70 p-6 rounded-3xl shadow-lg border border-white/50">
-                                <View className="flex flex-row justify-center gap-6">
-                                    {[
-                                        { icon: "chatbubble-outline", label: "Chat" },
-                                        { icon: "git-network-outline", label: "Connect" },
-                                        { icon: "heart-outline", label: "Share" }
-                                    ].map((item, index) => (
-                                        <View key={index} className="flex flex-col items-center">
-                                            <View className="h-18 w-18 rounded-full shadow-md overflow-hidden mb-2">
-                                                <View className="bg-gradient-to-br bg-blue-600 flex items-center justify-center p-4">
-                                                    <Ionicons name={item.icon} color="#ffffff" size={24} />
-                                        </View>
-                                    </View>
-                                            <Text style={{fontSize: 14, fontWeight: '600', color: '#4b5563'}}>{item.label}</Text>
-                                        </View>
-                                    ))}
-                                </View>
-                            </View>
-                        </View>
                     </View>
 
                     <View className="flex flex-col gap-4 items-center w-full mt-auto">

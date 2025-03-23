@@ -24,8 +24,10 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
     ];
 
     const renderTab = (route, index) => {
-        // Check if this route is active
-        const isActive = pathname.startsWith(`/${route.name}`);
+        let isActive = pathname.startsWith(`/${route.name}`);
+        if (route.name === 'profile') {
+            isActive = !pathname.includes("settings") && !pathname.startsWith("/home") && !pathname.startsWith("/networks") && !pathname.startsWith("/chats");
+        }
 
         const onPress = () => {
             router.push(`/${route.name}`);
@@ -69,6 +71,12 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
                 </View>
             </View>
         );
+    }
+
+    if (tabRoutes.some(route => pathname.startsWith("/" + route.name + "/"))) {
+        return (
+            <></>
+        )
     }
 
     // Render bottom tab bar for mobile
