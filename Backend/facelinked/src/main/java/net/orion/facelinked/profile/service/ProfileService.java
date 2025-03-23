@@ -22,7 +22,7 @@ public class ProfileService {
     private PostRepository postRepository;
 
     public Profile findByUsername(String memberId) {
-        return profileRepository.findById(memberId).orElseThrow();
+        return profileRepository.findById(memberId).orElse(null);
     }
 
     public boolean existsByUsername(String username) {

@@ -21,6 +21,7 @@ import {Link} from "expo-router";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
 import {TextEncoder} from "text-encoding";
+import asyncStorage from "@react-native-async-storage/async-storage";
 
 global.TextEncoder = TextEncoder;
 
@@ -30,65 +31,28 @@ const Index = () => {
 
     const [loggedIn, setLoggedIn] = useState(false);
 
-    async function requestPermission() {
-            if (Device.isDevice) {
-                const { status: existingStatus } = await Notification.getPermissionsAsync();
-                let finalStatus = existingStatus;
-
-                if (existingStatus !== 'granted') {
-                    const { status } = await Notification.requestPermissionsAsync();
-                    finalStatus = status;
-                }
-
-                if (finalStatus !== 'granted') {
-                    alert('You have to grant permission for notifications');
-                    return;
-                }
-                await Notification.getDevicePushTokenAsync().then((token) => {
-                    return token;
-                });
-            }
-    }
-
     async function signedIn() {
         if (Platform.OS === "web") {
             return localStorage.getItem("token") != null;
         }
         const token = await SecureStore.getItemAsync("token");
 
-        if (Notification.PermissionStatus.UNDETERMINED && token != null && Platform.OS === "ios" && Device.isDevice && localStorage.getItem("deviceToken") === null) {
-            const token = await requestPermission();
-            await fetch(`${ip}/messages/setDeviceToken`, {
+        if (Notification.PermissionStatus.GRANTED && Platform.OS === 'ios' && token != null && Device.isDevice && await asyncStorage.getItem("deviceToken") !== "true") {
+            const deviceToken = await Notification.getDevicePushTokenAsync();
+            const status = await fetch(`${ip}/messages/setDeviceToken`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${SecureStore.getItem("token")}`
                 },
                 body: JSON.stringify({
-                    token: token
+                    token: deviceToken
                 })
-            }).then(status => {
-                if (status.ok) {
-                    localStorage.setItem("deviceToken", "true");
-                }
             });
-        }
-        else if (Notification.PermissionStatus.GRANTED && token != null && Device.isDevice && localStorage.getItem("deviceToken") === null) {
-            const token = await Notification.getDevicePushTokenAsync();
-            await fetch(`${ip}/messages/setDeviceToken`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${SecureStore.getItem("token")}`
-                },
-                body: JSON.stringify({
-                    token: token
-                })
-            }).then(status => {
-                if (status.ok) {
-                    localStorage.setItem("deviceToken", "true");
-                }
-            });
+
+            if (status.ok) {
+                await asyncStorage.setItem("deviceToken", "true");
+            }
         }
         return token != null;
     }
@@ -122,13 +86,17 @@ const Index = () => {
                             style={{width: 150, height: 150, borderRadius: 40}}
                             className="shadow-md"
                         />
-                        <View className="absolute -bottom-2 -right-2 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                            <Volleyball size={20} color="white" />
-                        </View>
                     </View>
-                    <Text className="text-3xl font-bold text-center bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text mt-6">
+                        <View className="mt-6">
+                            <Text style={{
+                                fontSize: 28,
+                                fontWeight: 'bold',
+                                textAlign: 'center',
+                                color: '#1d4ed8'
+                            }}>
                         Facelinked
                     </Text>
+                        </View>
                     <Text className="text-lg text-gray-600 text-center mt-2 max-w-xs">
                         Real connections. Real people.
                     </Text>
@@ -137,8 +105,13 @@ const Index = () => {
                         <View className="h-1 w-1 bg-blue-500 rounded-full mr-1 opacity-80"></View>
                         <View className="h-1 w-1 bg-blue-600 rounded-full opacity-90"></View>
                     </View>
-                    <View className="mt-5 bg-gradient-to-r from-blue-500/20 to-blue-600/20 px-4 py-2 rounded-full self-center">
-                        <Text className="text-sm text-center bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text font-semibold">
+                        <View className="mt-5 bg-blue-500/20 px-4 py-2 rounded-full self-center">
+                            <Text style={{
+                                fontSize: 12,
+                                textAlign: 'center',
+                                color: '#2563eb',
+                                fontWeight: '600'
+                            }}>
                             crafted with ♥ by Orion
                     </Text>
                 </View>
@@ -328,7 +301,36 @@ const LandingPage = ({navigateTo, scrollContent}) => {
         <ScrollView className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100" ref={scrollContent}>
             <NavigationBar navigateTo={navigateTo} scrollContent={scrollContent} />
 
-            {/* Hero Section with Glass Card */}
+            <View className="relative flex items-center justify-center py-20 px-4">
+                <View className="absolute inset-0 z-0">
+                    <View
+                        className="absolute top-0 left-1/4 w-64 h-64 rounded-full bg-blue-300/20 filter blur-3xl"></View>
+                    <View
+                        className="absolute bottom-0 right-1/4 w-80 h-80 rounded-full bg-blue-400/20 filter blur-3xl"></View>
+                </View>
+
+                <View
+                    className="relative z-10 backdrop-blur-sm bg-white/40 rounded-3xl shadow-xl border border-white/50 p-14 max-w-4xl mx-auto text-center">
+                    <Text className="text-4xl text-center md:text-6xl font-bold text-gray-800 mb-8">
+                        Welcome to the <Text
+                        className="bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">new social media.</Text>
+                    </Text>
+                    <Text className="text-xl text-center text-gray-700 mb-10 max-w-2xl mx-auto">
+                        A platform designed for authentic connections, real friendships, and meaningful interactions.
+                    </Text>
+                    <View className="flex flex-col sm:flex-row gap-5 justify-center">
+                        <Pressable onPress={() => navigateTo("register")}
+                                   className="px-8 py-4 rounded-full bg-gradient-to-r from-blue-500 to-blue-700 text-white font-medium text-lg hover:from-blue-600 hover:to-blue-800 shadow-lg shadow-blue-200/50 transition duration-300">
+                            Join Now
+                        </Pressable>
+                        <Pressable onPress={() => navigateTo("login")}
+                                   className="px-8 py-4 rounded-full backdrop-blur-md bg-white/70 border border-blue-200 text-blue-600 font-medium text-lg hover:bg-white transition duration-300">
+                            Login
+                        </Pressable>
+                    </View>
+                </View>
+            </View>
+            {Platform.OS === "web" && ( <>
             <View className="relative flex items-center justify-center py-20 px-4">
                 <View className="absolute inset-0 z-0">
                     <View
@@ -359,7 +361,6 @@ const LandingPage = ({navigateTo, scrollContent}) => {
                 </View>
             </View>
 
-            {Platform.OS === "web" && ( <>
             <div className="py-20 px-4">
                 <div className="max-w-6xl mx-auto">
                     <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">What
@@ -907,6 +908,49 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                 else {
                     alert("There was an error uploading the image");
                     return;
+                }
+
+                async function requestPermission() {
+                    if (Device.isDevice) {
+                        const { status: existingStatus } = await Notification.getPermissionsAsync();
+                        let finalStatus = existingStatus;
+
+                        if (existingStatus !== 'granted') {
+                            const { status } = await Notification.requestPermissionsAsync();
+                            finalStatus = status;
+                        }
+
+                        if (finalStatus !== 'granted') {
+                            alert('You have to grant permission for notifications');
+                            return null;
+                        }
+                        await Notification.getDevicePushTokenAsync().then((token) => {
+                            return token;
+                        });
+                    }
+                }
+
+                if (Notification.PermissionStatus.UNDETERMINED && Platform.OS === "ios" && Device.isDevice && await asyncStorage.getItem("deviceToken") === null) {
+                    const deviceToken = await requestPermission();
+                    if (!deviceToken) {
+                        await asyncStorage.setItem("deviceToken", "false");
+                    }
+                    else {
+                        const status = await fetch(`${ip}/messages/setDeviceToken`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${SecureStore.getItem("token")}`
+                            },
+                            body: JSON.stringify({
+                                token: deviceToken
+                            })
+                        });
+
+                        if (status.ok) {
+                            await asyncStorage.setItem("deviceToken", "true");
+                        }
+                    }
                 }
 
                 const response = await fetch(`${ip}/profile/register`, {

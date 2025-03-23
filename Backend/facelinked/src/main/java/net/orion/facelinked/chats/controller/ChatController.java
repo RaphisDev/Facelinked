@@ -52,10 +52,10 @@ public class ChatController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
 
-        var id = chatService.saveToDatabase(new ChatMessage(sender, message.getReceiver(), message.getContent(), new AutoPrimaryKey(null, System.currentTimeMillis())));
+        var id = chatService.saveToDatabase(new ChatMessage(sender, message.getReceiver(), message.getContent(), new AutoPrimaryKey(null, System.currentTimeMillis()), message.getImages() == null ? new ArrayList<>() : message.getImages()));
 
         template.convertAndSendToUser(message.getReceiver(), "/queue/messages",
-               new ChatMessage(sender, message.getReceiver(), message.getContent(), new AutoPrimaryKey(null, id)));
+               new ChatMessage(sender, message.getReceiver(), message.getContent(), new AutoPrimaryKey(null, id), message.getImages() == null ? new ArrayList<>() : message.getImages()));
 
         sendPushNotification(message.getReceiver(), message.getContent(), sender);
     }

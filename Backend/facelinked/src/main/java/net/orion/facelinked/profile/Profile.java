@@ -31,8 +31,6 @@ public class Profile {
     String hobbies;
     @DynamoDBAttribute(attributeName="inRelationship")
     boolean inRelationship;
-    @DynamoDBAttribute(attributeName="partner")
-    String partner;
     @DynamoDBAttribute(attributeName="location")
     String location;
     @DynamoDBAttribute(attributeName="score")

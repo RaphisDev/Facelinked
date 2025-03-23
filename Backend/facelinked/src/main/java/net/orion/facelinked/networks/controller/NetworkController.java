@@ -93,9 +93,9 @@ public class NetworkController {
         senderProfile.setMemberId(sender);
 
         var millis = networkService.sendMessage(
-                new NetworkMessage(senderProfile, message.getReceiver(), message.getContent(), new AutoPrimaryKey(null, System.currentTimeMillis())));
+                new NetworkMessage(senderProfile, message.getReceiver(), message.getContent(), new AutoPrimaryKey(null, System.currentTimeMillis()), message.getImages() == null ? new ArrayList<>() : message.getImages()));
 
-        messagingTemplate.convertAndSend("/networks/" + message.getReceiver(), new NetworkMessage(senderProfile, message.getReceiver(), message.getContent(), new AutoPrimaryKey(null, millis)));
+        messagingTemplate.convertAndSend("/networks/" + message.getReceiver(), new NetworkMessage(senderProfile, message.getReceiver(), message.getContent(), new AutoPrimaryKey(null, millis), message.getImages() == null ? new ArrayList<>() : message.getImages()));
     }
     @GetMapping("/{networkId}/messages")
     public ResponseEntity<List<NetworkMessage>> getMessages(@PathVariable String networkId, @AuthenticationPrincipal UserDetails userDetails, @RequestParam(required = false) boolean additional) {

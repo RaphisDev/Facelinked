@@ -12,6 +12,5 @@ public class ProfileRequest {
     String dateOfBirth;
     String hobbies;
     boolean inRelationship;
-    String partner;
     String location;
 }

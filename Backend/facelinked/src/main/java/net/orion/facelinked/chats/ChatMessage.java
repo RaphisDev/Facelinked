@@ -7,6 +7,9 @@ import lombok.Setter;
 import net.orion.facelinked.config.AutoPrimaryKey;
 import org.springframework.data.annotation.Id;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Getter
 @Setter
@@ -47,14 +50,17 @@ public class ChatMessage
     private String receiverId;
     @DynamoDBAttribute(attributeName = "content")
     private String content;
+    @DynamoDBAttribute(attributeName = "images")
+    private List<String> images;
 
     public ChatMessage() {
     }
 
-    public ChatMessage(String senderId, String receiverId, String content, AutoPrimaryKey id) {
+    public ChatMessage(String senderId, String receiverId, String content, AutoPrimaryKey id, List<String> images) {
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.content = content;
         this.id = id;
+        this.images = images;
     }
 }

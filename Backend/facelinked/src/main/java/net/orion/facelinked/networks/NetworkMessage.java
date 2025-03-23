@@ -5,6 +5,8 @@ import lombok.*;
 import net.orion.facelinked.config.AutoPrimaryKey;
 import org.springframework.data.annotation.Id;
 
+import java.util.List;
+
 @Setter
 @Getter
 @DynamoDBTable(tableName = "networkMessages")
@@ -43,14 +45,17 @@ public class NetworkMessage {
     private String networkId;
     @DynamoDBAttribute(attributeName = "content")
     private String content;
+    @DynamoDBAttribute(attributeName = "images")
+    private List<String> images;
 
     public NetworkMessage() {
     }
 
-    public NetworkMessage(NetworkMember senderId, String networkId, String content, AutoPrimaryKey id) {
+    public NetworkMessage(NetworkMember senderId, String networkId, String content, AutoPrimaryKey id, List<String> images) {
         this.senderId = senderId;
         this.networkId = networkId;
         this.content = content;
         this.id = id;
+        this.images = images;
     }
 }

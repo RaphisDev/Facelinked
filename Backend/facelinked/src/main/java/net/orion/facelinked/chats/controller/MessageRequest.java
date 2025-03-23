@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -14,4 +15,5 @@ import java.util.Date;
 public class MessageRequest {
     private String receiver;
     private String content;
+    private List<String> images;
 }
