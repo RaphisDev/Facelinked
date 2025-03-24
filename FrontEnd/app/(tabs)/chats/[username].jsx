@@ -30,7 +30,7 @@ export default function ChatRoom() {
     const insets = useSafeAreaInsets();
     const segments = useSegments();
     const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
-    const [isDesktop, setIsDesktop] = useState(windowWidth > MOBILE_WIDTH_THRESHOLD);
+    const [isDesktop, setIsDesktop] = useState(windowWidth > MOBILE_WIDTH_THRESHOLD + 250);
     const [isEmbedded, setIsEmbedded] = useState(false);
 
     const [messages, setMessages] = useState([]);
@@ -52,7 +52,7 @@ export default function ChatRoom() {
         const handleResize = () => {
             const newWidth = Dimensions.get('window').width;
             setWindowWidth(newWidth);
-            setIsDesktop(newWidth > MOBILE_WIDTH_THRESHOLD);
+            setIsDesktop(newWidth > MOBILE_WIDTH_THRESHOLD + 250);
         };
 
         // Check if we're inside an iframe (embedded view)
