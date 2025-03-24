@@ -3,15 +3,16 @@ import { useState, useEffect } from "react";
 import { Image } from "expo-image";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as MediaLibrary from 'expo-media-library';
+import * as FileSystem from 'expo-file-system';
 import "../../global.css";
 
 export default function MessageEntry({ message }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [optionsVisible, setOptionsVisible] = useState(false);
-  
-  // Determine if the message is from the current user
-  const isSender = message.sender === "me";
+
+  const isSender = message.isSender;
+  message.timestamp = message.millis;
   
   // Get images from message if they exist
   const images = message.images || [];
@@ -92,15 +93,15 @@ export default function MessageEntry({ message }) {
             {message.content}
           </Text>
         )}
-        
-        <Text 
-          style={{ color: isSender ? "rgba(255,255,255,0.7)" : "rgba(31,41,55,0.7)" }} 
+
+        <Text
+          style={{ color: isSender ? "rgba(255,255,255,0.7)" : "rgba(31,41,55,0.7)" }}
           className="text-xs mt-1 text-right"
         >
           {new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
         </Text>
       </View>
-      
+
       {/* Full screen image modal */}
       <Modal
         animationType="fade"
@@ -145,32 +146,31 @@ export default function MessageEntry({ message }) {
           onPress={() => setOptionsVisible(false)}
         >
           <View style={{ backgroundColor: 'white', padding: 20, borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>
-            <TouchableOpacity 
-              style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 15 }}
-              onPress={async () => {
+            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 15 }}
+                onPress={async () => {
                 try {
-                    if (MediaLibrary.PermissionStatus === 'granted') {
-                        await MediaLibrary.createAssetAsync(selectedImage);
-                        Alert.alert("Image saved successfully!");
-                    } else {
-                        const {status} = await MediaLibrary.requestPermissionsAsync();
+                    const {status} = await MediaLibrary.requestPermissionsAsync();
 
-                        if (status !== 'granted') {
-                            Alert.alert(
-                                "Permission Required",
-                                "Please grant permission to save images to your device."
-                            );
-                            return;
-                        }
+                    if (status !== 'granted') {
+                        Alert.alert(
+                            "Permission Required",
+                            "Please grant permission to save images to your device."
+                        );
+                        return;
                     }
+                    const filename = `facelinked_${Date.now()}.jpg`;
+                    const fileUri = FileSystem.documentDirectory + filename;
+                    await FileSystem.downloadAsync(selectedImage, fileUri);
 
-                   await MediaLibrary.createAssetAsync(selectedImage);
-                    Alert.alert("Image saved successfully!");
-                } catch (error) {}
-                finally {
-                setOptionsVisible(false);
+                    await MediaLibrary.saveToLibraryAsync(fileUri);
+                    await FileSystem.deleteAsync(fileUri);
+
+                } catch (error) {
                 }
-              }}
+                finally {
+                    setOptionsVisible(false);
+                }
+            }}
             >
               <Ionicons name="download-outline" size={24} color="#3B82F6" />
               <Text style={{ marginLeft: 15, fontSize: 16 }}>Save Image</Text>

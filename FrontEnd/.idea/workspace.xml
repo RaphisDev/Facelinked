@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
-      <change beforePath="$PROJECT_DIR$/app/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/chats/[username].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chats/[username].jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/Entries/Message.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Entries/Message.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -240,7 +241,7 @@
       <workItem from="1742685805467" duration="4722000" />
       <workItem from="1742734861270" duration="6467000" />
       <workItem from="1742759625005" duration="7645000" />
-      <workItem from="1742844360896" duration="5828000" />
+      <workItem from="1742844360896" duration="10694000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />

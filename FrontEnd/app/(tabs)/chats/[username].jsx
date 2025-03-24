@@ -46,8 +46,6 @@ export default function ChatRoom() {
     const ws = new WebSocketProvider();
     const router = useRouter();
 
-    const {receiver} = useLocalSearchParams();
-
     useEffect(() => {
         setTimeout(() => {
             if (Platform.OS === "web") {
@@ -57,18 +55,19 @@ export default function ChatRoom() {
         });
 
         const loadMessages = async () => {
-            const loadedMessages = await asyncStorage.getItem(`messages/${receiver}`);
+            const loadedMessages = await asyncStorage.getItem(`messages/${username}`);
             if (loadedMessages !== null) {
                 setMessages(JSON.parse(loadedMessages));
             }
+            setIsLoading(false);
 
             let loadedChats = await asyncStorage.getItem("chats") || [];
             if (loadedChats.length !== 0) {
                 loadedChats = JSON.parse(loadedChats);
             }
 
-            if (loadedChats.filter((chat) => chat.username === receiver).length === 1) {
-                setUserData(loadedChats.filter((chat) => chat.username === receiver)[0])
+            if (loadedChats.filter((chat) => chat.username === username).length === 1) {
+                setUserData(loadedChats.filter((chat) => chat.username === username)[0])
             } else {
                 let token;
                 if (Platform.OS === "web") {
@@ -77,10 +76,11 @@ export default function ChatRoom() {
                 else {
                     token = SecureStore.getItem("token");
                 }
-                const profile = await fetch(`${ip}/profile/${receiver}`, {
+                const profile = await fetch(`${ip}/profile/${username}`, {
                     method: "GET",
                     headers: {
-                        "Authorization": `Bearer ${token}`
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
                     }
                 });
                 if (profile.ok) {
@@ -92,14 +92,14 @@ export default function ChatRoom() {
         loadMessages();
 
         ws.messageReceived.addListener("messageReceived", async (e) => {
-            let username;
+            let myUsername;
             if (Platform.OS === "web") {
-                username = localStorage.getItem("token");
+                myUsername = localStorage.getItem("username");
             }
             else {
-                username = SecureStore.getItem("token");
+                myUsername = SecureStore.getItem("username");
             }
-            if (e.detail.sender !== receiver && e.detail.sender !== username) {
+            if (e.detail.sender !== username && e.detail.sender !== myUsername) {
                 return;
             }
 
@@ -111,7 +111,7 @@ export default function ChatRoom() {
                     loadedChats = JSON.parse(loadedChats);
                 }
                 await asyncStorage.setItem("chats", JSON.stringify(loadedChats.map((chat) => {
-                    if (chat.username === receiver) {
+                    if (chat.username === username) {
                         return {...chat, unread: false};
                     }
                     return chat;
@@ -129,11 +129,20 @@ export default function ChatRoom() {
         }
     }, []);
 
-    async function sendMessage(message) {
+    async function sendMessage() {
         if (input.trim() === '' && selectedImages.length === 0) return;
 
         try {
-            setMessages((prevMessages) => [...prevMessages, {isSender: true, content: message, millis: Date.now(), isOptimistic: true}]);
+            const messageContent = input.trim();
+            setMessages((prevMessages) => [...prevMessages, {
+                isSender: true,
+                content: messageContent,
+                millis: Date.now(),
+                isOptimistic: true,
+                images: selectedImages
+            }]);
+            setInput("");
+            setSelectedImages([]);
 
             let imageURls = [];
             if (selectedImages.length > 0) {
@@ -172,15 +181,15 @@ export default function ChatRoom() {
             ws.stompClient.publish({
                 destination: `/app/chat`,
                 body: JSON.stringify({
-                    receiver: receiver,
-                    content: message,
+                    receiver: username,
+                    content: messageContent,
                     images: imageURls
                 })
             });
 
             let loadedChats = await asyncStorage.getItem("chats") || [];
             if (loadedChats.length !== 0) {loadedChats = JSON.parse(loadedChats);}
-            if(!loadedChats.find((chat) => chat.username === receiver) || loadedChats.length === 0) {
+            if(!loadedChats.find((chat) => chat.username === username) || loadedChats.length === 0) {
                 let token;
                 if (Platform.OS === "web") {
                     token = localStorage.getItem("token");
@@ -188,7 +197,7 @@ export default function ChatRoom() {
                 else {
                     token = SecureStore.getItem("token");
                 }
-                const profile = await fetch(`${ip}/profile/${receiver}`, {
+                const profile = await fetch(`${ip}/profile/${username}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`
@@ -200,18 +209,19 @@ export default function ChatRoom() {
                     loadedChats = [...loadedChats, { name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath }];
                 }
             }
-            await asyncStorage.setItem("chats", JSON.stringify([...loadedChats.filter(chat => chat.username === receiver), ...loadedChats.filter(chat => chat.username !== receiver)]));
+            await asyncStorage.setItem("chats", JSON.stringify([...loadedChats.filter(chat => chat.username === username), ...loadedChats.filter(chat => chat.username !== username)]));
 
-            let loadedMessages = await asyncStorage.getItem(`messages/${receiver}`) || [];
+            let loadedMessages = await asyncStorage.getItem(`messages/${username}`) || [];
             if (loadedMessages.length !== 0) {loadedMessages = JSON.parse(loadedMessages);}
-            await asyncStorage.setItem(`messages/${receiver}`, JSON.stringify([...loadedMessages, {
+            await asyncStorage.setItem(`messages/${username}`, JSON.stringify([...loadedMessages, {
                 isSender: true,
-                content: message,
-                millis: Date.now()
+                content: messageContent,
+                millis: Date.now(),
+                images: imageURls
             }]));
         }
         catch (e) {
-            console.error(e);
+            setMessages(prevState => prevState.filter((chat) => !chat.isOptimistic));
         }
     }
 
@@ -267,7 +277,8 @@ export default function ChatRoom() {
     };
 
     const renderSelectedImages = () => {
-        if (selectedImages.length === 0) return null;
+        if (!selectedImages || selectedImages.length === 0) return null;
+        if (selectedImages?.length === 0) return null;
         
         return (
             <View style={{ padding: 10, backgroundColor: '#f9fafb', borderTopWidth: 1, borderTopColor: '#e5e7eb' }}>
@@ -350,7 +361,7 @@ export default function ChatRoom() {
                     >
                         <Image
                             source={{ uri: userData.image }}
-                            style={{ width: 44, height: 44, borderRadius: 22 }}
+                            style={{ width: 40, height: 40, borderRadius: 22 }}
                             className="bg-gray-200"
                             cachePolicy="memory"
                         />
