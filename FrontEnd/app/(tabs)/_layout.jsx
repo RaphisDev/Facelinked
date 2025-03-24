@@ -25,7 +25,7 @@ function LayoutWrapper({ children }) {
 
     return (
         <View style={styles.rootContainer}>
-            {isDesktop && <View style={{ width: SIDEBAR_WIDTH }} />}
+            {isDesktop && <View style={{ width: SIDEBAR_WIDTH + 10 }} />}
             {children}
         </View>
     );
