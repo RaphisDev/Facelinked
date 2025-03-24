@@ -10,11 +10,11 @@ export default function LegalSettings() {
             <ScrollView className="h-full w-full">
                 <View className="self-center w-5/6 mt-5 rounded-xl overflow-hidden items-center">
                     <TouchableOpacity activeOpacity={0.7} onPress={() => router.push("/settings/privacy")}
-                                      className="p-1 active:bg-gray-400 dark:active:bg-dark-primary dark:bg-dark-primary bg-white border-b border-gray-500 w-full">
+                                      className="p-1 py-1.5 active:bg-gray-400 dark:active:bg-dark-primary dark:bg-dark-primary bg-white border-b border-gray-500 w-full">
                         <Text className="text-center text-lg font-semibold text-text dark:text-dark-text">Privacy Policy</Text>
                     </TouchableOpacity>
                     <TouchableOpacity activeOpacity={0.7} onPress={() => router.push("/settings/terms")}
-                                      className="p-1 active:bg-gray-400 dark:active:bg-dark-primary dark:bg-dark-primary bg-white border-gray-500 w-full">
+                                      className="p-1 py-1.5 active:bg-gray-400 dark:active:bg-dark-primary dark:bg-dark-primary bg-white border-gray-500 w-full">
                         <Text className="text-center text-lg font-semibold text-text dark:text-dark-text">Terms and Conditions</Text>
                     </TouchableOpacity>
                 </View>

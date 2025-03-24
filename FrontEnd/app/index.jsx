@@ -34,6 +34,7 @@ import * as ImagePicker from "expo-image-picker";
 import {TextEncoder} from "text-encoding";
 import asyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import CustomAlertProvider, {showAlert} from "../components/PopUpModalView";
 
 global.TextEncoder = TextEncoder;
 

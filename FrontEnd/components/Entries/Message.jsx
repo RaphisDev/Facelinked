@@ -141,7 +141,7 @@ export default function MessageEntry({ message }) {
         onRequestClose={() => setOptionsVisible(false)}
       >
         <Pressable 
-          style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.5)' }} 
+          style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0)' }}
           onPress={() => setOptionsVisible(false)}
         >
           <View style={{ backgroundColor: 'white', padding: 20, borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>

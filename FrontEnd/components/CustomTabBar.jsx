@@ -74,9 +74,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
     }
 
     if (tabRoutes.some(route => pathname.startsWith("/" + route.name + "/"))) {
-        return (
-            <></>
-        )
+        return null
     }
 
     // Render bottom tab bar for mobile
