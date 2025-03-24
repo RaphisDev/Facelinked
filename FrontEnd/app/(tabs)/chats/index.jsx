@@ -23,7 +23,7 @@ export default function Chats() {
     const segments = useSegments();
     const insets = useSafeAreaInsets();
     const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
-    const [isDesktop, setIsDesktop] = useState(windowWidth > MOBILE_WIDTH_THRESHOLD + 200);
+    const [isDesktop, setIsDesktop] = useState(windowWidth > MOBILE_WIDTH_THRESHOLD + 250);
     const searchInputRef = useRef(null);
     const [selectedChat, setSelectedChat] = useState(null);
     
@@ -34,7 +34,7 @@ export default function Chats() {
         const handleResize = () => {
             const newWidth = Dimensions.get('window').width;
             setWindowWidth(newWidth);
-            setIsDesktop(newWidth > MOBILE_WIDTH_THRESHOLD + 200);
+            setIsDesktop(newWidth > MOBILE_WIDTH_THRESHOLD + 250);
         };
 
         if (Platform.OS === 'web') {
