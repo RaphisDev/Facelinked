@@ -29,9 +29,9 @@ export default function ChatRoom() {
     const { username } = useLocalSearchParams();
     const insets = useSafeAreaInsets();
     const segments = useSegments();
-    const windowWidth = Dimensions.get('window').width;
-    const isDesktop = windowWidth > MOBILE_WIDTH_THRESHOLD;
-    const isEmbedded = window?.frameElement && Platform.OS === 'web';
+    const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
+    const [isDesktop, setIsDesktop] = useState(windowWidth > MOBILE_WIDTH_THRESHOLD);
+    const [isEmbedded, setIsEmbedded] = useState(false);
 
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
@@ -46,6 +46,30 @@ export default function ChatRoom() {
     const inputRef = useRef(null);
     const ws = new WebSocketProvider();
     const router = useRouter();
+
+    // Handle window resize and check if we're in an iframe
+    useEffect(() => {
+        const handleResize = () => {
+            const newWidth = Dimensions.get('window').width;
+            setWindowWidth(newWidth);
+            setIsDesktop(newWidth > MOBILE_WIDTH_THRESHOLD);
+        };
+
+        // Check if we're inside an iframe (embedded view)
+        if (Platform.OS === 'web') {
+            setIsEmbedded(window?.frameElement !== null);
+            window.addEventListener('resize', handleResize);
+        }
+
+        // Initial size check
+        handleResize();
+
+        return () => {
+            if (Platform.OS === 'web') {
+                window.removeEventListener('resize', handleResize);
+            }
+        };
+    }, []);
 
     useEffect(() => {
         setTimeout(() => {
@@ -129,6 +153,23 @@ export default function ChatRoom() {
             ws.messageReceived.removeAllListeners("messageReceived");
         }
     }, []);
+
+    // Handle back navigation appropriately based on context
+    const handleBackNavigation = () => {
+        if (isDesktop && !isEmbedded) {
+            // For desktop standalone view, return to chat list
+            router.push('/chats');
+        } else if (Platform.OS === 'web' && !isEmbedded) {
+            // For web, modify URL to remove username parameter
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.delete('username');
+            window.history.pushState({}, '', newUrl);
+            router.back();
+        } else {
+            // For mobile, just go back
+            router.back();
+        }
+    };
 
     async function sendMessage() {
         if (input.trim() === '' && selectedImages.length === 0) return;
@@ -344,9 +385,9 @@ export default function ChatRoom() {
             >
                 {/* Chat header - enhanced styling */}
                 <View className="bg-white border-b border-gray-200 px-4 py-3 flex-row items-center shadow-sm">
-                    {!isEmbedded && (
+                    {(!isEmbedded || !isDesktop) && (
                         <TouchableOpacity
-                            onPress={() => router.back()}
+                            onPress={handleBackNavigation}
                             className="mr-3 p-1"
                             style={{
                                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -414,7 +455,7 @@ export default function ChatRoom() {
                     className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200"
                     style={{
                         paddingBottom: Platform.OS === 'ios' ? Math.max(insets.bottom, 10) : 10,
-                        marginLeft: isDesktop && !isEmbedded ? 220 : 0,
+                        marginLeft: isDesktop && isEmbedded ? 0 : 0,
                         shadowColor: "#000",
                         shadowOffset: { width: 0, height: -3 },
                         shadowOpacity: 0.05,
@@ -434,7 +475,7 @@ export default function ChatRoom() {
 
                         <TextInput
                             ref={inputRef}
-                            className="flex-1 py-2 px-2 text-gray-700 max-h-24"
+                            className="flex-1 py-2 px-2 text-gray-700 max-h-24 outline-none"
                             placeholder="Type a message..."
                             placeholderTextColor="#9CA3AF"
                             value={input}
@@ -458,3 +499,4 @@ export default function ChatRoom() {
         </KeyboardAvoidingView>
     );
 }
+

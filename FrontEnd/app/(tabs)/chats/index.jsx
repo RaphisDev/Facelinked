@@ -23,30 +23,26 @@ export default function Chats() {
     const segments = useSegments();
     const insets = useSafeAreaInsets();
     const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
-    const [isDesktop, setIsDesktop] = useState(windowWidth > MOBILE_WIDTH_THRESHOLD);
+    const [isDesktop, setIsDesktop] = useState(windowWidth > MOBILE_WIDTH_THRESHOLD + 200);
     const searchInputRef = useRef(null);
     const [selectedChat, setSelectedChat] = useState(null);
     
     const stateManager = new StateManager();
     const ws = new WebSocketProvider();
 
-    // Add resize listener to update isDesktop state
     useEffect(() => {
         const handleResize = () => {
             const newWidth = Dimensions.get('window').width;
             setWindowWidth(newWidth);
-            setIsDesktop(newWidth > MOBILE_WIDTH_THRESHOLD);
+            setIsDesktop(newWidth > MOBILE_WIDTH_THRESHOLD + 200);
         };
 
-        // Set up event listener for window resize on web
         if (Platform.OS === 'web') {
             window.addEventListener('resize', handleResize);
         }
 
-        // Initial check for screen size
         handleResize();
 
-        // Cleanup
         return () => {
             if (Platform.OS === 'web') {
                 window.removeEventListener('resize', handleResize);
@@ -54,14 +50,12 @@ export default function Chats() {
         };
     }, []);
 
-    // Filter chats based on search query
     const filteredChats = chats.filter(chat => {
         if (!searchQuery) return true;
         return chat.name.toLowerCase().includes(searchQuery.toLowerCase());
     });
 
     useEffect(() => {
-        // Check current URL parameters on mount and resize
         if (isDesktop && Platform.OS === 'web') {
             const params = new URLSearchParams(window.location.search);
             const username = params.get('username');
@@ -98,7 +92,6 @@ export default function Chats() {
         });
         stateManager.setChatState(true);
 
-        // Check for URL parameter to open chat directly on desktop
         if (isDesktop) {
             const params = new URLSearchParams(window.location.search);
             const username = params.get('username');
@@ -112,7 +105,6 @@ export default function Chats() {
         }
     }, [segments, isDesktop]);
 
-    // Toggle search mode and focus input when activated
     const toggleSearch = () => {
         setIsSearching(!isSearching);
         if (!isSearching) {
@@ -184,8 +176,8 @@ export default function Chats() {
                 onPress={() => router.push('/networks')}
                 className="px-5 py-3 rounded-full bg-gradient-to-r bg-blue-600 from-blue-500 to-blue-700 shadow-md flex-row items-center"
             >
-                <Ionicons name="people" size={20} color="black" className="mr-2" />
-                <Text className="text-gray-800 font-medium">Find Friends</Text>
+                <Ionicons name="people" size={20} color="white" className="mr-2" />
+                <Text className="text-white font-medium">Find Friends</Text>
             </TouchableOpacity>
         </View>
     );
