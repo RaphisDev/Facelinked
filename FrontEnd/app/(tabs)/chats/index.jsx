@@ -22,18 +22,57 @@ export default function Chats() {
     const [searchQuery, setSearchQuery] = useState('');
     const segments = useSegments();
     const insets = useSafeAreaInsets();
-    const windowWidth = Dimensions.get('window').width;
-    const isDesktop = windowWidth > MOBILE_WIDTH_THRESHOLD;
+    const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
+    const [isDesktop, setIsDesktop] = useState(windowWidth > MOBILE_WIDTH_THRESHOLD);
     const searchInputRef = useRef(null);
+    const [selectedChat, setSelectedChat] = useState(null);
     
     const stateManager = new StateManager();
     const ws = new WebSocketProvider();
+
+    // Add resize listener to update isDesktop state
+    useEffect(() => {
+        const handleResize = () => {
+            const newWidth = Dimensions.get('window').width;
+            setWindowWidth(newWidth);
+            setIsDesktop(newWidth > MOBILE_WIDTH_THRESHOLD);
+        };
+
+        // Set up event listener for window resize on web
+        if (Platform.OS === 'web') {
+            window.addEventListener('resize', handleResize);
+        }
+
+        // Initial check for screen size
+        handleResize();
+
+        // Cleanup
+        return () => {
+            if (Platform.OS === 'web') {
+                window.removeEventListener('resize', handleResize);
+            }
+        };
+    }, []);
 
     // Filter chats based on search query
     const filteredChats = chats.filter(chat => {
         if (!searchQuery) return true;
         return chat.name.toLowerCase().includes(searchQuery.toLowerCase());
     });
+
+    useEffect(() => {
+        // Check current URL parameters on mount and resize
+        if (isDesktop && Platform.OS === 'web') {
+            const params = new URLSearchParams(window.location.search);
+            const username = params.get('username');
+            if (username) {
+                setSelectedChat(username);
+            } else if (selectedChat && !isDesktop) {
+                // Clear selected chat when switching to mobile
+                setSelectedChat(null);
+            }
+        }
+    }, [isDesktop]);
 
     useEffect(() => {
         setTimeout(() => {
@@ -59,10 +98,19 @@ export default function Chats() {
         });
         stateManager.setChatState(true);
 
+        // Check for URL parameter to open chat directly on desktop
+        if (isDesktop) {
+            const params = new URLSearchParams(window.location.search);
+            const username = params.get('username');
+            if (username) {
+                setSelectedChat(username);
+            }
+        }
+
         return() => {
             ws.messageReceived.removeAllListeners("newMessageReceived");
         }
-    }, [segments]);
+    }, [segments, isDesktop]);
 
     // Toggle search mode and focus input when activated
     const toggleSearch = () => {
@@ -73,6 +121,18 @@ export default function Chats() {
             }, 100);
         } else {
             setSearchQuery('');
+        }
+    };
+
+    const handleChatSelect = (username) => {
+        if (isDesktop) {
+            setSelectedChat(username);
+            // Update URL with selected chat
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.set('username', username);
+            window.history.pushState({}, '', newUrl);
+        } else {
+            router.push(`/chats/${username}`);
         }
     };
 
@@ -96,7 +156,7 @@ export default function Chats() {
                         <Ionicons name="search" size={18} color="#6B7280" />
                         <TextInput
                             ref={searchInputRef}
-                            className="flex-1 py-2 px-2 text-gray-700"
+                            className="flex-1 py-2 px-2 text-gray-700 outline-none"
                             placeholder="Search conversations..."
                             placeholderTextColor="#9CA3AF"
                             value={searchQuery}
@@ -122,7 +182,7 @@ export default function Chats() {
             </Text>
             <TouchableOpacity 
                 onPress={() => router.push('/networks')}
-                className="px-5 py-3 rounded-full bg-gradient-to-r from-blue-500 to-blue-700 shadow-md flex-row items-center"
+                className="px-5 py-3 rounded-full bg-gradient-to-r bg-blue-600 from-blue-500 to-blue-700 shadow-md flex-row items-center"
             >
                 <Ionicons name="people" size={20} color="black" className="mr-2" />
                 <Text className="text-gray-800 font-medium">Find Friends</Text>
@@ -130,13 +190,82 @@ export default function Chats() {
         </View>
     );
 
+    // Desktop split view layout
+    if (isDesktop) {
+        return (
+            <View 
+                className="flex-1 flex-row bg-blue-50/50 dark:bg-dark-primary"
+                style={{
+                    paddingTop: Platform.OS !== 'web' ? insets.top : 0,
+                }}
+            >
+                {/* Left panel - Chat list */}
+                <View className="w-1/3 border-r border-gray-200 bg-white">
+                    {renderHeader()}
+                    
+                    {chats.length > 0 ? (
+                        <View className="flex-1">
+                            <FlatList
+                                contentContainerStyle={{ paddingVertical: 10, paddingHorizontal: 16 }}
+                                data={filteredChats}
+                                renderItem={({ item }) => (
+                                    <TouchableOpacity 
+                                        onPress={() => handleChatSelect(item.username)}
+                                        className={`mb-3 p-3 rounded-lg ${selectedChat === item.username ? 'bg-blue-50' : ''}`}
+                                    >
+                                        <Chat {...item} />
+                                    </TouchableOpacity>
+                                )}
+                                keyExtractor={(item) => item.id || item.username}
+                                showsVerticalScrollIndicator={false}
+                                ListEmptyComponent={searchQuery ? (
+                                    <View className="flex-1 items-center justify-center py-10">
+                                        <Text className="text-gray-500">No matching conversations found</Text>
+                                    </View>
+                                ) : null}
+                            />
+                        </View>
+                    ) : (
+                        renderEmptyComponent()
+                    )}
+                </View>
+                
+                {/* Right panel - Selected chat or welcome screen */}
+                <View className="flex-1 bg-gray-50">
+                    {selectedChat ? (
+                        <iframe 
+                            src={`/chats/${selectedChat}`} 
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                border: 'none'
+                            }}
+                        />
+                    ) : (
+                        <View className="flex-1 items-center justify-center p-8">
+                            <View className="w-40 h-40 mb-6 items-center justify-center bg-blue-100/70 rounded-full">
+                                <Ionicons name="chatbubbles" size={80} color="#3B82F6" />
+                            </View>
+                            <Text className="text-2xl font-bold text-gray-800 mb-4 text-center">
+                                Select a conversation
+                            </Text>
+                            <Text className="text-center text-gray-500 max-w-md mb-8">
+                                Choose a chat from the left sidebar to start messaging or continue a conversation.
+                            </Text>
+                        </View>
+                    )}
+                </View>
+            </View>
+        );
+    }
+
+    // Mobile layout
     return (
         <View 
             className="flex-1 bg-blue-50/50 dark:bg-dark-primary"
             style={{
                 paddingTop: Platform.OS !== 'web' ? insets.top : 0,
-                paddingBottom: isDesktop ? 0 : 100, // Add padding for mobile tab bar
-                marginLeft: isDesktop ? 220 : 0, // Add margin for sidebar on desktop
+                paddingBottom: 100, // Add padding for mobile tab bar
             }}
         >
             {renderHeader()}
@@ -146,7 +275,11 @@ export default function Chats() {
                     <FlatList
                         contentContainerStyle={{ paddingVertical: 10 }}
                         data={filteredChats}
-                        renderItem={({ item }) => <Chat {...item} />}
+                        renderItem={({ item }) => (
+                            <TouchableOpacity onPress={() => router.push(`/chats/${item.username}`)}>
+                                <Chat {...item} />
+                            </TouchableOpacity>
+                        )}
                         keyExtractor={(item) => item.id || item.username}
                         showsVerticalScrollIndicator={false}
                         ItemSeparatorComponent={() => <View className="h-3" />}
@@ -163,3 +296,4 @@ export default function Chats() {
         </View>
     )
 }
+

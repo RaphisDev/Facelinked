@@ -31,6 +31,7 @@ export default function ChatRoom() {
     const segments = useSegments();
     const windowWidth = Dimensions.get('window').width;
     const isDesktop = windowWidth > MOBILE_WIDTH_THRESHOLD;
+    const isEmbedded = window?.frameElement && Platform.OS === 'web';
 
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
@@ -339,21 +340,22 @@ export default function ChatRoom() {
                 className="flex-1 bg-gray-50"
                 style={{
                     paddingTop: Platform.OS !== 'web' ? insets.top : 0,
-                    marginLeft: isDesktop ? 220 : 0,
                 }}
             >
                 {/* Chat header - enhanced styling */}
                 <View className="bg-white border-b border-gray-200 px-4 py-3 flex-row items-center shadow-sm">
-                    <TouchableOpacity
-                        onPress={() => router.back()}
-                        className="mr-3 p-1"
-                        style={{
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            borderRadius: 20,
-                        }}
-                    >
-                        <Ionicons name="arrow-back" size={22} color="#3B82F6" />
-                    </TouchableOpacity>
+                    {!isEmbedded && (
+                        <TouchableOpacity
+                            onPress={() => router.back()}
+                            className="mr-3 p-1"
+                            style={{
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                borderRadius: 20,
+                            }}
+                        >
+                            <Ionicons name="arrow-back" size={22} color="#3B82F6" />
+                        </TouchableOpacity>
+                    )}
 
                     <TouchableOpacity
                         onPress={() => router.push(`/${username}`)}
@@ -412,7 +414,7 @@ export default function ChatRoom() {
                     className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200"
                     style={{
                         paddingBottom: Platform.OS === 'ios' ? Math.max(insets.bottom, 10) : 10,
-                        marginLeft: isDesktop ? 220 : 0,
+                        marginLeft: isDesktop && !isEmbedded ? 220 : 0,
                         shadowColor: "#000",
                         shadowOffset: { width: 0, height: -3 },
                         shadowOpacity: 0.05,
@@ -456,4 +458,3 @@ export default function ChatRoom() {
         </KeyboardAvoidingView>
     );
 }
-
