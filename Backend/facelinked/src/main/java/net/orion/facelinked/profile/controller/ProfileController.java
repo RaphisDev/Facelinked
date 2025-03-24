@@ -85,6 +85,7 @@ public class ProfileController {
                 content(profile.getContent()).
                 likes(0).
                 comments(Collections.emptyList()).
+                images(profile.getImages()).
                 build());
     }
 

@@ -47,13 +47,16 @@ public class Post {
     private int likes;
     @DynamoDBAttribute(attributeName = "comments")
     private List<String> comments;
+    @DynamoDBAttribute(attributeName = "images")
+    private List<String> images;
 
-    public Post(PrimaryKey id, String title, List<String> content, int likes, List<String> comments) {
+    public Post(PrimaryKey id, String title, List<String> content, int likes, List<String> comments, List<String> images) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.likes = likes;
         this.comments = comments;
+        this.images = images;
     }
     public Post() {
     }
