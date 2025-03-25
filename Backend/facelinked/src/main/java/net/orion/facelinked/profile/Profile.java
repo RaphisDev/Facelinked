@@ -33,11 +33,11 @@ public class Profile {
     boolean inRelationship;
     @DynamoDBAttribute(attributeName="location")
     String location;
-    @DynamoDBAttribute(attributeName="score")
-    Integer score;
     @DynamoDBAttribute(attributeName="friends")
     @DynamoDBTypeConverted(converter = NetworkMemberListConverter.class)
     List<NetworkMember> friends;
     @DynamoDBAttribute(attributeName="searchName")
     String searchName;
+    @DynamoDBAttribute(attributeName="faceSmashId")
+    String faceSmashId;
 }

@@ -5,9 +5,11 @@ import net.orion.facelinked.auth.services.UserService;
 import net.orion.facelinked.config.PrimaryKey;
 import net.orion.facelinked.networks.NetworkMember;
 import net.orion.facelinked.networks.NetworkMessage;
+import net.orion.facelinked.profile.FaceSmash;
 import net.orion.facelinked.profile.Post;
 import net.orion.facelinked.profile.Profile;
 import net.orion.facelinked.profile.ProfileRequest;
+import net.orion.facelinked.profile.service.FaceSmashService;
 import net.orion.facelinked.profile.service.ProfileService;
 import net.orion.facelinked.profile.service.StorageService;
 import org.springframework.http.HttpStatus;
@@ -28,11 +30,19 @@ public class ProfileController {
     private final ProfileService profileService;
     private final UserService userService;
     private final StorageService storageService;
+    private final FaceSmashService faceSmashService;
 
     @ResponseStatus(HttpStatus.FOUND)
     @GetMapping("/{username}")
     private ResponseEntity<Profile> GetProfile(@PathVariable String username) {
         var profile = profileService.findByUsername(username);
+        return ResponseEntity.ok(profile);
+    }
+
+    @ResponseStatus(HttpStatus.FOUND)
+    @GetMapping("/facesmash/{username}")
+    private ResponseEntity<FaceSmash> GetFaceSmashProfile(@PathVariable String username) {
+        var profile = faceSmashService.findSmashById(username);
         return ResponseEntity.ok(profile);
     }
 
@@ -69,8 +79,8 @@ public class ProfileController {
 
         profileService.save(Profile.builder().profilePicturePath(profile.getProfilePicturePath())
                 .username(profile.getUsername()).name(profile.getName()).dateOfBirth(profile.getDateOfBirth())
-                .hobbies(profile.getHobbies()).score(0).inRelationship(profile.isInRelationship())
-                .friends(Collections.emptyList()).location(profile.getLocation()).searchName(profile.getName().toLowerCase()).build());
+                .hobbies(profile.getHobbies()).inRelationship(profile.isInRelationship())
+                .friends(Collections.emptyList()).location(profile.getLocation()).searchName(profile.getName().toLowerCase()).faceSmashId(null).build());
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)

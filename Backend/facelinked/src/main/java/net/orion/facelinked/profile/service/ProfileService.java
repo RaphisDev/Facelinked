@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class ProfileService {
+    private final FaceSmashService faceSmashService;
     private ProfileRepository profileRepository;
     private PostRepository postRepository;
 
@@ -58,6 +59,9 @@ public class ProfileService {
 
         if(user.getFriends().stream().anyMatch(friend -> friend.getMemberId().equals(toAdd.getMemberId()))) {
             return;
+        }
+        if (user.getFriends().size() >= 5 && user.getFaceSmashId() == null) {
+            faceSmashService.smashPerson(user);
         }
         var newFriends = new ArrayList<>(user.getFriends());
         newFriends.add(toAdd);
