@@ -133,7 +133,7 @@ export default function Chats() {
             <View className={`flex-row items-center ${isSearching ? 'justify-between' : 'justify-between'}`}>
                 {!isSearching ? (
                     <>
-                        <Text className="text-2xl ml-1 font-bold text-text dark:text-dark-text">
+                        <Text className="text-2xl ml-3 font-bold text-text dark:text-dark-text">
                             Messages
                         </Text>
                         <TouchableOpacity 
