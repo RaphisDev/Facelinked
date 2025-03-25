@@ -22,6 +22,7 @@ import asyncStorage from "@react-native-async-storage/async-storage";
 import ip from "../../../components/AppManager";
 import * as SecureStore from "expo-secure-store";
 import StateManager from "../../../components/StateManager";
+import {showAlert} from "../../../components/PopUpModalView";
 
 export default function Network() {
 
@@ -101,7 +102,18 @@ export default function Network() {
                 }
             }
             else {
-                Alert.alert("Network not found/You have no access");
+                showAlert({
+                    title: 'Not Found',
+                    message: 'Network not found/You have no access',
+                    buttons: [
+                        {
+                            text: 'OK',
+                            onPress: () => {
+
+                            }
+                        },
+                    ],
+                });
                 router.back();
             }
         }
@@ -346,10 +358,28 @@ export default function Network() {
         if (response.ok) {
             setMember(member.filter((member) => member.memberId !== user));
 
-            Alert.alert("User removed");
+            showAlert({
+                title: 'User removed',
+                message: '',
+                buttons: [
+                    {
+                        text: 'OK',
+                        onPress: () => {}
+                    },
+                ],
+            });
         }
         else {
-            Alert.alert("Failed to remove user");
+            showAlert({
+                title: 'Failed to remove user',
+                message: '',
+                buttons: [
+                    {
+                        text: 'Cancel',
+                        onPress: () => {}
+                    },
+                ],
+            });
         }
     }
 
@@ -420,31 +450,69 @@ export default function Network() {
                 <View className="h-full w-full dark:bg-dark-primary">
                     {Platform.OS === "web" && <TouchableOpacity className="p-4 bg-gray-700 rounded-xl self-end mr-4 mt-4" onPress={() => setModalVisible(false)}><Ionicons size={23} color="white" name="close"/></TouchableOpacity>}
                     {currentNetwork.current?.creatorId === username.current &&
-                        <TouchableOpacity activeOpacity={0.6} onPress={() =>
-                            Alert.prompt("Update Network", "Enter a new name for the network\n Leave out for no change", [
-                                {text: "Cancel"},
-                                {text: "Update", onPress: async (text) => {
+                        <TouchableOpacity activeOpacity={0.6} onPress={() => {
+                            showAlert({
+                                title: 'Update Network',
+                                message: 'Enter a new name for the network\nLeave empty for no change',
+                                hasInput: true,
+                                inputConfig: {
+                                    placeholder: 'New network name',
+                                    defaultValue: currentNetwork.current.name
+                                },
+                                buttons: [
+                                {
+                                        text: 'Cancel',
+                                        onPress: () => {}
+                                    },
+                                    {
+                                        text: 'Update',
+                                        onPress: (text) => {
                                         if (text.trim().length === 0) {
                                             text = currentNetwork.current.name;
-                                        }
-                                        else if (text.length <= 3) {
-                                            Alert.alert("Name too short");
+                                        } else if (text.length <= 3) {
+                                                showAlert({
+                                                    title: 'Error',
+                                                    message: 'Name too short',
+                                                    buttons: [{ text: 'OK', onPress: () => {} }]
+                                                });
                                             return;
                                         }
-                                        Alert.prompt("Update Network", "Enter a new description \n Leave out for no change", [
-                                            {text: "Cancel"},
-                                            {text: "Update", onPress: async (description) => {
+
+                                            showAlert({
+                                                title: 'Update Network',
+                                                message: 'Enter a new description\nLeave empty for no change',
+                                                hasInput: true,
+                                                inputConfig: {
+                                                    placeholder: 'New description',
+                                                    defaultValue: currentNetwork.current.description
+                                                },
+                                                buttons: [
+                                            {
+                                                        text: 'Cancel',
+                                                        onPress: () => {}
+                                                    },
+                                                    {
+                                                        text: 'Update',
+                                                        onPress: async (description) => {
                                                     if (description.trim().length === 0) {
                                                         if (text === currentNetwork.current.name) {
-                                                            Alert.alert("No change applied");
+                                                                    showAlert({
+                                                                        title: 'No Change',
+                                                                        message: 'No change applied',
+                                                                        buttons: [{ text: 'OK', onPress: () => {} }]
+                                                                    });
                                                             return;
                                                         }
                                                         description = currentNetwork.current.description;
-                                                    }
-                                                    else if (description.length <= 3) {
-                                                        Alert.alert("Description too short");
+                                                    } else if (description.length <= 3) {
+                                                                showAlert({
+                                                                    title: 'Error',
+                                                                    message: 'Description too short',
+                                                                    buttons: [{ text: 'OK', onPress: () => {} }]
+                                                                });
                                                         return;
                                                     }
+
                                                     const response = await fetch(`${ip}/networks/${Network}/update`, {
                                                         method: "POST",
                                                         headers: {
@@ -458,22 +526,50 @@ export default function Network() {
                                                         navigator.setOptions({
                                                             headerTitle: text
                                                         });
-                                                        currentNetwork.current = {networkId: currentNetwork.current.networkId, name: text, description: description, creatorId: currentNetwork.current.creatorId, private: currentNetwork.current.private, memberCount: currentNetwork.current.memberCount, networkPicturePath: currentNetwork.current.networkPicturePath};
+                                                        currentNetwork.current = {
+                                                            networkId: currentNetwork.current.networkId,
+                                                            name: text,
+                                                            description: description,
+                                                            creatorId: currentNetwork.current.creatorId,
+                                                            private: currentNetwork.current.private,
+                                                            memberCount: currentNetwork.current.memberCount,
+                                                            networkPicturePath: currentNetwork.current.networkPicturePath
+                                                        };
 
                                                         await asyncStorage.setItem("networks", JSON.stringify(JSON.parse(await asyncStorage.getItem("networks")).map((network) => {
                                                             if (network.networkId === Network) {
-                                                                return {networkId: currentNetwork.current.networkId, name: text, description: description, creatorId: currentNetwork.current.creatorId, private: currentNetwork.current.private, members: member, memberCount: currentNetwork.current.memberCount, networkPicturePath: currentNetwork.current.networkPicturePath};
+                                                                return {
+                                                                    networkId: currentNetwork.current.networkId,
+                                                                    name: text,
+                                                                    description: description,
+                                                                    creatorId: currentNetwork.current.creatorId,
+                                                                    private: currentNetwork.current.private,
+                                                                    members: member,
+                                                                    memberCount: currentNetwork.current.memberCount,
+                                                                    networkPicturePath: currentNetwork.current.networkPicturePath
+                                                                };
                                                             }
                                                             return network;
                                                         })));
-                                                        Alert.alert("Change approved!");
+
+                                                                showAlert({
+                                                                    title: 'Success',
+                                                                    message: 'Change approved!',
+                                                                    buttons: [{ text: 'OK', onPress: () => {} }]
+                                                                });
                                                         setModalVisible(false);
                                                     }
                                                 }
-                                            },
-                                        ]);
-                                    }},
-                            ])} className="self-center mt-5">
+                                                    }
+                                                ]
+                                            });
+                                    }
+                                    }
+                                ]
+                            })
+                        }
+
+                        } className="self-center mt-5">
                             <View className="flex-row items-center">
                                 <Text className="text-center text-text dark:text-dark-text font-bold text-2xl mr-1">{currentNetwork.current?.name}</Text>
                                 <Ionicons name={"create-outline"} size={22} color={"#285FF5"}></Ionicons>
@@ -508,11 +604,32 @@ export default function Network() {
                             <Text className="text-center text-text dark:text-dark-text self-start font-bold text-xl ml-2 mt-3">Member</Text>
                             <View className="self-end flex-row">
                                 <TouchableOpacity onPress={() => {
-                                    Alert.prompt("Add User", "Enter the username of the user you want to add to the network", [
-                                        {text: "Cancel"},
-                                        {text: "Add", onPress: async (text) => {
+                                    showAlert({
+                                        title: 'Add User',
+                                        message: 'Enter the username of the user you want to add to the network',
+                                        hasInput: true,
+                                        inputConfig: {
+                                            placeholder: 'Username'
+                                        },
+                                        buttons: [
+                                            {
+                                                text: 'Cancel',
+                                                onPress: () => {}
+                                            },
+                                            {
+                                                text: 'Add',
+                                                onPress: async (text) => {
                                                 if (text.length <= 3) {
-                                                    Alert.alert("User not found");
+                                                        showAlert({
+                                                            title: 'Error',
+                                                            message: 'User not found',
+                                                            buttons: [
+                                                                {
+                                                                    text: 'OK',
+                                                                    onPress: () => {}
+                                                                },
+                                                            ],
+                                                        });
                                                     return;
                                                 }
                                                 const response = await fetch(`${ip}/networks/${Network}/add`, {
@@ -535,13 +652,33 @@ export default function Network() {
                                                     const data = await receivedData.json();
                                                     setMember(data.members);
 
-                                                    Alert.alert("User added");
+                                                        showAlert({
+                                                            title: 'Success',
+                                                            message: 'User added',
+                                                            buttons: [
+                                                                {
+                                                                    text: 'OK',
+                                                                    onPress: () => {}
+                                                                },
+                                                            ],
+                                                        });
                                                 }
                                                 else {
-                                                    Alert.alert("User not found");
+                                                        showAlert({
+                                                            title: 'Error',
+                                                            message: 'User not found',
+                                                            buttons: [
+                                                                {
+                                                                    text: 'OK',
+                                                                    onPress: () => {}
+                                                                },
+                                                            ],
+                                                        });
                                                 }
-                                            }},
-                                    ]);
+                                                }
+                                            },
+                                        ],
+                                    });
                                 }} activeOpacity={0.65} className="rounded-full bg-accent p-2 mr-2 w-20">
                                     <Ionicons name={"add"} size={24} className="text-center" color={"#FFFFFF"}></Ionicons>
                                 </TouchableOpacity>
@@ -561,12 +698,22 @@ export default function Network() {
                                     </View>
                                 </View>
                                 {(currentNetwork.current.private && currentNetwork.current.creatorId === username.current && item.item.memberId !== username.current) && <TouchableOpacity onPress={async() => {
-                                    Alert.alert(`Are you sure you want to remove ${item.item.memberId}?`, "This action cannot be undone.", [
-                                        {text: "Cancel"},
-                                        {text: "Remove", onPress: async () => {
+                                    showAlert({
+                                        title: `Remove User`,
+                                        message: `Are you sure you want to remove ${item.item.memberId}? This action cannot be undone.`,
+                                        buttons: [
+                                            {
+                                                text: 'Cancel',
+                                                onPress: () => {}
+                                            },
+                                            {
+                                                text: 'Remove',
+                                                onPress: async () => {
                                                 await removeUser(item.item.memberId);
-                                        }}
-                                    ]);
+                                                }
+                                            }
+                                        ],
+                                    });
                                 }} activeOpacity={0.65} className="rounded-full bg-accent p-2">
                                     <Ionicons name={"trash"} size={16} color={"#FFFFFF"}></Ionicons>
                                 </TouchableOpacity>}

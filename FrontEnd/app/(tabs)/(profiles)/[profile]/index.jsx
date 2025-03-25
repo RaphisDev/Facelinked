@@ -18,6 +18,7 @@ import * as SecureStore from "expo-secure-store";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ip from "../../../../components/AppManager";
 import Post from "../../../../components/Entries/Post";
+import {showAlert} from "../../../../components/PopUpModalView";
 
 export default function Profile() {
 
@@ -45,9 +46,9 @@ export default function Profile() {
     const [friendsSearchResults, setFriendsSearchResults] = useState([]);
     const fadeAnim = useRef(new Animated.Value(1)).current;
 
+    //facesmash badge is missing but this is old design anyway
     const [profileInfos, setProfileInfos] = useState({
         name: "Loading...",
-        score: 0,
         location: "Loading...",
         hobbies: "Loading...",
         inRelationship: false,
@@ -201,7 +202,18 @@ export default function Profile() {
         });
 
         if (!data.ok) {
-            Alert.alert("Error", "An error occurred while sending your post. Please try again later.", [{text: "OK"}]);
+            showAlert({
+                title: 'Error',
+                message: 'An error occurred while sending your post. Please try again later.',
+                buttons: [
+                    {
+                        text: 'OK',
+                        onPress: () => {
+
+                        }
+                    },
+                ],
+            });
             setPosts(prevState => prevState.slice(1));
         }
         else {
@@ -237,19 +249,28 @@ export default function Profile() {
 
     async function AddFriend() {
         if(isAdded) {
-            Alert.alert(`Unfriend '${profileName.current}'?`, `Are you sure you want to remove '${profileName.current}' as a friend?`, [{
-                text: "Cancel"
-            }, {
-                text: "Unfriend", onPress: async () => {
-                    setIsAdded(false);
-                    await fetch(`${ip}/profile/friend/${profile}`, {
-                        method: 'DELETE',
-                        headers: {
-                            "Authorization": `Bearer ${token.current}`
+            showAlert({
+                title: `Unfriend ${profileName.current}'?`,
+                message: 'Are you sure you want to remove this user as a friend?',
+                buttons: [
+                    {
+                        text: 'Cancel',
+                        onPress: () => console.log('Cancelled')
+                    },
+                    {
+                        text: 'Submit',
+                        onPress: () => async () => {
+                            setIsAdded(false);
+                            await fetch(`${ip}/profile/friend/${profile}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    "Authorization": `Bearer ${token.current}`
+                                }
+                            });
                         }
-                    });
-                }
-            }]);
+                    }
+                ],
+            });
             return
         }
         setIsAdded(true);
@@ -355,11 +376,6 @@ export default function Profile() {
                     <Text className="text-text dark:text-dark-text text-center font-bold mt-7 text-4xl">{profileInfos.name}</Text>
                     <View className="justify-between flex-row mt-10">
                         <View className="ml-3 overflow-hidden w-52">
-                            <TouchableOpacity onPress={() => Alert.alert("Score", "The score is calculated based on the amount of likes you have received on your posts.",
-                                [{text: "OK"}])} activeOpacity={0.75} className="flex-row items-center justify-center self-center min-w-[95] mr-5 mb-2.5 bg-accent rounded-xl">
-                                <Ionicons size={14} color="black" name={"aperture"} className="ml-3"/>
-                                <Text className="font-bold text-lg text-center text-dark-text mr-3"> {profileInfos.score}</Text>
-                            </TouchableOpacity>
                             <FlatList scrollEnabled={false} data={[
                                 {id: "age", value: `${profileInfos.name?.split(" ")[0]}, ${calculateAge(new Date(profileInfos?.dateOfBirth))}`},
                                 {id: "location", value: profileInfos.location},
@@ -437,12 +453,22 @@ export default function Profile() {
                                     </View>
                                 </View>
                                 {profileName.current === username.current && <TouchableOpacity onPress={async() => {
-                                    Alert.alert(`Are you sure you want to remove '${item.item.memberId}' as a friend?`, "", [
-                                        {text: "Cancel"},
-                                        {text: "Remove", onPress: async () => {
-                                                await removeFriend(item.item.memberId);
-                                            }}
-                                    ]);
+                                    showAlert({
+                                        title: `Are you sure you want to remove ${item.item.memberId} as a friend?`,
+                                        message: 'You have to send a friend request again to add them back.',
+                                        buttons: [
+                                            {
+                                                text: 'Cancel',
+                                                onPress: () => console.log('Cancelled')
+                                            },
+                                            {
+                                                text: 'Remove',
+                                                onPress: async () => {
+                                                    await removeFriend(item.item.memberId);
+                                                }
+                                            }
+                                        ],
+                                    });
                                 }} activeOpacity={0.65} className="rounded-full bg-accent p-2">
                                     <Ionicons name={"close"} size={16} color={"#FFFFFF"}></Ionicons>
                                 </TouchableOpacity>}

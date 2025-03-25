@@ -337,10 +337,4 @@ useEffect(() => {
             ],
         });
     }, []);
-
-
-    return (
-        <>
-            <CustomAlertProvider />
-        </>);
  */
