@@ -23,7 +23,7 @@ export default function Chats() {
     const segments = useSegments();
     const insets = useSafeAreaInsets();
     const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
-    const [isDesktop, setIsDesktop] = useState(windowWidth > MOBILE_WIDTH_THRESHOLD + 250);
+    const [isDesktop, setIsDesktop] = useState(windowWidth > MOBILE_WIDTH_THRESHOLD + 250 && Platform.OS === 'web');
     const searchInputRef = useRef(null);
     const [selectedChat, setSelectedChat] = useState(null);
     
@@ -34,7 +34,7 @@ export default function Chats() {
         const handleResize = () => {
             const newWidth = Dimensions.get('window').width;
             setWindowWidth(newWidth);
-            setIsDesktop(newWidth > MOBILE_WIDTH_THRESHOLD + 250);
+            setIsDesktop(newWidth > MOBILE_WIDTH_THRESHOLD + 250 && Platform.OS === 'web');
         };
 
         if (Platform.OS === 'web') {
@@ -133,7 +133,7 @@ export default function Chats() {
             <View className={`flex-row items-center ${isSearching ? 'justify-between' : 'justify-between'}`}>
                 {!isSearching ? (
                     <>
-                        <Text className="text-2xl font-bold text-text dark:text-dark-text">
+                        <Text className="text-2xl ml-1 font-bold text-text dark:text-dark-text">
                             Messages
                         </Text>
                         <TouchableOpacity 

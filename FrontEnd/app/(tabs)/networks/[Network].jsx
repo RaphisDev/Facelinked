@@ -451,6 +451,7 @@ export default function Network() {
                     {Platform.OS === "web" && <TouchableOpacity className="p-4 bg-gray-700 rounded-xl self-end mr-4 mt-4" onPress={() => setModalVisible(false)}><Ionicons size={23} color="white" name="close"/></TouchableOpacity>}
                     {currentNetwork.current?.creatorId === username.current &&
                         <TouchableOpacity activeOpacity={0.6} onPress={() => {
+                            setModalVisible(false);
                             showAlert({
                                 title: 'Update Network',
                                 message: 'Enter a new name for the network\nLeave empty for no change',
@@ -470,14 +471,18 @@ export default function Network() {
                                         if (text.trim().length === 0) {
                                             text = currentNetwork.current.name;
                                         } else if (text.length <= 3) {
+                                            setTimeout(() => {
                                                 showAlert({
                                                     title: 'Error',
                                                     message: 'Name too short',
                                                     buttons: [{ text: 'OK', onPress: () => {} }]
                                                 });
+                                            }, 300)
                                             return;
                                         }
 
+                                            // Use setTimeout to ensure the next alert shows properly
+                                            setTimeout(() => {
                                             showAlert({
                                                 title: 'Update Network',
                                                 message: 'Enter a new description\nLeave empty for no change',
@@ -496,20 +501,30 @@ export default function Network() {
                                                         onPress: async (description) => {
                                                     if (description.trim().length === 0) {
                                                         if (text === currentNetwork.current.name) {
-                                                                    showAlert({
-                                                                        title: 'No Change',
-                                                                        message: 'No change applied',
-                                                                        buttons: [{ text: 'OK', onPress: () => {} }]
-                                                                    });
+                                                            setTimeout(() => {
+                                                                showAlert({
+                                                                    title: 'No Change',
+                                                                    message: 'No change applied',
+                                                                    buttons: [{
+                                                                        text: 'OK', onPress: () => {
+                                                                        }
+                                                                    }]
+                                                                });
+                                                            }, 300);
                                                             return;
                                                         }
                                                         description = currentNetwork.current.description;
                                                     } else if (description.length <= 3) {
-                                                                showAlert({
-                                                                    title: 'Error',
-                                                                    message: 'Description too short',
-                                                                    buttons: [{ text: 'OK', onPress: () => {} }]
-                                                                });
+                                                        setTimeout(() => {
+                                                            showAlert({
+                                                                title: 'Error',
+                                                                message: 'Description too short',
+                                                                buttons: [{
+                                                                    text: 'OK', onPress: () => {
+                                                                    }
+                                                                }]
+                                                            });
+                                                        }, 300);
                                                         return;
                                                     }
 
@@ -551,18 +566,19 @@ export default function Network() {
                                                             }
                                                             return network;
                                                         })));
-
+                                                        setTimeout(() => {
                                                                 showAlert({
                                                                     title: 'Success',
                                                                     message: 'Change approved!',
                                                                     buttons: [{ text: 'OK', onPress: () => {} }]
                                                                 });
-                                                        setModalVisible(false);
+                                                        }, 300);
                                                     }
                                                 }
                                                     }
                                                 ]
                                             });
+                                            }, 300); // Small delay to ensure previous alert is properly dismissed
                                     }
                                     }
                                 ]
@@ -604,6 +620,7 @@ export default function Network() {
                             <Text className="text-center text-text dark:text-dark-text self-start font-bold text-xl ml-2 mt-3">Member</Text>
                             <View className="self-end flex-row">
                                 <TouchableOpacity onPress={() => {
+                                    setModalVisible(false);
                                     showAlert({
                                         title: 'Add User',
                                         message: 'Enter the username of the user you want to add to the network',
@@ -620,16 +637,19 @@ export default function Network() {
                                                 text: 'Add',
                                                 onPress: async (text) => {
                                                 if (text.length <= 3) {
+                                                    setTimeout(() => {
                                                         showAlert({
                                                             title: 'Error',
                                                             message: 'User not found',
                                                             buttons: [
                                                                 {
                                                                     text: 'OK',
-                                                                    onPress: () => {}
+                                                                    onPress: () => {
+                                                                    }
                                                                 },
                                                             ],
                                                         });
+                                                    }, 300)
                                                     return;
                                                 }
                                                 const response = await fetch(`${ip}/networks/${Network}/add`, {
@@ -651,29 +671,34 @@ export default function Network() {
                                                     });
                                                     const data = await receivedData.json();
                                                     setMember(data.members);
-
+                                                    setTimeout(() => {
                                                         showAlert({
                                                             title: 'Success',
                                                             message: 'User added',
                                                             buttons: [
                                                                 {
                                                                     text: 'OK',
-                                                                    onPress: () => {}
+                                                                    onPress: () => {
+                                                                    }
                                                                 },
                                                             ],
                                                         });
+                                                    }, 300);
                                                 }
                                                 else {
+                                                    setTimeout(() => {
                                                         showAlert({
                                                             title: 'Error',
                                                             message: 'User not found',
                                                             buttons: [
                                                                 {
                                                                     text: 'OK',
-                                                                    onPress: () => {}
+                                                                    onPress: () => {
+                                                                    }
                                                                 },
                                                             ],
                                                         });
+                                                    }, 300)
                                                 }
                                                 }
                                             },
@@ -698,6 +723,7 @@ export default function Network() {
                                     </View>
                                 </View>
                                 {(currentNetwork.current.private && currentNetwork.current.creatorId === username.current && item.item.memberId !== username.current) && <TouchableOpacity onPress={async() => {
+                                    setModalVisible(false);
                                     showAlert({
                                         title: `Remove User`,
                                         message: `Are you sure you want to remove ${item.item.memberId}? This action cannot be undone.`,
