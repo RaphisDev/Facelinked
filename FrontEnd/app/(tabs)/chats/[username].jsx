@@ -473,7 +473,7 @@ export default function ChatRoom() {
                             onChangeText={setInput}
                             multiline
                             style={{ fontSize: 16 }}
-                            onSubmitEditing={sendMessage}
+                            onSubmitEditing={() => {if (Platform.OS === "web") {sendMessage()}}}
                         />
 
                         <TouchableOpacity
