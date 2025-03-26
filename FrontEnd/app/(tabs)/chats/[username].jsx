@@ -47,7 +47,6 @@ export default function ChatRoom() {
     const ws = new WebSocketProvider();
     const router = useRouter();
 
-    // Handle window resize and check if we're in an iframe
     useEffect(() => {
         const handleResize = () => {
             const newWidth = Dimensions.get('window').width;
@@ -55,13 +54,11 @@ export default function ChatRoom() {
             setIsDesktop(newWidth > MOBILE_WIDTH_THRESHOLD + 250);
         };
 
-        // Check if we're inside an iframe (embedded view)
         if (Platform.OS === 'web') {
             setIsEmbedded(window?.frameElement !== null);
             window.addEventListener('resize', handleResize);
         }
 
-        // Initial size check
         handleResize();
 
         return () => {
@@ -154,19 +151,15 @@ export default function ChatRoom() {
         }
     }, []);
 
-    // Handle back navigation appropriately based on context
     const handleBackNavigation = () => {
         if (isDesktop && !isEmbedded) {
-            // For desktop standalone view, return to chat list
             router.push('/chats');
         } else if (Platform.OS === 'web' && !isEmbedded) {
-            // For web, modify URL to remove username parameter
             const newUrl = new URL(window.location.href);
             newUrl.searchParams.delete('username');
             window.history.pushState({}, '', newUrl);
             router.back();
         } else {
-            // For mobile, just go back
             router.back();
         }
     };
@@ -428,7 +421,6 @@ export default function ChatRoom() {
                     </TouchableOpacity>
                 </View>
 
-                {/* Messages list with improved styling */}
                 <FlatList
                     ref={flatListRef}
                     data={messages}
@@ -450,7 +442,6 @@ export default function ChatRoom() {
                     showsVerticalScrollIndicator={false}
                 />
 
-                {/* Fixed input area at bottom */}
                 <View
                     className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200"
                     style={{
@@ -482,6 +473,7 @@ export default function ChatRoom() {
                             onChangeText={setInput}
                             multiline
                             style={{ fontSize: 16 }}
+                            onSubmitEditing={sendMessage}
                         />
 
                         <TouchableOpacity

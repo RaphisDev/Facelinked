@@ -59,7 +59,19 @@ public class SecurityConfig {
         configuration.addAllowedHeader("*");
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowCredentials(true);
-        configuration.setExposedHeaders(Arrays.asList("Authorization", "X-Requested-With", "X-HTTP-Method-Override", "Content-Type", "Accept", "Upgrade", "Connection"));
+        configuration.setExposedHeaders(Arrays.asList(
+            "Authorization", 
+            "X-Requested-With", 
+            "X-HTTP-Method-Override", 
+            "Content-Type", 
+            "Accept", 
+            "Upgrade", 
+            "Connection",
+            "Sec-WebSocket-Key",
+            "Sec-WebSocket-Version",
+            "Sec-WebSocket-Extensions",
+            "Sec-WebSocket-Protocol"
+        ));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
