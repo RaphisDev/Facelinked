@@ -261,7 +261,7 @@ export default function ChatRoom() {
     }
 
     useEffect(() => {
-        const keyboardShowListener = Platform.OS === 'ios' 
+        const keyboardShowListener = Platform.OS === 'ios'
             ? Keyboard.addListener('keyboardWillShow', (e) => {
                 setKeyboardVisible(true);
                 setKeyboardHeight(e.endCoordinates.height);
@@ -270,7 +270,7 @@ export default function ChatRoom() {
                 setKeyboardVisible(true);
                 setKeyboardHeight(e.endCoordinates.height);
               });
-              
+
         const keyboardHideListener = Platform.OS === 'ios'
             ? Keyboard.addListener('keyboardWillHide', () => {
                 setKeyboardVisible(false);
@@ -286,14 +286,6 @@ export default function ChatRoom() {
             keyboardHideListener.remove();
         };
     }, []);
-
-    useEffect(() => {
-        if (messages.length > 0 && flatListRef.current) {
-            setTimeout(() => {
-                flatListRef.current?.scrollToEnd({ animated: true });
-            }, 200);
-        }
-    }, [messages, keyboardVisible]);
 
     const pickImage = async () => {
         try {
@@ -431,13 +423,19 @@ export default function ChatRoom() {
                     contentContainerStyle={{
                         paddingHorizontal: 16,
                         paddingTop: 16,
-                        paddingBottom: keyboardVisible ? keyboardHeight + 80 : 100,
-                    }}
+                }}
+                    style={{marginBottom: 70}}
                     onContentSizeChange={() => {
-                        flatListRef.current?.scrollToEnd({ animated: false });
+                        if (flatListRef.current && messages.length > 0) {
+                            flatListRef.current.scrollToEnd({ animated: true });
+                        }
                     }}
                     onLayout={() => {
-                        flatListRef.current?.scrollToEnd({ animated: false });
+                        if (flatListRef.current && messages.length > 0) {
+                            setTimeout(() => {
+                        flatListRef.current?.scrollToEnd({ animated: true });
+                            }, 100);
+                        }
                     }}
                     showsVerticalScrollIndicator={false}
                 />
@@ -446,7 +444,6 @@ export default function ChatRoom() {
                     className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200"
                     style={{
                         paddingBottom: Platform.OS === 'ios' ? Math.max(insets.bottom, 10) : 10,
-                        marginLeft: isDesktop && isEmbedded ? 0 : 0,
                         shadowColor: "#000",
                         shadowOffset: { width: 0, height: -3 },
                         shadowOpacity: 0.05,

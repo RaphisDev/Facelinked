@@ -91,36 +91,36 @@ const Index = () => {
     else {
         if (Platform.OS === "web") {return <View className="bg-white"></View>}
         return (
-            <View className="w-full h-full bg-gradient-to-br from-blue-50 via-white to-blue-100 justify-center items-center">
-                <View className="backdrop-blur-md bg-white/60 rounded-3xl p-10 shadow-xl border border-white/50 flex flex-col items-center">
-                    <View className="relative mb-2">
+            <View className="w-full h-full bg-gradient-to-br from-blue-50 via-white to-blue-100 flex flex-col justify-between p-8">
+                <View className="flex-1" />
+                <View className="backdrop-blur-md bg-white/60 rounded-3xl p-10 shadow-xl border border-white/50 flex flex-col items-center w-full max-w-md mx-auto">
+                    <View className="mb-4">
                         <Image
                             source={require("../assets/images/icon.png")}
-                            style={{width: 150, height: 150, borderRadius: 40}}
+                            style={{width: 130, height: 130, borderRadius: 35}}
                             className="shadow-md"
                         />
                     </View>
-                        <View className="mt-6">
+
                             <Text style={{
-                                fontSize: 28,
+                        fontSize: 32,
                                 fontWeight: 'bold',
                                 textAlign: 'center',
-                                color: '#1d4ed8'
+                        color: '#1d4ed8',
+                        marginTop: 16
                             }}>
                         Facelinked
-                    </Text>
+                            </Text>
+
+                    <View className="flex-row items-center justify-center my-4">
+                        <View className="h-2 w-2 bg-blue-400 rounded-full mr-2 opacity-70"></View>
+                        <View className="h-2 w-2 bg-blue-500 rounded-full mr-2 opacity-80"></View>
+                        <View className="h-2 w-2 bg-blue-600 rounded-full opacity-90"></View>
                         </View>
-                    <Text className="text-lg text-gray-600 text-center mt-2 max-w-xs">
-                        Real connections. Real people.
-                    </Text>
-                    <View className="mt-8 flex-row items-center justify-center">
-                        <View className="h-1 w-1 bg-blue-400 rounded-full mr-1 opacity-70"></View>
-                        <View className="h-1 w-1 bg-blue-500 rounded-full mr-1 opacity-80"></View>
-                        <View className="h-1 w-1 bg-blue-600 rounded-full opacity-90"></View>
-                    </View>
-                        <View className="mt-5 bg-blue-500/20 px-4 py-2 rounded-full self-center">
+
+                    <View className="mt-5 bg-blue-500/20 px-5 py-2 rounded-full">
                             <Text style={{
-                                fontSize: 12,
+                            fontSize: 14,
                                 textAlign: 'center',
                                 color: '#2563eb',
                                 fontWeight: '600'
@@ -129,7 +129,8 @@ const Index = () => {
                     </Text>
                 </View>
             </View>
-            </View>
+                <View className="flex-1" />
+                </View>
         );
     }
 }
