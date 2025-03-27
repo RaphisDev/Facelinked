@@ -110,8 +110,7 @@ export default function MessageEntry({ message }) {
         onRequestClose={() => setModalVisible(false)}
       >
         <Pressable 
-          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center' }} 
-          onPress={() => setModalVisible(false)}
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center' }}
         >
           <Image
             source={{ uri: selectedImage }}

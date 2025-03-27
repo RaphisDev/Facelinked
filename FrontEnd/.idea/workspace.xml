@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/chats/[username].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chats/[username].jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/account.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/account.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/Entries/Message.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Entries/Message.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -244,7 +245,9 @@
       <workItem from="1742844360896" duration="12813000" />
       <workItem from="1743016298413" duration="1349000" />
       <workItem from="1743024757354" duration="51000" />
-      <workItem from="1743102179620" duration="4872000" />
+      <workItem from="1743102179620" duration="5043000" />
+      <workItem from="1743111449312" duration="53000" />
+      <workItem from="1743111592382" duration="1169000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />
