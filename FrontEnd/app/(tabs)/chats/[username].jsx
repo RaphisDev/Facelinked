@@ -360,7 +360,6 @@ export default function ChatRoom() {
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             style={{ flex: 1 }}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
         >
             <View
                 className="flex-1 bg-gray-50"
@@ -424,7 +423,7 @@ export default function ChatRoom() {
                         paddingHorizontal: 16,
                         paddingTop: 16,
                 }}
-                    style={{marginBottom: 70}}
+                    style={{marginBottom: Platform.OS === 'web' ? 0 : Platform.OS === 'ios' ? 85 : 70}}
                     onContentSizeChange={() => {
                         if (flatListRef.current && messages.length > 0) {
                             flatListRef.current.scrollToEnd({ animated: true });
@@ -443,7 +442,7 @@ export default function ChatRoom() {
                 <View
                     className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200"
                     style={{
-                        paddingBottom: Platform.OS === 'ios' ? Math.max(insets.bottom, 10) : 10,
+                        paddingBottom: Platform.OS === 'ios' ? keyboardVisible ? 10 : Math.max(insets.bottom, 10) : 10,
                         shadowColor: "#000",
                         shadowOffset: { width: 0, height: -3 },
                         shadowOpacity: 0.05,
