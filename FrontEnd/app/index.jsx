@@ -35,6 +35,7 @@ import {TextEncoder} from "text-encoding";
 import asyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import CustomAlertProvider, {showAlert} from "../components/PopUpModalView";
+import {MotiView} from "moti";
 
 global.TextEncoder = TextEncoder;
 
@@ -91,6 +92,14 @@ const Index = () => {
     else {
         if (Platform.OS === "web") {return <View className="bg-white"></View>}
         return (
+            <MotiView
+                from={{ opacity: 0, scale: 1}}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                    type: 'timing',
+                    duration: 200,
+                }}
+            >
             <View className="w-full h-full bg-gradient-to-br from-blue-50 via-white to-blue-100 flex flex-col justify-between p-8">
                 <View className="flex-1" />
                 <View className="backdrop-blur-md bg-white/60 rounded-3xl p-10 shadow-xl border border-white/50 flex flex-col items-center w-full max-w-md mx-auto">
@@ -131,6 +140,7 @@ const Index = () => {
             </View>
                 <View className="flex-1" />
                 </View>
+            </MotiView>
         );
     }
 }
@@ -312,6 +322,14 @@ const Footer = ({navigateTo, scrollContent}) => {
 const LandingPage = ({navigateTo, scrollContent}) => {
 
     return (
+        <MotiView
+            from={{ opacity: 0, scale: 1}}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{
+                type: 'timing',
+                duration: 175,
+            }}
+        >
         <ScrollView className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100" ref={scrollContent}>
             <NavigationBar navigateTo={navigateTo} scrollContent={scrollContent} />
 
@@ -578,12 +596,21 @@ const LandingPage = ({navigateTo, scrollContent}) => {
             </>)}
 
             <Footer navigateTo={navigateTo} scrollContent={scrollContent} />
-        </ScrollView>)
+        </ScrollView>
+        </MotiView>)
 }
 
 const AuthPages = ({ navigateTo, currentPage, previousPage, showPassword, setShowPassword}) => {
 
     return (
+        <MotiView
+            from={{ opacity: 0, scale: 1}}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{
+                type: 'timing',
+                duration: 125
+            }}
+        >
         <ScrollView className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex flex-col">
             <NavigationBar navigateTo={navigateTo} />
 
@@ -636,7 +663,7 @@ const AuthPages = ({ navigateTo, currentPage, previousPage, showPassword, setSho
                     {/* Right side auth forms */}
                     <View className="w-full md:w-1/2">
                         {currentPage === 'login' ? (
-                            <LoginPage navigateTo={navigateTo} showPassword={showPassword}
+                          <LoginPage navigateTo={navigateTo} showPassword={showPassword}
                                        setShowPassword={setShowPassword} previousPage={previousPage}/>
                         ) : (
                             <RegistrationFlow navigateTo={navigateTo} showPassword={showPassword}
@@ -650,6 +677,7 @@ const AuthPages = ({ navigateTo, currentPage, previousPage, showPassword, setSho
                 <Footer navigateTo={navigateTo} />
             </View>
         </ScrollView>
+        </MotiView>
     );
 };
 

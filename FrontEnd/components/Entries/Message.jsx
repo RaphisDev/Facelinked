@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Modal, Pressable, Alert, Platform } from "react-native";
+import { View, Text, TouchableOpacity, Modal, Pressable, Alert, Platform, Share } from "react-native";
 import { useState, useEffect } from "react";
 import { Image } from "expo-image";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -28,6 +28,44 @@ export default function MessageEntry({ message }) {
     setModalVisible(true);
   };
   
+  const isWeb = Platform.OS === 'web';
+
+  const handleSaveImage = async () => {
+    try {
+      if (isWeb) {
+        // Desktop-specific image download logic
+        const link = document.createElement('a');
+        link.href = selectedImage;
+        link.download = `facelinked_${Date.now()}.jpg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        // Mobile-specific logic
+        const {status} = await MediaLibrary.requestPermissionsAsync();
+
+        if (status !== 'granted') {
+          Alert.alert(
+            "Permission Required",
+            "Please grant permission to save images to your device."
+          );
+          return;
+        }
+        const filename = `facelinked_${Date.now()}.jpg`;
+        const fileUri = FileSystem.documentDirectory + filename;
+        await FileSystem.downloadAsync(selectedImage, fileUri);
+
+        await MediaLibrary.saveToLibraryAsync(fileUri);
+        await FileSystem.deleteAsync(fileUri);
+      }
+    } catch (error) {
+      console.error("Error saving image:", error);
+      Alert.alert("Error", "Failed to save image");
+    } finally {
+      setOptionsVisible(false);
+    }
+  };
+
   const renderImages = () => {
     if (images.length === 1) {
       return (
@@ -41,7 +79,7 @@ export default function MessageEntry({ message }) {
             style={{ 
               width: '100%', 
               aspectRatio: 1.5, 
-              maxHeight: 250, 
+              maxHeight: 250,
               borderRadius: 12, 
               marginBottom: 8 
             }}
@@ -144,32 +182,19 @@ export default function MessageEntry({ message }) {
           style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0)' }}
           onPress={() => setOptionsVisible(false)}
         >
-          <View style={{ backgroundColor: 'white', padding: 20, borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>
-            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 15 }}
-                onPress={async () => {
-                try {
-                    const {status} = await MediaLibrary.requestPermissionsAsync();
-
-                    if (status !== 'granted') {
-                        Alert.alert(
-                            "Permission Required",
-                            "Please grant permission to save images to your device."
-                        );
-                        return;
-                    }
-                    const filename = `facelinked_${Date.now()}.jpg`;
-                    const fileUri = FileSystem.documentDirectory + filename;
-                    await FileSystem.downloadAsync(selectedImage, fileUri);
-
-                    await MediaLibrary.saveToLibraryAsync(fileUri);
-                    await FileSystem.deleteAsync(fileUri);
-
-                } catch (error) {
-                }
-                finally {
-                    setOptionsVisible(false);
-                }
-            }}
+          <View style={{
+            backgroundColor: 'white',
+            padding: 20,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            width: isWeb ? '400px' : '100%',
+            alignSelf: isWeb ? 'center' : undefined,
+            marginBottom: isWeb ? 40 : 0,
+            borderRadius: isWeb ? 20 : undefined
+          }}>
+            <TouchableOpacity
+              style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 15 }}
+              onPress={handleSaveImage}
             >
               <Ionicons name="download-outline" size={24} color="#3B82F6" />
               <Text style={{ marginLeft: 15, fontSize: 16 }}>Save Image</Text>
@@ -177,13 +202,21 @@ export default function MessageEntry({ message }) {
             
             <TouchableOpacity 
               style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 15 }}
-              onPress={() => {
-                // Share image logic would go here
+              onPress={async () => {
+                if (isWeb) {
+                  await navigator.clipboard.writeText(selectedImage);
+                  }
+                  else {
+                  await Share.share({
+                    url: selectedImage,
+                    title: 'Share Image'
+                    });
+                }
                 setOptionsVisible(false);
               }}
             >
-              <Ionicons name="share-outline" size={24} color="#3B82F6" />
-              <Text style={{ marginLeft: 15, fontSize: 16 }}>Share</Text>
+              <Ionicons name={isWeb ? "copy-outline" : "share-outline"} size={24} color="#3B82F6" />
+              <Text style={{ marginLeft: 15, fontSize: 16 }}>{isWeb ? "Copy Link" : "Share"}</Text>
             </TouchableOpacity>
             
             <TouchableOpacity 

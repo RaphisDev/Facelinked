@@ -168,6 +168,10 @@ export default function ChatRoom() {
         if (input.trim() === '' && selectedImages.length === 0) return;
 
         try {
+            if (ws.stompClient === null) {
+                console.error("Connect to Websocket manually")
+                return;
+            }
             const messageContent = input.trim();
             setMessages((prevMessages) => [...prevMessages, {
                 isSender: true,
@@ -296,7 +300,7 @@ export default function ChatRoom() {
             });
 
             if (!result.canceled) {
-                setSelectedImages(result.assets.map(asset => asset.uri));
+                setSelectedImages(prevState => [...prevState, ...result.assets.map(asset => asset.uri)]);
             }
         } catch (error) {
             console.error('Error picking image:', error);

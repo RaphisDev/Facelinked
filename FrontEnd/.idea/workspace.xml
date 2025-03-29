@@ -6,6 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
       <change beforePath="$PROJECT_DIR$/app/(tabs)/chats/[username].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chats/[username].jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/Entries/Message.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Entries/Message.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,7 +92,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-WS-243.25659.40" />
+        <option value="bundled-js-predefined-d6986cc7102b-e768b9ed790e-JavaScript-WS-243.21565.180" />
       </set>
     </attachedChunks>
   </component>
@@ -247,6 +251,7 @@
       <workItem from="1743111449312" duration="53000" />
       <workItem from="1743111592382" duration="1169000" />
       <workItem from="1743177489564" duration="2259000" />
+      <workItem from="1743253203932" duration="3282000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />
