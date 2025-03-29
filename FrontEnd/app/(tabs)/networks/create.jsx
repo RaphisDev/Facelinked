@@ -7,6 +7,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import ip from "../../../components/AppManager";
 import {Image} from "expo-image";
 import * as ImagePicker from "expo-image-picker";
+import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
 
 export default function CreateNetwork() {
 
@@ -99,7 +100,14 @@ export default function CreateNetwork() {
             }
             url = await bucketUrl.text();
 
-            const response = await fetch(image.current.assets[0].uri);
+            let tempImage;
+            const manipResult = await ImageManipulator.manipulate(
+                image.current.assets[0].uri).resize({width: 500});
+            const renderedImage = await manipResult.renderAsync();
+            const savedImage = await renderedImage.saveAsync({format: SaveFormat.JPEG, compress: 0.7});
+            tempImage = savedImage.uri;
+
+            const response = await fetch(tempImage);
             const blob = await response.blob();
 
             await fetch(url, {
@@ -110,7 +118,6 @@ export default function CreateNetwork() {
                 body: blob,
             });
         }
-        //const compressedImage = await ImageManipulator.manipulateAsync(imageUri, [], { compress: 0.5 });
 
         let currentMembers = members;
         currentMembers = [...currentMembers, {memberId: username.current}];

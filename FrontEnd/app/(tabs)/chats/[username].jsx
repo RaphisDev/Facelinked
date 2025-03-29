@@ -22,6 +22,7 @@ import asyncStorage from "@react-native-async-storage/async-storage";
 import {Image} from "expo-image";
 import MessageEntry from "../../../components/Entries/Message.jsx";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
 
 const MOBILE_WIDTH_THRESHOLD = 768;
 
@@ -193,6 +194,13 @@ export default function ChatRoom() {
                 }
 
                 for (const image of selectedImages) {
+                    let tempImage;
+                    const manipResult = await ImageManipulator.manipulate(
+                        image).resize({width: 500});
+                    const renderedImage = await manipResult.renderAsync();
+                    const savedImage = await renderedImage.saveAsync({format: SaveFormat.JPEG, compress: 0.7});
+                    tempImage = savedImage.uri;
+
                     const bucketResponse = await fetch(`${ip}/profile/upload`, {
                         method: "GET",
                         headers: {
@@ -202,7 +210,7 @@ export default function ChatRoom() {
                     if (bucketResponse.ok) {
                         const url = await bucketResponse.text();
 
-                        const response = await fetch(image);
+                        const response = await fetch(tempImage);
                         const blob = await response.blob();
 
                         await fetch(url, {

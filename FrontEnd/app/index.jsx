@@ -36,6 +36,7 @@ import asyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import CustomAlertProvider, {showAlert} from "../components/PopUpModalView";
 import {MotiView} from "moti";
+import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
 
 global.TextEncoder = TextEncoder;
 
@@ -961,8 +962,14 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
 
                 if (bucketResponse.ok) {
                     const url = await bucketResponse.text();
+                    let image;
+                    const manipResult = await ImageManipulator.manipulate(
+                        formData.profilePicture).resize({width: 500, height: 500});
+                    const renderedImage = await manipResult.renderAsync();
+                    const savedImage = await renderedImage.saveAsync({format: SaveFormat.JPEG, compress: 0.7});
+                    image = savedImage.uri;
 
-                    const response = await fetch(formData.profilePicture);
+                    const response = await fetch(image);
                     const blob = await response.blob();
 
                     await fetch(url, {
