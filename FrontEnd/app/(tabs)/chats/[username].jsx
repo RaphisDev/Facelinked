@@ -42,11 +42,13 @@ export default function ChatRoom() {
     const [keyboardHeight, setKeyboardHeight] = useState(0);
     const [keyboardVisible, setKeyboardVisible] = useState(false);
     const [selectedImages, setSelectedImages] = useState([]);
+    const [inputHeight, setInputHeight] = useState(40);
 
     const flatListRef = useRef(null);
     const inputRef = useRef(null);
     const ws = new WebSocketProvider();
     const router = useRouter();
+    const inputBarAnimation = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         const handleResize = () => {
@@ -277,20 +279,40 @@ export default function ChatRoom() {
             ? Keyboard.addListener('keyboardWillShow', (e) => {
                 setKeyboardVisible(true);
                 setKeyboardHeight(e.endCoordinates.height);
+                Animated.timing(inputBarAnimation, {
+                    toValue: 1,
+                    duration: 250,
+                    useNativeDriver: false
+                }).start();
               })
             : Keyboard.addListener('keyboardDidShow', (e) => {
                 setKeyboardVisible(true);
                 setKeyboardHeight(e.endCoordinates.height);
+                Animated.timing(inputBarAnimation, {
+                    toValue: 1,
+                    duration: 150,
+                    useNativeDriver: false
+                }).start();
               });
 
         const keyboardHideListener = Platform.OS === 'ios'
             ? Keyboard.addListener('keyboardWillHide', () => {
                 setKeyboardVisible(false);
                 setKeyboardHeight(0);
+                Animated.timing(inputBarAnimation, {
+                    toValue: 0,
+                    duration: 200,
+                    useNativeDriver: false
+                }).start();
               })
             : Keyboard.addListener('keyboardDidHide', () => {
                 setKeyboardVisible(false);
                 setKeyboardHeight(0);
+                Animated.timing(inputBarAnimation, {
+                    toValue: 0,
+                    duration: 100,
+                    useNativeDriver: false
+                }).start();
               });
 
         return () => {
@@ -317,33 +339,23 @@ export default function ChatRoom() {
 
     const renderSelectedImages = () => {
         if (!selectedImages || selectedImages.length === 0) return null;
-        if (selectedImages?.length === 0) return null;
-        
+
         return (
-            <View style={{ padding: 10, backgroundColor: '#f9fafb', borderTopWidth: 1, borderTopColor: '#e5e7eb' }}>
+            <View style={styles.selectedImagesContainer}>
                 <FlatList
                     horizontal
                     data={selectedImages}
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item, index }) => (
-                        <View style={{ marginRight: 10, position: 'relative' }}>
+                        <View style={styles.selectedImageWrapper}>
                             <Image
                                 source={{ uri: item }}
-                                style={{ width: 70, height: 70, borderRadius: 8 }}
+                                style={styles.selectedImage}
                                 contentFit="cover"
+                                transition={200}
                             />
                             <TouchableOpacity
-                                style={{
-                                    position: 'absolute',
-                                    top: -5,
-                                    right: -5,
-                                    backgroundColor: 'rgba(0,0,0,0.5)',
-                                    borderRadius: 12,
-                                    width: 24,
-                                    height: 24,
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                }}
+                                style={styles.removeImageButton}
                                 onPress={() => {
                                     const newImages = [...selectedImages];
                                     newImages.splice(index, 1);
@@ -362,33 +374,39 @@ export default function ChatRoom() {
 
     if (isLoading) {
         return (
-            <View className="flex-1 justify-center items-center bg-white">
-                <Text className="text-gray-600 font-medium">Loading conversation...</Text>
+            <View style={styles.loadingContainer}>
+                <View style={styles.loadingIndicator}>
+                    <Text style={styles.loadingText}>Loading conversation...</Text>
+                </View>
             </View>
         );
     }
 
+    const bottomPadding = Platform.OS === 'ios' 
+        ? keyboardVisible 
+            ? 10  
+            : Math.max(insets.bottom, 16)
+        : 16;
+
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            style={{ flex: 1 }}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+            style={styles.container}
         >
             <View
-                className="flex-1 bg-gray-50"
-                style={{
-                    paddingTop: Platform.OS !== 'web' ? insets.top : 0,
-                }}
+                style={[
+                    styles.contentContainer, 
+                    { paddingTop: Platform.OS !== 'web' ? insets.top : 0 }
+                ]}
             >
                 {/* Chat header - enhanced styling */}
-                <View className="bg-white border-b border-gray-200 px-4 py-3 flex-row items-center shadow-sm">
+                <View style={styles.header}>
                     {(!isEmbedded || !isDesktop) && (
                         <TouchableOpacity
                             onPress={handleBackNavigation}
-                            className="mr-3 p-1"
-                            style={{
-                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                borderRadius: 20,
-                            }}
+                            style={styles.backButton}
+                            activeOpacity={0.7}
                         >
                             <Ionicons name="arrow-back" size={22} color="#3B82F6" />
                         </TouchableOpacity>
@@ -396,29 +414,29 @@ export default function ChatRoom() {
 
                     <TouchableOpacity
                         onPress={() => router.push(`/${username}`)}
-                        className="flex-row items-center flex-1"
+                        style={styles.profileContainer}
+                        activeOpacity={0.8}
                     >
                         <Image
                             source={{ uri: userData.image }}
-                            style={{ width: 40, height: 40, borderRadius: 22 }}
+                            style={styles.profileImage}
                             className="bg-gray-200"
                             cachePolicy="memory"
+                            transition={150}
                         />
-                        <View className="ml-3">
-                            <Text className="font-bold text-gray-800 text-base">{userData.name}</Text>
+                        <View style={styles.profileInfo}>
+                            <Text style={styles.profileName}>{userData.name}</Text>
                             {isTyping ? (
-                                <Text className="text-xs text-blue-500">typing...</Text>
+                                <Text style={styles.typingIndicator}>typing...</Text>
                             ) : (
-                                <Text className="text-xs text-gray-500">Tap to view profile</Text>
+                                <Text style={styles.profileSubtext}>Tap to view profile</Text>
                             )}
                         </View>
                     </TouchableOpacity>
 
                     <TouchableOpacity 
-                        className="w-10 h-10 rounded-full items-center justify-center"
-                        style={{
-                            backgroundColor: 'rgba(100, 116, 139, 0.1)',
-                        }}
+                        style={styles.menuButton}
+                        activeOpacity={0.7}
                     >
                         <Ionicons name="ellipsis-vertical" size={18} color="#64748B" />
                     </TouchableOpacity>
@@ -431,11 +449,8 @@ export default function ChatRoom() {
                     renderItem={({ item }) => (
                         <MessageEntry message={item} />
                     )}
-                    contentContainerStyle={{
-                        paddingHorizontal: 16,
-                        paddingTop: 16,
-                }}
-                    style={{marginBottom: Platform.OS === 'web' ? 0 : Platform.OS === 'ios' ? 85 : 70}}
+                    contentContainerStyle={styles.messagesContent}
+                    style={styles.messagesList}
                     onContentSizeChange={() => {
                         if (flatListRef.current && messages.length > 0) {
                             flatListRef.current.scrollToEnd({ animated: true });
@@ -444,59 +459,283 @@ export default function ChatRoom() {
                     onLayout={() => {
                         if (flatListRef.current && messages.length > 0) {
                             setTimeout(() => {
-                        flatListRef.current?.scrollToEnd({ animated: true });
+                                flatListRef.current?.scrollToEnd({ animated: true });
                             }, 100);
                         }
                     }}
                     showsVerticalScrollIndicator={false}
+                    ListEmptyComponent={
+                        <View style={styles.emptyChat}>
+                            <Text style={styles.emptyChatText}>No messages yet.</Text>
+                            <Text style={styles.emptyChatSubtext}>Start the conversation!</Text>
+                        </View>
+                    }
                 />
 
-                <View
-                    className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200"
-                    style={{
-                        paddingBottom: Platform.OS === 'ios' ? keyboardVisible ? 10 : Math.max(insets.bottom, 10) : 10,
-                        shadowColor: "#000",
-                        shadowOffset: { width: 0, height: -3 },
-                        shadowOpacity: 0.05,
-                        shadowRadius: 4,
-                        elevation: 3,
-                    }}
+                <Animated.View
+                    style={[
+                        styles.inputContainer,
+                        {
+                            paddingBottom: bottomPadding,
+                            backgroundColor: inputBarAnimation.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: ['rgba(255, 255, 255, 0.98)', 'rgba(255, 255, 255, 1)']
+                            }),
+                            shadowOpacity: inputBarAnimation.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: [0.05, 0.1]
+                            }),
+                        }
+                    ]}
                 >
                     {renderSelectedImages()}
                     
-                    <View className="flex-row items-center bg-gray-100 rounded-full px-3 mx-3 my-2">
+                    <View style={styles.inputWrapper}>
                         <TouchableOpacity
                             onPress={pickImage}
-                            className="pr-2 py-2"
+                            style={styles.attachButton}
+                            activeOpacity={0.7}
                         >
                             <Ionicons name="image-outline" size={24} color="#64748B" />
                         </TouchableOpacity>
 
                         <TextInput
                             ref={inputRef}
-                            className="flex-1 py-2 px-2 text-gray-700 max-h-24 outline-none"
+                            style={[styles.textInput, { height: Math.max(40, inputHeight) }]}
                             placeholder="Type a message..."
                             placeholderTextColor="#9CA3AF"
                             value={input}
                             onChangeText={setInput}
                             multiline
-                            style={{ fontSize: 16 }}
+                            onContentSizeChange={(e) => {
+                                const height = e.nativeEvent.contentSize.height;
+                                setInputHeight(Math.min(height, 120));
+                            }}
                             onSubmitEditing={() => {if (Platform.OS === "web") {sendMessage()}}}
                         />
 
                         <TouchableOpacity
                             onPress={sendMessage}
                             disabled={input.trim() === '' && selectedImages.length === 0}
-                            className={`ml-2 h-10 w-10 rounded-full items-center justify-center ${
-                                input.trim() === '' && selectedImages.length === 0 ? 'bg-gray-300' : 'bg-blue-500'
-                            }`}
+                            style={[
+                                styles.sendButton,
+                                { backgroundColor: input.trim() === '' && selectedImages.length === 0 ? '#CBD5E1' : '#3B82F6' }
+                            ]}
+                            activeOpacity={input.trim() === '' && selectedImages.length === 0 ? 1 : 0.7}
                         >
                             <Ionicons name="send" size={18} color="white" />
                         </TouchableOpacity>
                     </View>
-                </View>
+                </Animated.View>
             </View>
         </KeyboardAvoidingView>
     );
 }
 
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    contentContainer: {
+        flex: 1,
+        backgroundColor: '#F8FAFC',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F8FAFC',
+    },
+    loadingIndicator: {
+        padding: 16,
+        borderRadius: 12,
+        backgroundColor: 'white',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+        elevation: 3,
+    },
+    loadingText: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: '#64748B',
+    },
+    header: {
+        backgroundColor: 'white',
+        borderBottomWidth: 1,
+        borderBottomColor: '#E2E8F0',
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+        elevation: 2,
+        zIndex: 10,
+    },
+    backButton: {
+        width: 38,
+        height: 38,
+        borderRadius: 20,
+        backgroundColor: 'rgba(59, 130, 246, 0.08)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
+    profileContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1,
+    },
+    profileImage: {
+        width: 42,
+        height: 42,
+        borderRadius: 21,
+        borderWidth: 2,
+        borderColor: 'rgba(59, 130, 246, 0.2)',
+    },
+    profileInfo: {
+        marginLeft: 12,
+        justifyContent: 'center',
+    },
+    profileName: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#1E293B',
+    },
+    profileSubtext: {
+        fontSize: 12,
+        color: '#64748B',
+        marginTop: 1,
+    },
+    typingIndicator: {
+        fontSize: 12,
+        color: '#3B82F6',
+        marginTop: 1,
+        fontWeight: '500',
+    },
+    menuButton: {
+        width: 38,
+        height: 38,
+        borderRadius: 20,
+        backgroundColor: 'rgba(100, 116, 139, 0.08)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 8,
+    },
+    messagesContent: {
+        paddingHorizontal: 16,
+        paddingTop: 16,
+        paddingBottom: Platform.OS === 'web' ? 16 : 90,
+    },
+    messagesList: {
+        flex: 1,
+    },
+    emptyChat: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+        marginTop: 100,
+    },
+    emptyChatText: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: '#64748B',
+    },
+    emptyChatSubtext: {
+        fontSize: 14,
+        color: '#94A3B8',
+        marginTop: 8,
+    },
+    inputContainer: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: 'white',
+        borderTopWidth: 1,
+        borderTopColor: '#E2E8F0',
+        paddingTop: 10,
+        paddingHorizontal: 12,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: -3,
+        },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 3,
+        zIndex: 100,
+    },
+    inputWrapper: {
+        flexDirection: 'row',
+        alignItems: 'flex-end',
+        backgroundColor: '#F1F5F9',
+        borderRadius: 24,
+        paddingHorizontal: 12,
+        marginHorizontal: 2,
+    },
+    attachButton: {
+        paddingVertical: 10,
+        paddingHorizontal: 4,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    textInput: {
+        flex: 1,
+        paddingHorizontal: 10,
+        paddingVertical: 10,
+        fontSize: 16,
+        maxHeight: 120,
+        color: '#334155',
+    },
+    sendButton: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: '#3B82F6',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 8,
+        marginBottom: 4,
+    },
+    selectedImagesContainer: {
+        padding: 10,
+        backgroundColor: '#F8FAFC',
+        borderTopWidth: 1,
+        borderTopColor: '#E2E8F0',
+        marginBottom: 8,
+        borderRadius: 12,
+    },
+    selectedImageWrapper: {
+        marginRight: 10,
+        position: 'relative',
+    },
+    selectedImage: {
+        width: 70,
+        height: 70,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: 'rgba(203, 213, 225, 0.5)',
+    },
+    removeImageButton: {
+        position: 'absolute',
+        top: -6,
+        right: -6,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        borderRadius: 12,
+        width: 24,
+        height: 24,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1.5,
+        borderColor: 'white',
+    },
+});
