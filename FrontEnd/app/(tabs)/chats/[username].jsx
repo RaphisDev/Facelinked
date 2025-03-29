@@ -302,7 +302,7 @@ export default function ChatRoom() {
     const pickImage = async () => {
         try {
             const result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                mediaTypes: "images",
                 allowsMultipleSelection: true,
                 quality: 0.8,
             });
