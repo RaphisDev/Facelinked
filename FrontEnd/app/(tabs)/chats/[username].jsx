@@ -268,9 +268,20 @@ export default function ChatRoom() {
                 millis: Date.now(),
                 images: imageURls
             }]));
+
+            setMessages(prevState => prevState.map(message => {
+                if (message.isOptimistic) {
+                    return {
+                        ...message,
+                        isOptimistic: false,
+                        images: imageURls
+                    };
+                }
+                return message;
+            }))
         }
         catch (e) {
-            setMessages(prevState => prevState.filter((chat) => !chat.isOptimistic));
+            //setMessages(prevState => prevState.filter((chat) => !chat.isOptimistic));
         }
     }
 
@@ -284,7 +295,7 @@ export default function ChatRoom() {
                     duration: 250,
                     useNativeDriver: false
                 }).start();
-              })
+            })
             : Keyboard.addListener('keyboardDidShow', (e) => {
                 setKeyboardVisible(true);
                 setKeyboardHeight(e.endCoordinates.height);
@@ -293,7 +304,7 @@ export default function ChatRoom() {
                     duration: 150,
                     useNativeDriver: false
                 }).start();
-              });
+            });
 
         const keyboardHideListener = Platform.OS === 'ios'
             ? Keyboard.addListener('keyboardWillHide', () => {
@@ -304,7 +315,7 @@ export default function ChatRoom() {
                     duration: 200,
                     useNativeDriver: false
                 }).start();
-              })
+            })
             : Keyboard.addListener('keyboardDidHide', () => {
                 setKeyboardVisible(false);
                 setKeyboardHeight(0);
@@ -313,7 +324,7 @@ export default function ChatRoom() {
                     duration: 100,
                     useNativeDriver: false
                 }).start();
-              });
+            });
 
         return () => {
             keyboardShowListener.remove();
@@ -382,9 +393,9 @@ export default function ChatRoom() {
         );
     }
 
-    const bottomPadding = Platform.OS === 'ios' 
-        ? keyboardVisible 
-            ? 10  
+    const bottomPadding = Platform.OS === 'ios'
+        ? keyboardVisible
+            ? 10
             : Math.max(insets.bottom, 16)
         : 16;
 
@@ -396,7 +407,7 @@ export default function ChatRoom() {
         >
             <View
                 style={[
-                    styles.contentContainer, 
+                    styles.contentContainer,
                     { paddingTop: Platform.OS !== 'web' ? insets.top : 0 }
                 ]}
             >
@@ -434,7 +445,7 @@ export default function ChatRoom() {
                         </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.menuButton}
                         activeOpacity={0.7}
                     >
@@ -489,7 +500,7 @@ export default function ChatRoom() {
                     ]}
                 >
                     {renderSelectedImages()}
-                    
+
                     <View style={styles.inputWrapper}>
                         <TouchableOpacity
                             onPress={pickImage}

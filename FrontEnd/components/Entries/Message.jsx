@@ -269,7 +269,11 @@ export default function MessageEntry({ message }) {
       >
         <Pressable
           style={styles.optionsModalOverlay}
-          onPress={() => setOptionsVisible(false)}
+          onPress={(event) => {
+            if (event.target === event.currentTarget) {
+              setOptionsVisible(false);
+            }
+          }}
         >
           <View style={[
             styles.optionsContainer,
