@@ -1468,7 +1468,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                             <TouchableOpacity activeOpacity={0.7} onPress={async () => {
                                 const result = await ImagePicker.launchImageLibraryAsync({
                                     allowsEditing: true,
-                                    aspect: [16, 19],
+                                    aspect: [1, 1],
                                     quality: 0.8,
                                     mediaTypes: "images"
                                 });
