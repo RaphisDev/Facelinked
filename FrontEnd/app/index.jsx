@@ -755,32 +755,40 @@ const LoginPage = ({navigateTo, showPassword, setShowPassword, previousPage}) =>
                         router.replace("/");
                     }
                 } else {
-                    showAlert({
-                        title: "Error",
-                        message: "Invalid email or password. Please try again.",
-                        buttons: [{
-                            text: 'OK',
-                            onPress: () => {
+                    if (Platform.OS === "web") {
+                        showAlert({
+                            title: "Error",
+                            message: "Invalid email or password. Please try again.",
+                            buttons: [{
+                                text: 'OK',
+                                onPress: () => {
 
-                            }
-                        }],
-                    })
+                                }
+                            }],
+                        })
+                    } else {
+                        alert("Invalid email or password. Please try again.");
+                    }
                 }
             } catch (error) {
                 console.error("Error:", error);
             }
         }
         else {
-            showAlert({
-                title: "Error",
-                message: "Invalid email or password. Please try again.",
-                buttons: [{
-                    text: 'OK',
-                    onPress: () => {
+            if (Platform.OS === "web") {
+                showAlert({
+                    title: "Error",
+                    message: "Invalid email or password. Please try again.",
+                    buttons: [{
+                        text: 'OK',
+                        onPress: () => {
 
-                    }
-                }],
-            })
+                        }
+                    }],
+                })
+            } else {
+                alert("Invalid email or password. Please try again.");
+            }
         }
     }
 
@@ -956,16 +964,20 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
 
         if (emailRegex.test(formData.email) && formData.password.length > 3 && formData.username.length >= 3 && formData.name.length > 3) {
             if(age <= 13 || formData.interests.length < 3 || formData.location.length <= 3 || !formData.profilePicture) {
-                showAlert({
-                    title: "Error",
-                    message: "Please fill out all fields and comply with the Terms of Service",
-                    buttons: [{
-                        text: 'OK',
-                        onPress: () => {
+                if (Platform.OS === "web") {
+                    showAlert({
+                        title: "Error",
+                        message: "Please fill out all fields and comply with the Terms of Service",
+                        buttons: [{
+                            text: 'OK',
+                            onPress: () => {
 
-                        }
-                    },],
-                })
+                            }
+                        }],
+                    })
+                } else {
+                    alert("Please fill out all fields and comply with the Terms of Service");
+                }
                 jumpToStep(1);
                 return;
             }
@@ -989,47 +1001,59 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                     token.current = data.token;
                 }
                 else {
-                    showAlert({
-                        title: "Conflict",
-                        message: "There is already an account with that email or username.",
-                        buttons: [{
-                            text: 'OK',
-                            onPress: () => {
+                    if (Platform.OS === "web") {
+                        showAlert({
+                            title: "Conflict",
+                            message: "There is already an account with that email or username.",
+                            buttons: [{
+                                text: 'OK',
+                                onPress: () => {
 
-                            }
-                        },],
-                    })
+                                }
+                            }],
+                        })
+                    } else {
+                        alert("There is already an account with that email or username.");
+                    }
                     jumpToStep(1);
                     setRegistered(false);
                 }
             }
             catch (error) {
-                showAlert({
-                    title: "Error",
-                    message: "Please try again.",
-                    buttons: [{
-                        text: 'OK',
-                        onPress: () => {
+                if (Platform.OS === "web") {
+                    showAlert({
+                        title: "Error",
+                        message: "Please try again.",
+                        buttons: [{
+                            text: 'OK',
+                            onPress: () => {
 
-                        }
-                    },],
-                })
+                            }
+                        }],
+                    })
+                } else {
+                    alert("Network Error. Please try again.");
+                }
                 jumpToStep(1);
                 setRegistered(false);
             }
             await CompleteProfile();
         }
         else if(!registered) {
-            showAlert({
-                title: "Error",
-                message: "Please enter a valid email and password",
-                buttons: [{
-                    text: 'OK',
-                    onPress: () => {
+            if (Platform.OS === "web") {
+                showAlert({
+                    title: "Error",
+                    message: "Please enter a valid email and password",
+                    buttons: [{
+                        text: 'OK',
+                        onPress: () => {
 
-                    }
-                },],
-            })
+                        }
+                    }],
+                })
+            } else {
+                alert("Please enter a valid email and password");
+            }
             jumpToStep(1);
         }
     }
@@ -1067,16 +1091,20 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                     imageUrl.current = url.split('?')[0];
                 }
                 else {
-                    showAlert({
-                        title: "Error",
-                        message: "There was an error uploading the image. Please try again.",
-                        buttons: [{
-                            text: 'OK',
-                            onPress: () => {
+                    if (Platform.OS === "web") {
+                        showAlert({
+                            title: "Error",
+                            message: "There was an error uploading the image. Please try again.",
+                            buttons: [{
+                                text: 'OK',
+                                onPress: () => {
 
-                            }
-                        },],
-                    })
+                                }
+                            }],
+                        })
+                    } else {
+                        alert("There was an error uploading the image. Please try again.");
+                    }
                     return;
                 }
 
@@ -1091,16 +1119,20 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                         }
 
                         if (finalStatus !== 'granted') {
-                            showAlert({
-                                title: "Permission denied",
-                                message: "Notifications are disabled. Enable them in your settings.",
-                                buttons: [{
-                                    text: 'OK',
-                                    onPress: () => {
+                            if (Platform.OS === "web") {
+                                showAlert({
+                                    title: "Permission denied",
+                                    message: "Notifications are disabled. Enable them in your settings.",
+                                    buttons: [{
+                                        text: 'OK',
+                                        onPress: () => {
 
-                                    }
-                                },],
-                            })
+                                        }
+                                    },],
+                                })
+                            } else {
+                                alert("Notifications are disabled. Enable them in your settings.");
+                            }
                             return null;
                         }
                         await Notification.getDevicePushTokenAsync().then((token) => {
@@ -1181,9 +1213,29 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                     router.replace("/home");
                 }
                 else {
+                    if (Platform.OS === "web") {
+                        showAlert({
+                            title: "Conflict",
+                            message: "There is already an account with that email or username.",
+                            buttons: [{
+                                text: 'OK',
+                                onPress: () => {
+
+                                }
+                            },],
+                        })
+                    } else {
+                        alert("There is already an account with that email or username.");
+                    }
+                    setRegistered(false);
+                    jumpToStep(1);
+                }
+            }
+            catch (error) {
+                if (Platform.OS === "web") {
                     showAlert({
-                        title: "Conflict",
-                        message: "There is already an account with that email or username.",
+                        title: "Error",
+                        message: "There was an error registering. Please try again",
                         buttons: [{
                             text: 'OK',
                             onPress: () => {
@@ -1191,21 +1243,9 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                             }
                         },],
                     })
-                    setRegistered(false);
-                    jumpToStep(1);
+                } else {
+                    alert("There was an error registering. Please try again");
                 }
-            }
-            catch (error) {
-                showAlert({
-                    title: "Error",
-                    message: "There was an error registering. Please try again",
-                    buttons: [{
-                        text: 'OK',
-                        onPress: () => {
-
-                        }
-                    },],
-                })
                 setRegistered(false)
                 jumpToStep(1)
             }
