@@ -37,6 +37,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import CustomAlertProvider, {showAlert} from "../components/PopUpModalView";
 import {MotiView} from "moti";
 import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
+import {useDerivedValue} from "react-native-reanimated";
 
 global.TextEncoder = TextEncoder;
 
@@ -603,6 +604,26 @@ const LandingPage = ({navigateTo, scrollContent}) => {
 
 const AuthPages = ({ navigateTo, currentPage, previousPage, showPassword, setShowPassword}) => {
 
+    if (Platform.OS !== "web") {
+        return (
+            <MotiView
+                from={{ opacity: 0, scale: 1}}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                    type: 'timing',
+                    duration: 125
+                }}
+            >
+                {currentPage === 'login' ? (
+            <LoginPage navigateTo={navigateTo} showPassword={showPassword}
+                       setShowPassword={setShowPassword} previousPage={previousPage}/>
+        ) : (
+            <RegistrationFlow navigateTo={navigateTo} showPassword={showPassword}
+                              setShowPassword={setShowPassword} previousPage={previousPage}/>
+                )}
+            </MotiView>
+        );
+    }
     return (
         <MotiView
             from={{ opacity: 0, scale: 1}}
@@ -734,14 +755,32 @@ const LoginPage = ({navigateTo, showPassword, setShowPassword, previousPage}) =>
                         router.replace("/");
                     }
                 } else {
-                    alert("Wrong email or password");
+                    showAlert({
+                        title: "Error",
+                        message: "Invalid email or password. Please try again.",
+                        buttons: [{
+                            text: 'OK',
+                            onPress: () => {
+
+                            }
+                        }],
+                    })
                 }
             } catch (error) {
                 console.error("Error:", error);
             }
         }
         else {
-            alert("Please enter a valid email and password");
+            showAlert({
+                title: "Error",
+                message: "Invalid email or password. Please try again.",
+                buttons: [{
+                    text: 'OK',
+                    onPress: () => {
+
+                    }
+                }],
+            })
         }
     }
 
@@ -752,132 +791,142 @@ const LoginPage = ({navigateTo, showPassword, setShowPassword, previousPage}) =>
         });
     }
 
-    return (
-        <View
-            className="backdrop-blur-sm bg-white/60 rounded-3xl shadow-xl border border-white/50 p-6 md:p-8 w-full max-w-md mx-auto">
-            <View className="mb-8">
-                <TouchableOpacity activeOpacity={0.7}
-                    onPress={() => {
-                        if (previousPage === "register") {
-                            navigateTo("landing");
-                        } else {
-                            navigateTo(previousPage);
-                        }
-                    }}
-                    className="p-2 rounded-full self-start hover:bg-gray-100"
-                >
-                    {<X size={20}/>}
-                </TouchableOpacity>
-                <Text className="text-3xl text-center font-bold bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">Welcome
-                    Back</Text>
-                <Text className="text-gray-600 text-center mt-2">Sign in to your account</Text>
-            </View>
-
-            <View className="space-y-6">
-                <View>
-                    <Text htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</Text>
-                    <View className="relative">
-                        <View className="absolute inset-y-0 left-0 pl-3 flex flex-row items-center pointer-events-none">
-                            <Mail size={18} className="text-gray-400"/>
-                        </View>
-                        <TextInput
-                            type="email"
-                            name="email"
-                            onChangeText={(value) => updateFormData("email", value)}
-                            className="pl-10 block w-full rounded-lg border border-gray-300 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                            placeholder="Enter your email"
-                            placeholderTextColor="#9CA3AF"
-                        />
-                    </View>
+    if (Platform.OS === "web") {
+        return (
+            <View
+                className="backdrop-blur-sm bg-white/60 rounded-3xl shadow-xl border border-white/50 p-6 md:p-8 w-full max-w-md mx-auto">
+                <View className="mb-8">
+                    <TouchableOpacity activeOpacity={0.7}
+                                      onPress={() => {
+                                          if (previousPage === "register") {
+                                              navigateTo("landing");
+                                          } else {
+                                              navigateTo(previousPage);
+                                          }
+                                      }}
+                                      className="p-2 rounded-full self-start hover:bg-gray-100"
+                    >
+                        {<X size={20}/>}
+                    </TouchableOpacity>
+                    <Text
+                        className="text-3xl text-center font-bold bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">Welcome
+                        Back</Text>
+                    <Text className="text-gray-600 text-center mt-2">Sign in to your account</Text>
                 </View>
 
-                <View>
-                    <Text htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</Text>
-                    <View className="relative">
-                        <View className="absolute inset-y-0 left-0 pl-3 flex flex-row items-center pointer-events-none">
-                            <Lock size={18} className="text-gray-400" />
+                <View className="space-y-6">
+                    <View>
+                        <Text htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</Text>
+                        <View className="relative">
+                            <View
+                                className="absolute inset-y-0 left-0 pl-3 flex flex-row items-center pointer-events-none">
+                                <Mail size={18} className="text-gray-400"/>
+                            </View>
+                            <TextInput
+                                type="email"
+                                name="email"
+                                onChangeText={(value) => updateFormData("email", value)}
+                                className="pl-10 block w-full rounded-lg border border-gray-300 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                placeholder="Enter your email"
+                                placeholderTextColor="#9CA3AF"
+                            />
                         </View>
-                        <TextInput
-                            secureTextEntry={!showPassword}
-                            onChangeText={(value) => updateFormData("password", value)}
-                            className="pl-10 pr-10 block w-full rounded-lg border border-gray-300 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                            placeholder="Enter your password"
-                            placeholderTextColor="#9CA3AF"
-                        />
-                        <View className="absolute inset-y-0 right-0 pr-3 flex flex-row items-center">
-                            <Pressable
-                                type="button"
-                                onPress={() => setShowPassword(!showPassword)}
-                                className="text-gray-400 hover:text-gray-600"
+                    </View>
+
+                    <View>
+                        <Text htmlFor="password"
+                              className="block text-sm font-medium text-gray-700 mb-1">Password</Text>
+                        <View className="relative">
+                            <View
+                                className="absolute inset-y-0 left-0 pl-3 flex flex-row items-center pointer-events-none">
+                                <Lock size={18} className="text-gray-400"/>
+                            </View>
+                            <TextInput
+                                secureTextEntry={!showPassword}
+                                onChangeText={(value) => updateFormData("password", value)}
+                                className="pl-10 pr-10 block w-full rounded-lg border border-gray-300 py-3 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                placeholder="Enter your password"
+                                placeholderTextColor="#9CA3AF"
+                            />
+                            <View className="absolute inset-y-0 right-0 pr-3 flex flex-row items-center">
+                                <Pressable
+                                    type="button"
+                                    onPress={() => setShowPassword(!showPassword)}
+                                    className="text-gray-400 hover:text-gray-600"
+                                >
+                                    {showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
+                                </Pressable>
+                            </View>
+                        </View>
+                    </View>
+
+                    <View className="flex flex-row items-center justify-between">
+                        <View className="flex flex-row items-center">
+                            <Pressable disabled={true}
+                                       onPress={() => setRememberMe(prev => !prev)}
+                                       className="h-5 w-5 border border-gray-300 rounded flex items-center justify-center bg-white"
                             >
-                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                {rememberMe && (
+                                    <View className="h-3 w-3 bg-blue-500 rounded"></View>
+                                )}
                             </Pressable>
+                            <Text htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                                Remember me
+                            </Text>
+                        </View>
+                        <View className="text-sm">
+                            <Link href="mailto:bretter.schlaue83@icloud.com"
+                                  className="text-sm font-medium text-blue-500 hover:text-blue-600 active:text-blue-400">
+                                Forgot password?
+                            </Link>
+                        </View>
+                    </View>
+
+                    <TouchableOpacity activeOpacity={0.9} onPress={() => loginEmail()}
+                                      className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white text-center bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                        Sign in
+                    </TouchableOpacity>
+
+                    <View className="mt-6">
+                        <View className="flex-row items-center">
+                            <View className="flex-1 h-px bg-gray-300"/>
+                            <Text className="mx-2 text-gray-500 text-sm">Or continue with</Text>
+                            <View className="flex-1 h-px bg-gray-300"/>
+                        </View>
+
+                        <View className="mt-6 grid grid-cols-2 gap-3">
+                            <TouchableOpacity activeOpacity={0.9}
+                                              className="py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center text-gray-700 bg-white hover:bg-gray-50"
+                            >
+                                <View className="w-5 h-5 bg-blue-500 rounded-full mr-2"></View>
+                                Google
+                            </TouchableOpacity>
+                            <TouchableOpacity activeOpacity={0.9}
+                                              className="py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center text-gray-700 bg-white hover:bg-gray-50"
+                            >
+                                <View className="w-5 h-5 bg-black rounded-full mr-2"></View>
+                                Apple
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </View>
 
-                <View className="flex flex-row items-center justify-between">
-                    <View className="flex flex-row items-center">
-                        <Pressable disabled={true}
-                            onPress={() => setRememberMe(prev => !prev)}
-                            className="h-5 w-5 border border-gray-300 rounded flex items-center justify-center bg-white"
-                        >
-                            {rememberMe && (
-                                <View className="h-3 w-3 bg-blue-500 rounded"></View>
-                            )}
-                        </Pressable>
-                        <Text htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                            Remember me
-                        </Text>
-                    </View>
-                    <View className="text-sm">
-                        <Link href="mailto:bretter.schlaue83@icloud.com" className="text-sm font-medium text-blue-500 hover:text-blue-600 active:text-blue-400">
-                            Forgot password?
-                        </Link>
-                    </View>
-                </View>
-
-                <TouchableOpacity activeOpacity={0.9} onPress={() => loginEmail()}
-                    className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white text-center bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                    Sign in
-                </TouchableOpacity>
-
-                <View className="mt-6">
-                    <View className="flex-row items-center">
-                        <View className="flex-1 h-px bg-gray-300" />
-                        <Text className="mx-2 text-gray-500 text-sm">Or continue with</Text>
-                        <View className="flex-1 h-px bg-gray-300" />
-                    </View>
-
-                    <View className="mt-6 grid grid-cols-2 gap-3">
-                        <TouchableOpacity activeOpacity={0.9}
-                            className="py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center text-gray-700 bg-white hover:bg-gray-50"
-                        >
-                            <View className="w-5 h-5 bg-blue-500 rounded-full mr-2"></View>
-                            Google
-                        </TouchableOpacity>
-                        <TouchableOpacity activeOpacity={0.9}
-                            className="py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center text-gray-700 bg-white hover:bg-gray-50"
-                        >
-                            <View className="w-5 h-5 bg-black rounded-full mr-2"></View>
-                            Apple
-                        </TouchableOpacity>
-                    </View>
-                </View>
+                <Text className="mt-8 text-center text-sm text-gray-600">
+                    Don't have an account?{' '}
+                    <TouchableOpacity activeOpacity={0.8}
+                                      onPress={() => navigateTo('register')}
+                                      className="font-medium text-blue-600 hover:text-blue-500"
+                    >
+                        Sign up
+                    </TouchableOpacity>
+                </Text>
             </View>
-
-            <Text className="mt-8 text-center text-sm text-gray-600">
-                Don't have an account?{' '}
-                <TouchableOpacity activeOpacity={0.8}
-                    onPress={() => navigateTo('register')}
-                    className="font-medium text-blue-600 hover:text-blue-500"
-                >
-                    Sign up
-                </TouchableOpacity>
-            </Text>
-        </View>
-    );
+        );
+    } else {
+        return <MobileLoginFlow previousPage={previousPage} loginEmail={loginEmail} navigateTo={navigateTo} showPassword={showPassword} setShowPassword={setShowPassword}
+                                rememberMe={rememberMe} setRememberMe={setRememberMe} formData={formData} updateFormData={updateFormData} />
+    }
 };
 
 const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousPage }) => {
@@ -907,7 +956,16 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
 
         if (emailRegex.test(formData.email) && formData.password.length > 3 && formData.username.length >= 3 && formData.name.length > 3) {
             if(age <= 13 || formData.interests.length < 3 || formData.location.length <= 3 || !formData.profilePicture) {
-                alert("Please fill out all fields and comply with the Terms of Service");
+                showAlert({
+                    title: "Error",
+                    message: "Please fill out all fields and comply with the Terms of Service",
+                    buttons: [{
+                        text: 'OK',
+                        onPress: () => {
+
+                        }
+                    },],
+                })
                 jumpToStep(1);
                 return;
             }
@@ -931,20 +989,47 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                     token.current = data.token;
                 }
                 else {
-                    alert("There is already an account with that email or username.");
+                    showAlert({
+                        title: "Conflict",
+                        message: "There is already an account with that email or username.",
+                        buttons: [{
+                            text: 'OK',
+                            onPress: () => {
+
+                            }
+                        },],
+                    })
                     jumpToStep(1);
                     setRegistered(false);
                 }
             }
             catch (error) {
-                alert("There was an error registering. Please try again.");
+                showAlert({
+                    title: "Error",
+                    message: "Please try again.",
+                    buttons: [{
+                        text: 'OK',
+                        onPress: () => {
+
+                        }
+                    },],
+                })
                 jumpToStep(1);
                 setRegistered(false);
             }
             await CompleteProfile();
         }
         else if(!registered) {
-            alert("Please enter a valid email and password");
+            showAlert({
+                title: "Error",
+                message: "Please enter a valid email and password",
+                buttons: [{
+                    text: 'OK',
+                    onPress: () => {
+
+                    }
+                },],
+            })
             jumpToStep(1);
         }
     }
@@ -982,7 +1067,16 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                     imageUrl.current = url.split('?')[0];
                 }
                 else {
-                    alert("There was an error uploading the image");
+                    showAlert({
+                        title: "Error",
+                        message: "There was an error uploading the image. Please try again.",
+                        buttons: [{
+                            text: 'OK',
+                            onPress: () => {
+
+                            }
+                        },],
+                    })
                     return;
                 }
 
@@ -997,7 +1091,16 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                         }
 
                         if (finalStatus !== 'granted') {
-                            alert('You have to grant permission for notifications');
+                            showAlert({
+                                title: "Permission denied",
+                                message: "Notifications are disabled. Enable them in your settings.",
+                                buttons: [{
+                                    text: 'OK',
+                                    onPress: () => {
+
+                                    }
+                                },],
+                            })
                             return null;
                         }
                         await Notification.getDevicePushTokenAsync().then((token) => {
@@ -1078,13 +1181,31 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                     router.replace("/home");
                 }
                 else {
-                    alert("There is already an account with that email or username");
+                    showAlert({
+                        title: "Conflict",
+                        message: "There is already an account with that email or username.",
+                        buttons: [{
+                            text: 'OK',
+                            onPress: () => {
+
+                            }
+                        },],
+                    })
                     setRegistered(false);
                     jumpToStep(1);
                 }
             }
             catch (error) {
-                alert("There was an error registering. Please try again");
+                showAlert({
+                    title: "Error",
+                    message: "There was an error registering. Please try again",
+                    buttons: [{
+                        text: 'OK',
+                        onPress: () => {
+
+                        }
+                    },],
+                })
                 setRegistered(false)
                 jumpToStep(1)
             }
@@ -1130,424 +1251,1028 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
         setFormData({ ...formData, [field]: value });
     };
 
-    return (
-        <View className="backdrop-blur-sm bg-white/60 rounded-3xl shadow-xl border border-white/50 p-6 md:p-8 w-full max-w-md mx-auto">
-            <View className="flex flex-row items-center mb-6">
-                <TouchableOpacity activeOpacity={0.7}
-                    onPress={() => {
-                        if (step > 1) {
-                            prevStep();
-                        } else {
-                            navigateTo(previousPage);
-                        }
-                    }}
-                    className="p-2 rounded-full hover:bg-gray-100"
-                >
-                    {step > 1 ? <ArrowLeft size={20}/> : <X size={20}/>}
-                </TouchableOpacity>
-                <Text className="text-xl font-semibold flex-1 text-center">Create Your Account</Text>
-                <View style={{width: '32px'}}></View>
-            </View>
+    if (Platform.OS === "web") {
+        return (
+            <View
+                className="backdrop-blur-sm bg-white/60 rounded-3xl shadow-xl border border-white/50 p-6 md:p-8 w-full max-w-md mx-auto">
+                <View className="flex flex-row items-center mb-6">
+                    <TouchableOpacity activeOpacity={0.7}
+                                      onPress={() => {
+                                          if (step > 1) {
+                                              prevStep();
+                                          } else {
+                                              navigateTo(previousPage);
+                                          }
+                                      }}
+                                      className="p-2 rounded-full hover:bg-gray-100"
+                    >
+                        {step > 1 ? <ArrowLeft size={20}/> : <X size={20}/>}
+                    </TouchableOpacity>
+                    <Text className="text-xl font-semibold flex-1 text-center">Create Your Account</Text>
+                    <View style={{width: '32px'}}></View>
+                </View>
 
-            <View className="mb-8">
-                <View className="hidden md:flex md:flex-row justify-between mb-2">
-                    {Array.from({length: totalSteps}).map((_, index) => {
-                        const stepNum = index + 1;
-                        const isCompleted = stepNum < step;
-                        const isActive = stepNum === step;
-                        const isPrevious = stepNum < activeStep;
+                <View className="mb-8">
+                    <View className="hidden md:flex md:flex-row justify-between mb-2">
+                        {Array.from({length: totalSteps}).map((_, index) => {
+                            const stepNum = index + 1;
+                            const isCompleted = stepNum < step;
+                            const isActive = stepNum === step;
+                            const isPrevious = stepNum < activeStep;
 
-                        return (
-                            <Pressable
-                                key={index}
-                                onPress={() => jumpToStep(stepNum)}
-                                className={`flex mb-1 flex-col items-center ${isPrevious ? 'cursor-pointer' : 'cursor-not-allowed'}`}
-                            >
-                <Text className={`mb-1 text-xs ${isActive ? 'text-blue-600 font-medium' : 'text-gray-500'}`}>
-                  {['Basic', 'Account', 'About', 'Profile', 'Photo'][index]}
-                </Text>
-                                <View
-                                    className={`w-8 h-8 rounded-full flex items-center justify-center 
+                            return (
+                                <Pressable
+                                    key={index}
+                                    onPress={() => jumpToStep(stepNum)}
+                                    className={`flex mb-1 flex-col items-center ${isPrevious ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                                >
+                                    <Text
+                                        className={`mb-1 text-xs ${isActive ? 'text-blue-600 font-medium' : 'text-gray-500'}`}>
+                                        {['Basic', 'Account', 'About', 'Profile', 'Photo'][index]}
+                                    </Text>
+                                    <View
+                                        className={`w-8 h-8 rounded-full flex items-center justify-center 
                     ${isActive
+                                            ? 'bg-blue-500 text-white border-2 border-blue-200'
+                                            : isCompleted
+                                                ? 'bg-blue-500 text-white'
+                                                : 'bg-gray-200'}`}
+                                    >
+                                        {isCompleted ? <Check size={16}/> : stepNum}
+                                    </View>
+                                </Pressable>
+                            );
+                        })}
+                    </View>
+
+                    {/* Mobile step indicators */}
+                    <View className="flex flex-row md:hidden justify-between mb-2">
+                        {Array.from({length: totalSteps}).map((_, index) => {
+                            const stepNum = index + 1;
+                            const isCompleted = stepNum < step;
+                            const isActive = stepNum === step;
+
+                            return (
+                                <Pressable
+                                    key={index}
+                                    onPress={() => jumpToStep(stepNum)}
+                                    className={`w-8 h-8 rounded-full flex items-center justify-center 
+                  ${isActive
                                         ? 'bg-blue-500 text-white border-2 border-blue-200'
                                         : isCompleted
                                             ? 'bg-blue-500 text-white'
                                             : 'bg-gray-200'}`}
                                 >
                                     {isCompleted ? <Check size={16}/> : stepNum}
+                                </Pressable>
+                            );
+                        })}
+                    </View>
+
+                    <View className="w-full bg-gray-200 h-2 rounded-full">
+                        <View
+                            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                            style={{width: `${((step - 1) / (totalSteps - 1)) * 100}%`}}
+                        />
+                    </View>
+                </View>
+
+                {/* Step Content */}
+                <View className="mb-8">
+                    {step === 1 && (
+                        <View className="space-y-6">
+                            <Text className="text-2xl font-semibold text-gray-800">Let's get started</Text>
+                            <View className="space-y-4">
+                                <View>
+                                    <Text htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Your
+                                        Name</Text>
+                                    <TextInput
+                                        id="name"
+                                        value={formData.name}
+                                        onChangeText={(e) => updateFormData('name', e)}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="Enter your name"
+                                        placeholderTextColor="#9CA3AF"
+                                    />
                                 </View>
-                            </Pressable>
-                        );
-                    })}
-                </View>
-
-                {/* Mobile step indicators */}
-                <View className="flex flex-row md:hidden justify-between mb-2">
-                    {Array.from({length: totalSteps}).map((_, index) => {
-                        const stepNum = index + 1;
-                        const isCompleted = stepNum < step;
-                        const isActive = stepNum === step;
-
-                        return (
-                            <Pressable
-                                key={index}
-                                onPress={() => jumpToStep(stepNum)}
-                                className={`w-8 h-8 rounded-full flex items-center justify-center 
-                  ${isActive
-                                    ? 'bg-blue-500 text-white border-2 border-blue-200'
-                                    : isCompleted
-                                        ? 'bg-blue-500 text-white'
-                                        : 'bg-gray-200'}`}
-                            >
-                                {isCompleted ? <Check size={16}/> : stepNum}
-                            </Pressable>
-                        );
-                    })}
-                </View>
-
-                <View className="w-full bg-gray-200 h-2 rounded-full">
-                    <View
-                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${((step - 1) / (totalSteps - 1)) * 100}%`}}
-                    />
-                </View>
-            </View>
-
-            {/* Step Content */}
-            <View className="mb-8">
-                {step === 1 && (
-                    <View className="space-y-6">
-                        <Text className="text-2xl font-semibold text-gray-800">Let's get started</Text>
-                        <View className="space-y-4">
-                            <View>
-                                <Text htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Your Name</Text>
-                                <TextInput
-                                    id="name"
-                                    value={formData.name}
-                                    onChangeText={(e) => updateFormData('name', e)}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                    placeholder="Enter your name"
-                                    placeholderTextColor="#9CA3AF"
-                                />
-                            </View>
-                            <View>
-                                <Text htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">Choose a Username</Text>
-                                <TextInput
-                                    id="username"
-                                    value={formData.username}
-                                    onChangeText={(e) => updateFormData('username', e)}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                    placeholder="Enter username"
-                                    placeholderTextColor="#9CA3AF"                                />
+                                <View>
+                                    <Text htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">Choose
+                                        a Username</Text>
+                                    <TextInput
+                                        id="username"
+                                        value={formData.username}
+                                        onChangeText={(e) => updateFormData('username', e)}
+                                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                        placeholder="Enter username"
+                                        placeholderTextColor="#9CA3AF"/>
+                                </View>
                             </View>
                         </View>
-                    </View>
-                )}
+                    )}
 
-                {step === 2 && (
-                    <View className="space-y-6">
-                        <Text className="text-2xl font-semibold text-gray-800">Your account details</Text>
-                        <View className="space-y-4">
-                            <View>
-                                <Text htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</Text>
-                                <View className="relative">
-                                    <View className="absolute inset-y-0 left-0 flex flex-row items-center pl-3 pointer-events-none">
-                                        <Mail size={18} className="text-gray-400"/>
+                    {step === 2 && (
+                        <View className="space-y-6">
+                            <Text className="text-2xl font-semibold text-gray-800">Your account details</Text>
+                            <View className="space-y-4">
+                                <View>
+                                    <Text htmlFor="email"
+                                          className="block text-sm font-medium text-gray-700 mb-1">Email</Text>
+                                    <View className="relative">
+                                        <View
+                                            className="absolute inset-y-0 left-0 flex flex-row items-center pl-3 pointer-events-none">
+                                            <Mail size={18} className="text-gray-400"/>
+                                        </View>
+                                        <TextInput
+                                            type="email"
+                                            id="email"
+                                            value={formData.email}
+                                            onChangeText={(e) => updateFormData('email', e)}
+                                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="Enter your email"
+                                            placeholderTextColor="#9CA3AF"
+                                        />
                                     </View>
-                                    <TextInput
-                                        type="email"
-                                        id="email"
-                                        value={formData.email}
-                                        onChangeText={(e) => updateFormData('email', e)}
-                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                        placeholder="Enter your email"
-                                        placeholderTextColor="#9CA3AF"
-                                    />
+                                </View>
+                                <View>
+                                    <Text htmlFor="password"
+                                          className="block text-sm font-medium text-gray-700 mb-1">Password</Text>
+                                    <View className="relative">
+                                        <View
+                                            className="absolute inset-y-0 left-0 flex flex-row items-center pl-3 pointer-events-none">
+                                            <Lock size={18} className="text-gray-400"/>
+                                        </View>
+                                        <TextInput
+                                            secureTextEntry={!showPassword}
+                                            id="password"
+                                            value={formData.password}
+                                            onChangeText={(e) => updateFormData('password', e)}
+                                            className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="Enter your password"
+                                            placeholderTextColor="#9CA3AF"
+                                        />
+                                        <View className="absolute inset-y-0 right-0 flex flex-row items-center pr-3">
+                                            <Pressable
+                                                type="button"
+                                                onPress={() => setShowPassword(!showPassword)}
+                                                className="text-gray-400 hover:text-gray-600"
+                                            >
+                                                {showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
+                                            </Pressable>
+                                        </View>
+                                    </View>
+                                </View>
+                                <View className="mt-6">
+                                    <View className="flex-row items-center">
+                                        <View className="flex-1 h-px bg-gray-300"/>
+                                        <Text className="mx-2 text-gray-500 text-sm">Or continue with</Text>
+                                        <View className="flex-1 h-px bg-gray-300"/>
+                                    </View>
+
+                                    <View className="mt-6 grid grid-cols-2 gap-3">
+                                        <TouchableOpacity activeOpacity={0.8}
+                                                          className="py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center text-gray-700 bg-white hover:bg-gray-50"
+                                        >
+                                            <View className="w-5 h-5 bg-blue-500 rounded-full mr-2"></View>
+                                            Google
+                                        </TouchableOpacity>
+                                        <TouchableOpacity activeOpacity={0.8}
+                                                          className="py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center text-gray-700 bg-white hover:bg-gray-50"
+                                        >
+                                            <View className="w-5 h-5 bg-black rounded-full mr-2"></View>
+                                            Apple
+                                        </TouchableOpacity>
+                                    </View>
                                 </View>
                             </View>
-                            <View>
-                                <Text htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</Text>
-                                <View className="relative">
-                                    <View className="absolute inset-y-0 left-0 flex flex-row items-center pl-3 pointer-events-none">
-                                        <Lock size={18} className="text-gray-400"/>
-                                    </View>
-                                    <TextInput
-                                        secureTextEntry={!showPassword}
-                                        id="password"
-                                        value={formData.password}
-                                        onChangeText={(e) => updateFormData('password', e)}
-                                        className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                        placeholder="Enter your password"
-                                        placeholderTextColor="#9CA3AF"
-                                    />
-                                    <View className="absolute inset-y-0 right-0 flex flex-row items-center pr-3">
+                        </View>
+                    )}
+
+                    {step === 3 && (
+                        <View className="space-y-6">
+                            <Text className="text-2xl font-semibold text-gray-800">Tell us about yourself</Text>
+                            <View className="space-y-6">
+                                <View>
+                                    <Text className="text-lg font-medium text-gray-700 mb-3">Are you in a
+                                        relationship?</Text>
+                                    <View className="grid grid-cols-2 gap-3">
                                         <Pressable
-                                            type="button"
-                                            onPress={() => setShowPassword(!showPassword)}
-                                            className="text-gray-400 hover:text-gray-600"
+                                            onPress={() => updateFormData('relationship', true)}
+                                            className={`p-3 border rounded-lg flex flex-row justify-center items-center transition-colors ${
+                                                formData.relationship === true
+                                                    ? 'bg-blue-100 border-blue-400 text-blue-700'
+                                                    : 'border-gray-300 hover:bg-gray-50'
+                                            }`}
                                         >
-                                            {showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
+                                            <Heart size={18} className="mr-2"/>
+                                            Yes
+                                        </Pressable>
+                                        <Pressable
+                                            onPress={() => updateFormData('relationship', false)}
+                                            className={`p-3 border rounded-lg flex justify-center items-center transition-colors ${
+                                                formData.relationship === false
+                                                    ? 'bg-blue-100 border-blue-400 text-blue-700'
+                                                    : 'border-gray-300 hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            No
                                         </Pressable>
                                     </View>
                                 </View>
-                            </View>
-                            <View className="mt-6">
-                                <View className="flex-row items-center">
-                                    <View className="flex-1 h-px bg-gray-300" />
-                                    <Text className="mx-2 text-gray-500 text-sm">Or continue with</Text>
-                                    <View className="flex-1 h-px bg-gray-300" />
-                                </View>
-
-                                <View className="mt-6 grid grid-cols-2 gap-3">
-                                    <TouchableOpacity activeOpacity={0.8}
-                                        className="py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center text-gray-700 bg-white hover:bg-gray-50"
-                                    >
-                                        <View className="w-5 h-5 bg-blue-500 rounded-full mr-2"></View>
-                                        Google
-                                    </TouchableOpacity>
-                                    <TouchableOpacity activeOpacity={0.8}
-                                        className="py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center text-gray-700 bg-white hover:bg-gray-50"
-                                    >
-                                        <View className="w-5 h-5 bg-black rounded-full mr-2"></View>
-                                        Apple
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                )}
-
-                {step === 3 && (
-                    <View className="space-y-6">
-                        <Text className="text-2xl font-semibold text-gray-800">Tell us about yourself</Text>
-                        <View className="space-y-6">
-                            <View>
-                                <Text className="text-lg font-medium text-gray-700 mb-3">Are you in a relationship?</Text>
-                                <View className="grid grid-cols-2 gap-3">
-                                    <Pressable
-                                        onPress={() => updateFormData('relationship', true)}
-                                        className={`p-3 border rounded-lg flex flex-row justify-center items-center transition-colors ${
-                                            formData.relationship === true
-                                                ? 'bg-blue-100 border-blue-400 text-blue-700'
-                                                : 'border-gray-300 hover:bg-gray-50'
-                                        }`}
-                                    >
-                                        <Heart size={18} className="mr-2"/>
-                                        Yes
-                                    </Pressable>
-                                    <Pressable
-                                        onPress={() => updateFormData('relationship', false)}
-                                        className={`p-3 border rounded-lg flex justify-center items-center transition-colors ${
-                                            formData.relationship === false
-                                                ? 'bg-blue-100 border-blue-400 text-blue-700'
-                                                : 'border-gray-300 hover:bg-gray-50'
-                                        }`}
-                                    >
-                                        No
-                                    </Pressable>
-                                </View>
-                            </View>
-                            <>
-                                <Text className="text-lg font-medium text-gray-700 mb-3">When were you born?</Text>
-                                <View className="flex flex-row gap-2">
-                                    {Platform.OS === 'web' && <>
-                                        <select
-                                            className="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 text-center"
-                                            value={formData.birthDate.day}
-                                            onChange={(e) => updateFormData('birthDate', {
-                                                ...formData.birthDate,
-                                                day: e.target.value
-                                            })}
-                                        >
-                                            {[...Array(31)].map((_, i) => (
-                                                <option key={i + 1} value={i + 1}>{i + 1}</option>
-                                            ))}
-                                        </select>
-                                        <select
-                                            className="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 text-center"
-                                            value={formData.birthDate.month}
-                                            onChange={(e) => updateFormData('birthDate', {
-                                                ...formData.birthDate,
-                                                month: e.target.value
-                                            })}
-                                        >
-                                            {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map((month) => (
-                                                <option key={month} value={month}>{month}</option>
-                                            ))}
-                                        </select>
-                                        <select
-                                            className="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 text-center"
-                                            value={formData.birthDate.year}
-                                            onChange={(e) => updateFormData('birthDate', {
-                                                ...formData.birthDate,
-                                                year: e.target.value
-                                            })}
-                                        >
-                                            {[...Array(90)].map((_, i) => (
-                                                <option key={2025 - i} value={2025 - i}>{2025 - i}</option>
-                                            ))}
-                                        </select>
-                                    </>}
-                                    {Platform.OS === 'ios' && <>
-                                        <RNDateTimePicker
-                                            value={new Date()}
-                                            mode="date"
-                                            display="spinner"
-                                            onChange={(event, selectedDate) => {
-                                                updateFormData('birthDate', {
-                                                    day: selectedDate.getDay(),
-                                                    month: selectedDate.getMonth(),
-                                                    year: selectedDate.getFullYear()
-                                                });
-                                            }}
-                                        />
-                                    </>}
-                                    {Platform.OS === 'android' && <>
-                                        <RNDateTimePicker
-                                            value={new Date()}
-                                            mode="date"
-                                            display="default"
-                                            onChange={(event, selectedDate) => {
-                                                updateFormData('birthDate', {
-                                                    day: selectedDate.getDay(),
-                                                    month: selectedDate.getMonth(),
-                                                    year: selectedDate.getFullYear()
-                                                });
-                                            }}
-                                        />
-                                    </>}
-                                </View>
-                            </>
-                        </View>
-                    </View>
-                )}
-
-                {step === 4 && (
-                    <View className="space-y-6">
-                        <Text className="text-2xl font-semibold text-gray-800">Your profile details</Text>
-                        <View className="space-y-4">
-                            <View>
-                                <Text htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Where are you from?</Text>
-                                <View className="relative">
-                                    <View className="absolute inset-y-0 left-0 flex flex-row items-center pl-3 pointer-events-none">
-                                        <MapPin size={18} className="text-gray-400"/>
+                                <>
+                                    <Text className="text-lg font-medium text-gray-700 mb-3">When were you born?</Text>
+                                    <View className="flex flex-row gap-2">
+                                        {Platform.OS === 'web' && <>
+                                            <select
+                                                className="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 text-center"
+                                                value={formData.birthDate.day}
+                                                onChange={(e) => updateFormData('birthDate', {
+                                                    ...formData.birthDate,
+                                                    day: e.target.value
+                                                })}
+                                            >
+                                                {[...Array(31)].map((_, i) => (
+                                                    <option key={i + 1} value={i + 1}>{i + 1}</option>
+                                                ))}
+                                            </select>
+                                            <select
+                                                className="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 text-center"
+                                                value={formData.birthDate.month}
+                                                onChange={(e) => updateFormData('birthDate', {
+                                                    ...formData.birthDate,
+                                                    month: e.target.value
+                                                })}
+                                            >
+                                                {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map((month) => (
+                                                    <option key={month} value={month}>{month}</option>
+                                                ))}
+                                            </select>
+                                            <select
+                                                className="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 text-center"
+                                                value={formData.birthDate.year}
+                                                onChange={(e) => updateFormData('birthDate', {
+                                                    ...formData.birthDate,
+                                                    year: e.target.value
+                                                })}
+                                            >
+                                                {[...Array(90)].map((_, i) => (
+                                                    <option key={2025 - i} value={2025 - i}>{2025 - i}</option>
+                                                ))}
+                                            </select>
+                                        </>}
+                                        {Platform.OS === 'ios' && <>
+                                            <RNDateTimePicker
+                                                value={new Date()}
+                                                mode="date"
+                                                display="spinner"
+                                                onChange={(event, selectedDate) => {
+                                                    updateFormData('birthDate', {
+                                                        day: selectedDate.getDay(),
+                                                        month: selectedDate.getMonth(),
+                                                        year: selectedDate.getFullYear()
+                                                    });
+                                                }}
+                                            />
+                                        </>}
+                                        {Platform.OS === 'android' && <>
+                                            <RNDateTimePicker
+                                                value={new Date()}
+                                                mode="date"
+                                                display="default"
+                                                onChange={(event, selectedDate) => {
+                                                    updateFormData('birthDate', {
+                                                        day: selectedDate.getDay(),
+                                                        month: selectedDate.getMonth(),
+                                                        year: selectedDate.getFullYear()
+                                                    });
+                                                }}
+                                            />
+                                        </>}
                                     </View>
+                                </>
+                            </View>
+                        </View>
+                    )}
+
+                    {step === 4 && (
+                        <View className="space-y-6">
+                            <Text className="text-2xl font-semibold text-gray-800">Your profile details</Text>
+                            <View className="space-y-4">
+                                <View>
+                                    <Text htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Where
+                                        are you from?</Text>
+                                    <View className="relative">
+                                        <View
+                                            className="absolute inset-y-0 left-0 flex flex-row items-center pl-3 pointer-events-none">
+                                            <MapPin size={18} className="text-gray-400"/>
+                                        </View>
+                                        <TextInput
+                                            id="location"
+                                            value={formData.location}
+                                            onChangeText={(e) => updateFormData('location', e)}
+                                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="You live in"
+                                            placeholderTextColor="#9CA3AF"
+                                        />
+                                    </View>
+                                </View>
+                                <View>
+                                    <Text className="block text-sm font-medium mb-1 text-gray-700">What are your hobbies
+                                        or interests?</Text>
                                     <TextInput
-                                        id="location"
-                                        value={formData.location}
-                                        onChangeText={(e) => updateFormData('location', e)}
-                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                                        placeholder="You live in"
+                                        multiline={true}
+                                        numberOfLines={4}
+                                        placeholder="football, reading, hiking, cooking..."
+                                        placeholderTextColor="#9CA3AF"
+                                        onChangeText={(e) => updateFormData('interests', e)}
+                                        className="w-full p-3 border border-gray-300 rounded-lg h-24 resize-none"
+                                        value={formData.interests}
+                                    />
+                                    <View className="mt-2 text-xs text-gray-500">
+                                        Add multiple interests separated by commas
+                                    </View>
+                                </View>
+                            </View>
+                        </View>
+                    )}
+
+                    {step === 5 && (
+                        <View className="space-y-6">
+                            <Text className="text-2xl font-semibold text-gray-800">Profile Picture</Text>
+                            <View className="flex flex-col items-center">
+                                <TouchableOpacity activeOpacity={0.7} onPress={async () => {
+                                    const result = await ImagePicker.launchImageLibraryAsync({
+                                        allowsEditing: true,
+                                        aspect: [1, 1],
+                                        quality: 0.8,
+                                        mediaTypes: "images"
+                                    });
+
+                                    if (!result.canceled) {
+                                        updateFormData('profilePicture', result.assets[0].uri);
+                                    }
+                                }}
+                                                  className="w-40 h-40 bg-gray-100 rounded-full overflow-hidden mb-4 relative">
+                                    {formData.profilePicture ? (
+                                        <Image source={{uri: formData.profilePicture}} alt="Profile"
+                                               className="w-full h-full hover:opacity-65 object-cover"/>
+                                    ) : (
+                                        <View
+                                            className="absolute inset-0 flex border-dashed border-2 hover:opacity-75 border-gray-300 rounded-full items-center justify-center text-gray-400">
+                                            <Camera size={48}/>
+                                        </View>
+                                    )}
+                                </TouchableOpacity>
+                                <Text className="text-sm text-gray-500">JPG, PNG or GIF. Max size 5MB.</Text>
+                            </View>
+                            <View className="mt-6 pt-6 border-t border-gray-300">
+                                <View className="flex flex-row items-center">
+                                    <Pressable
+                                        onPress={() => setAcceptLegals(prev => !prev)}
+                                        className="h-5 w-5 border border-gray-300 rounded flex items-center justify-center bg-white"
+                                    >
+                                        {acceptLegals && (
+                                            <View className="h-3 w-3 bg-blue-500 rounded"></View>
+                                        )}
+                                    </Pressable>
+                                    <Text htmlFor="terms" className="ml-2 text-sm text-gray-700">
+                                        You are 14 or older and accept the{' '}
+                                        <Link target="_blank" href="/privacy" className="text-blue-600 font-medium">
+                                            Privacy Policy
+                                        </Link>{' '}
+                                        &{' '}
+                                        <Link target="_blank" href="/terms" className="text-blue-600 font-medium">
+                                            Terms and Conditions
+                                        </Link>
+                                    </Text>
+                                </View>
+                            </View>
+                        </View>
+                    )}
+                </View>
+
+                {/* Navigation Buttons */}
+                <View className="flex flex-row justify-between items-center pt-4">
+                    {step > 1 ? (
+                        <TouchableOpacity activeOpacity={0.85}
+                                          onPress={prevStep}
+                                          className="px-4 py-2 border border-gray-300 rounded-lg flex flex-row items-center text-gray-600 hover:bg-gray-50"
+                        >
+                            <ArrowLeft size={16} className="mr-2"/>
+                            Back
+                        </TouchableOpacity>
+                    ) : (
+                        <View></View>
+                    )}
+                    <TouchableOpacity activeOpacity={0.85}
+                                      onPress={nextStep}
+                                      disabled={(step === 5 && !acceptLegals) || registered}
+                                      className={`px-6 py-3 rounded-lg flex flex-row items-center text-white ${
+                                          step === 5 && !acceptLegals
+                                              ? 'bg-blue-300 cursor-not-allowed'
+                                              : 'bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800'
+                                      }`}
+                    >
+                        {step < totalSteps ? (
+                            <>
+                                Continue <ArrowRight size={16} className="ml-2"/>
+                            </>
+                        ) : (
+                            'Create Account'
+                        )}
+                    </TouchableOpacity>
+                </View>
+            </View>
+        );
+    } else {
+        return <MobileRegistrationFlow navigateTo={navigateTo} showPassword={showPassword} setShowPassword={setShowPassword} formData={formData}
+                                       previousPage={previousPage} step={step} activeStep={activeStep} jumpToStep={jumpToStep}
+                                       acceptLegals={acceptLegals} setAcceptLegals={setAcceptLegals} prevStep={prevStep} nextStep={nextStep} registered={registered} updateFormData={updateFormData} />
+    }
+};
+
+const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, setShowPassword, rememberMe, setRememberMe, formData, updateFormData}) => {
+
+    return (
+        <View className="backdrop-blur-sm mt-7 bg-white/60 rounded-3xl shadow-xl border border-white/50 p-6 md:p-8 w-full max-w-md mx-auto">
+            <View className="mb-8">
+                <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => {
+                        if (previousPage === "register") {
+                            navigateTo("landing");
+                        } else {
+                            navigateTo(previousPage);
+                        }
+                    }}
+                    className="p-2 rounded-full self-start hover:bg-gray-100"
+                >
+                    <X size={20} color="#000000" />
+                </TouchableOpacity>
+                <Text className="text-3xl text-center font-bold text-blue-600">Welcome Back</Text>
+                <Text className="text-gray-600 text-center mt-2">Sign in to your account</Text>
+            </View>
+
+            <View className="space-y-6">
+                <View className="mb-4">
+                    <Text className="block text-sm font-medium text-gray-700 mb-1">Email</Text>
+                    <View className="relative">
+                        <View className="absolute inset-y-0 left-0 pl-3 flex flex-row items-center pointer-events-none">
+                            <Mail size={18} color="#9CA3AF" />
+                        </View>
+                        <TextInput
+                            onChangeText={(value) => updateFormData("email", value)}
+                            className="pl-10 block w-full rounded-lg border border-gray-300 py-3 shadow-sm"
+                            placeholder="Enter your email"
+                            placeholderTextColor="#9CA3AF"
+                        />
+                    </View>
+                </View>
+
+                <View className="mb-3">
+                    <Text className="block text-sm font-medium text-gray-700 mb-1">Password</Text>
+                    <View className="relative">
+                        <View className="absolute inset-y-0 left-0 pl-3 flex flex-row items-center pointer-events-none">
+                            <Lock size={18} color="#9CA3AF" />
+                        </View>
+                        <TextInput
+                            secureTextEntry={!showPassword}
+                            onChangeText={(value) => updateFormData("password", value)}
+                            className="pl-10 pr-10 block w-full rounded-lg border border-gray-300 py-3 shadow-sm"
+                            placeholder="Enter your password"
+                            placeholderTextColor="#9CA3AF"
+                        />
+                        <TouchableOpacity
+                            onPress={() => setShowPassword(!showPassword)}
+                            className="absolute inset-y-0 right-0 pr-3 flex flex-row items-center"
+                        >
+                            {showPassword ? <EyeOff size={18} color="#9CA3AF" /> : <Eye size={18} color="#9CA3AF" />}
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
+                <View className="flex flex-row items-center justify-between mb-6">
+                    <View className="flex flex-row items-center">
+                        <Pressable
+                            onPress={() => setRememberMe(prev => !prev)}
+                            className="h-5 w-5 border border-gray-300 rounded flex items-center justify-center bg-white"
+                        >
+                            {rememberMe && (
+                                <View className="h-3 w-3 bg-blue-500 rounded"></View>
+                            )}
+                        </Pressable>
+                        <Text className="ml-2 block text-sm text-gray-700">
+                            Remember me
+                        </Text>
+                    </View>
+                    <TouchableOpacity>
+                        <Text className="text-sm font-medium text-blue-500">
+                            Forgot password?
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+
+                <TouchableOpacity
+                    activeOpacity={0.9}
+                    onPress={loginEmail}
+                    className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm bg-blue-600"
+                >
+                    <Text className="text-white text-center font-medium">Sign in</Text>
+                </TouchableOpacity>
+
+                <View className="mt-6">
+                    <View className="flex-row items-center">
+                        <View className="flex-1 h-px bg-gray-300" />
+                        <Text className="mx-2 text-gray-500 text-sm">Or continue with</Text>
+                        <View className="flex-1 h-px bg-gray-300" />
+                    </View>
+
+                    <View className="mt-6 flex flex-row gap-3">
+                        <TouchableOpacity
+                            activeOpacity={0.9}
+                            className="flex-1 py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center"
+                        >
+                            <View className="w-5 h-5 bg-blue-500 rounded-full mr-2"></View>
+                            <Text className="text-gray-700">Google</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            activeOpacity={0.9}
+                            className="flex-1 py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center"
+                        >
+                            <View className="w-5 h-5 bg-black rounded-full mr-2"></View>
+                            <Text className="text-gray-700">Apple</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </View>
+
+            <View className="mt-8">
+                <Text className="text-center text-sm text-gray-600">
+                    Don't have an account?{' '}
+                    <Text
+                        onPress={() => navigateTo('register')}
+                        className="font-medium text-blue-600"
+                    >
+                        Sign up
+                    </Text>
+                </Text>
+            </View>
+        </View>
+    );
+}
+
+const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousPage, step, activeStep, acceptLegals, setAcceptLegals, prevStep, nextStep, registered, jumpToStep, updateFormData, formData }) => {
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const totalSteps = 5;
+
+    const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    const handleDateChange = (event, selectedDate) => {
+        setShowDatePicker(false);
+        if (selectedDate) {
+            updateFormData('birthDate', {
+                day: selectedDate.getDate(),
+                month: monthNames[selectedDate.getMonth()],
+                year: selectedDate.getFullYear()
+            });
+        }
+    };
+
+    const renderWebDatePicker = () => (
+        <View className="flex flex-row gap-2">
+            <select
+                className="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 text-center"
+                value={formData.birthDate.day}
+                onChange={(e) => updateFormData('birthDate', {
+                    ...formData.birthDate,
+                    day: parseInt(e.target.value)
+                })}
+            >
+                {[...Array(31)].map((_, i) => (
+                    <option key={i + 1} value={i + 1}>{i + 1}</option>
+                ))}
+            </select>
+            <select
+                className="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 text-center"
+                value={formData.birthDate.month}
+                onChange={(e) => updateFormData('birthDate', {
+                    ...formData.birthDate,
+                    month: e.target.value
+                })}
+            >
+                {monthNames.map((month) => (
+                    <option key={month} value={month}>{month}</option>
+                ))}
+            </select>
+            <select
+                className="flex-1 p-3 border border-gray-300 rounded-lg bg-gray-50 text-center"
+                value={formData.birthDate.year}
+                onChange={(e) => updateFormData('birthDate', {
+                    ...formData.birthDate,
+                    year: parseInt(e.target.value)
+                })}
+            >
+                {[...Array(90)].map((_, i) => (
+                    <option key={2025 - i} value={2025 - i}>{2025 - i}</option>
+                ))}
+            </select>
+        </View>
+    );
+
+    const renderMobileDatePicker = () => {
+        const birthDate = new Date(
+            formData.birthDate.year,
+            monthNames.indexOf(formData.birthDate.month),
+            formData.birthDate.day
+        );
+
+        return (
+            <View>
+                <TouchableOpacity
+                    onPress={() => setShowDatePicker(true)}
+                    className="p-3 border border-gray-300 rounded-lg flex flex-row justify-center"
+                >
+                    <Text className="text-gray-700">
+                        {formData.birthDate.day} {formData.birthDate.month} {formData.birthDate.year}
+                    </Text>
+                </TouchableOpacity>
+
+                {showDatePicker && (
+                    <RNDateTimePicker
+                        value={birthDate}
+                        mode="date"
+                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                        onChange={handleDateChange}
+                        maximumDate={new Date()}
+                    />
+                )}
+            </View>
+        );
+    };
+
+    return (
+        <ScrollView contentContainerStyle={{ flexGrow: 1}} className="mt-7">
+            <View className="backdrop-blur-sm bg-white/60 rounded-3xl shadow-xl border border-white/50 p-6 md:p-8 w-full max-w-md mx-auto">
+                <View className="flex flex-row items-center mb-6">
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={() => {
+                            if (step > 1) {
+                                prevStep();
+                            } else {
+                                navigateTo(previousPage);
+                            }
+                        }}
+                        className="p-2 rounded-full hover:bg-gray-100"
+                    >
+                        {step > 1 ? <ArrowLeft size={20} color="#000000" /> : <X size={20} color="#000000" />}
+                    </TouchableOpacity>
+                    <Text className="text-xl font-semibold flex-1 text-center">Create Your Account</Text>
+                    <View style={{ width: 32 }}></View>
+                </View>
+
+                <View className="mb-8">
+                    {/* Progress indicators - web version */}
+                    {Platform.OS === 'web' && (
+                        <View className="hidden md:flex md:flex-row justify-between mb-2">
+                            {Array.from({ length: totalSteps }).map((_, index) => {
+                                const stepNum = index + 1;
+                                const isCompleted = stepNum < step;
+                                const isActive = stepNum === step;
+                                const isPrevious = stepNum < activeStep;
+
+                                return (
+                                    <Pressable
+                                        key={index}
+                                        onPress={() => jumpToStep(stepNum)}
+                                        className={`flex mb-1 flex-col items-center ${isPrevious ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                                    >
+                                        <Text className={`mb-1 text-xs ${isActive ? 'text-blue-600 font-medium' : 'text-gray-500'}`}>
+                                            {['Basic', 'Account', 'About', 'Profile', 'Photo'][index]}
+                                        </Text>
+                                        <View
+                                            className={`w-8 h-8 rounded-full flex items-center justify-center 
+                      ${isActive
+                                                ? 'bg-blue-500 text-white border-2 border-blue-200'
+                                                : isCompleted
+                                                    ? 'bg-blue-500 text-white'
+                                                    : 'bg-gray-200'}`}
+                                        >
+                                            {isCompleted ? <Check size={16} color="#FFFFFF" /> : <Text className={isActive ? "text-white" : "text-gray-700"}>{stepNum}</Text>}
+                                        </View>
+                                    </Pressable>
+                                );
+                            })}
+                        </View>
+                    )}
+
+                    {/* Progress indicators - mobile version */}
+                    <View className={Platform.OS === 'web' ? "flex flex-row md:hidden justify-between mb-2" : "flex flex-row justify-between mb-2"}>
+                        {Array.from({ length: totalSteps }).map((_, index) => {
+                            const stepNum = index + 1;
+                            const isCompleted = stepNum < step;
+                            const isActive = stepNum === step;
+
+                            return (
+                                <Pressable
+                                    key={index}
+                                    onPress={() => jumpToStep(stepNum)}
+                                    className={`w-8 h-8 rounded-full flex items-center justify-center 
+                  ${isActive
+                                        ? 'bg-blue-500 border-2 border-blue-200'
+                                        : isCompleted
+                                            ? 'bg-blue-500'
+                                            : 'bg-gray-200'}`}
+                                >
+                                    {isCompleted ?
+                                        <Check size={16} color="#FFFFFF" /> :
+                                        <Text className={isActive ? "text-white" : "text-gray-700"}>{stepNum}</Text>
+                                    }
+                                </Pressable>
+                            );
+                        })}
+                    </View>
+
+                    {/* Progress bar */}
+                    <View className="w-full bg-gray-200 h-2 rounded-full">
+                        <View
+                            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${((step - 1) / (totalSteps - 1)) * 100}%` }}
+                        />
+                    </View>
+                </View>
+
+                {/* Step Content */}
+                <View className="mb-8">
+                    {step === 1 && (
+                        <View className="space-y-6">
+                            <Text className="text-2xl font-semibold text-gray-800 mb-6">Let's get started</Text>
+                            <View className="space-y-4">
+                                <View className="mb-4">
+                                    <Text className="block text-sm font-medium text-gray-700 mb-1">Your Name</Text>
+                                    <TextInput
+                                        value={formData.name}
+                                        onChangeText={(value) => updateFormData('name', value)}
+                                        className="w-full p-3 border border-gray-300 rounded-lg"
+                                        placeholder="Enter your name"
+                                        placeholderTextColor="#9CA3AF"
+                                    />
+                                </View>
+                                <View className="mb-4">
+                                    <Text className="block text-sm font-medium text-gray-700 mb-1">Choose a Username</Text>
+                                    <TextInput
+                                        value={formData.username}
+                                        onChangeText={(value) => updateFormData('username', value)}
+                                        className="w-full p-3 border border-gray-300 rounded-lg"
+                                        placeholder="Enter username"
                                         placeholderTextColor="#9CA3AF"
                                     />
                                 </View>
                             </View>
-                            <View>
-                                <Text className="block text-sm font-medium mb-1 text-gray-700">What are your hobbies or interests?</Text>
-                                <TextInput
-                                    multiline={true}
-                                    numberOfLines={4}
-                                    placeholder="football, reading, hiking, cooking..."
-                                    placeholderTextColor="#9CA3AF"
-                                    onChangeText={(e) => updateFormData('interests', e)}
-                                    className="w-full p-3 border border-gray-300 rounded-lg h-24 resize-none"
-                                    value={formData.interests}
-                                />
-                                <View className="mt-2 text-xs text-gray-500">
-                                    Add multiple interests separated by commas
+                        </View>
+                    )}
+
+                    {step === 2 && (
+                        <View className="space-y-6">
+                            <Text className="text-2xl font-semibold text-gray-800 mb-6">Your account details</Text>
+                            <View className="space-y-4">
+                                <View className="mb-4">
+                                    <Text className="block text-sm font-medium text-gray-700 mb-1">Email</Text>
+                                    <View className="relative">
+                                        <View className="absolute inset-y-0 left-0 flex flex-row items-center pl-3 pointer-events-none">
+                                            <Mail size={18} color="#9CA3AF" />
+                                        </View>
+                                        <TextInput
+                                            value={formData.email}
+                                            onChangeText={(value) => updateFormData('email', value)}
+                                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg"
+                                            placeholder="Enter your email"
+                                            placeholderTextColor="#9CA3AF"
+                                        />
+                                    </View>
+                                </View>
+                                <View className="mb-4">
+                                    <Text className="block text-sm font-medium text-gray-700 mb-1">Password</Text>
+                                    <View className="relative">
+                                        <View className="absolute inset-y-0 left-0 flex flex-row items-center pl-3 pointer-events-none">
+                                            <Lock size={18} color="#9CA3AF" />
+                                        </View>
+                                        <TextInput
+                                            secureTextEntry={!showPassword}
+                                            value={formData.password}
+                                            onChangeText={(value) => updateFormData('password', value)}
+                                            className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg"
+                                            placeholder="Enter your password"
+                                            placeholderTextColor="#9CA3AF"
+                                        />
+                                        <TouchableOpacity
+                                            onPress={() => setShowPassword(!showPassword)}
+                                            className="absolute inset-y-0 right-0 flex flex-row items-center pr-3"
+                                        >
+                                            {showPassword ? <EyeOff size={18} color="#9CA3AF" /> : <Eye size={18} color="#9CA3AF" />}
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                                <View className="mt-6">
+                                    <View className="flex flex-row items-center">
+                                        <View className="flex-1 h-px bg-gray-300" />
+                                        <Text className="mx-2 text-gray-500 text-sm">Or continue with</Text>
+                                        <View className="flex-1 h-px bg-gray-300" />
+                                    </View>
+
+                                    <View className="mt-6 flex flex-row gap-3">
+                                        <TouchableOpacity
+                                            activeOpacity={0.8}
+                                            className="flex-1 py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center"
+                                        >
+                                            <View className="w-5 h-5 bg-blue-500 rounded-full mr-2"></View>
+                                            <Text className="text-gray-700">Google</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            activeOpacity={0.8}
+                                            className="flex-1 py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center"
+                                        >
+                                            <View className="w-5 h-5 bg-black rounded-full mr-2"></View>
+                                            <Text className="text-gray-700">Apple</Text>
+                                        </TouchableOpacity>
+                                    </View>
                                 </View>
                             </View>
                         </View>
-                    </View>
-                )}
+                    )}
 
-                {step === 5 && (
-                    <View className="space-y-6">
-                        <Text className="text-2xl font-semibold text-gray-800">Profile Picture</Text>
-                        <View className="flex flex-col items-center">
-                            <TouchableOpacity activeOpacity={0.7} onPress={async () => {
-                                const result = await ImagePicker.launchImageLibraryAsync({
-                                    allowsEditing: true,
-                                    aspect: [1, 1],
-                                    quality: 0.8,
-                                    mediaTypes: "images"
-                                });
-
-                                if (!result.canceled) {
-                                    updateFormData('profilePicture', result.assets[0].uri);
-                                }
-                            }}
-                                              className="w-40 h-40 bg-gray-100 rounded-full overflow-hidden mb-4 relative">
-                                {formData.profilePicture ? (
-                                        <Image source={{uri: formData.profilePicture}} alt="Profile"
-                                               className="w-full h-full hover:opacity-65 object-cover"/>
-                                ) : (
-                                    <View
-                                        className="absolute inset-0 flex border-dashed border-2 hover:opacity-75 border-gray-300 rounded-full items-center justify-center text-gray-400">      <Camera size={48}/>
+                    {step === 3 && (
+                        <View className="space-y-6">
+                            <Text className="text-2xl font-semibold text-gray-800 mb-6">Tell us about yourself</Text>
+                            <View className="space-y-6">
+                                <View className="mb-4">
+                                    <Text className="text-lg font-medium text-gray-700 mb-3">Are you in a relationship?</Text>
+                                    <View className="flex flex-row gap-3">
+                                        <Pressable
+                                            onPress={() => updateFormData('relationship', true)}
+                                            className={`flex-1 p-3 border rounded-lg flex flex-row gap-2 justify-center items-center ${
+                                                formData.relationship === true
+                                                    ? 'bg-blue-100 border-blue-400'
+                                                    : 'border-gray-300'
+                                            }`}
+                                        >
+                                            <Heart size={18} color={formData.relationship === true ? "#3B82F6" : "#6B7280"} className="mr-2" />
+                                            <Text className={formData.relationship === true ? "text-blue-700" : "text-gray-700"}>Yes</Text>
+                                        </Pressable>
+                                        <Pressable
+                                            onPress={() => updateFormData('relationship', false)}
+                                            className={`flex-1 p-3 border rounded-lg flex flex-row justify-center items-center ${
+                                                formData.relationship === false
+                                                    ? 'bg-blue-100 border-blue-400'
+                                                    : 'border-gray-300'
+                                            }`}
+                                        >
+                                            <Text className={formData.relationship === false ? "text-blue-700" : "text-gray-700"}>No</Text>
+                                        </Pressable>
                                     </View>
-                                )}
-                            </TouchableOpacity>
-                            <Text className="text-sm text-gray-500">JPG, PNG or GIF. Max size 5MB.</Text>
-                        </View>
-                        <View className="mt-6 pt-6 border-t border-gray-300">
-                            <View className="flex flex-row items-center">
-                                <Pressable
-                                    onPress={() => setAcceptLegals(prev => !prev)}
-                                    className="h-5 w-5 border border-gray-300 rounded flex items-center justify-center bg-white"
-                                >
-                                    {acceptLegals && (
-                                        <View className="h-3 w-3 bg-blue-500 rounded"></View>
-                                    )}
-                                </Pressable>
-                                <Text htmlFor="terms" className="ml-2 text-sm text-gray-700">
-                                    You are 14 or older and accept the{' '}
-                                    <Link target="_blank" href="/privacy" className="text-blue-600 font-medium">
-                                        Privacy Policy
-                                    </Link>{' '}
-                                    &{' '}
-                                    <Link target="_blank" href="/terms" className="text-blue-600 font-medium">
-                                        Terms and Conditions
-                                    </Link>
-                                </Text>
+                                </View>
+                                <View className="mb-4">
+                                    <Text className="text-lg font-medium text-gray-700 mb-3">When were you born?</Text>
+                                    {Platform.OS === 'web' ? renderWebDatePicker() : renderMobileDatePicker()}
+                                </View>
                             </View>
                         </View>
-                    </View>
-                )}
-            </View>
-
-            {/* Navigation Buttons */}
-            <View className="flex flex-row justify-between items-center pt-4">
-                {step > 1 ? (
-                    <TouchableOpacity activeOpacity={0.85}
-                        onPress={prevStep}
-                        className="px-4 py-2 border border-gray-300 rounded-lg flex flex-row items-center text-gray-600 hover:bg-gray-50"
-                    >
-                        <ArrowLeft size={16} className="mr-2"/>
-                        Back
-                    </TouchableOpacity>
-                ) : (
-                    <View></View>
-                )}
-                <TouchableOpacity activeOpacity={0.85}
-                    onPress={nextStep}
-                    disabled={(step === 5 && !acceptLegals) || registered}
-                    className={`px-6 py-3 rounded-lg flex flex-row items-center text-white ${
-                        step === 5 && !acceptLegals
-                            ? 'bg-blue-300 cursor-not-allowed'
-                            : 'bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800'
-                    }`}
-                >
-                    {step < totalSteps ? (
-                        <>
-                            Continue <ArrowRight size={16} className="ml-2"/>
-                        </>
-                    ) : (
-                        'Create Account'
                     )}
-                </TouchableOpacity>
+
+                    {step === 4 && (
+                        <View className="space-y-6">
+                            <Text className="text-2xl font-semibold text-gray-800 mb-6">Your profile details</Text>
+                            <View className="space-y-4">
+                                <View className="mb-4">
+                                    <Text className="block text-sm font-medium text-gray-700 mb-1">Where are you from?</Text>
+                                    <View className="relative">
+                                        <View className="absolute inset-y-0 left-0 flex flex-row items-center pl-3 pointer-events-none">
+                                            <MapPin size={18} color="#9CA3AF" />
+                                        </View>
+                                        <TextInput
+                                            value={formData.location}
+                                            onChangeText={(value) => updateFormData('location', value)}
+                                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg"
+                                            placeholder="You live in"
+                                            placeholderTextColor="#9CA3AF"
+                                        />
+                                    </View>
+                                </View>
+                                <View>
+                                    <Text className="block text-sm font-medium mb-1 text-gray-700">What are your hobbies or interests?</Text>
+                                    <TextInput
+                                        multiline={true}
+                                        numberOfLines={4}
+                                        placeholder="football, reading, hiking, cooking..."
+                                        placeholderTextColor="#9CA3AF"
+                                        onChangeText={(value) => updateFormData('interests', value)}
+                                        className="w-full p-3 border border-gray-300 rounded-lg h-24"
+                                        textAlignVertical="top"
+                                        value={formData.interests}
+                                    />
+                                    <Text className="mt-2 text-xs text-gray-500">
+                                        Add multiple interests separated by commas
+                                    </Text>
+                                </View>
+                            </View>
+                        </View>
+                    )}
+
+                    {step === 5 && (
+                        <View className="space-y-6">
+                            <Text className="text-2xl font-semibold text-gray-800 mb-6">Profile Picture</Text>
+                            <View className="flex flex-col items-center">
+                                <TouchableOpacity
+                                    activeOpacity={0.7}
+                                    onPress={async () => {
+                                        const result = await ImagePicker.launchImageLibraryAsync({
+                                            allowsEditing: true,
+                                            aspect: [1, 1],
+                                            quality: 0.8,
+                                            mediaTypes: "images"
+                                        });
+
+                                        if (!result.canceled) {
+                                            updateFormData('profilePicture', result.assets[0].uri);
+                                        }
+                                    }}
+                                    className="w-40 h-40 bg-gray-100 rounded-full overflow-hidden mb-4 relative"
+                                >
+                                    {formData.profilePicture ? (
+                                        <Image source={{ uri: formData.profilePicture }} style={{width: "100%", height: "100%"}} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <View className="absolute inset-0 flex border-dashed border-2 border-gray-300 rounded-full items-center justify-center">
+                                            <Camera size={48} color="#9CA3AF" />
+                                        </View>
+                                    )}
+                                </TouchableOpacity>
+                                <Text className="text-sm text-gray-500">JPG, PNG or GIF. Max size 5MB.</Text>
+                            </View>
+                            <View className="mt-6 pt-6 border-t border-gray-300">
+                                <View className="flex flex-row items-center">
+                                    <Pressable
+                                        onPress={() => setAcceptLegals(prev => !prev)}
+                                        className="h-5 w-5 border border-gray-300 rounded flex items-center justify-center bg-white"
+                                    >
+                                        {acceptLegals && (
+                                            <View className="h-3 w-3 bg-blue-500 rounded"></View>
+                                        )}
+                                    </Pressable>
+                                    <Text className="ml-2 text-sm text-gray-700">
+                                        You are 14 or older and accept the{' '}
+                                        <Text onPress={() => navigateTo('privacy')} className="text-blue-600 font-medium">
+                                            Privacy Policy
+                                        </Text>{' '}
+                                        &{' '}
+                                        <Text onPress={() => navigateTo('terms')} className="text-blue-600 font-medium">
+                                            Terms and Conditions
+                                        </Text>
+                                    </Text>
+                                </View>
+                            </View>
+                        </View>
+                    )}
+                </View>
+
+                {/* Navigation Buttons */}
+                <View className="flex flex-row justify-between items-center sticky bottom-0 bg-white/95 p-4 border-t border-gray-200">
+                    {step > 1 ? (
+                        <TouchableOpacity
+                            activeOpacity={0.85}
+                            onPress={prevStep}
+                            className="px-4 py-2 border border-gray-300 rounded-lg flex flex-row items-center"
+                        >
+                            <ArrowLeft size={16} color="#6B7280" className="mr-2" />
+                            <Text className="text-gray-600">Back</Text>
+                        </TouchableOpacity>
+                    ) : (
+                        <View></View>
+                    )}
+                    <TouchableOpacity
+                        activeOpacity={0.85}
+                        onPress={nextStep}
+                        disabled={(step === 5 && !acceptLegals) || registered}
+                        className={`px-6 py-3 rounded-lg flex flex-row items-center ${
+                            step === 5 && !acceptLegals
+                                ? 'bg-blue-300'
+                                : 'bg-blue-600'
+                        }`}
+                    >
+                        {step < totalSteps ? (
+                            <>
+                                <Text className="text-white">Continue</Text>
+                                <ArrowRight size={16} color="#FFFFFF" className="ml-2" />
+                            </>
+                        ) : (
+                            <Text className="text-white">Create Account</Text>
+                        )}
+                    </TouchableOpacity>
+                </View>
             </View>
-        </View>
-    );
-};
+        </ScrollView>
+    )
+}
 
 export default Index;
