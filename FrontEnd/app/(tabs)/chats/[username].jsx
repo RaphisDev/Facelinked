@@ -43,6 +43,7 @@ export default function ChatRoom() {
     const [keyboardVisible, setKeyboardVisible] = useState(false);
     const [selectedImages, setSelectedImages] = useState([]);
     const [inputHeight, setInputHeight] = useState(40);
+    const [inputContainerHeight, setInputContainerHeight] = useState(0);
 
     const flatListRef = useRef(null);
     const inputRef = useRef(null);
@@ -153,6 +154,14 @@ export default function ChatRoom() {
             ws.messageReceived.removeAllListeners("messageReceived");
         }
     }, []);
+
+    useEffect(() => {
+        if (flatListRef.current && messages.length > 0) {
+            setTimeout(() => {
+                flatListRef.current.scrollToEnd({ animated: false });
+            }, 50);
+        }
+    }, [inputContainerHeight, inputHeight, bottomPadding]);
 
     const handleBackNavigation = () => {
         if (isDesktop && !isEmbedded) {
@@ -461,18 +470,11 @@ export default function ChatRoom() {
                         <MessageEntry message={item} />
                     )}
                     contentContainerStyle={styles.messagesContent}
-                    style={styles.messagesList}
+                    style={[styles.messagesList, {marginBottom: inputContainerHeight}]}
                     onContentSizeChange={() => {
-                        if (flatListRef.current && messages.length > 0) {
-                            flatListRef.current.scrollToEnd({ animated: true });
-                        }
-                    }}
-                    onLayout={() => {
-                        if (flatListRef.current && messages.length > 0) {
-                            setTimeout(() => {
-                                flatListRef.current?.scrollToEnd({ animated: true });
-                            }, 100);
-                        }
+                        setTimeout(() => {
+                            flatListRef.current.scrollToEnd({animated: true});
+                        }, 50);
                     }}
                     showsVerticalScrollIndicator={false}
                     ListEmptyComponent={
@@ -484,6 +486,10 @@ export default function ChatRoom() {
                 />
 
                 <Animated.View
+                    onLayout={(event) => {
+                        const { height } = event.nativeEvent.layout;
+                        setInputContainerHeight(height);
+                    }}
                     style={[
                         styles.inputContainer,
                         {
@@ -643,7 +649,6 @@ const styles = StyleSheet.create({
     messagesContent: {
         paddingHorizontal: 16,
         paddingTop: 16,
-        paddingBottom: Platform.OS === 'web' ? 16 : 90,
     },
     messagesList: {
         flex: 1,
