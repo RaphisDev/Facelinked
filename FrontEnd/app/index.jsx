@@ -85,7 +85,7 @@ const Index = () => {
             } else {
                 setLoggedIn(true);
             }
-       }, Platform.OS === "web" ? 0 : 1000);
+       }, Platform.OS === "web" ? 0 : 1500);
     }, []);
 
     if (loggedIn) {
@@ -102,9 +102,9 @@ const Index = () => {
                     duration: 200,
                 }}
             >
-            <View className="w-full h-full bg-gradient-to-br from-blue-50 via-white to-blue-100 flex flex-col justify-between p-8">
+            <View className="w-full h-full bg-gray-200 flex flex-col justify-between p-8">
                 <View className="flex-1" />
-                <View className="backdrop-blur-md bg-white/60 rounded-3xl p-10 shadow-xl border border-white/50 flex flex-col items-center w-full max-w-md mx-auto">
+                <View className="backdrop-blur-md bg-white rounded-3xl p-10 border border-white/50 flex flex-col items-center w-full max-w-md mx-auto">
                     <View className="mb-4">
                         <Image
                             source={require("../assets/images/icon.png")}
@@ -332,13 +332,13 @@ const LandingPage = ({navigateTo, scrollContent}) => {
                 duration: 175,
             }}
         >
-        <ScrollView className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100" ref={scrollContent}>
+        <ScrollView style={Platform.OS !== "web" ? {backgroundColor: "#E5E7EB"} : {}} className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100" ref={scrollContent}>
             <NavigationBar navigateTo={navigateTo} scrollContent={scrollContent} />
 
             {Platform.OS !== "web" && (
             <View className="flex-1 items-center justify-center min-h-screen pt-safe-or-12 py-20 px-4">
                 <View
-                        className="relative z-10 backdrop-blur-sm mb-safe-offset-10 bg-white/40 rounded-3xl border border-white/50 p-8 w-full max-w-4xl mx-auto flex-1 flex flex-col justify-between">
+                        className="relative z-10 backdrop-blur-sm mb-safe-offset-10 bg-white rounded-3xl border border-white/50 p-8 w-full max-w-4xl mx-auto flex-1 flex flex-col justify-between">
                     <View className="flex-1 justify-start mt-32 items-center">
                     <Text style={{fontSize: 32, fontWeight: 'bold', textAlign: 'center', color: '#1f2937'}}>
                             Welcome to <Text style={{color: '#2563eb'}}>Facelinked</Text>
@@ -614,6 +614,7 @@ const AuthPages = ({ navigateTo, currentPage, previousPage, showPassword, setSho
                     duration: 125
                 }}
             >
+                <View className="bg-gray-200" style={{flexGrow: 1}}>
                 {currentPage === 'login' ? (
             <LoginPage navigateTo={navigateTo} showPassword={showPassword}
                        setShowPassword={setShowPassword} previousPage={previousPage}/>
@@ -621,6 +622,7 @@ const AuthPages = ({ navigateTo, currentPage, previousPage, showPassword, setSho
             <RegistrationFlow navigateTo={navigateTo} showPassword={showPassword}
                               setShowPassword={setShowPassword} previousPage={previousPage}/>
                 )}
+                </View>
             </MotiView>
         );
     }
@@ -1733,7 +1735,8 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
 const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, setShowPassword, rememberMe, setRememberMe, formData, updateFormData}) => {
 
     return (
-        <View className="backdrop-blur-sm mt-7 bg-white/60 rounded-3xl border border-white/50 p-6 md:p-8 w-full max-w-md mx-auto">
+        <View style={{height: "80%", justifyContent: "center", width: "100%", flexGrow: 1}}>
+        <View className="backdrop-blur-sm mt-7 bg-white rounded-3xl border border-white/50 p-6 md:p-8 w-full max-w-md mx-auto">
             <View className="mb-8">
                 <TouchableOpacity
                     activeOpacity={0.7}
@@ -1857,6 +1860,7 @@ const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, se
                 </Text>
             </View>
         </View>
+        </View>
     );
 }
 
@@ -1953,9 +1957,9 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
     };
 
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1}} className="mt-7">
-            <View className="backdrop-blur-sm bg-white/60 rounded-3xl border border-white/50 p-6 md:p-8 w-full max-w-md mx-auto">
-                <View className="flex flex-row items-center mb-6">
+        <ScrollView contentContainerStyle={{ flexGrow: 1, width: "100%", height: "80%", justifyContent: "center"}}>
+            <View className="backdrop-blur-sm bg-white rounded-3xl border border-white/50 p-6 md:p-8 w-full max-w-md mx-auto">
+                <View className="flex flex-row items-center mb-8">
                     <TouchableOpacity
                         activeOpacity={0.7}
                         onPress={() => {
