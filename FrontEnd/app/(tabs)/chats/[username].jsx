@@ -522,6 +522,7 @@ export default function ChatRoom() {
                             placeholder="Type a message..."
                             placeholderTextColor="#9CA3AF"
                             value={input}
+                            className="outline-none"
                             onChangeText={setInput}
                             multiline
                             onContentSizeChange={(e) => {
