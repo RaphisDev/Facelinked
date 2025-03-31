@@ -62,7 +62,7 @@ const AlertModal = () => {
         };
     }, []);
 
-    const isDesktop = Platform.OS === 'web' && windowDimensions.width > 768;
+    const isDesktop = windowDimensions.width > 768;
 
     CustomAlert.show = (config) => {
         setState(prevState => ({

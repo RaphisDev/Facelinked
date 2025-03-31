@@ -336,9 +336,9 @@ const LandingPage = ({navigateTo, scrollContent}) => {
             <NavigationBar navigateTo={navigateTo} scrollContent={scrollContent} />
 
             {Platform.OS !== "web" && (
-            <View className="flex-1 items-center justify-center min-h-screen py-16 px-4">
+            <View className="flex-1 items-center justify-center min-h-screen pt-safe-or-12 py-20 px-4">
                 <View
-                        className="relative z-10 backdrop-blur-sm mb-8 bg-white/40 rounded-3xl shadow-xl border border-white/50 p-8 w-full max-w-4xl mx-auto flex-1 flex flex-col justify-between">
+                        className="relative z-10 backdrop-blur-sm mb-safe-offset-10 bg-white/40 rounded-3xl border border-white/50 p-8 w-full max-w-4xl mx-auto flex-1 flex flex-col justify-between">
                     <View className="flex-1 justify-start mt-32 items-center">
                     <Text style={{fontSize: 32, fontWeight: 'bold', textAlign: 'center', color: '#1f2937'}}>
                             Welcome to <Text style={{color: '#2563eb'}}>Facelinked</Text>
@@ -1733,7 +1733,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
 const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, setShowPassword, rememberMe, setRememberMe, formData, updateFormData}) => {
 
     return (
-        <View className="backdrop-blur-sm mt-7 bg-white/60 rounded-3xl shadow-xl border border-white/50 p-6 md:p-8 w-full max-w-md mx-auto">
+        <View className="backdrop-blur-sm mt-7 bg-white/60 rounded-3xl border border-white/50 p-6 md:p-8 w-full max-w-md mx-auto">
             <View className="mb-8">
                 <TouchableOpacity
                     activeOpacity={0.7}
@@ -1761,7 +1761,7 @@ const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, se
                         </View>
                         <TextInput
                             onChangeText={(value) => updateFormData("email", value)}
-                            className="pl-10 block w-full rounded-lg border border-gray-300 py-3 shadow-sm"
+                            className="pl-10 block w-full rounded-lg border border-gray-300 py-3"
                             placeholder="Enter your email"
                             placeholderTextColor="#9CA3AF"
                         />
@@ -1777,7 +1777,7 @@ const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, se
                         <TextInput
                             secureTextEntry={!showPassword}
                             onChangeText={(value) => updateFormData("password", value)}
-                            className="pl-10 pr-10 block w-full rounded-lg border border-gray-300 py-3 shadow-sm"
+                            className="pl-10 pr-10 block w-full rounded-lg border border-gray-300 py-3"
                             placeholder="Enter your password"
                             placeholderTextColor="#9CA3AF"
                         />
@@ -1954,7 +1954,7 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
 
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1}} className="mt-7">
-            <View className="backdrop-blur-sm bg-white/60 rounded-3xl shadow-xl border border-white/50 p-6 md:p-8 w-full max-w-md mx-auto">
+            <View className="backdrop-blur-sm bg-white/60 rounded-3xl border border-white/50 p-6 md:p-8 w-full max-w-md mx-auto">
                 <View className="flex flex-row items-center mb-6">
                     <TouchableOpacity
                         activeOpacity={0.7}
@@ -2277,7 +2277,7 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
                 </View>
 
                 {/* Navigation Buttons */}
-                <View className="flex flex-row justify-between items-center sticky bottom-0 bg-white/95 p-4 border-t border-gray-200">
+                <View className="flex flex-row justify-between items-center sticky bottom-0 p-4 border-t border-gray-200">
                     {step > 1 ? (
                         <TouchableOpacity
                             activeOpacity={0.85}
