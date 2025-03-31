@@ -155,6 +155,12 @@ export default function ChatRoom() {
         }
     }, []);
 
+    const bottomPadding = Platform.OS === 'ios'
+        ? keyboardVisible
+            ? 10
+            : Math.max(insets.bottom, 16)
+        : 16;
+
     useEffect(() => {
         if (flatListRef.current && messages.length > 0) {
             setTimeout(() => {
@@ -401,12 +407,6 @@ export default function ChatRoom() {
             </View>
         );
     }
-
-    const bottomPadding = Platform.OS === 'ios'
-        ? keyboardVisible
-            ? 10
-            : Math.max(insets.bottom, 16)
-        : 16;
 
     return (
         <KeyboardAvoidingView
