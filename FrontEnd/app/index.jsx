@@ -614,7 +614,7 @@ const AuthPages = ({ navigateTo, currentPage, previousPage, showPassword, setSho
                     duration: 125
                 }}
             >
-                <View className="bg-gray-200" style={{flexGrow: 1}}>
+                <View className="bg-gray-200" style={{flexGrow: 1, height: "100%"}}>
                 {currentPage === 'login' ? (
             <LoginPage navigateTo={navigateTo} showPassword={showPassword}
                        setShowPassword={setShowPassword} previousPage={previousPage}/>
@@ -1735,7 +1735,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
 const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, setShowPassword, rememberMe, setRememberMe, formData, updateFormData}) => {
 
     return (
-        <View style={{height: "80%", justifyContent: "center", width: "100%", flexGrow: 1}}>
+        <View style={{marginBottom: 110, justifyContent: "center", width: "100%", flexGrow: 1}}>
         <View className="backdrop-blur-sm mt-7 bg-white rounded-3xl border border-white/50 p-6 md:p-8 w-full max-w-md mx-auto">
             <View className="mb-8">
                 <TouchableOpacity
@@ -1957,7 +1957,7 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
     };
 
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1, width: "100%", height: "80%", justifyContent: "center"}}>
+        <ScrollView contentContainerStyle={{marginBottom: 110, flexGrow: 1, width: "100%", justifyContent: "center"}}>
             <View className="backdrop-blur-sm bg-white rounded-3xl border border-white/50 p-6 md:p-8 w-full max-w-md mx-auto">
                 <View className="flex flex-row items-center mb-8">
                     <TouchableOpacity

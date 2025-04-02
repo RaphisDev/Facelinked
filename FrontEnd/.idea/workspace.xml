@@ -6,6 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
       <change beforePath="$PROJECT_DIR$/app/(tabs)/chats/[username].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chats/[username].jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/WebSocketProvider.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/WebSocketProvider.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -250,7 +252,8 @@
       <workItem from="1743253203932" duration="12829000" />
       <workItem from="1743359605878" duration="9353000" />
       <workItem from="1743369640282" duration="192000" />
-      <workItem from="1743436363800" duration="7947000" />
+      <workItem from="1743436363800" duration="8178000" />
+      <workItem from="1743618030888" duration="3632000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />

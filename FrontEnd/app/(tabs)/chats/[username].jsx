@@ -200,6 +200,7 @@ export default function ChatRoom() {
             }]);
             setInput("");
             setSelectedImages([]);
+            setInputHeight(40);
 
             let imageURls = [];
             if (selectedImages.length > 0) {
@@ -518,7 +519,7 @@ export default function ChatRoom() {
 
                         <TextInput
                             ref={inputRef}
-                            style={[styles.textInput, { height: Math.max(40, inputHeight) }]}
+                            style={[styles.textInput, {maxHeight: 120}]}
                             placeholder="Type a message..."
                             placeholderTextColor="#9CA3AF"
                             value={input}
@@ -527,9 +528,14 @@ export default function ChatRoom() {
                             multiline
                             onContentSizeChange={(e) => {
                                 const height = e.nativeEvent.contentSize.height;
-                                setInputHeight(Math.min(height, 120));
+                                setInputHeight(input.length <= 1 ? 40 : Math.min(Math.max(40, height), 120));
                             }}
-                            onSubmitEditing={() => {if (Platform.OS === "web") {sendMessage()}}}
+                            onKeyPress={(e) => {
+                              if (Platform.OS === "web" && e.nativeEvent.key === "Enter" && !e.nativeEvent.shiftKey) {
+                                e.preventDefault();
+                                sendMessage();
+                              }
+                            }}
                         />
 
                         <TouchableOpacity

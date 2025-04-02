@@ -122,6 +122,7 @@ class WebsocketController{
                             isSender: username === message.senderId,
                             content: message.content,
                             millis: message.millis,
+                            images: message.images,
                         }]));
                     }
                     const processMessage = async (parsedMessage) => {
@@ -142,7 +143,8 @@ class WebsocketController{
                         await asyncStorage.setItem(`messages/${messageUserName}`, JSON.stringify([...loadedMessages, {
                             isSender: username === parsedMessage.senderId,
                             content: parsedMessage.content,
-                            millis: parsedMessage.millis
+                            millis: parsedMessage.millis,
+                            images: parsedMessage.images,
                         }]));
                         await asyncStorage.setItem("lastMessageId", parsedMessage.millis.toString());
                     }
@@ -230,7 +232,8 @@ class WebsocketController{
                                 isSender: false,
                                 content: parsedMessage.content,
                                 sender: parsedMessage.senderId,
-                                millis: parsedMessage.millis
+                                millis: parsedMessage.millis,
+                                images: parsedMessage.images,
                             }
                         });
 
@@ -238,7 +241,8 @@ class WebsocketController{
                         await asyncStorage.setItem(`messages/${parsedMessage.senderId}`, JSON.stringify([...loadedMessages, {
                             isSender: false,
                             content: parsedMessage.content,
-                            millis: parsedMessage.millis
+                            millis: parsedMessage.millis,
+                            images: parsedMessage.images,
                         }]));
 
                         const loadedChats = await getChats();
