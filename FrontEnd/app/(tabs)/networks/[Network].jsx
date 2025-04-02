@@ -91,7 +91,7 @@ export default function Network() {
 
                 let loadedNetworks = await asyncStorage.getItem("networks") || [];
                 if (loadedNetworks.length !== 0) {loadedNetworks = JSON.parse(loadedNetworks);}
-                if(loadedNetworks.find((network) =>network.networkId === Network)) {
+                if(loadedNetworks.some((network) =>network.networkId === Network)) {
                     setIsFavorite(true);
                     await asyncStorage.setItem("networks", JSON.stringify(loadedNetworks.map((network) => {
                         if (network.networkId === Network) {
@@ -136,7 +136,7 @@ export default function Network() {
                 parsedNetworks = JSON.parse(parsedNetworks);
             }
 
-            if (!parsedNetworks.find((network) => network.networkId === Network) || parsedNetworks.length === 0) {
+            if (!parsedNetworks.some((network) => network.networkId === Network)) {
                 if (ws.stompClient.connected) {
                     ws.stompClient.subscribe(`/networks/${Network}`, async (message) => {
                         const parsedMessage = JSON.parse(message.body);
@@ -248,7 +248,7 @@ export default function Network() {
 
             addMessage((prevMessages) => [...prevMessages, {sender: username.current, senderProfilePicturePath: profilePicture, content: message, millis: Date.now()}]);
 
-            if (JSON.parse(await asyncStorage.getItem("networks"))?.find((network) => network.networkId === Network)) {
+            if (JSON.parse(await asyncStorage.getItem("networks"))?.some((network) => network.networkId === Network)) {
                 let loadedMessages = await asyncStorage.getItem(`networks/${Network}`) || [];
                 if (loadedMessages.length !== 0) {
                     loadedMessages = JSON.parse(loadedMessages);
@@ -391,7 +391,7 @@ export default function Network() {
                         const loadedNetworks = await asyncStorage.getItem("networks") || null;
                         if (loadedNetworks !== null) {
                             const parsedNetworks = JSON.parse(loadedNetworks);
-                            if (!parsedNetworks.find((network) => network.networkId === Network)) {
+                            if (!parsedNetworks.some((network) => network.networkId === Network)) {
                                 if (ws.stompClient.connected) {
                                     const receivedMessages = await fetch(`${ip}/networks/${Network}/messages?additional=${encodeURIComponent(true)}`, {
                                         method: "GET",

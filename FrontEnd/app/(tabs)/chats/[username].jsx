@@ -254,7 +254,7 @@ export default function ChatRoom() {
 
             let loadedChats = await asyncStorage.getItem("chats") || [];
             if (loadedChats.length !== 0) {loadedChats = JSON.parse(loadedChats);}
-            if(!loadedChats.find((chat) => chat.username === username) || loadedChats.length === 0) {
+            if(!loadedChats.some((chat) => chat.username === username)) {
                 let token;
                 if (Platform.OS === "web") {
                     token = localStorage.getItem("token");
