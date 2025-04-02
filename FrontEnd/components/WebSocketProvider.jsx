@@ -82,6 +82,7 @@ class WebsocketController{
                             return;
                         }
 
+                        if (!loadedChats.some((chat) => chat.username === senderId)) {
 
                             const profile = await fetch(`${ip}/profile/${senderId}`, {
                                 method: "GET",
