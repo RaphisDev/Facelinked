@@ -5,7 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
-      <change beforePath="$PROJECT_DIR$/components/WebSocketProvider.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/WebSocketProvider.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/controller/ProfileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/controller/ProfileController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/service/ProfileService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/service/ProfileService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/index.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,7 +90,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-e768b9ed790e-JavaScript-WS-243.21565.180" />
+        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-WS-243.25659.40" />
       </set>
     </attachedChunks>
   </component>
@@ -252,6 +254,7 @@
       <workItem from="1743369640282" duration="192000" />
       <workItem from="1743436363800" duration="8178000" />
       <workItem from="1743618030888" duration="4699000" />
+      <workItem from="1743624151176" duration="2290000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />

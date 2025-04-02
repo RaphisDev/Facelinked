@@ -757,7 +757,7 @@ const LoginPage = ({navigateTo, showPassword, setShowPassword, previousPage}) =>
                         router.replace("/");
                     }
                 } else {
-                    if (Platform.OS === "web") {
+                    if (Platform.OS !== "android") {
                         showAlert({
                             title: "Error",
                             message: "Invalid email or password. Please try again.",
@@ -777,7 +777,7 @@ const LoginPage = ({navigateTo, showPassword, setShowPassword, previousPage}) =>
             }
         }
         else {
-            if (Platform.OS === "web") {
+            if (Platform.OS !== "android") {
                 showAlert({
                     title: "Error",
                     message: "Invalid email or password. Please try again.",
@@ -966,7 +966,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
 
         if (emailRegex.test(formData.email) && formData.password.length > 3 && formData.username.length >= 3 && formData.name.length > 3) {
             if(age <= 13 || formData.interests.length < 3 || formData.location.length <= 3 || !formData.profilePicture) {
-                if (Platform.OS === "web") {
+                if (Platform.OS !== "android") {
                     showAlert({
                         title: "Error",
                         message: "Please fill out all fields and comply with the Terms of Service",
@@ -1003,7 +1003,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                     token.current = data.token;
                 }
                 else {
-                    if (Platform.OS === "web") {
+                    if (Platform.OS !== "android") {
                         showAlert({
                             title: "Conflict",
                             message: "There is already an account with that email or username.",
@@ -1022,7 +1022,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                 }
             }
             catch (error) {
-                if (Platform.OS === "web") {
+                if (Platform.OS !== "android") {
                     showAlert({
                         title: "Error",
                         message: "Please try again.",
@@ -1042,7 +1042,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
             await CompleteProfile();
         }
         else if(!registered) {
-            if (Platform.OS === "web") {
+            if (Platform.OS !== "android") {
                 showAlert({
                     title: "Error",
                     message: "Please enter a valid email and password",
@@ -1093,20 +1093,22 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                     imageUrl.current = url.split('?')[0];
                 }
                 else {
-                    if (Platform.OS === "web") {
+                    if (Platform.OS !== "android") {
                         showAlert({
-                            title: "Error",
-                            message: "There was an error uploading the image. Please try again.",
+                            title: "Conflict",
+                            message: "There is already an account with that email or username.",
                             buttons: [{
                                 text: 'OK',
                                 onPress: () => {
 
                                 }
-                            }],
+                            },],
                         })
                     } else {
-                        alert("There was an error uploading the image. Please try again.");
+                        alert("There is already an account with that email or username.");
                     }
+                    setRegistered(false);
+                    jumpToStep(1);
                     return;
                 }
 
@@ -1121,7 +1123,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                         }
 
                         if (finalStatus !== 'granted') {
-                            if (Platform.OS === "web") {
+                            if (Platform.OS !== "android") {
                                 showAlert({
                                     title: "Permission denied",
                                     message: "Notifications are disabled. Enable them in your settings.",
@@ -1175,8 +1177,13 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                     body: JSON.stringify({
                         username: formData.username,
                         name: formData.name,
-                        profilePicturePath: imageUrl,
-                        dateOfBirth: formData.birthDate,
+                        profilePicturePath: imageUrl.current,
+                        dateOfBirth: new Date(formData.birthDate.year,
+                                    typeof formData.birthDate.month === 'string'
+                                        ? ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+                                           'August', 'September', 'October', 'November', 'December'].indexOf(formData.birthDate.month)
+                                        : formData.birthDate.month - 1,
+                                    formData.birthDate.day).toISOString(),
                         hobbies: formData.interests,
                         inRelationship: formData.relationship,
                         location: formData.location,
@@ -1215,7 +1222,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                     router.replace("/home");
                 }
                 else {
-                    if (Platform.OS === "web") {
+                    if (Platform.OS !== "android") {
                         showAlert({
                             title: "Conflict",
                             message: "There is already an account with that email or username.",
@@ -1234,7 +1241,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                 }
             }
             catch (error) {
-                if (Platform.OS === "web") {
+                if (Platform.OS !== "android") {
                     showAlert({
                         title: "Error",
                         message: "There was an error registering. Please try again",
@@ -1281,7 +1288,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
         email: '',
         password: '',
         relationship: null,
-        birthDate: { day: 15, month: 'March', year: 2000 },
+        birthDate: { day: 2, month: 'April', year: 2025 },
         location: '',
         interests: '',
         profilePicture: null
