@@ -47,7 +47,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         @Override
         protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler,
                                           Map<String, Object> attributes) {
-            var token = request.getHeaders().getFirst("Sec-WebSocket-Protocol");
+            var protocols = request.getHeaders().getFirst("Sec-WebSocket-Protocol");
+            String token = null;
+            if (protocols != null && protocols.contains(",")) {
+                token = protocols.split(",")[0].trim();
+            }
 
             final String email;
             if (token == null) {
