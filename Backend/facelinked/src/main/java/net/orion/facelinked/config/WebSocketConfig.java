@@ -49,7 +49,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                                           Map<String, Object> attributes) {
             var protocols = request.getHeaders().getFirst("Sec-WebSocket-Protocol");
             String token = null;
-            if (protocols != null && protocols.contains(",")) {
+            if (protocols != null) {
                 token = protocols.split(",")[0].trim();
             }
 
