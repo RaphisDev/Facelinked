@@ -27,6 +27,8 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 import java.security.Principal;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @EnableWebSocketMessageBroker
@@ -77,6 +79,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             }
 
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
+        }
+
+        @Override
+        protected String selectProtocol(List<String> requestedProtocols, WebSocketHandler webSocketHandler) {
+            return requestedProtocols.isEmpty() ? null : requestedProtocols.getFirst();
         }
     }
 
