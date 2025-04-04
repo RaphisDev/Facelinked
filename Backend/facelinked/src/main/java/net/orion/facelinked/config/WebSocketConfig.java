@@ -80,11 +80,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
         }
-
-        @Override
-        protected String selectProtocol(List<String> requestedProtocols, WebSocketHandler webSocketHandler) {
-            return requestedProtocols.isEmpty() ? null : requestedProtocols.getFirst();
-        }
     }
 
     @Override
