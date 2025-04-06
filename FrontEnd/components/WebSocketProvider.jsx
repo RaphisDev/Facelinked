@@ -38,9 +38,6 @@ class WebsocketController{
                 heartbeatIncoming: 10000,
                 reconnectDelay: 5000,
                 connectionTimeout: 10000,
-                webSocketFactory: () => {
-                    return new WebSocket(`${webSocketIp}/ws`, [token]);
-                },
                 onWebSocketError: (error) => {
                     //alert("Network error. Please check your internet connection.");
                     if (!this.stompClient.connected) {
@@ -52,208 +49,227 @@ class WebsocketController{
                     }
                 },
                 onConnect: async () => {
-                    const lastMessageId = Number.parseInt(await asyncStorage.getItem("lastMessageId")) || null;
-                    let username;
-                    if (Platform.OS === "web") {
-                        username = localStorage.getItem("username");
-                    }
-                    else {
-                        username = SecureStore.getItem("username");
-                    }
-
-                    const getMessages = async (sender) => {
-                        let loadedMessages = await asyncStorage.getItem(`messages/${sender}`) || [];
-                        if (loadedMessages.length !== 0) {
-                            loadedMessages = JSON.parse(loadedMessages);
+                    this.stompClient.send("/auth", token);
+                    this.stompClient.subscribe("/auth", (message) => {
+                        const data = JSON.parse(message);
+                        if (data.type === 'auth_success') {
+                            Initialize();
+                        } else if (data.type === 'auth_error') {
+                            this.reset()
                         }
-                        return loadedMessages;
-                    }
-                    const getChats = async () => {
-                        let loadedChats = await asyncStorage.getItem("chats") || [];
-                        if (loadedChats.length !== 0) {
-                            loadedChats = JSON.parse(loadedChats);
-                        }
-                        return loadedChats;
-                    }
+                    })
 
-                    const saveChats = async (senderId, loadedChats, oldMessage) => {
-
-                        if (senderId === username) {
-                            return;
+                    const Initialize = async () => {
+                        const lastMessageId = Number.parseInt(await asyncStorage.getItem("lastMessageId")) || null;
+                        let username;
+                        if (Platform.OS === "web") {
+                            username = localStorage.getItem("username");
+                        } else {
+                            username = SecureStore.getItem("username");
                         }
 
-                        if (!loadedChats.some((chat) => chat.username === senderId)) {
+                        const getMessages = async (sender) => {
+                            let loadedMessages = await asyncStorage.getItem(`messages/${sender}`) || [];
+                            if (loadedMessages.length !== 0) {
+                                loadedMessages = JSON.parse(loadedMessages);
+                            }
+                            return loadedMessages;
+                        }
+                        const getChats = async () => {
+                            let loadedChats = await asyncStorage.getItem("chats") || [];
+                            if (loadedChats.length !== 0) {
+                                loadedChats = JSON.parse(loadedChats);
+                            }
+                            return loadedChats;
+                        }
 
-                            const profile = await fetch(`${ip}/profile/${senderId}`, {
-                                method: "GET",
-                                headers: {
-                                    "Authorization": `Bearer ${token}`
+                        const saveChats = async (senderId, loadedChats, oldMessage) => {
+
+                            if (senderId === username) {
+                                return;
+                            }
+
+                            if (!loadedChats.some((chat) => chat.username === senderId)) {
+
+                                const profile = await fetch(`${ip}/profile/${senderId}`, {
+                                    method: "GET",
+                                    headers: {
+                                        "Authorization": `Bearer ${token}`
+                                    }
+                                });
+                                if (profile.ok) {
+                                    const profileJson = await profile.json();
+
+                                    await asyncStorage.setItem("chats", JSON.stringify([...loadedChats, {
+                                        name: profileJson.name,
+                                        username: profileJson.username,
+                                        image: profileJson.profilePicturePath,
+                                        unread: !oldMessage
+                                    }]));
+                                    this.messageReceived.emit("newMessageReceived");
                                 }
-                            });
-                            if (profile.ok) {
-                                const profileJson = await profile.json();
+                            } else {
+                                await asyncStorage.setItem("chats", JSON.stringify(loadedChats.map((chat) => {
+                                    if (chat.username === senderId) {
+                                        return {
+                                            ...chat,
+                                            unread: oldMessage ? chat.unread : true
+                                        }
+                                    }
 
-                                await asyncStorage.setItem("chats", JSON.stringify([...loadedChats, {
-                                    name: profileJson.name,
-                                    username: profileJson.username,
-                                    image: profileJson.profilePicturePath,
-                                    unread: !oldMessage
-                                }]));
+                                    return chat;
+                                })));
                                 this.messageReceived.emit("newMessageReceived");
                             }
-                        } else {
-                            await asyncStorage.setItem("chats", JSON.stringify(loadedChats.map((chat) => {
-                                if (chat.username === senderId) {
-                                    return {
-                                        ...chat,
-                                        unread: oldMessage ? chat.unread : true
+                        }
+                        const saveMessages = async (message) => {
+                            const loadedMessages = await getMessages(message.senderId);
+
+                            await asyncStorage.setItem(`messages/${message.senderId}`, JSON.stringify([...loadedMessages, {
+                                isSender: username === message.senderId,
+                                content: message.content,
+                                millis: message.millis,
+                                images: message.images,
+                            }]));
+                        }
+                        const processMessage = async (parsedMessage) => {
+                            const loadedChats = await getChats();
+
+                            await saveChats(parsedMessage.senderId, loadedChats, false);
+                            await saveMessages(parsedMessage);
+                            await asyncStorage.setItem("lastMessageId", parsedMessage.millis.toString());
+                        }
+                        const processOldMessages = async (parsedMessage) => {
+                            const loadedChats = await getChats();
+
+                            await saveChats(parsedMessage.senderId, loadedChats, true);
+
+                            const messageUserName = parsedMessage.senderId === username ? parsedMessage.receiverId : parsedMessage.senderId;
+
+                            const loadedMessages = await getMessages(messageUserName);
+                            await asyncStorage.setItem(`messages/${messageUserName}`, JSON.stringify([...loadedMessages, {
+                                isSender: username === parsedMessage.senderId,
+                                content: parsedMessage.content,
+                                millis: parsedMessage.millis,
+                                images: parsedMessage.images,
+                            }]));
+                            await asyncStorage.setItem("lastMessageId", parsedMessage.millis.toString());
+                        }
+
+                        const receiveNetworkMessages = async () => {
+                            let networks = await asyncStorage.getItem("networks") || [];
+                            if (networks.length !== 0) {
+                                networks = JSON.parse(networks);
+                            }
+                            for (const network in networks) {
+                                const id = networks[network].networkId
+                                this.stompClient.subscribe(`/networks/${id}`, async (message) => {
+                                    const parsedMessage = JSON.parse(message.body);
+
+                                    if (parsedMessage.senderId.memberId === username) {
+                                        return;
                                     }
-                                }
-
-                                return chat;
-                            })));
-                            this.messageReceived.emit("newMessageReceived");
-                        }
-                    }
-                    const saveMessages = async (message) => {
-                        const loadedMessages = await getMessages(message.senderId);
-
-                        await asyncStorage.setItem(`messages/${message.senderId}`, JSON.stringify([...loadedMessages, {
-                            isSender: username === message.senderId,
-                            content: message.content,
-                            millis: message.millis,
-                            images: message.images,
-                        }]));
-                    }
-                    const processMessage = async (parsedMessage) => {
-                        const loadedChats = await getChats();
-
-                        await saveChats(parsedMessage.senderId, loadedChats, false);
-                        await saveMessages(parsedMessage);
-                        await asyncStorage.setItem("lastMessageId", parsedMessage.millis.toString());
-                    }
-                    const processOldMessages = async (parsedMessage) => {
-                        const loadedChats = await getChats();
-
-                        await saveChats(parsedMessage.senderId, loadedChats, true);
-
-                        const messageUserName = parsedMessage.senderId === username ? parsedMessage.receiverId : parsedMessage.senderId;
-
-                        const loadedMessages = await getMessages(messageUserName);
-                        await asyncStorage.setItem(`messages/${messageUserName}`, JSON.stringify([...loadedMessages, {
-                            isSender: username === parsedMessage.senderId,
-                            content: parsedMessage.content,
-                            millis: parsedMessage.millis,
-                            images: parsedMessage.images,
-                        }]));
-                        await asyncStorage.setItem("lastMessageId", parsedMessage.millis.toString());
-                    }
-
-                    const receiveNetworkMessages = async () => {
-                        let networks = await asyncStorage.getItem("networks") || [];
-                        if (networks.length !== 0) {
-                            networks = JSON.parse(networks);
-                        }
-                        for (const network in networks) {
-                            const id = networks[network].networkId
-                            this.stompClient.subscribe(`/networks/${id}`, async (message) => {
-                                const parsedMessage = JSON.parse(message.body);
-
-                                if (parsedMessage.senderId.memberId === username) {
-                                    return;
-                                }
-                                this.messageReceived.emit("networkMessageReceived", {
-                                    detail: {
+                                    this.messageReceived.emit("networkMessageReceived", {
+                                        detail: {
+                                            networkId: id,
+                                            content: parsedMessage.content,
+                                            sender: parsedMessage.senderId.memberId,
+                                            senderProfileName: parsedMessage.senderId.memberName,
+                                            senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath,
+                                            millis: parsedMessage.millis
+                                        }
+                                    });
+                                    let loadedMessages = await asyncStorage.getItem(`networks/${id}`) || [];
+                                    if (loadedMessages.length !== 0) {
+                                        loadedMessages = JSON.parse(loadedMessages);
+                                    }
+                                    await asyncStorage.setItem(`networks/${id}`, JSON.stringify([...loadedMessages, {
                                         networkId: id,
                                         content: parsedMessage.content,
                                         sender: parsedMessage.senderId.memberId,
                                         senderProfileName: parsedMessage.senderId.memberName,
                                         senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath,
                                         millis: parsedMessage.millis
+                                    }]));
+                                    await asyncStorage.setItem(`lastNetworkMessageId/${id}`, parsedMessage.millis.toString());
+
+                                    let loadedNetworks = await asyncStorage.getItem("networks") || [];
+                                    if (loadedNetworks.length !== 0) {
+                                        loadedNetworks = JSON.parse(loadedNetworks);
                                     }
+                                    await asyncStorage.setItem("networks", JSON.stringify([...loadedNetworks.filter(network => network.networkId === id), ...loadedNetworks.filter(network => network.networkId !== id)]));
                                 });
-                                let loadedMessages = await asyncStorage.getItem(`networks/${id}`) || [];
-                                if (loadedMessages.length !== 0) {loadedMessages = JSON.parse(loadedMessages);}
-                                await asyncStorage.setItem(`networks/${id}`, JSON.stringify([...loadedMessages, {networkId: id, content: parsedMessage.content, sender: parsedMessage.senderId.memberId, senderProfileName: parsedMessage.senderId.memberName,
-                                    senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath, millis: parsedMessage.millis}]));
-                                await asyncStorage.setItem(`lastNetworkMessageId/${id}`, parsedMessage.millis.toString());
+                            }
+                        }
 
-                                let loadedNetworks = await asyncStorage.getItem("networks") || [];
-                                if (loadedNetworks.length !== 0) {loadedNetworks = JSON.parse(loadedNetworks);}
-                                await asyncStorage.setItem("networks", JSON.stringify([...loadedNetworks.filter(network => network.networkId === id), ...loadedNetworks.filter(network => network.networkId !== id)]));
+                        if (lastMessageId) {
+                            const messages = await fetch(`${ip}/messages/afterId?id=${encodeURIComponent(lastMessageId)}`, {
+                                method: "GET",
+                                headers: {
+                                    "Application-Type": "application/json",
+                                    "Authorization": `Bearer ${token}`
+                                }
                             });
-                        }
-                    }
 
-                    if (lastMessageId) {
-                        const messages = await fetch(`${ip}/messages/afterId?id=${encodeURIComponent(lastMessageId)}`, {
-                            method: "GET",
-                            headers: {
-                                "Application-Type": "application/json",
-                                "Authorization": `Bearer ${token}`
+                            if (messages.ok) {
+                                const parsedMessages = await messages.json();
+
+                                for (const message of parsedMessages) {
+                                    await processMessage(message);
+                                }
+                            } else {
+                                alert("Network error. Please check your internet connection.");
                             }
-                        });
+                        } else {
+                            const messages = await fetch(`${ip}/messages/all`, {
+                                method: "GET",
+                                headers: {
+                                    "Application-Type": "application/json",
+                                    "Authorization": `Bearer ${token}`
+                                }
+                            });
 
-                        if (messages.ok) {
-                            const parsedMessages = await messages.json();
+                            if (messages.ok) {
+                                const parsedMessages = await messages.json();
 
-                            for (const message of parsedMessages) {
-                                await processMessage(message);
-                            }
-                        }
-                        else {
-                            alert("Network error. Please check your internet connection.");
-                        }
-                    } else {
-                        const messages = await fetch(`${ip}/messages/all`, {
-                            method: "GET",
-                            headers: {
-                                "Application-Type": "application/json",
-                                "Authorization": `Bearer ${token}`
-                            }
-                        });
-
-                        if (messages.ok) {
-                            const parsedMessages = await messages.json();
-
-                            for (const message of parsedMessages) {
-                                await processOldMessages(message);
+                                for (const message of parsedMessages) {
+                                    await processOldMessages(message);
+                                }
+                            } else {
+                                alert("Network error. Please check your internet connection.");
                             }
                         }
-                        else {
-                            alert("Network error. Please check your internet connection.");
-                        }
-                    }
 
-                    this.stompClient.subscribe(`/user/${username}/queue/messages`, async (message) => {
-                        const parsedMessage = JSON.parse(message.body);
-                        this.messageReceived.emit("messageReceived", {
-                            detail: {
+                        this.stompClient.subscribe(`/user/${username}/queue/messages`, async (message) => {
+                            const parsedMessage = JSON.parse(message.body);
+                            this.messageReceived.emit("messageReceived", {
+                                detail: {
+                                    isSender: false,
+                                    content: parsedMessage.content,
+                                    sender: parsedMessage.senderId,
+                                    millis: parsedMessage.millis,
+                                    images: parsedMessage.images,
+                                }
+                            });
+
+                            const loadedMessages = await getMessages(parsedMessage.senderId);
+                            await asyncStorage.setItem(`messages/${parsedMessage.senderId}`, JSON.stringify([...loadedMessages, {
                                 isSender: false,
                                 content: parsedMessage.content,
-                                sender: parsedMessage.senderId,
                                 millis: parsedMessage.millis,
                                 images: parsedMessage.images,
-                            }
+                            }]));
+
+                            const loadedChats = await getChats();
+                            this.messageReceived.emit("unreadMessagesChanged", {
+                                detail: {unread: loadedChats.filter((chat) => chat.unread).length}
+                            });
+
+                            await saveChats(parsedMessage.senderId, loadedChats, false);
+                            await asyncStorage.setItem("lastMessageId", parsedMessage.millis.toString());
                         });
-
-                        const loadedMessages = await getMessages(parsedMessage.senderId);
-                        await asyncStorage.setItem(`messages/${parsedMessage.senderId}`, JSON.stringify([...loadedMessages, {
-                            isSender: false,
-                            content: parsedMessage.content,
-                            millis: parsedMessage.millis,
-                            images: parsedMessage.images,
-                        }]));
-
-                        const loadedChats = await getChats();
-                        this.messageReceived.emit("unreadMessagesChanged", {
-                            detail: { unread:  loadedChats.filter((chat) => chat.unread).length }
-                        });
-
-                        await saveChats(parsedMessage.senderId, loadedChats, false);
-                        await asyncStorage.setItem("lastMessageId", parsedMessage.millis.toString());
-                    });
-                    receiveNetworkMessages();
+                        receiveNetworkMessages();
+                    }
                 },
             });
             this.stompClient.activate();

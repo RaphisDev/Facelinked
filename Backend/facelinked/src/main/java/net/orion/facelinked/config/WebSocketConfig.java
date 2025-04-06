@@ -23,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
@@ -41,61 +42,42 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final JwtAuthService jwtService;
     private final UserDetailsService userDetailsService;
 
-    @AllArgsConstructor
     public class HandshakeHandler extends DefaultHandshakeHandler {
-
-        private final UserDetailsService userDetailsService;
 
         @Override
         protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler,
                                           Map<String, Object> attributes) {
-            var token = request.getHeaders().getFirst("Sec-WebSocket-Protocol");
 
-            final String email;
-            if (token == null) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No token provided");
-            }
-            email = jwtService.extractEmail(token);
-            if (email != null) {
-                UserDetails userDetails = null;
-                try {
-                    userDetails = this.userDetailsService.loadUserByUsername(email);
-                } catch (UsernameNotFoundException e) {
-                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
+            WebSocketAuthenticationHandler.afterConnected(session);
+
+            return new Principal() {
+                @Override
+                public String getName() {
+                    return null;
                 }
-                if(jwtService.isTokenValid(token, userDetails)) {
-                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
-                    var username = userService.findByEmail(email).getUserName();
-
-                    return new Principal() {
-                        @Override
-                        public String getName() {
-                            return username;
-                        }
-                    };
-                }
-            }
-
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
+            };
         }
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/networks", "/user");
+        config.enableSimpleBroker("/networks", "/user", "/auth");
         config.setApplicationDestinationPrefixes("/app");
         config.setUserDestinationPrefix("/user");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").setHandshakeHandler(new HandshakeHandler(userDetailsService)).setAllowedOriginPatterns("https://www.facelinked.com");
+        registry.addEndpoint("/ws").setHandshakeHandler(new HandshakeHandler()).setAllowedOriginPatterns("https://www.facelinked.com");
     }
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration channelRegistration) {
         channelRegistration.interceptors(new WebSocketChannelInterceptor(networkService));
+    }
+
+    @Override
+    public void configureClientOutboundChannel(ChannelRegistration channelRegistration) {
+        //TODO: Check if authenticated, if not, throw exception | Check if Principal username is not null
     }
 }
