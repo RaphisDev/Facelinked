@@ -48,7 +48,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler,
                                           Map<String, Object> attributes) {
 
-            WebSocketAuthenticationHandler.afterConnected(session);
+            WebSocketAuthenticationHandler.afterConnected(wsHandler.getSessionId());
 
             return new Principal() {
                 @Override

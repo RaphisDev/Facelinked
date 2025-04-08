@@ -43,9 +43,9 @@ public class WebSocketAuthenticationHandler {
     private final UserService userService;
 
     @MessageMapping("/auth")
-    public void handleAuthentication(SimpMessageHeaderAccessor session, String token) { //how to get SimpMessageHeaderAccessor? (this shouldn't work I think)
+    public void handleAuthentication(SimpMessageHeaderAccessor session, String token, WebSocketSession webSocketSession) { //how to get SimpMessageHeaderAccessor? (this shouldn't work I think)
         if (token == null || token.isEmpty()) {
-            session.close();
+            webSocketSession.close();
             return;
         }
         final String email;
@@ -55,11 +55,11 @@ public class WebSocketAuthenticationHandler {
             try {
                 userDetails = this.userDetailsService.loadUserByUsername(email);
             } catch (UsernameNotFoundException e) {
-                session.close();
+                webSocketSession.close();
                 return;
             }
             if (userDetails == null) {
-                session.close();
+                webSocketSession.close();
                 return;
             }
             if(jwtService.isTokenValid(token, userDetails)) {
@@ -75,7 +75,7 @@ public class WebSocketAuthenticationHandler {
                     }
                 });
 
-                pendingConnections.remove(session.getSessionId());
+                pendingConnections.remove(webSocketSession.getId());
                 session.send("/auth", new TextMessage("{'type':'auth_success'}"));
             }
             else {
@@ -84,14 +84,14 @@ public class WebSocketAuthenticationHandler {
         }
     }
 
-    public static void afterConnected(SimpMessageHeaderAccessor session) {
-        String sessionId = session.getSessionId();
-        pendingConnections.put(sessionId, new ConnectionInfo(session));
+    public static void afterConnected(WebSocketSession webSocketSession) {
+        String sessionId = session.StompSession.getId(); //TODO: Get StompSession or something like that
+        pendingConnections.put(sessionId, new ConnectionInfo(session, webSocketSession.getId()));
 
         scheduler.schedule(() -> {
-            if (pendingConnections.containsKey(sessionId)) {
+            if (pendingConnections.containsKey(webSocketSession.getId())) {
                 session.close();
-                pendingConnections.remove(sessionId);
+                pendingConnections.remove(webSocketSession.getId());
             }
         }, 30, TimeUnit.SECONDS);
     }
@@ -107,11 +107,13 @@ public class WebSocketAuthenticationHandler {
     }
 
     private static class ConnectionInfo {
+        final WebSocketSession webSocketSession;
         final SimpMessageHeaderAccessor session;
         final long connectedAt;
 
-        ConnectionInfo(SimpMessageHeaderAccessor session) {
+        ConnectionInfo(SimpMessageHeaderAccessor session, WebSocketSession webSocketSession) {
             this.session = session;
+            this.webSocketSession = webSocketSession;
             this.connectedAt = System.currentTimeMillis();
         }
     }
