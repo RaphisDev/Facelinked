@@ -35,7 +35,7 @@ import {TextEncoder} from "text-encoding";
 import asyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import CustomAlertProvider, {showAlert} from "../components/PopUpModalView";
-import {MotiView} from "moti";
+import {MotiScrollView, MotiView} from "moti";
 import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
 import {useDerivedValue} from "react-native-reanimated";
 
@@ -324,15 +324,16 @@ const Footer = ({navigateTo, scrollContent}) => {
 const LandingPage = ({navigateTo, scrollContent}) => {
 
     return (
-        <MotiView
+        <MotiScrollView
             from={{ opacity: 0, scale: 1}}
             animate={{ opacity: 1, scale: 1 }}
             transition={{
                 type: 'timing',
                 duration: 175,
             }}
+            ref={scrollContent}
         >
-        <ScrollView style={Platform.OS !== "web" ? {backgroundColor: "#E5E7EB"} : {}} className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100" ref={scrollContent}>
+        <View style={Platform.OS !== "web" ? {backgroundColor: "#E5E7EB"} : {}} className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
             <NavigationBar navigateTo={navigateTo} scrollContent={scrollContent} />
 
             {Platform.OS !== "web" && (
@@ -598,8 +599,8 @@ const LandingPage = ({navigateTo, scrollContent}) => {
             </>)}
 
             <Footer navigateTo={navigateTo} scrollContent={scrollContent} />
-        </ScrollView>
-        </MotiView>)
+        </View>
+        </MotiScrollView>)
 }
 
 const AuthPages = ({ navigateTo, currentPage, previousPage, showPassword, setShowPassword}) => {
@@ -627,7 +628,7 @@ const AuthPages = ({ navigateTo, currentPage, previousPage, showPassword, setSho
         );
     }
     return (
-        <MotiView
+        <MotiScrollView
             from={{ opacity: 0, scale: 1}}
             animate={{ opacity: 1, scale: 1 }}
             transition={{
@@ -635,14 +636,14 @@ const AuthPages = ({ navigateTo, currentPage, previousPage, showPassword, setSho
                 duration: 125
             }}
         >
-        <ScrollView className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex flex-col">
+        <View className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex flex-col">
             <NavigationBar navigateTo={navigateTo} />
 
             <View className="flex-1 flex justify-center items-center p-4 md:p-8 lg:p-12">
                 <View className="w-full max-w-6xl flex flex-col md:flex-row items-center justify-between">
                     {/* Left side content for desktop */}
                     <View className="hidden md:block w-full md:w-1/2 pr-8 mb-8 md:mb-0">
-                        <Text className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text mb-6">
+                        <Text className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">
                             {currentPage === 'login' ? 'Welcome Back to Facelinked' : 'Join the Facelinked Community'} {"\n"}
                         </Text>
                         <Text className="text-lg text-gray-600">
@@ -700,8 +701,8 @@ const AuthPages = ({ navigateTo, currentPage, previousPage, showPassword, setSho
             <View className="hidden md:flex">
                 <Footer navigateTo={navigateTo} />
             </View>
-        </ScrollView>
-        </MotiView>
+        </View>
+        </MotiScrollView>
     );
 };
 
