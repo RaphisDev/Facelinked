@@ -337,7 +337,7 @@ const LandingPage = ({navigateTo, scrollContent}) => {
             <NavigationBar navigateTo={navigateTo} scrollContent={scrollContent} />
 
             {Platform.OS !== "web" && (
-            <View className="flex-1 items-center justify-center min-h-screen pt-safe-or-12 py-20 px-4">
+            <View className="flex-1 items-center justify-center min-h-screen pt-safe-or-12 py-20 px-4" style={Platform.OS === "ios" ? {marginTop: 50} : {}}>
                 <View
                         className="relative z-10 backdrop-blur-sm mb-safe-offset-10 bg-white rounded-3xl border border-white/50 p-8 w-full max-w-4xl mx-auto flex-1 flex flex-col justify-between">
                     <View className="flex-1 justify-start mt-32 items-center">
@@ -1744,7 +1744,7 @@ const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, se
 
     return (
         <View style={{marginBottom: 110, justifyContent: "center", width: "100%", flexGrow: 1}}>
-        <View className="backdrop-blur-sm mt-7 bg-white rounded-3xl border border-white/50 p-6 md:p-8 w-full max-w-md mx-auto">
+        <View className="backdrop-blur-sm mt-7 bg-white rounded-3xl border border-white/50 p-6 md:p-8 w-full max-w-[93%] mx-auto">
             <View className="mb-8">
                 <TouchableOpacity
                     activeOpacity={0.7}
@@ -1966,7 +1966,7 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
 
     return (
         <ScrollView contentContainerStyle={{marginBottom: 110, flexGrow: 1, width: "100%", justifyContent: "center"}}>
-            <View className="backdrop-blur-sm bg-white rounded-3xl border border-white/50 p-6 md:p-8 w-full max-w-md mx-auto">
+            <View className="backdrop-blur-sm bg-white rounded-3xl border border-white/50 p-6 md:p-8 w-full max-w-[93%] mx-auto">
                 <View className="flex flex-row items-center mb-8">
                     <TouchableOpacity
                         activeOpacity={0.7}
