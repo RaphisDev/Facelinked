@@ -23,6 +23,7 @@ import {Image} from "expo-image";
 import MessageEntry from "../../../components/Entries/Message.jsx";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
+import { setEmbeddedState } from "../../../components/EmbeddedStateManager";
 
 const MOBILE_WIDTH_THRESHOLD = 768;
 
@@ -31,7 +32,7 @@ export default function ChatRoom() {
     const insets = useSafeAreaInsets();
     const segments = useSegments();
     const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
-    const [isDesktop, setIsDesktop] = useState(windowWidth > MOBILE_WIDTH_THRESHOLD + 250);
+    const [isDesktop, setIsDesktop] = useState(windowWidth > MOBILE_WIDTH_THRESHOLD);
     const [isEmbedded, setIsEmbedded] = useState(false);
 
     const [messages, setMessages] = useState([]);
@@ -55,20 +56,36 @@ export default function ChatRoom() {
         const handleResize = () => {
             const newWidth = Dimensions.get('window').width;
             setWindowWidth(newWidth);
-            setIsDesktop(newWidth > MOBILE_WIDTH_THRESHOLD + 250);
+            setIsDesktop(newWidth > MOBILE_WIDTH_THRESHOLD);
         };
 
+        // Initialize window width and desktop state immediately
+        const initialWidth = Dimensions.get('window').width;
+        const initialIsDesktop = initialWidth > MOBILE_WIDTH_THRESHOLD;
+        setWindowWidth(initialWidth);
+        setIsDesktop(initialIsDesktop);
+
         if (Platform.OS === 'web') {
-            setIsEmbedded(window?.frameElement !== null);
+            try {
+                const isIframe = window.parent !== window;
+                setIsEmbedded(isIframe);
+                setEmbeddedState(isIframe);
+
+                if (initialIsDesktop && !isIframe) {
+                    router.push('/chats/?username=' + username);
+                }
+            } catch (e) {
+                setIsEmbedded(false);
+                setEmbeddedState(false);
+            }
             window.addEventListener('resize', handleResize);
         }
-
-        handleResize();
 
         return () => {
             if (Platform.OS === 'web') {
                 window.removeEventListener('resize', handleResize);
             }
+            setEmbeddedState(false);
         };
     }, []);
 

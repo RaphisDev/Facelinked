@@ -18,6 +18,7 @@ const MOBILE_WIDTH_THRESHOLD = 768;
 
 export default function Chats() {
     const [chats, setChats] = useState([]);
+    const urlParams = useLocalSearchParams();
     const [isSearching, setIsSearching] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const segments = useSegments();
@@ -56,17 +57,45 @@ export default function Chats() {
     });
 
     useEffect(() => {
-        if (isDesktop && Platform.OS === 'web') {
-            const params = new URLSearchParams(window.location.search);
-            const username = params.get('username');
-            if (username) {
-                setSelectedChat(username);
-            } else if (selectedChat && !isDesktop) {
-                // Clear selected chat when switching to mobile
-                setSelectedChat(null);
-            }
-        }
-    }, [isDesktop]);
+       const handleSelectedChat = async () => {
+           if (isDesktop) {
+               const params = new URLSearchParams(window.location.search);
+               const username = params.get('username');
+               if (username) {
+                   if (!chats.some(chat => chat.username === username)) {
+                       let token;
+                          if (Platform.OS === "web") {
+                            token = localStorage.getItem("token");
+                          } else {
+                            token = await SecureStore.getItemAsync("token");
+                          }
+                       let user = await fetch(`${ip}/profile/${username}`, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': 'Bearer ' + token
+                            }
+                          });
+                       if (user.ok) {
+                           const profileInfos = await user.json();
+                           setChats(chats => [
+                               {
+                               username: username,
+                               name: profileInfos.name,
+                               image: profileInfos.image,
+                           },
+                               ...chats
+                           ])
+                       }
+                   }
+                   setSelectedChat(username);
+               }
+           } else if (selectedChat && !isDesktop) {
+               setSelectedChat(null);
+           }
+       }
+       handleSelectedChat();
+    }, [isDesktop, selectedChat, urlParams]);
 
     useEffect(() => {
         setTimeout(() => {
@@ -117,6 +146,19 @@ export default function Chats() {
     };
 
     const handleChatSelect = (username) => {
+        const makeChatRead = async () => {
+            let chats = await asyncStorage.getItem("chats") || [];
+            if (chats.length !== 0) {
+                chats = JSON.parse(chats);
+            }
+            await asyncStorage.setItem("chats", JSON.stringify(chats.map((chat) => {
+                if (chat.username === username) {
+                    return {...chat, unread: false};
+                }
+                return chat;
+            })));
+        }
+        makeChatRead();
         if (isDesktop) {
             setSelectedChat(username);
             // Update URL with selected chat
@@ -288,4 +330,3 @@ export default function Chats() {
         </View>
     )
 }
-

@@ -7,6 +7,7 @@ import CustomTabBar from "../../components/CustomTabBar";
 import {SafeAreaProvider, useSafeAreaInsets} from "react-native-safe-area-context";
 import {useEffect, useRef, useState} from "react";
 import WebSocketProvider from "../../components/WebSocketProvider";
+import { useEmbeddedState } from "../../components/EmbeddedStateManager";
 
 const MOBILE_WIDTH_THRESHOLD = 768;
 const SIDEBAR_WIDTH = 220;
@@ -15,6 +16,7 @@ const SIDEBAR_WIDTH = 220;
 function LayoutWrapper({ children }) {
     const [dimensions, setDimensions] = useState(() => Dimensions.get('window'));
     const isDesktop = dimensions.width > MOBILE_WIDTH_THRESHOLD;
+    const embedded = useEmbeddedState();
 
     useEffect(() => {
         const subscription = Dimensions.addEventListener('change', ({ window }) => {
@@ -25,7 +27,7 @@ function LayoutWrapper({ children }) {
 
     return (
         <View style={styles.rootContainer}>
-            {isDesktop && <View style={{ width: SIDEBAR_WIDTH - 3 }} />}
+            {(isDesktop && !embedded) && <View style={{ width: SIDEBAR_WIDTH - 3 }} />}
             {children}
         </View>
     );

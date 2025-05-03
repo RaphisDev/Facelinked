@@ -24,23 +24,7 @@ export default function Chat(props) {
     };
 
     return (
-        <TouchableOpacity 
-            activeOpacity={0.7} 
-            onLongPress={() => router.navigate(`/${props.username}`)} 
-            onPress={async () => {
-                router.navigate(`/chats/${props.username}`);
-                let chats = await asyncStorage.getItem("chats") || [];
-                if (chats.length !== 0) {
-                    chats = JSON.parse(chats);
-                }
-                await asyncStorage.setItem("chats", JSON.stringify(chats.map((chat) => {
-                    if (chat.username === props.username) {
-                        return {...chat, unread: false};
-                    }
-                    return chat;
-                })));
-            }}
-            className={`flex-row items-center p-4 rounded-xl ${props.unread ? 'bg-blue-50' : 'bg-white'} shadow-sm border border-gray-100`}
+        <View className={`flex-row items-center p-4 rounded-xl ${props.unread ? 'bg-blue-50' : 'bg-white'} shadow-sm border border-gray-100`}
         >
             <View className="relative">
                 <Image 
@@ -80,6 +64,6 @@ export default function Chat(props) {
                     )}
                 </View>
             </View>
-        </TouchableOpacity>
+        </View>
     );
 }

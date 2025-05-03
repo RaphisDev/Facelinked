@@ -4,6 +4,7 @@ import { View, TouchableOpacity, Text, StyleSheet, Dimensions } from 'react-nati
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { usePathname, useRouter } from 'expo-router';
+import { useEmbeddedState } from "./EmbeddedStateManager";
 
 const MOBILE_WIDTH_THRESHOLD = 768;
 const SIDEBAR_WIDTH = 220;
@@ -14,6 +15,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
     const isDesktop = windowWidth > MOBILE_WIDTH_THRESHOLD;
     const pathname = usePathname();
     const router = useRouter();
+    const embedded = useEmbeddedState();
 
     // Define tab routes and their icons
     const tabRoutes = [
@@ -61,6 +63,9 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 
     if (isDesktop) {
         // Render sidebar for desktop
+        if (embedded) {
+            return null;
+        }
         return (
             <View style={[
                 styles.sidebarContainer,

@@ -4,7 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize" />
+    <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
+      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/config/WebSocketAuthenticationHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/_layout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/_layout.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/chats/[username].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chats/[username].jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/chats/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chats/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/CustomTabBar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/CustomTabBar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/Entries/Chat.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Entries/Chat.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/WebSocketProvider.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/WebSocketProvider.jsx" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -34,6 +42,9 @@
     &quot;accountId&quot;: &quot;fa33dc65-2b8e-4bf1-85b8-1c628900dee2&quot;
   }
 }</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/app/(tabs)/chats/[username].jsx" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -63,8 +74,8 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/Applications/WebStorm.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;ml.llm.LLMConfigurable&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\Raphael\\AppData\\Local\\Programs\\WebStorm\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -262,6 +273,11 @@
       <workItem from="1745260034507" duration="191000" />
       <workItem from="1745698213451" duration="194000" />
       <workItem from="1745698449255" duration="17000" />
+      <workItem from="1745781328525" duration="30000" />
+      <workItem from="1745781438594" duration="5642000" />
+      <workItem from="1745787316905" duration="38000" />
+      <workItem from="1745865836247" duration="7318000" />
+      <workItem from="1746287887905" duration="1477000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />
