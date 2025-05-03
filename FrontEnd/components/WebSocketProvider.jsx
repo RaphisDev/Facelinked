@@ -39,11 +39,15 @@ class WebsocketController{
                 reconnectDelay: 5000,
                 connectionTimeout: 10000,
                 webSocketFactory: () => {
-                    return new WebSocket(`${webSocketIp}/ws`, [], {
-                        headers: {
-                            "token": `Bearer ${token}`,
-                        }
-                    })
+                    if (Platform.OS === "web") {
+                        return new WebSocket(`${webSocketIp}/ws?token=${token}`)
+                    } else {
+                        return new WebSocket(`${webSocketIp}/ws`, [], {
+                            headers: {
+                                "Authorization": `Bearer ${token}`,
+                            }
+                        })
+                    }
                 },
                 onWebSocketError: (error) => {
                     //alert("Network error. Please check your internet connection.");
