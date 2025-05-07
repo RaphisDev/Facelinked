@@ -51,7 +51,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             List<String> authHeaders = request.getHeaders().get("Authorization");
 
             var uri = request.getURI();
-            var query = uri.getQuery();
             MultiValueMap<String, String> queryParams = UriComponentsBuilder.fromUri(uri).build().getQueryParams();
             var paramsToken = queryParams.getFirst("token");
 
@@ -65,7 +64,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             }
             if (paramsToken != null) token = paramsToken;
 
-            if (token == null) {
+            if (token != null) {
                 final String email;
                 email = jwtService.extractEmail(token);
                 if (email != null) {
