@@ -57,47 +57,6 @@ export default function Chats() {
     });
 
     useEffect(() => {
-       const handleSelectedChat = async () => {
-           if (isDesktop) {
-               const params = new URLSearchParams(window.location.search);
-               const username = params.get('username');
-               if (username) {
-                   if (!chats.some(chat => chat.username === username)) {
-                       let token;
-                          if (Platform.OS === "web") {
-                            token = localStorage.getItem("token");
-                          } else {
-                            token = await SecureStore.getItemAsync("token");
-                          }
-                       let user = await fetch(`${ip}/profile/${username}`, {
-                            method: 'GET',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': 'Bearer ' + token
-                            }
-                          });
-                       if (user.ok) {
-                           const profileInfos = await user.json();
-                           setChats(chats => [
-                               {
-                               username: username,
-                               name: profileInfos.name,
-                               image: profileInfos.image,
-                           },
-                               ...chats
-                           ])
-                       }
-                   }
-                   setSelectedChat(username);
-               }
-           } else if (selectedChat && !isDesktop) {
-               setSelectedChat(null);
-           }
-       }
-       handleSelectedChat();
-    }, [isDesktop, selectedChat, urlParams]);
-
-    useEffect(() => {
         setTimeout(() => {
             if (Platform.OS === "web") {
                 if (localStorage.getItem("token") === null) {router.replace("/")}
@@ -133,6 +92,50 @@ export default function Chats() {
             ws.messageReceived.removeAllListeners("newMessageReceived");
         }
     }, [segments, isDesktop]);
+
+    useEffect(() => {
+        const handleSelectedChat = async () => {
+            if (isDesktop && chats !== []) {
+                const params = new URLSearchParams(window.location.search);
+                const username = params.get('username');
+                if (username) {
+                    if (!chats?.some(chat => chat.username === username)) {
+                        let token;
+                        if (Platform.OS === "web") {
+                            token = localStorage.getItem("token");
+                        } else {
+                            token = await SecureStore.getItemAsync("token");
+                        }
+                        let user = await fetch(`${ip}/profile/${username}`, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': 'Bearer ' + token
+                            }
+                        });
+                        if (user.ok) {
+                            const profileInfos = await user.json();
+                            setChats(chats => [
+                                {
+                                    username: username,
+                                    name: profileInfos.name,
+                                    image: profileInfos.profilePicturePath,
+                                },
+                                ...chats
+                            ])
+                        }else {
+                            setSelectedChat(null);
+                            return;
+                        }
+                    }
+                    setSelectedChat(username);
+                }
+            } else if (selectedChat && !isDesktop) {
+                setSelectedChat(null);
+            }
+        }
+        handleSelectedChat();
+    }, [isDesktop, selectedChat, urlParams, chats]);
 
     const toggleSearch = () => {
         setIsSearching(!isSearching);
@@ -310,7 +313,19 @@ export default function Chats() {
                         contentContainerStyle={{ paddingVertical: 10 }}
                         data={filteredChats}
                         renderItem={({ item }) => (
-                            <TouchableOpacity onPress={() => router.push(`/chats/${item.username}`)}>
+                            <TouchableOpacity onPress={async () => {
+                                let chats = await asyncStorage.getItem("chats") || [];
+                                if (chats.length !== 0) {
+                                    chats = JSON.parse(chats);
+                                }
+                                await asyncStorage.setItem("chats", JSON.stringify(chats.map((chat) => {
+                                    if (chat.username === username) {
+                                        return {...chat, unread: false};
+                                    }
+                                    return chat;
+                                })));
+                                router.push(`/chats/${item.username}`)
+                            }}>
                                 <Chat {...item} />
                             </TouchableOpacity>
                         )}

@@ -373,11 +373,15 @@ export default function ChatRoom() {
                 });
                 if (profile.ok) {
                     const profileJson = await profile.json();
-                    await asyncStorage.setItem("chats", JSON.stringify([...loadedChats, { name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath }]));
+                    await asyncStorage.setItem("chats", JSON.stringify([...loadedChats, { name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath, lastMessage: messageContent }]));
                     loadedChats = [...loadedChats, { name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath }];
                 }
             }
-            await asyncStorage.setItem("chats", JSON.stringify([...loadedChats.filter(chat => chat.username === username), ...loadedChats.filter(chat => chat.username !== username)]));
+            await asyncStorage.setItem("chats", JSON.stringify([...loadedChats.filter(chat => chat.username === username).map(value => {
+                let chat = value;
+                chat.lastMessage = messageContent;
+                return chat;
+            }), ...loadedChats.filter(chat => chat.username !== username)]));
 
             let loadedMessages = await asyncStorage.getItem(`messages/${username}`) || [];
             if (loadedMessages.length !== 0) {loadedMessages = JSON.parse(loadedMessages);}
@@ -400,7 +404,7 @@ export default function ChatRoom() {
             }))
         }
         catch (e) {
-            //setMessages(prevState => prevState.filter((chat) => !chat.isOptimistic));
+            //setMessages(prevState => prevState.filter((chat) => !chat.isOptimistic)); letting the message vanish isnt a good approach to network failure either
         }
     }
 
