@@ -101,7 +101,7 @@ export default function MessageEntry({ message }) {
           onPress={() => handleImagePress(images[0])}
           onLongPress={() => handleImageLongPress(images[0])}
           delayLongPress={500}
-          activeOpacity={0.9}
+          activeOpacity={0.8}
           style={styles.singleImageContainer}
         >
           <Image
@@ -136,7 +136,7 @@ export default function MessageEntry({ message }) {
               onPress={() => handleImagePress(image)}
               onLongPress={() => handleImageLongPress(image)}
               delayLongPress={500}
-              activeOpacity={0.9}
+              activeOpacity={0.8}
             >
               <Image
                 source={{ uri: image }}

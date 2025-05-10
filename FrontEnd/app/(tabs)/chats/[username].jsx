@@ -199,6 +199,92 @@ export default function ChatRoom() {
         }
     };
 
+    const formatMessageDate = (timestamp) => {
+        const messageDate = new Date(timestamp);
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        const messageDay = new Date(messageDate.getFullYear(), messageDate.getMonth(), messageDate.getDate());
+        const todayDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const yesterdayDay = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate());
+
+        if (messageDay.getTime() === todayDay.getTime()) {
+            return "Today";
+        } else if (messageDay.getTime() === yesterdayDay.getTime()) {
+            return "Yesterday";
+        } else {
+            const options = { weekday: 'long', month: 'short', day: 'numeric' };
+
+            if (messageDay.getFullYear() !== today.getFullYear()) {
+                options.year = 'numeric';
+            }
+
+            return messageDate.toLocaleDateString(undefined, options);
+        }
+    };
+
+    const groupMessagesByDate = (messages) => {
+        if (!messages || messages.length === 0) return [];
+
+        const groups = [];
+        let currentDate = null;
+
+        messages.forEach(message => {
+            const timestamp = message.millis;
+            const dateString = formatMessageDate(timestamp);
+
+            if (dateString !== currentDate) {
+                currentDate = dateString;
+                groups.push({
+                    type: 'date-header',
+                    date: dateString,
+                    id: `date-${timestamp}`
+                });
+            }
+
+            groups.push({...message, id: `message-${timestamp}`});
+        });
+
+        return groups;
+    };
+
+    const DateHeader = ({ date }) => {
+        return (
+            <View style={Headerstyles.container}>
+                <View style={Headerstyles.line} />
+                <Text style={Headerstyles.dateText}>{date}</Text>
+                <View style={Headerstyles.line} />
+            </View>
+        );
+    };
+
+    const Headerstyles = StyleSheet.create({
+        container: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginVertical: 16,
+            paddingHorizontal: 10,
+        },
+        line: {
+            flex: 1,
+            height: 1,
+            backgroundColor: '#E2E8F0',
+        },
+        dateText: {
+            fontSize: 12,
+            fontWeight: '500',
+            color: '#64748B',
+            marginHorizontal: 10,
+            paddingHorizontal: 12,
+            paddingVertical: 4,
+            backgroundColor: '#F1F5F9',
+            borderRadius: 12,
+            overflow: 'hidden',
+        },
+    });
+
+
     async function sendMessage() {
         if (input.trim() === '' && selectedImages.length === 0) return;
 
@@ -426,6 +512,14 @@ export default function ChatRoom() {
         );
     }
 
+    const renderListItem = ({ item }) => {
+        if (item.type === 'date-header') {
+            return <DateHeader date={item.date} />;
+        } else {
+            return <MessageEntry message={item} />;
+        }
+    };
+
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -482,16 +576,14 @@ export default function ChatRoom() {
 
                 <FlatList
                     ref={flatListRef}
-                    data={messages}
-                    keyExtractor={(item, index) => item.id || index.toString()}
-                    renderItem={({ item }) => (
-                        <MessageEntry message={item} />
-                    )}
+                    data={groupMessagesByDate(messages)}
+                    keyExtractor={(item) => item.id}
+                    renderItem={renderListItem}
                     contentContainerStyle={styles.messagesContent}
                     style={[styles.messagesList, {marginBottom: inputContainerHeight}]}
                     onContentSizeChange={() => {
                         setTimeout(() => {
-                            flatListRef.current.scrollToEnd({animated: true});
+                            flatListRef.current?.scrollToEnd({animated: true});
                         }, 50);
                     }}
                     showsVerticalScrollIndicator={false}

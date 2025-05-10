@@ -47,28 +47,12 @@ export default function TabsLayout() {
     const [dimensions, setDimensions] = useState(() => Dimensions.get('window'));
     const isDesktop = dimensions.width > MOBILE_WIDTH_THRESHOLD;
     const insets = useSafeAreaInsets();
-    const unreadMessagesCount = useRef(0);
 
     useEffect(() => {
         const subscription = Dimensions.addEventListener('change', ({ window }) => {
             setDimensions(window);
         });
         return () => subscription.remove();
-    }, []);
-
-    const ws = new WebSocketProvider();
-
-    useEffect(() => {
-        ws.messageReceived.addListener(
-            "unreadMessagesChanged",
-            (event) => {
-                unreadMessagesCount.current = event.detail.unread;
-            }
-        );
-
-        return () => {
-            ws.messageReceived.removeAllListeners("unreadMessagesChanged");
-        };
     }, []);
 
     return (
@@ -116,8 +100,6 @@ export default function TabsLayout() {
                 <Tabs.Screen name="chats" options={{headerShown: false,
                     headerTitleAlign: "center",
                     tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "chatbubbles-sharp" : "chatbubble-outline"} size={30}/>,
-                    tabBarBadge: unreadMessagesCount.current > 0 ? unreadMessagesCount.current : null ,
-                    //tabBarBadgeStyle: { backgroundColor: 'blue', minWidth: 8, height: 8, borderRadius: 4 }
                 }}/>
 
                 <Tabs.Screen name="(profiles)" options={{headerShown: false,
