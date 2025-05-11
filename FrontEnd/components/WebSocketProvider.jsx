@@ -84,8 +84,16 @@ class WebsocketController{
                     }
 
                     const saveChats = async (senderId, loadedChats, oldMessage, message) => {
-
                         if (senderId === username) {
+                            await asyncStorage.setItem("chats", JSON.stringify(loadedChats.map((chat) => {
+                                if (chat.username === senderId) {
+                                    return {
+                                        ...chat,
+                                        lastMessage: "You: " + message
+                                    }
+                                }
+                                return chat;
+                            })))
                             return;
                         }
 
@@ -105,7 +113,7 @@ class WebsocketController{
                                     username: profileJson.username,
                                     image: profileJson.profilePicturePath,
                                     unread: !oldMessage,
-                                    lastMessage: message
+                                    lastMessage: senderId + ": " + message
                                 }]));
                                 this.messageReceived.emit("newMessageReceived");
                             }
@@ -115,7 +123,7 @@ class WebsocketController{
                                     return {
                                         ...chat,
                                         unread: oldMessage ? chat.unread : true,
-                                        lastMessage: message
+                                        lastMessage: senderId + ": " + message
                                     }
                                 }
 
@@ -263,9 +271,6 @@ class WebsocketController{
                         }]));
 
                         const loadedChats = await getChats();
-                        this.messageReceived.emit("unreadMessagesChanged", {
-                            detail: {unread: loadedChats.filter((chat) => chat.unread).length}
-                        });
 
                         await saveChats(parsedMessage.senderId, loadedChats, false, parsedMessage.content);
                         await asyncStorage.setItem("lastMessageId", parsedMessage.millis.toString());

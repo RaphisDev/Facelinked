@@ -51,10 +51,7 @@ export default function Chats() {
         };
     }, []);
 
-    const filteredChats = chats.filter(chat => {
-        if (!searchQuery) return true;
-        return chat.name.toLowerCase().includes(searchQuery.toLowerCase());
-    });
+    const [filteredChats, setFilteredChats] = useState([]);
 
     useEffect(() => {
         setTimeout(() => {
@@ -71,6 +68,19 @@ export default function Chats() {
                 loadedChats = JSON.parse(loadedChats);
                 loadedChats.sort((a, b) => a.unread === b.unread ? 0 : a.unread ? -1 : 1);
                 setChats(loadedChats);
+                setFilteredChats(loadedChats.filter(chat => {
+                    if (!searchQuery) return true;
+                    return chat.name.toLowerCase().includes(searchQuery.toLowerCase());
+                }))
+            }
+            stateManager.setChatState(true);
+
+            if (isDesktop) {
+                const params = new URLSearchParams(window.location.search);
+                const username = params.get('username');
+                if (username) {
+                    setSelectedChat(username);
+                }
             }
         }
         loadChats();
@@ -78,20 +88,11 @@ export default function Chats() {
         ws.messageReceived.addListener("newMessageReceived", () => {
             loadChats();
         });
-        stateManager.setChatState(true);
-
-        if (isDesktop) {
-            const params = new URLSearchParams(window.location.search);
-            const username = params.get('username');
-            if (username) {
-                setSelectedChat(username);
-            }
-        }
 
         return() => {
             ws.messageReceived.removeAllListeners("newMessageReceived");
         }
-    }, [segments, isDesktop]);
+    }, [segments, isDesktop, searchQuery]);
 
     useEffect(() => {
         const handleSelectedChat = async () => {
@@ -319,7 +320,7 @@ export default function Chats() {
                                     chats = JSON.parse(chats);
                                 }
                                 await asyncStorage.setItem("chats", JSON.stringify(chats.map((chat) => {
-                                    if (chat.username === username) {
+                                    if (chat.username === item.username) {
                                         return {...chat, unread: false};
                                     }
                                     return chat;

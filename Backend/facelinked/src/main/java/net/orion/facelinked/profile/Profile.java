@@ -36,6 +36,9 @@ public class Profile {
     @DynamoDBAttribute(attributeName="friends")
     @DynamoDBTypeConverted(converter = NetworkMemberListConverter.class)
     List<NetworkMember> friends;
+    @DynamoDBAttribute(attributeName="friendRequests")
+    @DynamoDBTypeConverted(converter = NetworkMemberListConverter.class)
+    List<NetworkMember> friendRequests;
     @DynamoDBAttribute(attributeName="searchName")
     String searchName;
     @DynamoDBAttribute(attributeName="faceSmashId")

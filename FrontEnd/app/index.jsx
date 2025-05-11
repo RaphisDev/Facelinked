@@ -951,6 +951,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
 
     async function Register() {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        const bannedUsernames = ["chats", "(profiles)", "home", "networks", "profile", "undefined", "privacy", "terms", "about", "index", "_layout", "+not_found", "(tabs)"];
 
         const birthDateObj = formData.birthDate;
         const monthIndex = typeof birthDateObj.month === 'string'
@@ -965,7 +966,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
             age--;
         }
 
-        if (emailRegex.test(formData.email) && formData.password.length > 3 && formData.username.length >= 3 && formData.name.length > 3) {
+        if (emailRegex.test(formData.email) && formData.password.length > 3 && formData.username.length >= 3 && formData.name.length > 3 && !formData.username.includes("/") && !bannedUsernames.includes(formData.username)) {
             if(age <= 13 || formData.interests.length < 3 || formData.location.length <= 3 || !formData.profilePicture) {
                 if (Platform.OS !== "android") {
                     showAlert({
@@ -1046,7 +1047,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
             if (Platform.OS !== "android") {
                 showAlert({
                     title: "Error",
-                    message: "Please enter a valid email and password",
+                    message: "Please enter a valid email, password and username.",
                     buttons: [{
                         text: 'OK',
                         onPress: () => {
@@ -1055,7 +1056,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                     }],
                 })
             } else {
-                alert("Please enter a valid email and password");
+                alert("Please enter a valid email, password and username.");
             }
             jumpToStep(1);
         }
