@@ -21,7 +21,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import ip from "../../../components/AppManager";
 import Post from "../../../components/Entries/Post";
 import {showAlert} from "../../../components/PopUpModalView";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import {SafeAreaProvider, SafeAreaView, useSafeAreaInsets} from "react-native-safe-area-context";
 import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
 
 export default function Profile() {
@@ -1217,7 +1217,7 @@ export default function Profile() {
                                       return (
                                           <TouchableOpacity 
                                               onPress={() => openPostDetails(items.item)}
-                                              className="w-full px-8 mt-4"
+                                              className={`w-full ${isDesktop ? "px-8" : "px-4"} mt-4`}
                                               activeOpacity={0.8}
                                           >
                                               <View className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
@@ -1532,113 +1532,293 @@ export default function Profile() {
 
             {/* Image Gallery Modal */}
             <Modal animationType="slide" visible={showImageGallery} presentationStyle={isDesktop ? "formSheet" : "pageSheet"} onRequestClose={() => {setShowImageGallery(false);}}>
-                <View className="bg-white dark:bg-dark-primary h-full w-full" style={isDesktop ? {maxWidth: 800, marginHorizontal: 'auto'} : {}}>
-                    {Platform.OS === "web" && <TouchableOpacity className="p-3 bg-gray-100 rounded-full self-end mr-4 mt-4" onPress={() => setShowImageGallery(false)}><Ionicons size={20} color="#3B82F6" name="close"/></TouchableOpacity>}
+                <SafeAreaView className="bg-white h-full w-full" style={isDesktop ? {maxWidth: 1200, marginHorizontal: 'auto'} : {}}>
+                    {/* Header with controls */}
+                    <View className="flex-row justify-between items-center px-6 py-4">
+                        <TouchableOpacity 
+                            onPress={() => setShowImageGallery(false)}
+                            className="w-10 h-10 rounded-full bg-gray-200 items-center justify-center"
+                        >
+                            <Ionicons name="arrow-back" size={22} color="#3B82F6" />
+                        </TouchableOpacity>
 
-                    <Text className="text-2xl text-gray-800 dark:text-dark-text text-center mt-6 font-bold">Photo Gallery</Text>
+                        <Text className="text-gray-800 text-xl font-bold">Photo Gallery</Text>
 
-                    <View className="flex-row flex-wrap justify-center mt-6 px-4">
-                        {profileImages.map((image, index) => (
+                        {profileName.current === username.current && (
                             <TouchableOpacity 
-                                key={index}
-                                onPress={() => setSelectedImage(image)}
-                                className="w-1/3 aspect-square p-1"
-                                style={{ position: 'relative' }}
-                            >
-                                <Image 
-                                    source={{uri: image}}
-                                    style={{width: '100%', height: '100%', borderRadius: 8}}
-                                />
-
-                                {profileName.current === username.current && (
-                                    <>
-                                        <TouchableOpacity
-                                            style={{
-                                                position: 'absolute',
-                                                top: 8,
-                                                right: 8,
-                                                backgroundColor: 'rgba(0,0,0,0.6)',
-                                                borderRadius: 12,
-                                                width: 24,
-                                                height: 24,
-                                                justifyContent: 'center',
-                                                alignItems: 'center',
-                                                borderWidth: 1.5,
-                                                borderColor: 'white',
-                                            }}
-                                            onPress={() => {
-                                                const newImages = [...profileImages];
-                                                newImages.splice(index, 1);
-                                                setProfileImages(newImages);
-                                            }}
-                                        >
-                                            <Ionicons name="close" size={16} color="white" />
-                                        </TouchableOpacity>
-
-                                        <TouchableOpacity
-                                            style={{
-                                                position: 'absolute',
-                                                bottom: 8,
-                                                left: 8,
-                                                backgroundColor: index === 0 ? 'rgba(59, 130, 246, 0.8)' : 'rgba(0,0,0,0.6)',
-                                                borderRadius: 12,
-                                                paddingHorizontal: 8,
-                                                paddingVertical: 4,
-                                                justifyContent: 'center',
-                                                alignItems: 'center',
-                                                borderWidth: 1.5,
-                                                borderColor: 'white',
-                                            }}
-                                            onPress={() => {
-                                                if (index !== 0) {
-                                                    const newImages = [...profileImages];
-                                                    const temp = newImages[0];
-                                                    newImages[0] = newImages[index];
-                                                    newImages[index] = temp;
-                                                    setProfileImages(newImages);
-                                                }
-                                            }}
-                                        >
-                                            {index === 0 ? (
-                                                <Text style={{ color: 'white', fontSize: 10, fontWeight: 'bold' }}>Profile</Text>
-                                            ) : (
-                                                <Text style={{ color: 'white', fontSize: 10 }}>Set as Profile</Text>
-                                            )}
-                                        </TouchableOpacity>
-                                    </>
-                                )}
-                            </TouchableOpacity>
-                        ))}
-
-                        {profileName.current === username.current && profileImages.length < 5 && (
-                            <TouchableOpacity 
-                                className="w-1/3 aspect-square p-1 items-center justify-center bg-gray-100 rounded-lg"
+                                className="w-10 h-10 rounded-full bg-blue-100 items-center justify-center"
                                 onPress={() => Alert.alert("Add Photo", "This feature is coming soon")}
                             >
-                                <Ionicons name="add" size={40} color="#3B82F6" />
-                                <Text className="text-blue-500 mt-2">Add Photo</Text>
+                                <Ionicons name="add" size={22} color="#3B82F6" />
                             </TouchableOpacity>
                         )}
                     </View>
 
+                    {/* Main content area */}
+                    <View className="flex-1">
+                        {/* Featured image - large display */}
+                        <View className="w-full aspect-square mb-4 rounded-xl overflow-hidden shadow-sm">
+                            <Image 
+                                source={{uri: profileImages[0]}}
+                                style={{
+                                    width: '100%', 
+                                    height: '100%',
+                                }}
+                                contentFit="cover"
+                            />
+
+                            <TouchableOpacity 
+                                className="absolute inset-0 bg-black/10 items-center justify-center"
+                                onPress={() => setSelectedImage(profileImages[0])}
+                                activeOpacity={0.9}
+                            >
+                                <View className="bg-white/70 rounded-full p-4 shadow-md">
+                                    <Ionicons name="expand-outline" size={30} color="#3B82F6" />
+                                </View>
+                            </TouchableOpacity>
+
+                            {profileName.current === username.current && (
+                                <View className="absolute bottom-4 left-4 bg-blue-500 px-3 py-1 rounded-full shadow-sm">
+                                    <Text className="text-white font-medium">Profile Picture</Text>
+                                </View>
+                            )}
+                        </View>
+
+                        {/* Image carousel */}
+                        <ScrollView 
+                            horizontal 
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={{paddingHorizontal: 16}}
+                            className="mb-6"
+                        >
+                            {profileImages.map((image, index) => (
+                                <View key={index} className="mr-4 relative">
+                                    <TouchableOpacity
+                                        onPress={() => setSelectedImage(image)}
+                                        activeOpacity={0.9}
+                                    >
+                                        <Image 
+                                            source={{uri: image}}
+                                            style={{
+                                                width: 120, 
+                                                height: 120, 
+                                                borderRadius: 12,
+                                                borderWidth: index === 0 ? 3 : 0,
+                                                borderColor: '#3B82F6',
+                                            }}
+                                            contentFit="cover"
+                                            className="shadow-sm"
+                                        />
+                                    </TouchableOpacity>
+
+                                    {profileName.current === username.current && (
+                                        <View className="absolute top-2 right-2 flex-row">
+                                            {index !== 0 && (
+                                                <TouchableOpacity
+                                                    className="w-8 h-8 rounded-full bg-blue-100 items-center justify-center mr-2 shadow-sm"
+                                                    onPress={() => {
+                                                        const newImages = [...profileImages];
+                                                        const temp = newImages[0];
+                                                        newImages[0] = newImages[index];
+                                                        newImages[index] = temp;
+                                                        setProfileImages(newImages);
+                                                    }}
+                                                >
+                                                    <Ionicons name="star" size={16} color="#3B82F6" />
+                                                </TouchableOpacity>
+                                            )}
+
+                                            <TouchableOpacity
+                                                className="w-8 h-8 rounded-full bg-red-100 items-center justify-center shadow-sm"
+                                                onPress={() => {
+                                                    const newImages = [...profileImages];
+                                                    newImages.splice(index, 1);
+                                                    setProfileImages(newImages);
+                                                }}
+                                            >
+                                                <Ionicons name="trash" size={16} color="#EF4444" />
+                                            </TouchableOpacity>
+                                        </View>
+                                    )}
+                                </View>
+                            ))}
+
+                            {profileName.current === username.current && profileImages.length < 5 && (
+                                <TouchableOpacity 
+                                    className="w-120 h-120 items-center justify-center bg-gray-100 rounded-xl border-2 border-dashed border-gray-300"
+                                    style={{width: 120, height: 120}}
+                                    onPress={() => Alert.alert("Add Photo", "This feature is coming soon")}
+                                >
+                                    <Ionicons name="add" size={40} color="#3B82F6" />
+                                    <Text className="text-gray-600 mt-2">Add Photo</Text>
+                                </TouchableOpacity>
+                            )}
+                        </ScrollView>
+                    </View>
+
+                    {/* Fullscreen image modal */}
                     {selectedImage && (
                         <Modal visible={!!selectedImage} transparent={true} onRequestClose={() => setSelectedImage(null)}>
-                            <View className="flex-1 bg-black/90 items-center justify-center">
-                                <TouchableOpacity 
-                                    className="absolute top-10 right-10 z-10"
-                                    onPress={() => setSelectedImage(null)}
+                            <SafeAreaProvider>
+                            <SafeAreaView className="flex-1 bg-black">
+                                <Animated.View 
+                                    className="flex-row justify-between items-center px-6 py-4"
+                                    style={{
+                                        opacity: 1,
+                                        transform: [{ translateY: 0 }]
+                                    }}
                                 >
-                                    <Ionicons name="close" size={30} color="white" />
-                                </TouchableOpacity>
-                                <Image 
-                                    source={{uri: selectedImage}}
-                                    style={{width: '90%', height: '70%'}}
-                                    resizeMode="contain"
-                                />
-                            </View>
+                                    <TouchableOpacity 
+                                        onPress={() => setSelectedImage(null)}
+                                        className="w-10 h-10 rounded-full bg-gray-800/50 items-center justify-center"
+                                    >
+                                        <Ionicons name="arrow-back" size={22} color="white" />
+                                    </TouchableOpacity>
+
+                                    <View className="flex-row items-center">
+                                        <Text className="text-white mr-4">
+                                            {profileImages.findIndex(img => img === selectedImage) + 1}/{profileImages.length}
+                                        </Text>
+
+                                        {profileName.current === username.current && (
+                                            <>
+                                                <TouchableOpacity 
+                                                    className="w-10 h-10 rounded-full bg-blue-500/50 items-center justify-center mr-3"
+                                                    onPress={() => {
+                                                        // Set as profile picture
+                                                        const currentIndex = profileImages.findIndex(img => img === selectedImage);
+                                                        if (currentIndex !== 0 && currentIndex !== -1) {
+                                                            const newImages = [...profileImages];
+                                                            const temp = newImages[0];
+                                                            newImages[0] = newImages[currentIndex];
+                                                            newImages[currentIndex] = temp;
+                                                            setProfileImages(newImages);
+                                                        }
+                                                    }}
+                                                >
+                                                    <Ionicons name="star" size={20} color="white" />
+                                                </TouchableOpacity>
+
+                                                <TouchableOpacity 
+                                                    className="w-10 h-10 rounded-full bg-red-500/50 items-center justify-center"
+                                                    onPress={() => {
+                                                        // Remove image
+                                                        const currentIndex = profileImages.findIndex(img => img === selectedImage);
+                                                        if (currentIndex !== -1) {
+                                                            const newImages = [...profileImages];
+                                                            newImages.splice(currentIndex, 1);
+                                                            setProfileImages(newImages);
+                                                            setSelectedImage(null);
+                                                        }
+                                                    }}
+                                                >
+                                                    <Ionicons name="trash" size={20} color="white" />
+                                                </TouchableOpacity>
+                                            </>
+                                        )}
+                                    </View>
+                                </Animated.View>
+
+                                <View className="flex-1 justify-center">
+                                    <View className="absolute left-4 top-1/2 z-10">
+                                        {profileImages.findIndex(img => img === selectedImage) > 0 && (
+                                            <TouchableOpacity 
+                                                className="w-12 h-12 rounded-full bg-black/30 items-center justify-center"
+                                                onPress={() => {
+                                                    const currentIndex = profileImages.findIndex(img => img === selectedImage);
+                                                    if (currentIndex > 0) {
+                                                        setSelectedImage(profileImages[currentIndex - 1]);
+                                                    }
+                                                }}
+                                            >
+                                                <Ionicons name="chevron-back" size={28} color="white" />
+                                            </TouchableOpacity>
+                                        )}
+                                    </View>
+
+                                    <Image 
+                                        source={{uri: selectedImage}}
+                                        style={{width: '100%', height: '80%'}}
+                                        contentFit="contain"
+                                        transition={300}
+                                    />
+
+                                    <View className="absolute right-4 top-1/2 z-10">
+                                        {profileImages.findIndex(img => img === selectedImage) < profileImages.length - 1 && (
+                                            <TouchableOpacity 
+                                                className="w-12 h-12 rounded-full bg-black/30 items-center justify-center"
+                                                onPress={() => {
+                                                    const currentIndex = profileImages.findIndex(img => img === selectedImage);
+                                                    if (currentIndex < profileImages.length - 1) {
+                                                        setSelectedImage(profileImages[currentIndex + 1]);
+                                                    }
+                                                }}
+                                            >
+                                                <Ionicons name="chevron-forward" size={28} color="white" />
+                                            </TouchableOpacity>
+                                        )}
+                                    </View>
+                                </View>
+
+                                {/* Image pagination dots */}
+                                <View className="flex-row justify-center items-center py-2">
+                                    {profileImages.map((image, index) => (
+                                        <TouchableOpacity
+                                            key={index}
+                                            onPress={() => setSelectedImage(image)}
+                                            className="mx-1"
+                                        >
+                                            <View 
+                                                style={{
+                                                    width: image === selectedImage ? 10 : 8,
+                                                    height: image === selectedImage ? 10 : 8,
+                                                    borderRadius: 5,
+                                                    backgroundColor: image === selectedImage ? '#3B82F6' : 'rgba(255,255,255,0.5)',
+                                                    transform: [{ scale: image === selectedImage ? 1 : 0.8 }]
+                                                }}
+                                            />
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+
+                                {/* Image navigation */}
+                                <View className="px-6 py-4">
+                                    <ScrollView 
+                                        horizontal 
+                                        showsHorizontalScrollIndicator={false}
+                                        contentContainerStyle={{paddingHorizontal: 8}}
+                                    >
+                                        {profileImages.map((image, index) => (
+                                            <TouchableOpacity
+                                                key={index}
+                                                onPress={() => setSelectedImage(image)}
+                                                className="mr-3"
+                                                style={{
+                                                    transform: [{ scale: image === selectedImage ? 1.1 : 1 }]
+                                                }}
+                                            >
+                                                <Image 
+                                                    source={{uri: image}}
+                                                    style={{
+                                                        width: 60, 
+                                                        height: 60, 
+                                                        borderRadius: 8,
+                                                        borderWidth: image === selectedImage ? 3 : 0,
+                                                        borderColor: '#3B82F6',
+                                                        opacity: image === selectedImage ? 1 : 0.6
+                                                    }}
+                                                    contentFit="cover"
+                                                    transition={200}
+                                                />
+                                            </TouchableOpacity>
+                                        ))}
+                                    </ScrollView>
+                                </View>
+                            </SafeAreaView>
+                            </SafeAreaProvider>
                         </Modal>
                     )}
-                </View>
+                </SafeAreaView>
             </Modal>
 
             {/* Friend Requests Modal */}

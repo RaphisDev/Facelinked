@@ -5,12 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
-      <change afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile].jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/controller/ProfileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/controller/ProfileController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/service/ProfileService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/service/ProfileService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile]/index.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/_layout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/_layout.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/Entries/Post.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Entries/Post.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile].jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,7 +68,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "reference.settings.project.statistic.project.settings",
+    "settings.editor.selected.configurable": "ml.llm.LLMConfigurable",
     "ts.external.directory.path": "/Applications/WebStorm.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external",
     "vue.rearranger.settings.migration": "true"
   }
@@ -287,7 +282,7 @@
       <workItem from="1746796299122" duration="4112000" />
       <workItem from="1746816911399" duration="678000" />
       <workItem from="1746917589273" duration="41000" />
-      <workItem from="1746964356855" duration="21839000" />
+      <workItem from="1746964356855" duration="24805000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />
