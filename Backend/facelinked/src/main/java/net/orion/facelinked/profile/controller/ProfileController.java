@@ -126,7 +126,7 @@ public class ProfileController {
         member.setMemberName(toAdd.getName());
         member.setMemberProfilePicturePath(toAdd.getProfilePicturePath());
 
-        profileService.addFriend(senderProfile, member, faceSmashService);
+        profileService.addFriend(senderProfile, toAdd, member, faceSmashService);
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)
