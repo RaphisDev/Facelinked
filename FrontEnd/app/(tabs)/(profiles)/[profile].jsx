@@ -62,6 +62,10 @@ export default function Profile() {
     // New states for additional features
     const [showPostModal, setShowPostModal] = useState(false);
     const [selectedPost, setSelectedPost] = useState(null);
+    const [showPostImageGallery, setShowPostImageGallery] = useState(false);
+    const [currentPostImage, setCurrentPostImage] = useState(null);
+    const [postImageGallery, setPostImageGallery] = useState([]);
+    const [cachedPost, setCachedPost] = useState(null);
     const [comments, setComments] = useState([]);
     const [commentText, setCommentText] = useState("");
     const [showImageGallery, setShowImageGallery] = useState(false);
@@ -805,7 +809,7 @@ export default function Profile() {
                                 <View className="bg-white rounded-xl shadow-sm p-4">
                                     <View className="w-full aspect-square rounded-xl mb-4 relative bg-transparent">
                                         <TouchableOpacity
-                                            onPress={() => setShowImageGallery(true)}
+                                            onPress={() => {setShowImageGallery(true); if (isDesktop) {setSelectedImage(profileInfos.profilePicturePath)}}}
                                             style={{
                                                 width: '100%',
                                                 height: '100%',
@@ -817,7 +821,8 @@ export default function Profile() {
                                                 style={{
                                                     width: '100%',
                                                     height: '100%',
-                                                    backgroundColor: 'transparent'
+                                                    backgroundColor: 'transparent',
+                                                    borderRadius: 12,
                                                 }}
                                                 contentFit="cover"
                                                 alt="Profile picture"
@@ -1221,7 +1226,7 @@ export default function Profile() {
                                               activeOpacity={0.8}
                                           >
                                               <View className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                                                  <Post {...items.item} onCommentPress={() => openPostDetails(items.item)} onImagePress={() => openPostDetails(items.item)} />
+                                                  <Post {...items.item} onCommentPress={() => openPostDetails(items.item)} onImagePress={(image) => {if(items.item.content.length > 1) {setShowPostImageGallery(true); setCurrentPostImage(image); setPostImageGallery(items.item.content)} else {openPostDetails(items.item)}}} />
                                               </View>
                                           </TouchableOpacity>
                                       )
@@ -1401,7 +1406,7 @@ export default function Profile() {
             </Modal>
 
             {/* Post Detail Modal */}
-            <Modal animationType="slide" visible={showPostModal} presentationStyle={isDesktop ? "formSheet" : "pageSheet"} onRequestClose={() => {setShowPostModal(false);}}>
+            <Modal animationType="slide" visible={showPostModal} presentationStyle={isDesktop ? "formSheet" : "pageSheet"} onRequestClose={() => {setShowPostModal(false)}}>
                 <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     style={{ flex: 1 }}
@@ -1446,7 +1451,7 @@ export default function Profile() {
                                                                     scrollEnabled={false}
                                                                     keyExtractor={(item, index) => index.toString()}
                                                                     renderItem={({item, index}) => (
-                                                                        <View 
+                                                                        <TouchableOpacity activeOpacity={0.8} onPress={() => {if(selectedPost.content.length > 1) {setShowPostModal(false); setCachedPost(selectedPost); setShowPostImageGallery(true); setCurrentPostImage(item); setPostImageGallery(selectedPost.content)}}}
                                                                             className="p-1"
                                                                             style={{
                                                                                 width: selectedPost.content.length === 2 ? '50%' : 
@@ -1460,7 +1465,7 @@ export default function Profile() {
                                                                                     contentFit="cover"
                                                                                 />
                                                                             </View>
-                                                                        </View>
+                                                                        </TouchableOpacity>
                                                                     )}
                                                                 />
                                                             )}
@@ -1528,6 +1533,129 @@ export default function Profile() {
                         )}
                     </View>
                 </KeyboardAvoidingView>
+            </Modal>
+
+            <Modal visible={showPostImageGallery} transparent={true} onRequestClose={() => {setShowImageGallery(false);  if (cachedPost){setShowPostModal(true); setSelectedPost(cachedPost); setCachedPost(false)}}}>
+                <SafeAreaProvider>
+                    <SafeAreaView className="flex-1 bg-black">
+                        <Animated.View
+                            className="flex-row justify-between items-center px-6 py-4"
+                            style={{
+                                opacity: 1,
+                                transform: [{ translateY: 0 }]
+                            }}
+                        >
+                            <TouchableOpacity
+                                onPress={() => {setShowPostImageGallery(false);  if (cachedPost){setShowPostModal(true); setSelectedPost(cachedPost); setCachedPost(false)}}}
+                                className="w-10 h-10 rounded-full bg-gray-800/50 items-center justify-center"
+                            >
+                                <Ionicons name="arrow-back" size={22} color="white" />
+                            </TouchableOpacity>
+
+                            <View className="flex-row items-center">
+                                <Text className="text-white mr-4">
+                                    {postImageGallery.findIndex(img => img === currentPostImage) + 1}/{postImageGallery.length}
+                                </Text>
+                            </View>
+                        </Animated.View>
+
+                        <View className="flex-1 justify-center">
+                            <View className="absolute left-4 top-1/2 z-10">
+                                {postImageGallery.findIndex(img => img === currentPostImage) > 0 && (
+                                    <TouchableOpacity
+                                        className="w-12 h-12 rounded-full bg-black/30 items-center justify-center"
+                                        onPress={() => {
+                                            const currentIndex = postImageGallery.findIndex(img => img === currentPostImage);
+                                            if (currentIndex > 0) {
+                                                setCurrentPostImage(postImageGallery[currentIndex - 1]);
+                                            }
+                                        }}
+                                    >
+                                        <Ionicons name="chevron-back" size={28} color="white" />
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+
+                            <Image
+                                source={{uri: currentPostImage}}
+                                style={{width: '100%', height: '80%'}}
+                                contentFit="contain"
+                                transition={300}
+                            />
+
+                            <View className="absolute right-4 top-1/2 z-10">
+                                {postImageGallery.findIndex(img => img === currentPostImage) < postImageGallery.length - 1 && (
+                                    <TouchableOpacity
+                                        className="w-12 h-12 rounded-full bg-black/30 items-center justify-center"
+                                        onPress={() => {
+                                            const currentIndex = postImageGallery.findIndex(img => img === currentPostImage);
+                                            if (currentIndex < postImageGallery.length - 1) {
+                                                setCurrentPostImage(postImageGallery[currentIndex + 1]);
+                                            }
+                                        }}
+                                    >
+                                        <Ionicons name="chevron-forward" size={28} color="white" />
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+                        </View>
+
+                        {/* Image pagination dots */}
+                        <View className="flex-row justify-center items-center py-2">
+                            {postImageGallery.map((image, index) => (
+                                <TouchableOpacity
+                                    key={index}
+                                    onPress={() => setCurrentPostImage(image)}
+                                    className="mx-1"
+                                >
+                                    <View
+                                        style={{
+                                            width: image === currentPostImage ? 10 : 8,
+                                            height: image === currentPostImage ? 10 : 8,
+                                            borderRadius: 5,
+                                            backgroundColor: image === currentPostImage ? '#3B82F6' : 'rgba(255,255,255,0.5)',
+                                            transform: [{ scale: image === currentPostImage ? 1 : 0.8 }]
+                                        }}
+                                    />
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+
+                        {/* Image navigation */}
+                        <View className="px-6 py-4">
+                            <ScrollView
+                                horizontal
+                                showsHorizontalScrollIndicator={false}
+                                contentContainerStyle={{paddingHorizontal: 8}}
+                            >
+                                {postImageGallery.map((image, index) => (
+                                    <TouchableOpacity
+                                        key={index}
+                                        onPress={() => setCurrentPostImage(image)}
+                                        className="mr-3"
+                                        style={{
+                                            transform: [{ scale: image === currentPostImage ? 1.1 : 1 }]
+                                        }}
+                                    >
+                                        <Image
+                                            source={{uri: image}}
+                                            style={{
+                                                width: 60,
+                                                height: 60,
+                                                borderRadius: 8,
+                                                borderWidth: image === currentPostImage ? 3 : 0,
+                                                borderColor: '#3B82F6',
+                                                opacity: image === currentPostImage ? 1 : 0.6
+                                            }}
+                                            contentFit="cover"
+                                            transition={200}
+                                        />
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+                        </View>
+                    </SafeAreaView>
+                </SafeAreaProvider>
             </Modal>
 
             {/* Image Gallery Modal */}
@@ -1657,8 +1785,8 @@ export default function Profile() {
                     </View>
 
                     {/* Fullscreen image modal */}
-                    {selectedImage && (
-                        <Modal visible={!!selectedImage} transparent={true} onRequestClose={() => setSelectedImage(null)}>
+                    {(selectedImage || isDesktop) && (
+                        <Modal visible={!!selectedImage || isDesktop} transparent={true} onRequestClose={() => setSelectedImage(null)}>
                             <SafeAreaProvider>
                             <SafeAreaView className="flex-1 bg-black">
                                 <Animated.View 
@@ -1669,7 +1797,7 @@ export default function Profile() {
                                     }}
                                 >
                                     <TouchableOpacity 
-                                        onPress={() => setSelectedImage(null)}
+                                        onPress={() => isDesktop ? setShowImageGallery(false) : setSelectedImage(null)}
                                         className="w-10 h-10 rounded-full bg-gray-800/50 items-center justify-center"
                                     >
                                         <Ionicons name="arrow-back" size={22} color="white" />
