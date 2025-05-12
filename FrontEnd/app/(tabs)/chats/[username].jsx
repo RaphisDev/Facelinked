@@ -402,6 +402,7 @@ export default function ChatRoom() {
         }
         catch (e) {
             //setMessages(prevState => prevState.filter((chat) => !chat.isOptimistic)); letting the message vanish isnt a good approach to network failure either
+            console.error(e);
         }
     }
 

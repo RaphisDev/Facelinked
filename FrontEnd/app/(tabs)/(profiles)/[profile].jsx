@@ -114,21 +114,24 @@ export default function Profile() {
                 }
             });
             if (data.ok) {
-                const profileInfos = await data.json();
+                let profileInfos = await data.json();
+                profileInfos.profilePicturePath = profileInfos.profilePicturePath.split(',')[0];
                 setProfileInfos(profileInfos);
                 setFriendsSearchResults(profileInfos.friends ? profileInfos.friends : []);
                 if (Platform.OS === "web") {
                     const profile = JSON.parse(localStorage.getItem('profile'));
                     if (!profile.friends) {
                         setIsAdded(false);
+                    } else {
+                        setIsAdded(profile.friends.some((friend) => friend.memberId === profileName.current));
                     }
-                    setIsAdded(profile.friends.some((friend) => friend.memberId === profileName.current));
                 } else {
                     const profile = JSON.parse(SecureStore.getItem('profile'));
                     if (!profile.friends) {
                         setIsAdded(false);
+                    } else {
+                        setIsAdded(profile.friends.some((friend) => friend.memberId === profileName.current));
                     }
-                    setIsAdded(profile.friends.some((friend) => friend.memberId === profileName.current));
                 }
                 if (profileName.current === username.current) {
                     if (Platform.OS === "web") {
@@ -138,27 +141,17 @@ export default function Profile() {
                     }
                 }
 
-                // Mock profile images for the gallery feature
-                setProfileImages([
-                    profileInfos.profilePicturePath,
-                    "https://source.unsplash.com/random/800x600/?nature",
-                    "https://source.unsplash.com/random/800x600/?city",
-                    "https://source.unsplash.com/random/800x600/?travel",
-                    "https://source.unsplash.com/random/800x600/?food"
-                ]);
+                setProfileImages(profileInfos.profilePicturePath.split(','));
 
                 // Mock friend requests
                 if (profileName.current === username.current) {
-                    const mockRequests = [
-                        { id: "user1", name: "John Doe", profilePicture: "https://source.unsplash.com/random/100x100/?face" },
-                        { id: "user2", name: "Jane Smith", profilePicture: "https://source.unsplash.com/random/100x100/?portrait" }
-                    ];
-                    setFriendRequests(mockRequests);
-                    setHasFriendRequests(mockRequests.length > 0);
+                    setFriendRequests(profileInfos.friendRequests);
+                    setHasFriendRequests(profileInfos.friendRequests.length > 0);
                 }
             }
         }
         catch (error) {
+            console.error('Error fetching data:', error);
         }
 
         try {
@@ -198,8 +191,6 @@ export default function Profile() {
             return !shown
         });
     }
-
-    // We're removing the header search button and will add it to the UI
 
     // Handle window resize for responsive layout
     useEffect(() => {
@@ -437,11 +428,9 @@ export default function Profile() {
     // Function to open post details and comments
     const openPostDetails = (post) => {
         setSelectedPost(post);
-        // Mock comments data
-        setComments([
-            { id: 1, author: "User1", text: "Great post!", timestamp: new Date().getTime() - 3600000 },
-            { id: 2, author: "User2", text: "I agree with this!", timestamp: new Date().getTime() - 7200000 }
-        ]);
+        setComments(
+            post.comments.length > 0 ? post.comments : []
+        );
         setShowPostModal(true);
     };
 
@@ -458,6 +447,8 @@ export default function Profile() {
 
         setComments([...comments, newComment]);
         setCommentText("");
+
+        //TODO: Server API Call
     };
 
     // Function to format timestamp
@@ -861,7 +852,7 @@ export default function Profile() {
                                                         <Ionicons name="people" color="#3B82F6" size={18} />
                                                         <Text className="text-gray-700 font-medium ml-2">Friends</Text>
                                                     </View>
-                                                    {hasFriendRequests && (
+                                                    {hasFriendRequests && profileName.current === username.current && (
                                                         <View 
                                                             style={{ 
                                                                 position: 'absolute', 
@@ -901,7 +892,7 @@ export default function Profile() {
                                                         <Ionicons name="people" color="#3B82F6" size={18} />
                                                         <Text className="text-gray-700 font-medium ml-2">Friends</Text>
                                                     </View>
-                                                    {hasFriendRequests && (
+                                                    {hasFriendRequests && profileName.current === username.current && (
                                                         <View 
                                                             style={{ 
                                                                 position: 'absolute', 
@@ -1057,7 +1048,7 @@ export default function Profile() {
                                                 <Ionicons name="people" color="#3B82F6" size={18} />
                                                 <Text className="text-gray-700 font-medium ml-2">Friends</Text>
                                             </View>
-                                            {hasFriendRequests && (
+                                            {hasFriendRequests && profileName.current === username.current && (
                                                 <View 
                                                     style={{ 
                                                         position: 'absolute', 
@@ -1097,7 +1088,7 @@ export default function Profile() {
                                                 <Ionicons name="people" color="#3B82F6" size={18} />
                                                 <Text className="text-gray-700 font-medium ml-2">Friends</Text>
                                             </View>
-                                            {hasFriendRequests && (
+                                            {hasFriendRequests && profileName.current === username.current && (
                                                 <View 
                                                     style={{ 
                                                         position: 'absolute', 
@@ -1136,7 +1127,7 @@ export default function Profile() {
                         keyExtractor={(items) => items.millis} 
                         scrollEnabled={false} 
                         ListEmptyComponent={
-                            <View className={`items-center justify-center py-16 ${isDesktop ? 'mx-auto w-3/4 mt-7' : 'mx-4'} bg-white rounded-xl shadow-sm`}>
+                            <View className={`items-center justify-center mt-4 py-16 ${isDesktop ? 'mx-auto w-3/4 mt-7' : 'mx-4'} bg-white rounded-xl shadow-sm`}>
                                 <View className="w-16 h-16 mb-4 items-center justify-center bg-blue-100/70 rounded-full">
                                     <Ionicons name="document-text-outline" size={28} color="#3B82F6" />
                                 </View>
@@ -1252,7 +1243,7 @@ export default function Profile() {
                                     className="bg-blue-100 rounded-full p-2 mr-2 relative"
                                 >
                                     <Ionicons name="person-add" size={22} color="#3B82F6" />
-                                    {hasFriendRequests && (
+                                    {hasFriendRequests && profileName.current === username.current && (
                                         <View 
                                             style={{ 
                                                 position: 'absolute', 

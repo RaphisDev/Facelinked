@@ -32,7 +32,6 @@ export default function Post(props) {
             return (
                 <View className="mb-3">
                     <FlatList
-                        data={props.content}
                         numColumns={props.content.length === 2 ? 2 : props.content.length >= 4 ? 2 : 3}
                         scrollEnabled={false}
                         keyExtractor={(item, index) => index.toString()}
@@ -107,11 +106,11 @@ export default function Post(props) {
 
                     <TouchableOpacity 
                         onPress={() => Share.share({
-                            message: "Check out this post!",
                             title: "Check out this post!",
-                            text: "Check out this post!",
-                            url: `https://facelinked.com/${props.username === undefined ? Platform.OS === "web" ? localStorage.getItem("username") : SecureStore.getItem("username") : props.username}?post=${encodeURIComponent(props.id)}`,
-                            dialogTitle: "Check out this post!"
+                            url: `https://facelinked.com/${props.username === undefined ? Platform.OS === "web" ? localStorage.getItem("username") : SecureStore.getItem("username") : props.username}?post=${encodeURIComponent(props.id.millis)}`,
+                            message: `https://facelinked.com/${props.username === undefined ? Platform.OS === "web" ? localStorage.getItem("username") : SecureStore.getItem("username") : props.username}?post=${encodeURIComponent(props.id.millis)}`,
+                            dialogTitle: "Check out this post!",
+                            text: "Check out this post!"
                         })}
                         className="flex-row items-center py-2 px-3 rounded-full hover:bg-gray-100"
                         activeOpacity={0.7}

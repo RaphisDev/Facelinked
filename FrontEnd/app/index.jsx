@@ -755,6 +755,62 @@ const LoginPage = ({navigateTo, showPassword, setShowPassword, previousPage}) =>
                                 await SecureStore.setItemAsync("profile", JSON.stringify(profileJson));
                             }
                         }
+                        async function requestPermission() {
+                            if (Device.isDevice) {
+                                const { status: existingStatus } = await Notification.getPermissionsAsync();
+                                let finalStatus = existingStatus;
+
+                                if (existingStatus !== 'granted') {
+                                    const { status } = await Notification.requestPermissionsAsync();
+                                    finalStatus = status;
+                                }
+
+                                if (finalStatus !== 'granted') {
+                                    if (Platform.OS !== "android") {
+                                        showAlert({
+                                            title: "Permission denied",
+                                            message: "Notifications are disabled. Enable them in your settings.",
+                                            buttons: [{
+                                                text: 'OK',
+                                                onPress: () => {
+
+                                                }
+                                            },],
+                                        })
+                                    } else {
+                                        alert("Notifications are disabled. Enable them in your settings.");
+                                    }
+                                    return null;
+                                }
+                                await Notification.getDevicePushTokenAsync().then((token) => {
+                                    return token;
+                                });
+                            }
+                        }
+
+                        if (Notification.PermissionStatus.UNDETERMINED && Platform.OS === "ios" && Device.isDevice && await asyncStorage.getItem("deviceToken") === null) {
+                            const deviceToken = await requestPermission();
+                            if (!deviceToken) {
+                                await asyncStorage.setItem("deviceToken", "false");
+                            }
+                            else {
+                                const status = await fetch(`${ip}/messages/setDeviceToken`, {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                        "Authorization": `Bearer ${token}`
+                                    },
+                                    body: JSON.stringify({
+                                        token: deviceToken
+                                    })
+                                });
+
+                                if (status.ok) {
+                                    await asyncStorage.setItem("deviceToken", "true");
+                                }
+                            }
+                        }
+
                         router.replace("/");
                     }
                 } else {

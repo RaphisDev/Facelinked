@@ -14,6 +14,12 @@ class WebsocketController{
 
     stompClient = null;
     messageReceived = new EventEmitter();
+    appState = null;
+
+    restart () {
+        this.reset();
+        setTimeout(() => this.stompClient.activate(), 1000);
+    }
 
     reset ()  {
         this.stompClient.deactivate();
@@ -28,6 +34,15 @@ class WebsocketController{
         else {
             token = SecureStore.getItem("token");
         }
+
+        AppState.addEventListener('change', nextAppState => {
+            if (this.appState?.match(/inactive|background/) &&
+                nextAppState === 'active') {
+                this.restart();
+            }
+
+            this.appState = nextAppState;
+        });
 
         if(!webSocketInstance) {
             this.stompClient = new StompJs.Client({

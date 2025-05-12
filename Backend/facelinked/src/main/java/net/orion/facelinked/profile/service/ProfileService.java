@@ -100,5 +100,12 @@ public class ProfileService {
         user.setFriends(newFriends);
 
         profileRepository.save(user);
+
+        var toRemove = profileRepository.findById(username).orElseThrow();
+        var newFriendRequests = new ArrayList<>(toRemove.getFriendRequests());
+        newFriendRequests.removeIf(friend -> friend.getMemberId().equals(user.getUsername()));
+        toRemove.setFriendRequests(newFriendRequests);
+
+        profileRepository.save(toRemove);
     }
 }
