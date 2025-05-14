@@ -6,9 +6,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import {useState} from "react";
 
 export default function Post(props) {
-    const [expandedImage, setExpandedImage] = useState(null);
 
-    // Function to render multiple images in a grid
     const renderImages = () => {
         if (!props.content || props.content.length === 0) return null;
 
@@ -89,7 +87,7 @@ export default function Post(props) {
                     >
                         <Ionicons name="heart-outline" size={20} color="#6B7280" />
                         <Text className="ml-1 text-gray-600 font-medium">
-                            {props.likes > 0 ? props.likes : "Like"}
+                            {props.likes.length > 0 ? props.likes.length : "Like"}
                         </Text>
                     </TouchableOpacity>
 

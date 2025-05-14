@@ -47,7 +47,7 @@ export default function Profile() {
     const scrollView = useRef(null);
     const [posts, setPosts] = useState([]);
     const newPostInput = useRef(null);
-    const postInputText = useRef("");
+    const [postInputText, setPostInputText] = useState("");
     const cachedPosts = useRef([]);
 
     const token = useRef("");
@@ -176,6 +176,28 @@ export default function Profile() {
         return Math.abs(ageDate.getUTCFullYear() - 1970);
     }
 
+    async function LikePost(post) {
+        const response = await fetch(`${ip}/profile/posts/like/${profileName.current}/${post.id.millis}`, {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${token.current}`
+            }
+        })
+
+        if (response.ok) {
+            setPosts(prevState => {
+                const newPosts = [...prevState];
+                const index = newPosts.findIndex(post => post.id.millis === post.id.millis);
+                if (newPosts[index].likes.contains(username.current)) {
+                    newPosts[index].likes = newPosts[index].likes.filter(like => like !== username.current);
+                } else {
+                    newPosts[index].likes.push(username.current);
+                }
+                return newPosts;
+            });
+        }
+    }
+
     function handleAddBar() {
         setShowInput(shown => {
             if (shown) {
@@ -251,15 +273,14 @@ export default function Profile() {
     async function sendPost() {
         // Create a temporary post with optimistic UI update
         setPosts([{
-            title: postInputText.current, 
+            title: postInputText,
             content: selectedPostImages, 
             likes: 0, 
             millis: Date.now()
         }, ...cachedPosts.current]);
 
-        const title = postInputText.current;
-        postInputText.current = "";
-
+        const title = postInputText;
+        setPostInputText("");
         // Upload images if any
         let imageUrls = [];
         try {
@@ -390,7 +411,7 @@ export default function Profile() {
                         text: 'Submit',
                         onPress: () => async () => {
                             setIsAdded(false);
-                            await fetch(`${ip}/profile/friend/${profile}`, {
+                            await fetch(`${ip}/profile/friend/${profileName.current}`, {
                                 method: 'DELETE',
                                 headers: {
                                     "Authorization": `Bearer ${token.current}`
@@ -404,7 +425,7 @@ export default function Profile() {
         }
         setIsAdded(true);
 
-        await fetch(`${ip}/profile/friend/${profile}`, {
+        await fetch(`${ip}/profile/friend/${profileName.current}`, {
             method: 'POST',
             headers: {
                 "Authorization": `Bearer ${token.current}`
@@ -429,41 +450,99 @@ export default function Profile() {
     const openPostDetails = (post) => {
         setSelectedPost(post);
         setComments(
-            post.comments.length > 0 ? post.comments : []
+            post.comments.length > 0 ? post.comments.map((comment) => {let newComment = comment;
+            newComment.id = comments.findIndex(comment);
+            newComment.author = comment.split('Ð')[0];
+            newComment.text = comment.split('Ð')[2];
+            newComment.profilePicturePath = comment.split('Ð')[1];
+            return newComment;
+            }) : []
         );
         setShowPostModal(true);
     };
 
     // Function to add a comment
-    const addComment = () => {
+    const addComment = async () => {
         if (commentText.trim() === "") return;
 
+        let profilePath;
+        if (Platform.OS === "web") {
+            profilePath = JSON.parse(localStorage.getItem('profile')).profilePicturePath;
+        } else {
+            profilePath = JSON.parse(SecureStore.getItem('profile')).profilePicturePath;
+        }
+
         const newComment = {
-            id: comments.length + 1,
+            id: comments.length,
             author: username.current,
             text: commentText,
-            timestamp: new Date().getTime()
+            profilePicturePath: profilePath,
         };
 
-        setComments([...comments, newComment]);
+        setComments(prevState => [...prevState, newComment]);
         setCommentText("");
 
-        //TODO: Server API Call
+        const status = await fetch(`${ip}/profile/posts/${profileName.current}/${selectedPost.id}`, {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${token.current}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                comment: commentText,
+            })
+        });
+
+        if (!status.ok) {
+            setComments(prevState => prevState.slice(0, -1));
+
+            showAlert({
+                title: 'Error',
+                message: 'An error occurred while sending your comment. Please try again later.',
+                buttons: [
+                    {
+                        text: 'OK',
+                        onPress: () => {}
+                    }
+                ]
+            })
+        }
     };
 
-    // Function to format timestamp
     const formatTimestamp = (timestamp) => {
         const date = new Date(timestamp);
         return date.toLocaleString();
     };
 
     // Function to handle friend request response
-    const handleFriendRequest = (id, accept) => {
-        setFriendRequests(friendRequests.filter(request => request.id !== id));
-        setHasFriendRequests(friendRequests.length > 1); // Update badge status
-        // Here you would normally make an API call to accept/reject the request
+    const handleFriendRequest = async (id, accept) => {
+        if (accept) {
+            const status = await fetch(`${ip}/profile/friend/${id}`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token.current}`
+                }
+            })
+
+            if (status.ok) {
+                setFriendRequests(friendRequests.filter(request => request.id !== id));
+                setHasFriendRequests(friendRequests.length > 1);
+            }
+        } else {
+            const status = await fetch(`${ip}/profile/friend/request/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token.current}`
+                }
+            })
+
+            if (status.ok) {
+                setFriendRequests(friendRequests.filter(request => request.id !== id));
+                setHasFriendRequests(friendRequests.length > 1);
+            }
+        }
     };
-    // Function to initialize edit profile form
+
     const initEditProfile = () => {
         setEditName(profileInfos.name || "");
         setEditLocation(profileInfos.location || "");
@@ -476,14 +555,13 @@ export default function Profile() {
     const saveProfile = async () => {
         try {
             const updatedProfile = {
-                ...profileInfos,
                 name: editName,
                 location: editLocation,
                 hobbies: editHobbies,
                 inRelationship: editRelationship
             };
 
-            const response = await fetch(`${ip}/profile`, {
+            const response = await fetch(`${ip}/profile/update`, {
                 method: 'PUT',
                 headers: {
                     "Authorization": `Bearer ${token.current}`,
@@ -493,14 +571,14 @@ export default function Profile() {
             });
 
             if (response.ok) {
-                setProfileInfos(updatedProfile);
+                setProfileInfos({...profileInfos, ...updatedProfile});
                 setShowEditProfile(false);
 
                 // Update local storage
                 if (Platform.OS === "web") {
-                    localStorage.setItem('profile', JSON.stringify(updatedProfile));
+                    localStorage.setItem('profile', JSON.stringify({...profileInfos, ...updatedProfile}));
                 } else {
-                    SecureStore.setItem('profile', JSON.stringify(updatedProfile));
+                    SecureStore.setItem('profile', JSON.stringify({...profileInfos, ...updatedProfile}));
                 }
 
                 showAlert({
@@ -1166,13 +1244,13 @@ export default function Profile() {
                                                       <TextInput 
                                                           onChangeText={(text) => {
                                                               scrollView.current.scrollToEnd(); 
-                                                              postInputText.current = text
+                                                              setPostInputText(text)
                                                           }} 
                                                           onKeyPress={(key) => {
-                                                              if (key.nativeEvent.key === "Enter" && postInputText.current.trim().length > 0) {
+                                                              if (key.nativeEvent.key === "Enter" && postInputText.trim().length > 0) {
                                                                   sendPost();
                                                               }
-                                                              else if (postInputText.current.trim().length === 0 && key.nativeEvent.key === "Enter") {
+                                                              else if (postInputText.trim().length === 0 && key.nativeEvent.key === "Enter") {
                                                                   setPosts(cachedPosts.current);
                                                               }
                                                           }} 
@@ -1185,12 +1263,13 @@ export default function Profile() {
                                                       />
 
                                                       <TouchableOpacity
+                                                          activeOpacity={0.7}
                                                           onPress={() => {
-                                                              if (postInputText.current.trim().length > 0 || selectedPostImages.length > 0) {
+                                                              if (postInputText.trim().length > 0 || selectedPostImages.length > 0) {
                                                                   sendPost();
                                                               }
                                                           }}
-                                                          disabled={postInputText.current === '' && selectedPostImages.length === 0}
+                                                          disabled={postInputText === '' && selectedPostImages.length === 0}
                                                           style={{
                                                               width: 36,
                                                               height: 36,
@@ -1200,6 +1279,7 @@ export default function Profile() {
                                                               alignItems: 'center',
                                                               marginLeft: 8,
                                                           }}
+                                                          className="disabled:opacity-50"
                                                       >
                                                           <Ionicons name="send" size={18} color="white" />
                                                       </TouchableOpacity>
@@ -1217,7 +1297,7 @@ export default function Profile() {
                                               activeOpacity={0.8}
                                           >
                                               <View className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                                                  <Post {...items.item} onCommentPress={() => openPostDetails(items.item)} onImagePress={(image) => {if(items.item.content.length > 1) {setShowPostImageGallery(true); setCurrentPostImage(image); setPostImageGallery(items.item.content)} else {openPostDetails(items.item)}}} />
+                                                  <Post {...items.item} onLikePress={() => LikePost(items.item)} onCommentPress={() => openPostDetails(items.item)} onImagePress={(image) => {if(items.item.content.length > 1) {setShowPostImageGallery(true); setCurrentPostImage(image); setPostImageGallery(items.item.content)} else {openPostDetails(items.item)}}} />
                                               </View>
                                           </TouchableOpacity>
                                       )
@@ -1487,13 +1567,12 @@ export default function Profile() {
                                     renderItem={({item}) => (
                                         <View className="bg-gray-50 rounded-lg p-4 mx-4 mb-3">
                                             <View className="flex-row justify-between items-center mb-2">
-                                                <View className="flex-row items-center">
+                                                <TouchableOpacity activeOpacity={0.8} onPress={() => {setShowPostModal(false); router.navigate(`/${item.author}`)}} className="flex-row items-center">
                                                     <View className="w-8 h-8 rounded-full bg-blue-100 items-center justify-center mr-2">
-                                                        <Text className="text-blue-500 font-bold">{item.author.charAt(0).toUpperCase()}</Text>
+                                                        <Image source={{uri: item.profilePicturePath}} style={{width: 30, height: 30, borderRadius: 15}}/>
                                                     </View>
                                                     <Text className="font-bold text-gray-800">{item.author}</Text>
-                                                </View>
-                                                <Text className="text-gray-500 text-xs">{formatTimestamp(item.timestamp)}</Text>
+                                                </TouchableOpacity>
                                             </View>
                                             <Text className="text-gray-700">{item.text}</Text>
                                         </View>
@@ -1953,8 +2032,8 @@ export default function Profile() {
                         contentContainerStyle={{padding: 16}}
                         renderItem={({item}) => (
                             <View className="bg-white border border-gray-200 rounded-xl p-4 mb-4 shadow-sm">
-                                <View className="flex-row items-center">
-                                    <Image 
+                                <TouchableOpacity onPress={() => {setShowFriendRequests(false); router.navigate(`/${item.id}`)}} className="flex-row items-center">
+                                    <Image
                                         source={{uri: item.profilePicture}}
                                         style={{width: 50, height: 50, borderRadius: 25}}
                                     />
@@ -1962,7 +2041,7 @@ export default function Profile() {
                                         <Text className="font-bold text-gray-800">{item.name}</Text>
                                         <Text className="text-gray-500">Wants to be your friend</Text>
                                     </View>
-                                </View>
+                                </TouchableOpacity>
 
                                 <View className="flex-row justify-end mt-4">
                                     <TouchableOpacity 

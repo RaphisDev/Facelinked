@@ -44,7 +44,7 @@ public class Post {
     @DynamoDBAttribute(attributeName = "content")
     private List<String> content;
     @DynamoDBAttribute(attributeName = "likes")
-    private int likes;
+    private List<String> likes;
     @DynamoDBAttribute(attributeName = "comments")
     private List<String> comments;
     @DynamoDBAttribute(attributeName = "images")

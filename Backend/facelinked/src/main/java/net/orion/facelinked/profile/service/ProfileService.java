@@ -1,12 +1,16 @@
 package net.orion.facelinked.profile.service;
 
+import com.amazonaws.services.dynamodbv2.document.Item;
 import lombok.AllArgsConstructor;
+import net.orion.facelinked.config.PrimaryKey;
 import net.orion.facelinked.networks.NetworkMember;
 import net.orion.facelinked.networks.NetworkMemberListConverter;
 import net.orion.facelinked.profile.Post;
 import net.orion.facelinked.profile.Profile;
+import net.orion.facelinked.profile.controller.UpdateProfile;
 import net.orion.facelinked.profile.repository.PostRepository;
 import net.orion.facelinked.profile.repository.ProfileRepository;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -93,6 +97,17 @@ public class ProfileService {
         profileRepository.save(toAdd);
     }
 
+    public void addComment(Long millis, Profile user, String comment) {
+
+        comment = user.getUsername() + "Ð" + user.getProfilePicturePath() + "Ð" + comment;
+
+        var post = postRepository.findById(new PrimaryKey(user.getUsername(), millis)).orElseThrow();
+        var currentComment = new ArrayList<>(post.getComments());
+        currentComment.add(comment);
+        post.setComments(currentComment);
+        postRepository.save(post);
+    }
+
     public void removeFriend(Profile user, String username) {
 
         var newFriends = new ArrayList<>(user.getFriends());
@@ -102,10 +117,46 @@ public class ProfileService {
         profileRepository.save(user);
 
         var toRemove = profileRepository.findById(username).orElseThrow();
-        var newFriendRequests = new ArrayList<>(toRemove.getFriendRequests());
-        newFriendRequests.removeIf(friend -> friend.getMemberId().equals(user.getUsername()));
-        toRemove.setFriendRequests(newFriendRequests);
+        var newFriendsOfOther = new ArrayList<>(toRemove.getFriends());
+        newFriendsOfOther.removeIf(friend -> friend.getMemberId().equals(user.getUsername()));
+        toRemove.setFriends(newFriendsOfOther);
 
         profileRepository.save(toRemove);
+    }
+
+    public void LikePost(String user, Long millis, String liker) {
+        var post = postRepository.findById(new PrimaryKey(user, millis)).orElseThrow();
+
+        var newLikes = new ArrayList<>(post.getLikes());
+        if (post.getLikes().contains(liker)) {
+            newLikes.remove(liker);
+        } else {
+            newLikes.add(liker);
+        }
+        post.setLikes(newLikes);
+        postRepository.save(post);
+    }
+
+    public void removeFriendRequest(Profile senderProfile, Profile toRemove) {
+        var newFriendRequests = new ArrayList<>(senderProfile.getFriendRequests());
+        newFriendRequests.removeIf(friend -> friend.getMemberId().equals(toRemove.getUsername()));
+        senderProfile.setFriendRequests(newFriendRequests);
+
+        profileRepository.save(senderProfile);
+    }
+
+    public void deleteProfile(String username) {
+        profileRepository.deleteById(username);
+    }
+
+    public void updateProfile(String username, UpdateProfile body) {
+        var profile = profileRepository.findById(username).orElseThrow();
+
+        profile.setName(body.getName());
+        profile.setLocation(body.getLocation());
+        profile.setHobbies(body.getHobbies());
+        profile.setInRelationship(body.isInRelationship());
+
+        profileRepository.save(profile);
     }
 }

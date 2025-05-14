@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import software.amazon.awssdk.core.endpointdiscovery.providers.ProfileEndpointDiscoveryProvider;
 
 import java.util.*;
 
@@ -56,13 +57,22 @@ public class ProfileController {
         return ResponseEntity.ok(profile);
     }
 
-    //To-Do: Also delete User
     @ResponseStatus(HttpStatus.ACCEPTED)
-    @DeleteMapping("/{username}")
-    private void Delete(@PathVariable String username)
+    @PutMapping("/update")
+    public void Update(@AuthenticationPrincipal UserDetails userDetails, UpdateProfile body) {
+        var username = userService.findByEmail(userDetails.getUsername()).getUserName();
+
+        profileService.updateProfile(username, body);
+    }
+
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @DeleteMapping("/delete")
+    private void Delete(@AuthenticationPrincipal UserDetails userDetails)
     {
-        //Only when user is authenticated
-        //profileRepository.delete(profileRepository.findByUserName(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+        var username = userService.findByEmail(userDetails.getUsername()).getUserName();
+
+        profileService.deleteProfile(username);
+        userService.deleteUser(username);
     }
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register")
@@ -93,10 +103,18 @@ public class ProfileController {
                 title(profile.getTitle()).
                 id(new PrimaryKey(sender, System.currentTimeMillis())).
                 content(profile.getContent()).
-                likes(0).
+                likes(Collections.emptyList()).
                 comments(Collections.emptyList()).
                 images(profile.getImages()).
                 build());
+    }
+
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @PostMapping("/posts/like/{username}/{id}")
+    public void LikePost(@PathVariable String username, @PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        var liker = userService.findByEmail(userDetails.getUsername()).getUserName();
+
+        profileService.LikePost(username, id, liker);
     }
 
     @ResponseStatus(HttpStatus.FOUND)
@@ -129,6 +147,17 @@ public class ProfileController {
         profileService.addFriend(senderProfile, toAdd, member, faceSmashService);
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/friend/request/{username}")
+    public void RemoveFriendRequest(@PathVariable String username, @AuthenticationPrincipal UserDetails userDetails) {
+        var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
+        var senderProfile = profileService.findByUsername(sender);
+
+        var toRemove = profileService.findByUsername(username);
+
+        profileService.removeFriendRequest(senderProfile, toRemove);
+    }
+
     @ResponseStatus(HttpStatus.ACCEPTED)
     @DeleteMapping("/friend/{username}")
     public void RemoveFriend(@PathVariable String username, @AuthenticationPrincipal UserDetails userDetails)
@@ -137,6 +166,15 @@ public class ProfileController {
         var senderProfile = profileService.findByUsername(sender);
 
         profileService.removeFriend(senderProfile, username);
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/posts/{profile}/{id}")
+    public void AddComment(@PathVariable String profile, @PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails, @RequestBody String comment) {
+        var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
+        var senderProfile = profileService.findByUsername(sender);
+
+        profileService.addComment(id, senderProfile, comment);
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)
