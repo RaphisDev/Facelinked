@@ -117,6 +117,26 @@ public class ProfileController {
         profileService.LikePost(username, id, liker);
     }
 
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @PutMapping("/update/profilePicture")
+    public void UpdateProfilePicture(@AuthenticationPrincipal UserDetails userDetails, @RequestBody List<String> profilePicturePath) {
+        var username = userService.findByEmail(userDetails.getUsername()).getUserName();
+        StringBuilder oneStringProfilePicture = new StringBuilder();
+        for(String path : profilePicturePath) {
+            if(path.isEmpty()) {
+                continue;
+            }
+            if(oneStringProfilePicture.isEmpty()) {
+                oneStringProfilePicture = new StringBuilder(path);
+            }
+            else {
+                oneStringProfilePicture.append(",").append(path);
+            }
+        }
+
+        profileService.updateProfilePicture(username, oneStringProfilePicture.toString());
+    }
+
     @ResponseStatus(HttpStatus.FOUND)
     @GetMapping("/posts/all/{username}")
     public ResponseEntity<List<Post>> GetPosts(@PathVariable String username)

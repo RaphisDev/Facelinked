@@ -176,6 +176,134 @@ export default function Profile() {
         return Math.abs(ageDate.getUTCFullYear() - 1970);
     }
 
+    async function newMainProfilePicture(path) {
+        let profilePictures;
+        profilePictures = [...profileImages];
+        const lastMain = profilePictures[0];
+        profilePictures[0] = path;
+        profilePictures.push(lastMain);
+
+        const response = await fetch(`${ip}/profile/update/profilePicture`, {
+            method: 'PUT',
+            headers: {
+                "Authorization": `Bearer ${token.current}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                profilePicturePath: profilePictures
+            })
+        })
+
+        if (response.ok) {
+            setProfileImages(profilePictures)
+        }
+    }
+
+    async function addProfilePicture() {
+        let image;
+        try {
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: "images",
+                allowsMultipleSelection: true,
+                quality: 0.8,
+            });
+
+            if (!result.canceled) {
+                image = result.assets.map(asset => asset.uri)
+            } else {
+                return;
+            }
+        } catch (error) {
+            console.error('Error picking image:', error);
+            return;
+        }
+        let path;
+
+        let tempImage;
+        const manipResult = await ImageManipulator.manipulate(
+            image).resize({width: 500});
+        const renderedImage = await manipResult.renderAsync();
+        const savedImage = await renderedImage.saveAsync({format: SaveFormat.JPEG, compress: 0.7});
+        tempImage = savedImage.uri;
+
+        const bucketResponse = await fetch(`${ip}/profile/upload`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            }
+        });
+        if (bucketResponse.ok) {
+            const url = await bucketResponse.text();
+
+            const response = await fetch(tempImage);
+            const blob = await response.blob();
+
+            await fetch(url, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": blob.type
+                },
+                body: blob,
+            });
+            path = url.split("?")[0];
+        } else {
+            showAlert({
+                title: 'Error',
+                message: 'An error occurred while uploading your image. Please try again later.',
+                buttons: [
+                    {
+                        text: 'OK',
+                        onPress: () => {}
+                    },
+                ],
+            })
+            return;
+        }
+
+        let newProfileImages = [...profileImages];
+        newProfileImages.push(path);
+
+        const response = await fetch(`${ip}/profile/update/profilePicture`, {
+            method: 'PUT',
+            headers: {
+                "Authorization": `Bearer ${token.current}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                profilePicturePath: newProfileImages
+            })
+        })
+
+        if (response.ok) {
+            setProfileImages(newProfileImages);
+        }
+    }
+
+    async function removeProfilePicture(path) {
+        let newProfileImages = [...profileImages];
+
+        if (path === profileImages[0]) {
+            newProfileImages.splice(1);
+        } else {
+            newProfileImages = newProfileImages.filter(image => image !== path);
+        }
+
+        const response = await fetch(`${ip}/profile/update/profilePicture`, {
+            method: 'PUT',
+            headers: {
+                "Authorization": `Bearer ${token.current}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                profilePicturePath: newProfileImages
+            })
+        })
+
+        if(response.ok) {
+            setProfileImages(newProfileImages);
+        }
+    }
+
     async function LikePost(post) {
         const response = await fetch(`${ip}/profile/posts/like/${profileName.current}/${post.id.millis}`, {
             method: 'POST',
@@ -1745,7 +1873,7 @@ export default function Profile() {
                         {profileName.current === username.current && (
                             <TouchableOpacity 
                                 className="w-10 h-10 rounded-full bg-blue-100 items-center justify-center"
-                                onPress={() => Alert.alert("Add Photo", "This feature is coming soon")}
+                                onPress={() => addProfilePicture()}
                             >
                                 <Ionicons name="add" size={22} color="#3B82F6" />
                             </TouchableOpacity>
@@ -1815,11 +1943,7 @@ export default function Profile() {
                                                 <TouchableOpacity
                                                     className="w-8 h-8 rounded-full bg-blue-100 items-center justify-center mr-2 shadow-sm"
                                                     onPress={() => {
-                                                        const newImages = [...profileImages];
-                                                        const temp = newImages[0];
-                                                        newImages[0] = newImages[index];
-                                                        newImages[index] = temp;
-                                                        setProfileImages(newImages);
+                                                        newMainProfilePicture(profileImages[index])
                                                     }}
                                                 >
                                                     <Ionicons name="star" size={16} color="#3B82F6" />
@@ -1829,9 +1953,7 @@ export default function Profile() {
                                             <TouchableOpacity
                                                 className="w-8 h-8 rounded-full bg-red-100 items-center justify-center shadow-sm"
                                                 onPress={() => {
-                                                    const newImages = [...profileImages];
-                                                    newImages.splice(index, 1);
-                                                    setProfileImages(newImages);
+                                                    removeProfilePicture(profileImages[index])
                                                 }}
                                             >
                                                 <Ionicons name="trash" size={16} color="#EF4444" />
@@ -1845,7 +1967,7 @@ export default function Profile() {
                                 <TouchableOpacity 
                                     className="w-120 h-120 items-center justify-center bg-gray-100 rounded-xl border-2 border-dashed border-gray-300"
                                     style={{width: 120, height: 120}}
-                                    onPress={() => Alert.alert("Add Photo", "This feature is coming soon")}
+                                    onPress={() => addProfilePicture()}
                                 >
                                     <Ionicons name="add" size={40} color="#3B82F6" />
                                     <Text className="text-gray-600 mt-2">Add Photo</Text>
@@ -1886,11 +2008,7 @@ export default function Profile() {
                                                         // Set as profile picture
                                                         const currentIndex = profileImages.findIndex(img => img === selectedImage);
                                                         if (currentIndex !== 0 && currentIndex !== -1) {
-                                                            const newImages = [...profileImages];
-                                                            const temp = newImages[0];
-                                                            newImages[0] = newImages[currentIndex];
-                                                            newImages[currentIndex] = temp;
-                                                            setProfileImages(newImages);
+                                                            newMainProfilePicture(profileImages[currentIndex])
                                                         }
                                                     }}
                                                 >
@@ -1903,10 +2021,7 @@ export default function Profile() {
                                                         // Remove image
                                                         const currentIndex = profileImages.findIndex(img => img === selectedImage);
                                                         if (currentIndex !== -1) {
-                                                            const newImages = [...profileImages];
-                                                            newImages.splice(currentIndex, 1);
-                                                            setProfileImages(newImages);
-                                                            setSelectedImage(null);
+                                                            removeProfilePicture(profileImages[currentIndex])
                                                         }
                                                     }}
                                                 >

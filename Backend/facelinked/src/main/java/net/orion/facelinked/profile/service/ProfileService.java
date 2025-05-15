@@ -159,4 +159,11 @@ public class ProfileService {
 
         profileRepository.save(profile);
     }
+
+    public void updateProfilePicture(String username, String profilePicturePath) {
+        var profile = profileRepository.findById(username).orElseThrow();
+
+        profile.setProfilePicturePath(profilePicturePath);
+        profileRepository.save(profile);
+    }
 }
