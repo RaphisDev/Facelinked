@@ -5,9 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
-      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/controller/ProfileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/src/main/java/net/orion/facelinked/profile/controller/ProfileController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/account.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/account.jsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/icon_rounded.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/assets/images/icon_rounded_small.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/app.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/ic_launcher_foreground.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/ic_launcher_foreground.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/icon-bg-removed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/icon-rounded.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/icon.png" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,11 +89,11 @@
       <recent name="D:\Projects\FaceLinked\FrontEnd\assets\images" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/app/(tabs)/(profiles)" />
       <recent name="D:\Projects\FaceLinked\FrontEnd\assets\images" />
+      <recent name="D:\Projects\FaceLinked\FrontEnd\assets" />
+      <recent name="$PROJECT_DIR$/app/(tabs)/(profiles)" />
       <recent name="$PROJECT_DIR$/app" />
       <recent name="$PROJECT_DIR$/app/(tabs)/(profiles)/settings" />
-      <recent name="$PROJECT_DIR$/dist" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -288,7 +293,7 @@
       <workItem from="1747072820353" duration="3614000" />
       <workItem from="1747158350617" duration="3463000" />
       <workItem from="1747245627837" duration="4455000" />
-      <workItem from="1747321351525" duration="4729000" />
+      <workItem from="1747321351525" duration="7515000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />

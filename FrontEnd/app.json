@@ -28,7 +28,7 @@
     "web": {
       "bundler": "metro",
       "output": "single",
-      "favicon": "./assets/images/icon-rounded.png",
+      "favicon": "./assets/images/icon_rounded.png",
       "description": "Chat, Connect, and Share with Friends",
       "name": "Facelinked",
       "shortName": "Facelinked",

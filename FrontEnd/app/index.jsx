@@ -189,8 +189,8 @@ const NavigationBar = ({navigateTo, scrollContent}) => {
         className="sticky top-0 z-50 backdrop-blur-md bg-white/70 shadow-sm py-4 px-6 flex justify-between items-center">
         <Pressable onPress={() => navigateTo('landing')} className="flex flex-row items-center space-x-2">
             <View
-                className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
-                <Image source={require("../assets/images/icon-bg-removed.png")} style={{height:35,width:35}}/>
+                className="h-10 w-10 flex items-center justify-center">
+                <Image source={require("../assets/images/new_icon.png")} style={{height:40,width:40, borderRadius: 15}}/>
             </View>
             <span
                 className="font-bold text-2xl bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">Facelinked</span>
