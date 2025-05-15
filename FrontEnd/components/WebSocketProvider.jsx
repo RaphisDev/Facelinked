@@ -22,7 +22,7 @@ class WebsocketController{
     }
 
     reset ()  {
-        this.stompClient.deactivate();
+        this.stompClient?.deactivate();
         webSocketInstance = null;
     }
 
@@ -38,7 +38,9 @@ class WebsocketController{
         AppState.addEventListener('change', nextAppState => {
             if (this.appState?.match(/inactive|background/) &&
                 nextAppState === 'active') {
-                this.restart();
+                if (!this.stompClient.connected) {
+                    this.restart();
+                }
             }
 
             this.appState = nextAppState;
@@ -67,7 +69,7 @@ class WebsocketController{
                 onWebSocketError: (error) => {
                     //alert("Network error. Please check your internet connection.");
                     if (!this.stompClient.connected) {
-                        this.stompClient.deactivate();
+                        this.stompClient?.deactivate();
                         webSocketInstance = null;
                         setTimeout(() => {
                             this.stompClient.activate();
