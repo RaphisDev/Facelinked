@@ -67,12 +67,14 @@ public class ProfileController {
 
     @ResponseStatus(HttpStatus.ACCEPTED)
     @DeleteMapping("/delete")
-    private void Delete(@AuthenticationPrincipal UserDetails userDetails)
+    private void Delete(@AuthenticationPrincipal UserDetails userDetails, @RequestParam(value = "onlyUser", required = false) Boolean onlyUser)
     {
         var username = userService.findByEmail(userDetails.getUsername()).getUserName();
 
-        profileService.deleteProfile(username);
         userService.deleteUser(username);
+        if (onlyUser == null || !onlyUser) {
+            profileService.deleteProfile(username);
+        }
     }
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register")

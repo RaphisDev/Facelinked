@@ -1153,8 +1153,8 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                 else {
                     if (Platform.OS !== "android") {
                         showAlert({
-                            title: "Conflict",
-                            message: "There is already an account with that email or username.",
+                            title: "Error",
+                            message: "Try again later",
                             buttons: [{
                                 text: 'OK',
                                 onPress: () => {
@@ -1163,8 +1163,15 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                             },],
                         })
                     } else {
-                        alert("There is already an account with that email or username.");
+                        alert("Try again later");
                     }
+                    await fetch(`${ip}/profile/delete?onlyUser=true`, {
+                        method: "DELETE",
+                        headers: {
+                            "Authorization": `Bearer ${token.current}`,
+                        }
+                    })
+
                     setRegistered(false);
                     jumpToStep(1);
                     return;
@@ -1294,6 +1301,13 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                     } else {
                         alert("There is already an account with that email or username.");
                     }
+                    await fetch(`${ip}/profile/delete?onlyUser=true`, {
+                        method: "DELETE",
+                        headers: {
+                            "Authorization": `Bearer ${token.current}`,
+                        }
+                    })
+
                     setRegistered(false);
                     jumpToStep(1);
                 }
@@ -1313,6 +1327,13 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                 } else {
                     alert("There was an error registering. Please try again");
                 }
+                await fetch(`${ip}/profile/delete?onlyUser=true`, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${token.current}`,
+                    }
+                })
+
                 setRegistered(false)
                 jumpToStep(1)
             }

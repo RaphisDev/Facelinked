@@ -47,6 +47,59 @@ export default function AccountSettings() {
             }} className="bg-accent p-0.5 w-28 rounded-lg">
                 <Text className="text-center text-xl font-semibold text-dark-text">Log out</Text>
             </TouchableOpacity>
+                <TouchableOpacity activeOpacity={0.7} onPress={() => {
+                    showAlert({
+                        title: "Are you sure you want to delete your account?",
+                        message: "This action cannot be undone.",
+                        buttons: [
+                            {text: "Cancel", onPress: () => {}},
+                            {
+                                text: "Continue", onPress: async () => {
+                                    const response = await fetch(`${ip}/profile/delete`, {
+                                        method: "DELETE",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                            "Authorization": `Bearer ${await SecureStore.getItemAsync("token")}`
+                                        }
+                                    })
+                                    if (response.ok) {
+                                        await asyncStorage.clear();
+                                        if (Platform.OS === "web") {
+                                            localStorage.clear();
+                                        } else {
+                                            await SecureStore.deleteItemAsync("token");
+                                            await SecureStore.deleteItemAsync("username");
+                                            await SecureStore.deleteItemAsync("profilePicture");
+                                            await SecureStore.deleteItemAsync("profile");
+                                        }
+                                        new WebSocketProvider().reset();
+
+                                        showAlert({
+                                            title: "Account deleted",
+                                            message: "Your account has been deleted successfully.",
+                                            buttons: [
+                                                {text: "Okay", onPress: () => router.replace("/")}
+                                            ]
+                                        })
+                                    } else {
+                                        showAlert({
+                                            title: "Error. Try again later.",
+                                            message: "An error occurred while deleting your account.",
+                                            buttons: [
+                                                {text: "Okay", onPress: () => {}}
+                                            ]
+                                        })
+                                        console.error(await response.json())
+                                        console.error(await response.text())
+                                        console.error(response.status)
+                                    }
+                                }
+                            }
+                        ]
+                    })
+                }} className="bg-accent p-0.5 w-28 rounded-lg mt-5">
+                    <Text className="text-center text-xl font-semibold text-dark-text">Delete Account</Text>
+                </TouchableOpacity>
             </View>
         </View>
     )
