@@ -5,14 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile].jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/account.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/account.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/chats/[username].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chats/[username].jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/chats/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chats/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/networks/[Network].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/networks/[Network].jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/Entries/Chat.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Entries/Chat.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/Entries/NetworkMessage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Entries/NetworkMessage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/Entries/Post.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Entries/Post.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/ic_launcher_foreground.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/ic_launcher_foreground.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/icon_rounded.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/icon_rounded.png" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,11 +84,11 @@
       <recent name="D:\Projects\FaceLinked\FrontEnd\assets\images" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/android" />
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/assets/images" />
       <recent name="D:\Projects\FaceLinked\FrontEnd\assets\images" />
       <recent name="D:\Projects\FaceLinked\FrontEnd\assets" />
-      <recent name="$PROJECT_DIR$/app/(tabs)/(profiles)" />
-      <recent name="$PROJECT_DIR$/app" />
-      <recent name="$PROJECT_DIR$/app/(tabs)/(profiles)/settings" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -295,7 +290,7 @@
       <workItem from="1747245627837" duration="4455000" />
       <workItem from="1747321351525" duration="7548000" />
       <workItem from="1747503214729" duration="53000" />
-      <workItem from="1747503270790" duration="15909000" />
+      <workItem from="1747503270790" duration="18488000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />
