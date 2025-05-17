@@ -183,9 +183,7 @@ public class ProfileController {
         var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
         var senderProfile = profileService.findByUsername(sender);
 
-        var toRemove = profileService.findByUsername(username);
-
-        profileService.removeFriendRequest(senderProfile, toRemove);
+        profileService.removeFriendRequest(senderProfile, username);
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)

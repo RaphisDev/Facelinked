@@ -28,7 +28,7 @@ export default function Chat(props) {
         >
             <View className="relative">
                 <Image 
-                    source={{uri: props.image}}
+                    source={{uri: props.image.split(",")[0]}}
                     style={{
                         width: 56,
                         height: 56,

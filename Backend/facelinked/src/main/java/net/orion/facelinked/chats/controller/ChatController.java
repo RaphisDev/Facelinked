@@ -5,6 +5,9 @@ import com.eatthepath.pushy.apns.ApnsPushNotification;
 import com.eatthepath.pushy.apns.PushNotificationResponse;
 import com.eatthepath.pushy.apns.util.SimpleApnsPushNotification;
 import com.eatthepath.pushy.apns.util.concurrent.PushNotificationFuture;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import net.orion.facelinked.auth.repository.UserRepository;
 import net.orion.facelinked.auth.services.UserService;
@@ -67,40 +70,54 @@ public class ChatController {
         }
 
         for (String token : receiverAccount.getDeviceTokens()) {
-            String escapedMessage = message.replace("\"", "\\\"").replace("\n", "\\n");
-            String escapedSender = sender.replace("\"", "\\\"");
-            
-            String payload = "{"
-                    + "\"aps\":{"
-                    + "\"alert\":{\"title\":\"" + escapedSender + "\",\"body\":\"" + escapedMessage + "\"},"
-                    + "\"sound\":\"default\","
-                    + "\"badge\":1,"
-                    + "\"content-available\":1,"
-                    + "\"mutable-content\":1"
-                    + "},"
-                    + "\"sender\":\"" + escapedSender + "\","
-                    + "\"message\":\"" + escapedMessage + "\""
-                    + "}";
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = null;
+            try {
+                root = mapper.readTree(token);
+            } catch (JsonProcessingException e) {
+                continue;
+            }
 
-            
-            SimpleApnsPushNotification pushNotification = new SimpleApnsPushNotification(
-                    token, "com.orion.friendslinked", payload, Instant.now());
+            JsonNode tokenNode = root.path("token");
 
-            PushNotificationFuture<SimpleApnsPushNotification, PushNotificationResponse<SimpleApnsPushNotification>> future = apnsClient.sendNotification(pushNotification);
+            String type = tokenNode.path("type").asText();
+            String data = tokenNode.path("data").asText();
 
-            future.whenComplete((response, exception) -> {
-                if (exception != null) {
-                    System.err.println("Failed to send notification: " + exception.getMessage());
-                    exception.printStackTrace();
-                } else if (!response.isAccepted()) {
-                    System.err.println("Notification rejected by the device: " + response.getRejectionReason());
-                    // If token is invalid, you might want to remove it
-                    if (response.getRejectionReason().orElseThrow().contains("BadDeviceToken") || 
-                        response.getRejectionReason().orElseThrow().contains("Unregistered")) {
-                        removeInvalidToken(sender, token);
+            if (type.equals("ios")) {
+                String escapedMessage = message.replace("\"", "\\\"").replace("\n", "\\n");
+                String escapedSender = sender.replace("\"", "\\\"");
+
+                String payload = "{"
+                        + "\"aps\":{"
+                        + "\"alert\":{\"title\":\"" + escapedSender + "\",\"body\":\"" + escapedMessage + "\"},"
+                        + "\"sound\":\"default\","
+                        + "\"badge\":1,"
+                        + "\"content-available\":1,"
+                        + "\"mutable-content\":1"
+                        + "},"
+                        + "\"sender\":\"" + escapedSender + "\","
+                        + "\"message\":\"" + escapedMessage + "\""
+                        + "}";
+
+
+                SimpleApnsPushNotification pushNotification = new SimpleApnsPushNotification(
+                        data, "com.orion.friendslinked", payload, Instant.now());
+
+                PushNotificationFuture<SimpleApnsPushNotification, PushNotificationResponse<SimpleApnsPushNotification>> future = apnsClient.sendNotification(pushNotification);
+
+                future.whenComplete((response, exception) -> {
+                    if (exception != null) {
+                        System.err.println("Failed to send notification: " + exception.getMessage());
+                        exception.printStackTrace();
+                    } else if (!response.isAccepted()) {
+                        System.err.println("Notification rejected by the device: " + response.getRejectionReason());
+                        if (response.getRejectionReason().orElseThrow().contains("BadDeviceToken") ||
+                                response.getRejectionReason().orElseThrow().contains("Unregistered")) {
+                            removeInvalidToken(sender, data);
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     }
     
@@ -122,10 +139,7 @@ public class ChatController {
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        var tokens = user.getDeviceTokens();
-        if (tokens == null) {
-            tokens = new ArrayList<>();
-        }
+        var tokens = new ArrayList<>(user.getDeviceTokens());
         tokens.add(token);
         user.setDeviceTokens(tokens);
         userService.save(user);

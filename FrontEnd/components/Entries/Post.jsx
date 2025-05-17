@@ -105,7 +105,6 @@ export default function Post(props) {
                     <TouchableOpacity 
                         onPress={() => Share.share({
                             title: "Check out this post!",
-                            url: `https://facelinked.com/${props.username === undefined ? Platform.OS === "web" ? localStorage.getItem("username") : SecureStore.getItem("username") : props.username}?post=${encodeURIComponent(props.id.millis)}`,
                             message: `https://facelinked.com/${props.username === undefined ? Platform.OS === "web" ? localStorage.getItem("username") : SecureStore.getItem("username") : props.username}?post=${encodeURIComponent(props.id.millis)}`,
                             dialogTitle: "Check out this post!",
                             text: "Check out this post!"

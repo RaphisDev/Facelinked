@@ -120,7 +120,7 @@ export default function Chats() {
                                 {
                                     username: username,
                                     name: profileInfos.name,
-                                    image: profileInfos.profilePicturePath,
+                                    image: profileInfos.profilePicturePath.split(",")[0],
                                 },
                                 ...chats
                             ])

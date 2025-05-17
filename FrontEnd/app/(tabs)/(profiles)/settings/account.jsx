@@ -55,11 +55,17 @@ export default function AccountSettings() {
                         buttons: [
                             {text: "Cancel", onPress: () => {}},
                             {text: "Continue", onPress: async () => {
+                                    let token;
+                                    if (Platform.OS === "web") {
+                                        token = localStorage.getItem("token");
+                                    } else {
+                                        token = SecureStore.getItem("token");
+                                    }
                                     const response = await fetch(`${ip}/profile/delete`, {
                                         method: "DELETE",
                                         headers: {
                                             "Content-Type": "application/json",
-                                            "Authorization": `Bearer ${await SecureStore.getItemAsync("token")}`
+                                            "Authorization": `Bearer ${token}`
                                         }
                                     })
                                     if (response.ok) {

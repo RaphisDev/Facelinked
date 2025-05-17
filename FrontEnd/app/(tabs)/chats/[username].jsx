@@ -128,7 +128,7 @@ export default function ChatRoom() {
                 });
                 if (profile.ok) {
                     const profileJson = await profile.json();
-                    setUserData({ name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath });
+                    setUserData({ name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath.split(",")[0] });
                 }
             }
         }
@@ -368,8 +368,8 @@ export default function ChatRoom() {
                 });
                 if (profile.ok) {
                     const profileJson = await profile.json();
-                    await asyncStorage.setItem("chats", JSON.stringify([...loadedChats, { name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath, lastMessage: "You: " + messageContent }]));
-                    loadedChats = [...loadedChats, { name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath }];
+                    await asyncStorage.setItem("chats", JSON.stringify([...loadedChats, { name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath.split(",")[0], lastMessage: "You: " + messageContent }]));
+                    loadedChats = [...loadedChats, { name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath.split(",")[0], lastMessage: "You: " + messageContent }];
                 }
             }
             await asyncStorage.setItem("chats", JSON.stringify([...loadedChats.filter(chat => chat.username === username).map(value => {

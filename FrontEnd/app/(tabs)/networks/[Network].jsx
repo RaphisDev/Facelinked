@@ -141,7 +141,7 @@ export default function Network() {
                     ws.stompClient.subscribe(`/networks/${Network}`, async (message) => {
                         const parsedMessage = JSON.parse(message.body);
                         if (parsedMessage.senderId.memberId === username.current) {return;}
-                        addMessage((prevMessages) => [...prevMessages, {sender: parsedMessage.senderId.memberId, senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath, content: parsedMessage.content, millis: parsedMessage.millis}]);
+                        addMessage((prevMessages) => [...prevMessages, {sender: parsedMessage.senderId.memberId, senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath.split(",")[0], content: parsedMessage.content, millis: parsedMessage.millis}]);
                     });
 
                     const receivedMessages = await fetch(`${ip}/networks/${Network}/messages`, {
@@ -154,7 +154,7 @@ export default function Network() {
                     if (receivedMessages.ok) {
                         const data = await receivedMessages.json();
                         addMessage(prevState => [...prevState, ...data.map((message) => {
-                            return {senderProfilePicturePath: message.senderId.memberProfilePicturePath, sender: message.senderId.memberId, content: message.content, millis: message.millis};
+                            return {senderProfilePicturePath: message.senderId.memberProfilePicturePath.split(",")[0], sender: message.senderId.memberId, content: message.content, millis: message.millis};
                         })]);
                         setTimeout(() => {
                             initializedMessages.current = true;
@@ -177,7 +177,7 @@ export default function Network() {
 
                         addMessage(prevState => [...prevState, ...data.map((message) => {
                             return {
-                                senderProfilePicturePath: message.senderId.memberProfilePicturePath,
+                                senderProfilePicturePath: message.senderId.memberProfilePicturePath.split(",")[0],
                                 sender: message.senderId.memberId,
                                 content: message.content,
                                 millis: message.millis,
@@ -192,7 +192,7 @@ export default function Network() {
                         }
                         await asyncStorage.setItem(`networks/${Network}`, JSON.stringify([...messages, ...data.map((message) => {
                             return {
-                                senderProfilePicturePath: message.senderId.memberProfilePicturePath,
+                                senderProfilePicturePath: message.senderId.memberProfilePicturePath.split(",")[0],
                                 sender: message.senderId.memberId,
                                 content: message.content,
                                 millis: message.millis
@@ -246,7 +246,7 @@ export default function Network() {
                 profilePicture = SecureStore.getItem("profilePicture");
             }
 
-            addMessage((prevMessages) => [...prevMessages, {sender: username.current, senderProfilePicturePath: profilePicture, content: message, millis: Date.now()}]);
+            addMessage((prevMessages) => [...prevMessages, {sender: username.current, senderProfilePicturePath: profilePicture.split(",")[0], content: message, millis: Date.now()}]);
 
             if (JSON.parse(await asyncStorage.getItem("networks"))?.some((network) => network.networkId === Network)) {
                 let loadedMessages = await asyncStorage.getItem(`networks/${Network}`) || [];
@@ -405,7 +405,7 @@ export default function Network() {
                                         const data = await receivedMessages.json();
                                         addMessage([...data.map((message) => {
                                             return {
-                                                senderProfilePicturePath: message.senderId.memberProfilePicturePath,
+                                                senderProfilePicturePath: message.senderId.memberProfilePicturePath.split(",")[0],
                                                 sender: message.senderId.memberId,
                                                 content: message.content,
                                                 millis: message.millis,
@@ -427,7 +427,7 @@ export default function Network() {
                 }} ref={messageList} style={{marginTop: 5, marginBottom: 50}} onContentSizeChange={(size) => {
                     if(!loadingAdditionalMessages.current) {messageList.current.scrollToEnd()}
                     }} data={messages} renderItem={(item) =>
-                    <NetworkMessage content={item.item.content} sender={item.item.sender} senderProfilePicturePath={item.item.senderProfilePicturePath} timestamp={new Date(item.item.millis).toLocaleString()}/>}
+                    <NetworkMessage content={item.item.content} sender={item.item.sender} senderProfilePicturePath={item.item.senderProfilePicturePath.split(",")[0]} timestamp={new Date(item.item.millis).toLocaleString()}/>}
                           keyExtractor={(item, index) => index.toString()}>
                 </FlatList>
             </View>
@@ -716,7 +716,7 @@ export default function Network() {
                                 router.navigate(`/${item.item.memberId}`);
                             }} activeOpacity={0.4} className="flex-row justify-between items-center p-3">
                                 <View className="flex-row items-center">
-                                    <Image source={{uri: item.item.memberProfilePicturePath}} style={{width: 42, height: 42, borderRadius: 21}}></Image>
+                                    <Image source={{uri: item.item.memberProfilePicturePath.split(",")[0]}} style={{width: 42, height: 42, borderRadius: 21}}></Image>
                                     <View className="flex-col ml-3">
                                         <Text className="text-text dark:text-dark-text font-bold text-lg">{item.item.memberName}</Text>
                                         <Text className="text-text dark:text-dark-text text-sm">@{item.item.memberId}</Text>

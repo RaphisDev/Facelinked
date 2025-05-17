@@ -63,18 +63,21 @@ public class ProfileService {
         if(user.getFriends().stream().anyMatch(friend -> friend.getMemberId().equals(memberToAdd.getMemberId()))) {
             return;
         }
-        if (user.getFriendRequests().stream().anyMatch(friend -> friend.getMemberId().equals(memberToAdd.getMemberId()))) {
-            return;
-        }
         if (user.getFriendRequests().contains(memberToAdd)) {
-            user.getFriendRequests().remove(memberToAdd);
+            var friendRequests = new ArrayList<>(user.getFriendRequests());
+            friendRequests.remove(memberToAdd);
+            user.setFriendRequests(friendRequests);
             var newFriends = new ArrayList<>(user.getFriends());
             newFriends.add(memberToAdd);
             user.setFriends(newFriends);
             profileRepository.save(user);
 
             var newFriendsOfToAdd = new ArrayList<>(toAdd.getFriends());
-            newFriendsOfToAdd.add(memberToAdd);
+            var userMember = new NetworkMember();
+            userMember.setMemberId(user.getUsername());
+            userMember.setMemberName(user.getName());
+            userMember.setMemberProfilePicturePath(user.getProfilePicturePath());
+            newFriendsOfToAdd.add(userMember);
             toAdd.setFriends(newFriendsOfToAdd);
             profileRepository.save(toAdd);
 
@@ -84,6 +87,9 @@ public class ProfileService {
             return;
         }
 
+        if (toAdd.getFriendRequests().stream().anyMatch(friend -> friend.getMemberId().equals(user.getUsername()))) {
+            return;
+        }
         var newFriendRequests = new ArrayList<>(toAdd.getFriendRequests());
 
         var member = new NetworkMember();
@@ -137,9 +143,9 @@ public class ProfileService {
         postRepository.save(post);
     }
 
-    public void removeFriendRequest(Profile senderProfile, Profile toRemove) {
+    public void removeFriendRequest(Profile senderProfile, String toRemove) {
         var newFriendRequests = new ArrayList<>(senderProfile.getFriendRequests());
-        newFriendRequests.removeIf(friend -> friend.getMemberId().equals(toRemove.getUsername()));
+        newFriendRequests.removeIf(friend -> friend.getMemberId().equals(toRemove));
         senderProfile.setFriendRequests(newFriendRequests);
 
         profileRepository.save(senderProfile);
