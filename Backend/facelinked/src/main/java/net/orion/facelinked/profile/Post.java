@@ -50,7 +50,7 @@ public class Post {
     @DynamoDBAttribute(attributeName = "images")
     private List<String> images;
 
-    public Post(PrimaryKey id, String title, List<String> content, int likes, List<String> comments, List<String> images) {
+    public Post(PrimaryKey id, String title, List<String> content, List<String> likes, List<String> comments, List<String> images) {
         this.id = id;
         this.title = title;
         this.content = content;

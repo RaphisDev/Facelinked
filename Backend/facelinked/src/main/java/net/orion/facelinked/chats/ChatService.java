@@ -32,4 +32,9 @@ public class ChatService {
         modifiableList.sort(Comparator.comparing(ChatMessage::getMillis));
         return modifiableList;
     }
+
+    public void deleteChatMessages(String username) {
+        chatRepository.deleteAllBySenderId(username);
+        chatRepository.deleteAllByReceiverId(username);
+    }
 }

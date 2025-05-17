@@ -1,6 +1,7 @@
 package net.orion.facelinked.networks.repository;
 
 import net.orion.facelinked.config.AutoPrimaryKey;
+import net.orion.facelinked.networks.NetworkMember;
 import net.orion.facelinked.networks.NetworkMessage;
 import org.socialsignin.spring.data.dynamodb.repository.EnableScan;
 import org.springframework.data.domain.Pageable;
@@ -17,4 +18,6 @@ public interface NetworkMessageRepository extends CrudRepository<NetworkMessage,
     List<NetworkMessage> findByMillisGreaterThanAndNetworkId(Long idIsGreaterThan, String networkId);
 
     List<NetworkMessage> findByNetworkId(String networkId);
+
+    void deleteAllBySenderId(NetworkMember senderId);
 }

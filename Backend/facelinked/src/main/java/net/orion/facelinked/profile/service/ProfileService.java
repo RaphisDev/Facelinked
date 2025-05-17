@@ -166,4 +166,8 @@ public class ProfileService {
         profile.setProfilePicturePath(profilePicturePath);
         profileRepository.save(profile);
     }
+
+    public void deletePosts(String username) {
+        postRepository.deleteAllByUserId(username);
+    }
 }

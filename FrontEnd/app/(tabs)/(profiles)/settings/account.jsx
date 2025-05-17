@@ -5,6 +5,7 @@ import WebSocketProvider from "../../../../components/WebSocketProvider";
 import {useRouter} from "expo-router";
 import {useEffect} from "react";
 import {showAlert} from "../../../../components/PopUpModalView";
+import ip from "../../../../components/AppManager";
 
 export default function AccountSettings() {
     const router = useRouter();
@@ -53,8 +54,7 @@ export default function AccountSettings() {
                         message: "This action cannot be undone.",
                         buttons: [
                             {text: "Cancel", onPress: () => {}},
-                            {
-                                text: "Continue", onPress: async () => {
+                            {text: "Continue", onPress: async () => {
                                     const response = await fetch(`${ip}/profile/delete`, {
                                         method: "DELETE",
                                         headers: {

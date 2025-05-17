@@ -9,6 +9,7 @@ import net.orion.facelinked.networks.NetworkMessage;
 import net.orion.facelinked.networks.repository.NetworkMessageRepository;
 import net.orion.facelinked.networks.repository.NetworkRepository;
 import net.orion.facelinked.networks.controller.NetworkUpdateRequest;
+import net.orion.facelinked.profile.Profile;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -84,5 +85,14 @@ public class NetworkService {
 
     public List<NetworkMessage> getMessagesAfterId(String networkId, Long id) {
         return networkMessageRepository.findByMillisGreaterThanAndNetworkId(id, networkId);
+    }
+
+    public void deleteNetworkMessages(Profile username) {
+        var networkMember = new NetworkMember();
+        networkMember.setMemberId(username.getUsername());
+        networkMember.setMemberName(username.getName());
+        networkMember.setMemberProfilePicturePath(username.getProfilePicturePath());
+
+        networkMessageRepository.deleteAllBySenderId(networkMember);
     }
 }

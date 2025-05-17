@@ -14,4 +14,6 @@ public interface PostRepository extends CrudRepository<Post, PrimaryKey> {
     List<Post> findByUserIdOrderByMillisDesc(String username);
 
     List<Post> findTop5ByUserIdOrderByMillisDesc(String userId);
+
+    void deleteAllByUserId(String userId);
 }

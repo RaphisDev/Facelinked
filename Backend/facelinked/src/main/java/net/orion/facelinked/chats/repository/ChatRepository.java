@@ -20,4 +20,8 @@ public interface ChatRepository extends CrudRepository<ChatMessage, AutoPrimaryK
     public List<ChatMessage> findBySenderId(String senderId);
 
     public List<ChatMessage> findByMillisGreaterThanAndReceiverId(Long idIsGreaterThan, String receiverId);
+
+    void deleteAllBySenderId(String senderId);
+
+    void deleteAllByReceiverId(String receiverId);
 }

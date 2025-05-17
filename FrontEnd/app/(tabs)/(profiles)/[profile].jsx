@@ -115,6 +115,7 @@ export default function Profile() {
             });
             if (data.ok) {
                 let profileInfos = await data.json();
+                setProfileImages(profileInfos.profilePicturePath.split(','));
                 profileInfos.profilePicturePath = profileInfos.profilePicturePath.split(',')[0];
                 setProfileInfos(profileInfos);
                 setFriendsSearchResults(profileInfos.friends ? profileInfos.friends : []);
@@ -140,8 +141,6 @@ export default function Profile() {
                         SecureStore.setItem('profile', JSON.stringify(profileInfos));
                     }
                 }
-
-                setProfileImages(profileInfos.profilePicturePath.split(','));
 
                 // Mock friend requests
                 if (profileName.current === username.current) {
@@ -177,9 +176,10 @@ export default function Profile() {
     }
 
     async function newMainProfilePicture(path) {
-        let profilePictures;
-        profilePictures = [...profileImages];
-        const lastMain = profilePictures[0];
+        let profilePictures = [...profileImages];
+        const lastMain = profilePictures.at(0);
+        const indexOfPath = profilePictures.indexOf(path);
+        profilePictures.splice(indexOfPath, 1);
         profilePictures[0] = path;
         profilePictures.push(lastMain);
 
@@ -189,13 +189,14 @@ export default function Profile() {
                 "Authorization": `Bearer ${token.current}`,
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                profilePicturePath: profilePictures
-            })
+            body: JSON.stringify([
+                ...profilePictures
+            ])
         })
 
         if (response.ok) {
             setProfileImages(profilePictures)
+            setProfileInfos(prevState => ({...prevState, profilePicturePath: profilePictures[0]}))
         }
     }
 
@@ -206,6 +207,7 @@ export default function Profile() {
                 mediaTypes: "images",
                 allowsMultipleSelection: true,
                 quality: 0.8,
+                selectionLimit: 6 - profileImages.length,
             });
 
             if (!result.canceled) {
@@ -217,51 +219,50 @@ export default function Profile() {
             console.error('Error picking image:', error);
             return;
         }
-        let path;
-
-        let tempImage;
-        const manipResult = await ImageManipulator.manipulate(
-            image).resize({width: 500});
-        const renderedImage = await manipResult.renderAsync();
-        const savedImage = await renderedImage.saveAsync({format: SaveFormat.JPEG, compress: 0.7});
-        tempImage = savedImage.uri;
-
-        const bucketResponse = await fetch(`${ip}/profile/upload`, {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`,
-            }
-        });
-        if (bucketResponse.ok) {
-            const url = await bucketResponse.text();
-
-            const response = await fetch(tempImage);
-            const blob = await response.blob();
-
-            await fetch(url, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": blob.type
-                },
-                body: blob,
-            });
-            path = url.split("?")[0];
-        } else {
-            showAlert({
-                title: 'Error',
-                message: 'An error occurred while uploading your image. Please try again later.',
-                buttons: [
-                    {
-                        text: 'OK',
-                        onPress: () => {}
-                    },
-                ],
-            })
-            return;
-        }
-
         let newProfileImages = [...profileImages];
-        newProfileImages.push(path);
+
+        for (const singleImage of image) {
+            let tempImage;
+            const manipResult = await ImageManipulator.manipulate(
+                singleImage).resize({width: 500});
+            const renderedImage = await manipResult.renderAsync();
+            const savedImage = await renderedImage.saveAsync({format: SaveFormat.JPEG, compress: 0.7});
+            tempImage = savedImage.uri;
+
+            const bucketResponse = await fetch(`${ip}/profile/upload`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token.current}`,
+                }
+            });
+            if (bucketResponse.ok) {
+                const url = await bucketResponse.text();
+
+                const response = await fetch(tempImage);
+                const blob = await response.blob();
+
+                await fetch(url, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": blob.type
+                    },
+                    body: blob,
+                });
+                newProfileImages.push(url.split("?")[0]);
+            } else {
+                showAlert({
+                    title: 'Error',
+                    message: 'An error occurred while uploading your image. Please try again later.',
+                    buttons: [
+                        {
+                            text: 'OK',
+                            onPress: () => {}
+                        },
+                    ],
+                })
+                return;
+            }
+        }
 
         const response = await fetch(`${ip}/profile/update/profilePicture`, {
             method: 'PUT',
@@ -269,13 +270,14 @@ export default function Profile() {
                 "Authorization": `Bearer ${token.current}`,
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                profilePicturePath: newProfileImages
-            })
+            body: JSON.stringify([
+                ...newProfileImages
+            ])
         })
 
         if (response.ok) {
             setProfileImages(newProfileImages);
+            setProfileInfos(prevState => ({...prevState, profilePicturePath: newProfileImages[0]}))
         }
     }
 
@@ -283,7 +285,10 @@ export default function Profile() {
         let newProfileImages = [...profileImages];
 
         if (path === profileImages[0]) {
-            newProfileImages.splice(1);
+            if (profileImages.length === 1) {
+                return;
+            }
+            newProfileImages.splice(0,1);
         } else {
             newProfileImages = newProfileImages.filter(image => image !== path);
         }
@@ -294,13 +299,14 @@ export default function Profile() {
                 "Authorization": `Bearer ${token.current}`,
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                profilePicturePath: newProfileImages
-            })
+            body: JSON.stringify([
+                ...newProfileImages
+            ])
         })
 
         if(response.ok) {
             setProfileImages(newProfileImages);
+            setProfileInfos(prevState => ({...prevState, profilePicturePath: newProfileImages[0]}));
         }
     }
 
@@ -316,7 +322,7 @@ export default function Profile() {
             setPosts(prevState => {
                 const newPosts = [...prevState];
                 const index = newPosts.findIndex(post => post.id.millis === post.id.millis);
-                if (newPosts[index].likes.contains(username.current)) {
+                if (newPosts[index].likes.some((item) => item === username.current)) {
                     newPosts[index].likes = newPosts[index].likes.filter(like => like !== username.current);
                 } else {
                     newPosts[index].likes.push(username.current);
@@ -402,8 +408,8 @@ export default function Profile() {
         // Create a temporary post with optimistic UI update
         setPosts([{
             title: postInputText,
-            content: selectedPostImages, 
-            likes: 0, 
+            content: selectedPostImages,
+            likes: 0,
             millis: Date.now()
         }, ...cachedPosts.current]);
 
@@ -578,11 +584,11 @@ export default function Profile() {
     const openPostDetails = (post) => {
         setSelectedPost(post);
         setComments(
-            post.comments.length > 0 ? post.comments.map((comment) => {let newComment = comment;
-            newComment.id = comments.findIndex(comment);
+            post.comments.length > 0 ? post.comments.map((comment) => {let newComment = {};
+            newComment.id = comments.findIndex((_comment) => _comment === comment);
             newComment.author = comment.split('Ð')[0];
-            newComment.text = comment.split('Ð')[2];
             newComment.profilePicturePath = comment.split('Ð')[1];
+            newComment.text = JSON.parse(comment.split('Ð')[2]).comment;
             return newComment;
             }) : []
         );
@@ -610,7 +616,7 @@ export default function Profile() {
         setComments(prevState => [...prevState, newComment]);
         setCommentText("");
 
-        const status = await fetch(`${ip}/profile/posts/${profileName.current}/${selectedPost.id}`, {
+        const status = await fetch(`${ip}/profile/posts/${profileName.current}/${selectedPost.id.millis}`, {
             method: 'POST',
             headers: {
                 "Authorization": `Bearer ${token.current}`,
@@ -839,7 +845,7 @@ export default function Profile() {
             <SafeAreaView className="bg-blue-50/50 dark:bg-dark-primary w-full h-full">
                 {/* Header with settings and search buttons */}
                 <View className="flex-row justify-between items-center px-4 pt-2 pb-2">
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         onPress={() => router.push('/settings')}
                         className="w-10 h-10 rounded-full bg-gray-500/20 items-center justify-center"
                         activeOpacity={0.7}
@@ -847,8 +853,8 @@ export default function Profile() {
                         <Ionicons name="settings-outline" size={22} color="#3B82F6" />
                     </TouchableOpacity>
 
-                    <TouchableOpacity 
-                        onPress={handleAddBar} 
+                    <TouchableOpacity
+                        onPress={handleAddBar}
                         className="w-10 h-10 rounded-full bg-gray-500/20 items-center justify-center"
                         activeOpacity={0.7}
                     >
@@ -859,14 +865,14 @@ export default function Profile() {
                     <View className="px-4 pt-2 pb-2 z-10">
                         <View className="flex-row items-center bg-white/90 rounded-full px-4 py-2 border border-gray-200 shadow-sm">
                             <Ionicons name="search" size={18} color="#64748B" />
-                            <TextInput 
+                            <TextInput
                                 onEndEditing={(t) => {
                                     if (t.nativeEvent.text.trim().length === 0 && showInput) {
                                         handleAddBar();
                                     }
-                                }} 
-                                autoCorrect={false} 
-                                ref={input} 
+                                }}
+                                autoCorrect={false}
+                                ref={input}
                                 onChangeText={(text) => {
                                     if (text.trim().length > 0) {
                                         setIsSearching(true);
@@ -895,11 +901,11 @@ export default function Profile() {
                                     else if (text.length < 2) {
                                         setSearchResults([]);
                                     }
-                                }} 
-                                placeholder="Search for users..." 
+                                }}
+                                placeholder="Search for users..."
                                 placeholderTextColor="#94A3B8"
-                                autoCapitalize="none" 
-                                className="flex-1 ml-2 text-gray-700 outline-none py-2" 
+                                autoCapitalize="none"
+                                className="flex-1 ml-2 text-gray-700 outline-none py-2"
                                 onSubmitEditing={(e) => {
                                     if (e.nativeEvent.text.trim().length > 0 && searchResults.length > 0 && isSearching) {
                                         input.current.focus();
@@ -913,8 +919,8 @@ export default function Profile() {
                     </View>
                 )}
                 <View style={{display: isSearching ? "flex" : "none"}} className="h-full w-full bg-white dark:bg-dark-primary">
-                    <FlatList 
-                        data={searchResults} 
+                    <FlatList
+                        data={searchResults}
                         ListEmptyComponent={() => (
                             <View className="flex-1 items-center justify-center mt-10">
                                 <View className="w-20 h-20 mb-4 items-center justify-center bg-blue-100/70 rounded-full">
@@ -923,7 +929,7 @@ export default function Profile() {
                                 <Text className="text-center text-xl font-semibold text-gray-800">No results</Text>
                                 <Text className="text-center text-gray-500 mt-2">Try a different search term</Text>
                             </View>
-                        )} 
+                        )}
                         renderItem={(item) =>
                         <View>
                             <TouchableOpacity onPress={() => {
@@ -947,10 +953,10 @@ export default function Profile() {
                     contentContainerStyle={{ paddingVertical: 10 }}
                     />
                 </View>
-                <ScrollView 
-                    scrollEventThrottle={400} 
-                    ref={scrollView} 
-                    contentContainerStyle={{ 
+                <ScrollView
+                    scrollEventThrottle={400}
+                    ref={scrollView}
+                    contentContainerStyle={{
                         paddingBottom: 40,
                         maxWidth: isDesktop ? '1200px' : '100%',
                         alignSelf: 'center',
@@ -976,7 +982,7 @@ export default function Profile() {
                     {/* Back button for navigation */}
                     {profileName.current !== username.current && (
                         <View className={`${isDesktop ? 'mx-auto max-w-4xl' : 'mx-4'} mt-4`}>
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 onPress={() => {
 
                                     if(cachedProfileName.length === 0)
@@ -1037,9 +1043,9 @@ export default function Profile() {
                                     <View className="py-3">
                                         {profileName.current !== username.current ? (
                                             <View className="space-y-2">
-                                                <TouchableOpacity 
-                                                    onPress={() => router.navigate(`/chats/${profile}`)} 
-                                                    activeOpacity={0.7} 
+                                                <TouchableOpacity
+                                                    onPress={() => router.navigate(`/chats/${profile}`)}
+                                                    activeOpacity={0.7}
                                                     className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg py-3 px-4 shadow-sm"
                                                 >
                                                     <View className="flex-row items-center justify-center">
@@ -1048,9 +1054,9 @@ export default function Profile() {
                                                     </View>
                                                 </TouchableOpacity>
 
-                                                <TouchableOpacity 
-                                                    onPress={() => setShowModal(true)} 
-                                                    activeOpacity={0.7} 
+                                                <TouchableOpacity
+                                                    onPress={() => setShowModal(true)}
+                                                    activeOpacity={0.7}
                                                     className="bg-white border border-gray-200 rounded-lg py-3 px-4 shadow-sm"
                                                     style={{ position: 'relative' }}
                                                 >
@@ -1059,27 +1065,27 @@ export default function Profile() {
                                                         <Text className="text-gray-700 font-medium ml-2">Friends</Text>
                                                     </View>
                                                     {hasFriendRequests && profileName.current === username.current && (
-                                                        <View 
-                                                            style={{ 
-                                                                position: 'absolute', 
-                                                                top: -5, 
-                                                                right: -5, 
-                                                                backgroundColor: '#EF4444', 
-                                                                width: 16, 
-                                                                height: 16, 
+                                                        <View
+                                                            style={{
+                                                                position: 'absolute',
+                                                                top: -5,
+                                                                right: -5,
+                                                                backgroundColor: '#EF4444',
+                                                                width: 16,
+                                                                height: 16,
                                                                 borderRadius: 8,
                                                                 borderWidth: 2,
                                                                 borderColor: 'white',
-                                                            }} 
+                                                            }}
                                                         />
                                                     )}
                                                 </TouchableOpacity>
                                             </View>
                                         ) : (
                                             <View className="space-y-2">
-                                                <TouchableOpacity 
-                                                    onPress={initEditProfile} 
-                                                    activeOpacity={0.7} 
+                                                <TouchableOpacity
+                                                    onPress={initEditProfile}
+                                                    activeOpacity={0.7}
                                                     className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg py-3 px-4 shadow-sm"
                                                 >
                                                     <View className="flex-row items-center justify-center">
@@ -1088,9 +1094,9 @@ export default function Profile() {
                                                     </View>
                                                 </TouchableOpacity>
 
-                                                <TouchableOpacity 
-                                                    onPress={() => setShowModal(true)} 
-                                                    activeOpacity={0.7} 
+                                                <TouchableOpacity
+                                                    onPress={() => setShowModal(true)}
+                                                    activeOpacity={0.7}
                                                     className="bg-white border border-gray-200 rounded-lg py-3 px-4 shadow-sm"
                                                     style={{ position: 'relative' }}
                                                 >
@@ -1099,18 +1105,18 @@ export default function Profile() {
                                                         <Text className="text-gray-700 font-medium ml-2">Friends</Text>
                                                     </View>
                                                     {hasFriendRequests && profileName.current === username.current && (
-                                                        <View 
-                                                            style={{ 
-                                                                position: 'absolute', 
-                                                                top: -5, 
-                                                                right: -5, 
-                                                                backgroundColor: '#EF4444', 
-                                                                width: 16, 
-                                                                height: 16, 
+                                                        <View
+                                                            style={{
+                                                                position: 'absolute',
+                                                                top: -5,
+                                                                right: -5,
+                                                                backgroundColor: '#EF4444',
+                                                                width: 16,
+                                                                height: 16,
                                                                 borderRadius: 8,
                                                                 borderWidth: 2,
                                                                 borderColor: 'white',
-                                                            }} 
+                                                            }}
                                                         />
                                                     )}
                                                 </TouchableOpacity>
@@ -1179,14 +1185,14 @@ export default function Profile() {
 
                                 <View className="flex-row justify-between mt-4">
                                     <View className="flex-1 pr-4">
-                                        <FlatList 
-                                            scrollEnabled={false} 
+                                        <FlatList
+                                            scrollEnabled={false}
                                             data={[
                                                 {id: "age", icon: "calendar", value: `${calculateAge(new Date(profileInfos?.dateOfBirth))} years old`},
                                                 {id: "location", icon: "location", value: profileInfos.location},
                                                 {id: "hobbies", icon: "heart", value: profileInfos.hobbies},
                                                 {id: "relationshipStatus", icon: "people", value: profileInfos.inRelationship ? "In a relationship" : "Single"},
-                                            ]} 
+                                            ]}
                                             renderItem={({item}) => (
                                                 <View className="flex-row items-center mb-3">
                                                     <View className="w-8 h-8 rounded-full bg-blue-100 items-center justify-center mr-3">
@@ -1233,9 +1239,9 @@ export default function Profile() {
                             <View className="px-4 py-4 bg-gray-50 border-t border-gray-100">
                                 {profileName.current !== username.current ? (
                                     <View className={isDesktop ? 'space-y-2' : 'flex-row justify-between'}>
-                                        <TouchableOpacity 
-                                            onPress={() => router.navigate(`/chats/${profile}`)} 
-                                            activeOpacity={0.7} 
+                                        <TouchableOpacity
+                                            onPress={() => router.navigate(`/chats/${profile}`)}
+                                            activeOpacity={0.7}
                                             className={`bg-blue-500 ${isDesktop ? 'mb-3' : 'flex-1 mr-2'} ${isDesktop ? 'rounded-lg' : 'rounded-full'} py-3 shadow-sm`}
                                         >
                                             <View className="flex-row items-center justify-center">
@@ -1244,9 +1250,9 @@ export default function Profile() {
                                             </View>
                                         </TouchableOpacity>
 
-                                        <TouchableOpacity 
-                                            onPress={() => setShowModal(true)} 
-                                            activeOpacity={0.7} 
+                                        <TouchableOpacity
+                                            onPress={() => setShowModal(true)}
+                                            activeOpacity={0.7}
                                             className={`bg-white border border-gray-200 ${isDesktop ? '' : 'flex-1 ml-2'} ${isDesktop ? 'rounded-lg' : 'rounded-full'} py-3 shadow-sm`}
                                             style={{ position: 'relative' }}
                                         >
@@ -1255,27 +1261,27 @@ export default function Profile() {
                                                 <Text className="text-gray-700 font-medium ml-2">Friends</Text>
                                             </View>
                                             {hasFriendRequests && profileName.current === username.current && (
-                                                <View 
-                                                    style={{ 
-                                                        position: 'absolute', 
-                                                        top: -5, 
-                                                        right: 10, 
-                                                        backgroundColor: '#EF4444', 
-                                                        width: 16, 
-                                                        height: 16, 
+                                                <View
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: -5,
+                                                        right: 10,
+                                                        backgroundColor: '#EF4444',
+                                                        width: 16,
+                                                        height: 16,
                                                         borderRadius: 8,
                                                         borderWidth: 2,
                                                         borderColor: 'white',
-                                                    }} 
+                                                    }}
                                                 />
                                             )}
                                         </TouchableOpacity>
                                     </View>
                                 ) : (
                                     <View className={isDesktop ? 'space-y-2' : 'flex-row justify-between'}>
-                                        <TouchableOpacity 
-                                            onPress={initEditProfile} 
-                                            activeOpacity={0.7} 
+                                        <TouchableOpacity
+                                            onPress={initEditProfile}
+                                            activeOpacity={0.7}
                                             className={`bg-blue-500 ${isDesktop ? 'mb-3' : 'flex-1 mr-2'} ${isDesktop ? 'rounded-lg' : 'rounded-full'} py-3 shadow-sm`}
                                         >
                                             <View className="flex-row items-center justify-center">
@@ -1284,9 +1290,9 @@ export default function Profile() {
                                             </View>
                                         </TouchableOpacity>
 
-                                        <TouchableOpacity 
-                                            onPress={() => setShowModal(true)} 
-                                            activeOpacity={0.7} 
+                                        <TouchableOpacity
+                                            onPress={() => setShowModal(true)}
+                                            activeOpacity={0.7}
                                             className={`bg-white border border-gray-200 ${isDesktop ? '' : 'flex-1 ml-2'} ${isDesktop ? 'rounded-lg' : 'rounded-full'} py-3 shadow-sm`}
                                             style={{ position: 'relative' }}
                                         >
@@ -1295,18 +1301,18 @@ export default function Profile() {
                                                 <Text className="text-gray-700 font-medium ml-2">Friends</Text>
                                             </View>
                                             {hasFriendRequests && profileName.current === username.current && (
-                                                <View 
-                                                    style={{ 
-                                                        position: 'absolute', 
-                                                        top: -5, 
-                                                        right: 10, 
-                                                        backgroundColor: '#EF4444', 
-                                                        width: 16, 
-                                                        height: 16, 
+                                                <View
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: -5,
+                                                        right: 10,
+                                                        backgroundColor: '#EF4444',
+                                                        width: 16,
+                                                        height: 16,
                                                         borderRadius: 8,
                                                         borderWidth: 2,
                                                         borderColor: 'white',
-                                                    }} 
+                                                    }}
                                                 />
                                             )}
                                         </TouchableOpacity>
@@ -1319,9 +1325,9 @@ export default function Profile() {
                         <View className={`flex-row justify-between ${isDesktop ? "space-x-20" : ""} items-center px-5 py-4 border-b border-gray-100`}>
                             <Text className="text-gray-800 dark:text-dark-text font-bold text-xl">Posts</Text>
                             {profileName.current === username.current &&
-                                <TouchableOpacity 
-                                    onPress={createPost} 
-                                    activeOpacity={0.7} 
+                                <TouchableOpacity
+                                    onPress={createPost}
+                                    activeOpacity={0.7}
                                     className="rounded-3xl px-6 bg-blue-500 p-2 shadow-sm"
                                 >
                                     <Ionicons name="add" size={22} className="text-center" color="white" />
@@ -1329,9 +1335,9 @@ export default function Profile() {
                             }
                         </View>
                     </View>
-                    <FlatList 
-                        keyExtractor={(items) => items.millis} 
-                        scrollEnabled={false} 
+                    <FlatList
+                        keyExtractor={(items) => items.millis}
+                        scrollEnabled={false}
                         ListEmptyComponent={
                             <View className={`items-center justify-center mt-4 py-16 ${isDesktop ? 'mx-auto w-3/4 mt-7' : 'mx-4'} bg-white rounded-xl shadow-sm`}>
                                 <View className="w-16 h-16 mb-4 items-center justify-center bg-blue-100/70 rounded-full">
@@ -1340,9 +1346,9 @@ export default function Profile() {
                                 <Text className="text-gray-800 dark:text-dark-text text-center font-semibold text-lg">No posts yet</Text>
                                 <Text className="text-gray-500 text-center mt-1">Posts will appear here</Text>
                             </View>
-                        } 
+                        }
                         data={posts}
-                        style={{width: "100%"}} 
+                        style={{width: "100%"}}
                         contentContainerStyle={{
                             paddingBottom: 60,
                             maxWidth: isDesktop ? '1200px' : '100%',
@@ -1369,11 +1375,11 @@ export default function Profile() {
                                                           <Ionicons name="image-outline" size={24} color="#64748B" />
                                                       </TouchableOpacity>
 
-                                                      <TextInput 
+                                                      <TextInput
                                                           onChangeText={(text) => {
-                                                              scrollView.current.scrollToEnd(); 
+                                                              scrollView.current.scrollToEnd();
                                                               setPostInputText(text)
-                                                          }} 
+                                                          }}
                                                           onKeyPress={(key) => {
                                                               if (key.nativeEvent.key === "Enter" && postInputText.trim().length > 0) {
                                                                   sendPost();
@@ -1381,12 +1387,12 @@ export default function Profile() {
                                                               else if (postInputText.trim().length === 0 && key.nativeEvent.key === "Enter") {
                                                                   setPosts(cachedPosts.current);
                                                               }
-                                                          }} 
-                                                          ref={newPostInput} 
+                                                          }}
+                                                          ref={newPostInput}
                                                           //onEndEditing={() => setPosts(cachedPosts.current)}
-                                                          multiline={true} 
-                                                          placeholderTextColor="#9CA3AF" 
-                                                          placeholder="What's on your mind?" 
+                                                          multiline={true}
+                                                          placeholderTextColor="#9CA3AF"
+                                                          placeholder="What's on your mind?"
                                                           className="flex-1 text-gray-800 outline-none p-2"
                                                       />
 
@@ -1419,7 +1425,7 @@ export default function Profile() {
                                           </KeyboardAvoidingView>)
                                   } else {
                                       return (
-                                          <TouchableOpacity 
+                                          <TouchableOpacity
                                               onPress={() => openPostDetails(items.item)}
                                               className={`w-full ${isDesktop ? "px-8" : "px-4"} mt-4`}
                                               activeOpacity={0.8}
@@ -1452,24 +1458,24 @@ export default function Profile() {
                                 >
                                     <Ionicons name="person-add" size={22} color="#3B82F6" />
                                     {hasFriendRequests && profileName.current === username.current && (
-                                        <View 
-                                            style={{ 
-                                                position: 'absolute', 
-                                                top: -5, 
-                                                right: -5, 
-                                                backgroundColor: '#EF4444', 
-                                                width: 16, 
-                                                height: 16, 
+                                        <View
+                                            style={{
+                                                position: 'absolute',
+                                                top: -5,
+                                                right: -5,
+                                                backgroundColor: '#EF4444',
+                                                width: 16,
+                                                height: 16,
                                                 borderRadius: 8,
                                                 borderWidth: 2,
                                                 borderColor: 'white',
-                                            }} 
+                                            }}
                                         />
                                     )}
                                 </TouchableOpacity>
                             )}
 
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 onPress={() => setShowModal(false)}
                                 className="bg-gray-100 rounded-full p-2"
                             >
@@ -1482,19 +1488,19 @@ export default function Profile() {
                     <View className="px-6 pt-4 pb-2">
                         <View className="flex-row items-center bg-gray-100 rounded-full px-4 py-2">
                             <Ionicons name="search" size={18} color="#64748B" />
-                            <TextInput 
+                            <TextInput
                                 onChangeText={(text) => {
                                     if (text.length >= 1) {
-                                        setFriendsSearchResults(profileInfos.friends?.filter((friend) => 
-                                            friend.memberName.toLowerCase().includes(text.toLowerCase()) || 
+                                        setFriendsSearchResults(profileInfos.friends?.filter((friend) =>
+                                            friend.memberName.toLowerCase().includes(text.toLowerCase()) ||
                                             friend.memberId.toLowerCase().includes(text.toLowerCase())
                                         ));
                                     } else if (text.length === 0) {
                                         setFriendsSearchResults(profileInfos.friends ? profileInfos.friends : []);
                                     }
-                                }} 
-                                className="flex-1 ml-2 text-gray-700 outline-none" 
-                                placeholder="Search friends..." 
+                                }}
+                                className="flex-1 ml-2 text-gray-700 outline-none"
+                                placeholder="Search friends..."
                                 placeholderTextColor="#94A3B8"
                                 autoCapitalize="none"
                             />
@@ -1502,8 +1508,8 @@ export default function Profile() {
                     </View>
 
                     {/* Friends List */}
-                    <FlatList 
-                        className="px-4" 
+                    <FlatList
+                        className="px-4"
                         data={friendsSearchResults}
                         ListEmptyComponent={() => (
                             <View className="flex-1 items-center justify-center py-16">
@@ -1512,25 +1518,25 @@ export default function Profile() {
                                 </View>
                                 <Text className="text-center text-xl font-semibold text-gray-800">No friends found</Text>
                                 <Text className="text-center text-gray-500 mt-2 max-w-xs">
-                                    {profileName.current === username.current 
-                                        ? "Connect with others to build your network" 
+                                    {profileName.current === username.current
+                                        ? "Connect with others to build your network"
                                         : `${profileInfos.name} hasn't added any friends yet`}
                                 </Text>
                             </View>
                         )}
                         renderItem={(item) => (
                             <View className="mb-2">
-                                <TouchableOpacity 
+                                <TouchableOpacity
                                     onPress={() => {
                                         setShowModal(false);
                                         router.navigate(`/${item.item.memberId}`);
-                                    }} 
-                                    activeOpacity={0.7} 
+                                    }}
+                                    activeOpacity={0.7}
                                     className="flex-row justify-between items-center p-3 bg-white rounded-xl border border-gray-100 shadow-sm"
                                 >
                                     <View className="flex-row items-center">
-                                        <Image 
-                                            source={{uri: item.item.memberProfilePicturePath}} 
+                                        <Image
+                                            source={{uri: item.item.memberProfilePicturePath}}
                                             style={{width: 50, height: 50, borderRadius: 25}}
                                             className="bg-gray-200"
                                         />
@@ -1541,7 +1547,7 @@ export default function Profile() {
                                     </View>
 
                                     <View className="flex-row">
-                                        <TouchableOpacity 
+                                        <TouchableOpacity
                                             onPress={() => router.navigate(`/chats/${item.item.memberId}`)}
                                             className="mr-2 w-10 h-10 rounded-full bg-blue-100 items-center justify-center"
                                         >
@@ -1549,7 +1555,7 @@ export default function Profile() {
                                         </TouchableOpacity>
 
                                         {profileName.current === username.current && (
-                                            <TouchableOpacity 
+                                            <TouchableOpacity
                                                 onPress={async() => {
                                                     showAlert({
                                                         title: `Remove Friend`,
@@ -1567,8 +1573,8 @@ export default function Profile() {
                                                             }
                                                         ],
                                                     });
-                                                }} 
-                                                activeOpacity={0.7} 
+                                                }}
+                                                activeOpacity={0.7}
                                                 className="w-10 h-10 rounded-full bg-red-100 items-center justify-center"
                                             >
                                                 <Ionicons name="person-remove-outline" size={18} color="#EF4444" />
@@ -1583,15 +1589,15 @@ export default function Profile() {
                     {/* Add Friend Button */}
                     {profileName.current !== username.current && (
                         <View className="px-6 py-4 border-t border-gray-100">
-                            <TouchableOpacity 
-                                onPress={() => AddFriend()} 
+                            <TouchableOpacity
+                                onPress={() => AddFriend()}
                                 className="bg-blue-500 rounded-lg py-3 shadow-sm"
                                 activeOpacity={0.8}
                             >
                                 <View className="flex-row items-center justify-center">
-                                    <Ionicons 
-                                        name={isAdded ? "checkmark-sharp" : "person-add-outline"} 
-                                        size={20} 
+                                    <Ionicons
+                                        name={isAdded ? "checkmark-sharp" : "person-add-outline"}
+                                        size={20}
                                         color="white"
                                     />
                                     <Animated.Text style={[{opacity: fadeAnim}, {color: 'white', fontWeight: '600', marginLeft: 8}]}>
@@ -1613,7 +1619,7 @@ export default function Profile() {
                 >
                     <View className="bg-white dark:bg-dark-primary h-full w-full" style={isDesktop ? {maxWidth: 800, marginHorizontal: 'auto'} : {}}>
                         <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 onPress={() => setShowPostModal(false)}
                                 className="p-2 rounded-full"
                             >
@@ -1638,7 +1644,7 @@ export default function Profile() {
                                                     {selectedPost.content && selectedPost.content.length > 0 && (
                                                         <View className="mb-4">
                                                             {selectedPost.content.length === 1 ? (
-                                                                <Image 
+                                                                <Image
                                                                     source={{uri: selectedPost.content[0]}}
                                                                     style={{width: '100%', aspectRatio: 1, borderRadius: 10}}
                                                                     contentFit="cover"
@@ -1653,12 +1659,12 @@ export default function Profile() {
                                                                         <TouchableOpacity activeOpacity={0.8} onPress={() => {if(selectedPost.content.length > 1) {setShowPostModal(false); setCachedPost(selectedPost); setShowPostImageGallery(true); setCurrentPostImage(item); setPostImageGallery(selectedPost.content)}}}
                                                                             className="p-1"
                                                                             style={{
-                                                                                width: selectedPost.content.length === 2 ? '50%' : 
+                                                                                width: selectedPost.content.length === 2 ? '50%' :
                                                                                     selectedPost.content.length >= 4 ? '50%' : '33.33%',
                                                                             }}
                                                                         >
                                                                             <View className="rounded-lg overflow-hidden" style={{aspectRatio: 1}}>
-                                                                                <Image 
+                                                                                <Image
                                                                                     source={{uri: item}}
                                                                                     style={{width: '100%', height: '100%'}}
                                                                                     contentFit="cover"
@@ -1718,7 +1724,7 @@ export default function Profile() {
                                             multiline
                                             maxLength={500}
                                         />
-                                        <TouchableOpacity 
+                                        <TouchableOpacity
                                             onPress={addComment}
                                             disabled={commentText.trim() === ''}
                                             className={`ml-2 p-2 rounded-full ${commentText.trim() === '' ? 'bg-gray-300' : 'bg-blue-500'}`}
@@ -1861,7 +1867,7 @@ export default function Profile() {
                 <SafeAreaView className="bg-white h-full w-full" style={isDesktop ? {maxWidth: 1200, marginHorizontal: 'auto'} : {}}>
                     {/* Header with controls */}
                     <View className="flex-row justify-between items-center px-6 py-4">
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             onPress={() => setShowImageGallery(false)}
                             className="w-10 h-10 rounded-full bg-gray-200 items-center justify-center"
                         >
@@ -1871,7 +1877,7 @@ export default function Profile() {
                         <Text className="text-gray-800 text-xl font-bold">Photo Gallery</Text>
 
                         {profileName.current === username.current && (
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 className="w-10 h-10 rounded-full bg-blue-100 items-center justify-center"
                                 onPress={() => addProfilePicture()}
                             >
@@ -1884,16 +1890,16 @@ export default function Profile() {
                     <View className="flex-1">
                         {/* Featured image - large display */}
                         <View className="w-full aspect-square mb-4 rounded-xl overflow-hidden shadow-sm">
-                            <Image 
+                            <Image
                                 source={{uri: profileImages[0]}}
                                 style={{
-                                    width: '100%', 
+                                    width: '100%',
                                     height: '100%',
                                 }}
                                 contentFit="cover"
                             />
 
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 className="absolute inset-0 bg-black/10 items-center justify-center"
                                 onPress={() => setSelectedImage(profileImages[0])}
                                 activeOpacity={0.9}
@@ -1911,8 +1917,8 @@ export default function Profile() {
                         </View>
 
                         {/* Image carousel */}
-                        <ScrollView 
-                            horizontal 
+                        <ScrollView
+                            horizontal
                             showsHorizontalScrollIndicator={false}
                             contentContainerStyle={{paddingHorizontal: 16}}
                             className="mb-6"
@@ -1923,11 +1929,11 @@ export default function Profile() {
                                         onPress={() => setSelectedImage(image)}
                                         activeOpacity={0.9}
                                     >
-                                        <Image 
+                                        <Image
                                             source={{uri: image}}
                                             style={{
-                                                width: 120, 
-                                                height: 120, 
+                                                width: 120,
+                                                height: 120,
                                                 borderRadius: 12,
                                                 borderWidth: index === 0 ? 3 : 0,
                                                 borderColor: '#3B82F6',
@@ -1963,8 +1969,8 @@ export default function Profile() {
                                 </View>
                             ))}
 
-                            {profileName.current === username.current && profileImages.length < 5 && (
-                                <TouchableOpacity 
+                            {profileName.current === username.current && profileImages.length < 6 && (
+                                <TouchableOpacity
                                     className="w-120 h-120 items-center justify-center bg-gray-100 rounded-xl border-2 border-dashed border-gray-300"
                                     style={{width: 120, height: 120}}
                                     onPress={() => addProfilePicture()}
@@ -1981,14 +1987,14 @@ export default function Profile() {
                         <Modal visible={!!selectedImage || isDesktop} transparent={true} onRequestClose={() => setSelectedImage(null)}>
                             <SafeAreaProvider>
                             <SafeAreaView className="flex-1 bg-black">
-                                <Animated.View 
+                                <Animated.View
                                     className="flex-row justify-between items-center px-6 py-4"
                                     style={{
                                         opacity: 1,
                                         transform: [{ translateY: 0 }]
                                     }}
                                 >
-                                    <TouchableOpacity 
+                                    <TouchableOpacity
                                         onPress={() => isDesktop ? setShowImageGallery(false) : setSelectedImage(null)}
                                         className="w-10 h-10 rounded-full bg-gray-800/50 items-center justify-center"
                                     >
@@ -2002,7 +2008,7 @@ export default function Profile() {
 
                                         {profileName.current === username.current && (
                                             <>
-                                                <TouchableOpacity 
+                                                <TouchableOpacity
                                                     className="w-10 h-10 rounded-full bg-blue-500/50 items-center justify-center mr-3"
                                                     onPress={() => {
                                                         // Set as profile picture
@@ -2015,7 +2021,7 @@ export default function Profile() {
                                                     <Ionicons name="star" size={20} color="white" />
                                                 </TouchableOpacity>
 
-                                                <TouchableOpacity 
+                                                <TouchableOpacity
                                                     className="w-10 h-10 rounded-full bg-red-500/50 items-center justify-center"
                                                     onPress={() => {
                                                         // Remove image
@@ -2035,7 +2041,7 @@ export default function Profile() {
                                 <View className="flex-1 justify-center">
                                     <View className="absolute left-4 top-1/2 z-10">
                                         {profileImages.findIndex(img => img === selectedImage) > 0 && (
-                                            <TouchableOpacity 
+                                            <TouchableOpacity
                                                 className="w-12 h-12 rounded-full bg-black/30 items-center justify-center"
                                                 onPress={() => {
                                                     const currentIndex = profileImages.findIndex(img => img === selectedImage);
@@ -2049,7 +2055,7 @@ export default function Profile() {
                                         )}
                                     </View>
 
-                                    <Image 
+                                    <Image
                                         source={{uri: selectedImage}}
                                         style={{width: '100%', height: '80%'}}
                                         contentFit="contain"
@@ -2058,7 +2064,7 @@ export default function Profile() {
 
                                     <View className="absolute right-4 top-1/2 z-10">
                                         {profileImages.findIndex(img => img === selectedImage) < profileImages.length - 1 && (
-                                            <TouchableOpacity 
+                                            <TouchableOpacity
                                                 className="w-12 h-12 rounded-full bg-black/30 items-center justify-center"
                                                 onPress={() => {
                                                     const currentIndex = profileImages.findIndex(img => img === selectedImage);
@@ -2081,7 +2087,7 @@ export default function Profile() {
                                             onPress={() => setSelectedImage(image)}
                                             className="mx-1"
                                         >
-                                            <View 
+                                            <View
                                                 style={{
                                                     width: image === selectedImage ? 10 : 8,
                                                     height: image === selectedImage ? 10 : 8,
@@ -2096,8 +2102,8 @@ export default function Profile() {
 
                                 {/* Image navigation */}
                                 <View className="px-6 py-4">
-                                    <ScrollView 
-                                        horizontal 
+                                    <ScrollView
+                                        horizontal
                                         showsHorizontalScrollIndicator={false}
                                         contentContainerStyle={{paddingHorizontal: 8}}
                                     >
@@ -2110,11 +2116,11 @@ export default function Profile() {
                                                     transform: [{ scale: image === selectedImage ? 1.1 : 1 }]
                                                 }}
                                             >
-                                                <Image 
+                                                <Image
                                                     source={{uri: image}}
                                                     style={{
-                                                        width: 60, 
-                                                        height: 60, 
+                                                        width: 60,
+                                                        height: 60,
                                                         borderRadius: 8,
                                                         borderWidth: image === selectedImage ? 3 : 0,
                                                         borderColor: '#3B82F6',
@@ -2159,14 +2165,14 @@ export default function Profile() {
                                 </TouchableOpacity>
 
                                 <View className="flex-row justify-end mt-4">
-                                    <TouchableOpacity 
+                                    <TouchableOpacity
                                         onPress={() => handleFriendRequest(item.id, false)}
                                         className="bg-gray-200 rounded-full px-4 py-2 mr-3"
                                     >
                                         <Text className="text-gray-800 font-medium">Decline</Text>
                                     </TouchableOpacity>
 
-                                    <TouchableOpacity 
+                                    <TouchableOpacity
                                         onPress={() => handleFriendRequest(item.id, true)}
                                         className="bg-blue-500 rounded-full px-4 py-2"
                                     >
@@ -2231,7 +2237,7 @@ export default function Profile() {
 
                         <View className="mb-6 flex-row items-center">
                             <Text className="text-gray-700 font-medium mr-4">In a relationship</Text>
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 onPress={() => setEditRelationship(!editRelationship)}
                                 className={`w-6 h-6 rounded-md border ${editRelationship ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-300'} justify-center items-center`}
                             >
@@ -2240,14 +2246,14 @@ export default function Profile() {
                         </View>
 
                         <View className="flex-row justify-end mt-8 mb-12">
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 onPress={() => setShowEditProfile(false)}
                                 className="bg-gray-200 rounded-full px-6 py-3 mr-4"
                             >
                                 <Text className="text-gray-800 font-medium">Cancel</Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 onPress={saveProfile}
                                 className="bg-blue-500 rounded-full px-6 py-3"
                             >

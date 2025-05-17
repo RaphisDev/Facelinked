@@ -2,9 +2,11 @@ package net.orion.facelinked.profile.controller;
 
 import lombok.RequiredArgsConstructor;
 import net.orion.facelinked.auth.services.UserService;
+import net.orion.facelinked.chats.ChatService;
 import net.orion.facelinked.config.PrimaryKey;
 import net.orion.facelinked.networks.NetworkMember;
 import net.orion.facelinked.networks.NetworkMessage;
+import net.orion.facelinked.networks.service.NetworkService;
 import net.orion.facelinked.profile.FaceSmash;
 import net.orion.facelinked.profile.Post;
 import net.orion.facelinked.profile.Profile;
@@ -32,6 +34,8 @@ public class ProfileController {
     private final UserService userService;
     private final StorageService storageService;
     private final FaceSmashService faceSmashService;
+    private final ChatService chatService;
+    private final NetworkService networkService;
 
     @ResponseStatus(HttpStatus.FOUND)
     @GetMapping("/{username}")
@@ -59,7 +63,7 @@ public class ProfileController {
 
     @ResponseStatus(HttpStatus.ACCEPTED)
     @PutMapping("/update")
-    public void Update(@AuthenticationPrincipal UserDetails userDetails, UpdateProfile body) {
+    public void Update(@AuthenticationPrincipal UserDetails userDetails, @RequestBody UpdateProfile body) {
         var username = userService.findByEmail(userDetails.getUsername()).getUserName();
 
         profileService.updateProfile(username, body);
@@ -70,10 +74,14 @@ public class ProfileController {
     private void Delete(@AuthenticationPrincipal UserDetails userDetails, @RequestParam(value = "onlyUser", required = false) Boolean onlyUser)
     {
         var username = userService.findByEmail(userDetails.getUsername()).getUserName();
+        var profile = profileService.findByUsername(username);
 
         userService.deleteUser(username);
         if (onlyUser == null || !onlyUser) {
             profileService.deleteProfile(username);
+            profileService.deletePosts(username);
+            chatService.deleteChatMessages(username);
+            networkService.deleteNetworkMessages(profile);
         }
     }
     @ResponseStatus(HttpStatus.CREATED)
