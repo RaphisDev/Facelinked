@@ -6,7 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
       <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile].jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/icon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/index.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,9 +83,9 @@
       <recent name="D:\Projects\FaceLinked\FrontEnd\assets\images" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/assets/images" />
       <recent name="$PROJECT_DIR$/android" />
       <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/assets/images" />
       <recent name="D:\Projects\FaceLinked\FrontEnd\assets\images" />
       <recent name="D:\Projects\FaceLinked\FrontEnd\assets" />
     </key>
@@ -292,7 +292,7 @@
       <workItem from="1747503270790" duration="18488000" />
       <workItem from="1747523565446" duration="332000" />
       <workItem from="1747524002722" duration="94000" />
-      <workItem from="1747575704214" duration="508000" />
+      <workItem from="1747575704214" duration="6606000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />

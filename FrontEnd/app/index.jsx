@@ -149,9 +149,6 @@ const Index = () => {
 
 const HomePage = () => {
 
-    //look if newPassword, existingPassword, newMail, existing mail works
-    //look if images work on android, web, ios
-
     const [currentPage, setCurrentPage] = useState('landing');
     const previousPage = useRef(null);
     const [showPassword, setShowPassword] = useState(false);
@@ -323,284 +320,325 @@ const Footer = ({navigateTo, scrollContent}) => {
 
 const LandingPage = ({navigateTo, scrollContent}) => {
 
-    return (
-        <MotiScrollView
-            from={{ opacity: 0, scale: 1}}
-            animate={{ opacity: 1, scale: 1 }}
+    if (Platform.OS === "web") {
+        return (
+            <MotiScrollView
+                from={{opacity: 0, scale: 1}}
+                animate={{opacity: 1, scale: 1}}
+                transition={{
+                    type: 'timing',
+                    duration: 175,
+                }}
+                ref={scrollContent}
+            >
+                <View style={Platform.OS !== "web" ? {backgroundColor: "#E5E7EB"} : {}}
+                      className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
+                    <NavigationBar navigateTo={navigateTo} scrollContent={scrollContent}/>
+
+                    {Platform.OS === "web" && (<>
+                        <View className="relative flex items-center justify-center py-20 px-4">
+                            <View className="absolute inset-0 z-0">
+                                <View
+                                    className="absolute top-0 left-1/4 w-64 h-64 rounded-full bg-blue-300/20 filter blur-3xl"></View>
+                                <View
+                                    className="absolute bottom-0 right-1/4 w-80 h-80 rounded-full bg-blue-400/20 filter blur-3xl"></View>
+                            </View>
+
+                            <View
+                                className="relative z-10 backdrop-blur-sm bg-white/40 rounded-3xl shadow-xl border border-white/50 p-14 max-w-4xl mx-auto text-center">
+                                <Text className="text-4xl text-center md:text-6xl font-bold text-gray-800 mb-8">
+                                    Welcome to the <Text
+                                    className="bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">new
+                                    social media.</Text>
+                                </Text>
+                                <Text className="text-xl text-center text-gray-700 mb-10 max-w-2xl mx-auto">
+                                    A platform designed for authentic connections, real friendships, and meaningful
+                                    interactions.
+                                </Text>
+                                <View className="flex flex-col sm:flex-row gap-5 justify-center">
+                                    <Pressable onPress={() => navigateTo("register")}
+                                               className="px-8 py-4 rounded-full bg-gradient-to-r from-blue-500 to-blue-700 text-white font-medium text-lg hover:from-blue-600 hover:to-blue-800 shadow-lg shadow-blue-200/50 transition duration-300">
+                                        Join Now
+                                    </Pressable>
+                                    <Pressable onPress={() => navigateTo("login")}
+                                               className="px-8 py-4 rounded-full backdrop-blur-md bg-white/70 border border-blue-200 text-blue-600 font-medium text-lg hover:bg-white transition duration-300">
+                                        Login
+                                    </Pressable>
+                                </View>
+                            </View>
+                        </View>
+
+                        <div className="py-20 px-4">
+                            <div className="max-w-6xl mx-auto">
+                                <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">What
+                                    We're About</h2>
+
+                                <div className="grid md:grid-cols-3 gap-8">
+                                    {/* Chat Feature */}
+                                    <div
+                                        className="backdrop-blur-md bg-white/40 rounded-2xl p-8 shadow-xl border border-white/50 flex flex-col items-center text-center transform hover:scale-105 transition duration-300">
+                                        <div
+                                            className="bg-gradient-to-br from-blue-400 to-blue-600 p-5 rounded-full mb-6 shadow-lg">
+                                            <MessageCircle className="h-8 w-8 text-white"/>
+                                        </div>
+                                        <h3 className="text-2xl font-bold mb-4 text-gray-800">Chat</h3>
+                                        <p className="text-gray-700">
+                                            Get to know the people around you better. Start meaningful conversations
+                                            that
+                                            matter.
+                                        </p>
+                                    </div>
+
+                                    {/* Connect Feature */}
+                                    <div
+                                        className="backdrop-blur-md bg-white/40 rounded-2xl p-8 shadow-xl border border-white/50 flex flex-col items-center text-center transform hover:scale-105 transition duration-300">
+                                        <div
+                                            className="bg-gradient-to-br from-blue-400 to-blue-600 p-5 rounded-full mb-6 shadow-lg">
+                                            <Users className="h-8 w-8 text-white"/>
+                                        </div>
+                                        <h3 className="text-2xl font-bold mb-4 text-gray-800">Connect</h3>
+                                        <p className="text-gray-700">
+                                            Connect with others in a meaningful way. We are not about fake profiles, but
+                                            about real friends.
+                                        </p>
+                                    </div>
+
+                                    {/* Share Feature */}
+                                    <div
+                                        className="backdrop-blur-md bg-white/40 rounded-2xl p-8 shadow-xl border border-white/50 flex flex-col items-center text-center transform hover:scale-105 transition duration-300">
+                                        <div
+                                            className="bg-gradient-to-br from-blue-400 to-blue-600 p-5 rounded-full mb-6 shadow-lg">
+                                            <Share2 className="h-8 mr-1 w-8 text-white"/>
+                                        </div>
+                                        <h3 className="text-2xl font-bold mb-4 text-gray-800">Share</h3>
+                                        <p className="text-gray-700">
+                                            We are not about likes, but about real connections. We are not about fake
+                                            news, but about real
+                                            stories.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* How It Works - With Flowing Background */}
+                        <div className="relative py-20 px-4">
+                            <div className="absolute inset-0 z-0">
+                                <div
+                                    className="absolute top-0 right-0 w-96 h-96 rounded-full bg-blue-200/30 filter blur-3xl"></div>
+                                <div
+                                    className="absolute bottom-0 left-0 w-96 h-96 rounded-full bg-blue-300/30 filter blur-3xl"></div>
+                            </div>
+
+                            <div className="relative z-10 max-w-6xl mx-auto">
+                                <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">How
+                                    It Works</h2>
+
+                                <div className="grid md:grid-cols-3 gap-10">
+                                    <div
+                                        className="backdrop-blur-md bg-white/40 rounded-2xl p-8 shadow-xl border border-white/50 flex flex-col items-center text-center">
+                                        <div
+                                            className="h-16 w-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-xl font-bold mb-6 shadow-lg">1
+                                        </div>
+                                        <h3 className="text-2xl font-bold mb-4 text-gray-800">Create Your Profile</h3>
+                                        <p className="text-gray-700">Show your authentic self with a simple, genuine
+                                            profile that highlights
+                                            your real interests.</p>
+                                    </div>
+
+                                    <div
+                                        className="backdrop-blur-md bg-white/40 rounded-2xl p-8 shadow-xl border border-white/50 flex flex-col items-center text-center">
+                                        <div
+                                            className="h-16 w-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-xl font-bold mb-6 shadow-lg">2
+                                        </div>
+                                        <h3 className="text-2xl font-bold mb-4 text-gray-800">Connect With People</h3>
+                                        <p className="text-gray-700">Find friends and meet people near you who share
+                                            your values and
+                                            interests.</p>
+                                    </div>
+
+                                    <div
+                                        className="backdrop-blur-md bg-white/40 rounded-2xl p-8 shadow-xl border border-white/50 flex flex-col items-center text-center">
+                                        <div
+                                            className="h-16 w-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-xl font-bold mb-6 shadow-lg">3
+                                        </div>
+                                        <h3 className="text-2xl font-bold mb-4 text-gray-800">Build Real
+                                            Relationships</h3>
+                                        <p className="text-gray-700">Enjoy meaningful conversations and experiences that
+                                            strengthen your
+                                            connections.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Community Section */}
+                        <div className="relative py-20 px-4 overflow-hidden">
+                            <div className="absolute inset-0 z-0 bg-gradient-to-r from-blue-500 to-blue-700">
+                                <div
+                                    className="absolute top-0 left-1/3 w-64 h-64 rounded-full bg-white/10 filter blur-3xl"></div>
+                                <div
+                                    className="absolute bottom-0 right-1/3 w-80 h-80 rounded-full bg-white/10 filter blur-3xl"></div>
+                            </div>
+
+                            <div
+                                className="relative z-10 backdrop-blur-md bg-white/10 rounded-3xl border border-white/20 p-10 max-w-4xl mx-auto text-center">
+                                <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Join Our Growing
+                                    Community</h2>
+                                <p className="text-xl text-white/90 mb-10">
+                                    Many people are already rediscovering what social media should be about - real
+                                    people, real
+                                    connections, and real stories.
+                                </p>
+                                <div className="flex flex-col sm:flex-row gap-5 justify-center">
+                                    <button onClick={() => navigateTo("register")}
+                                            className="px-8 py-4 rounded-full bg-white text-blue-600 font-medium text-lg hover:bg-blue-50 shadow-lg transition duration-300">
+                                        Join Now
+                                    </button>
+                                    <button onClick={() => navigateTo("login")}
+                                            className="px-8 py-4 rounded-full bg-transparent border border-white text-white font-medium text-lg hover:bg-white/10 transition duration-300">
+                                        Login
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Testimonials */}
+                        <div className="py-20 px-4">
+                            <div className="max-w-6xl mx-auto">
+                                <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">What
+                                    Our Users Say</h2>
+
+                                <div className="grid md:grid-cols-3 gap-8">
+                                    <div
+                                        className="backdrop-blur-md bg-white/40 rounded-2xl p-8 shadow-xl border border-white/50">
+                                        <p className="text-gray-700 mb-6">"I've made more meaningful connections in one
+                                            month on Facelinked than
+                                            I did in years on other platforms."</p>
+                                        <div className="flex items-center">
+                                            <div
+                                                className="h-12 w-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full mr-4 flex items-center justify-center">
+                                                <span className="text-white font-bold">T</span>
+                                            </div>
+                                            <div>
+                                                <h4 className="font-medium text-gray-800">Tom</h4>
+                                                <p className="text-gray-500">Member since 2024</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        className="backdrop-blur-md bg-white/40 rounded-2xl p-8 shadow-xl border border-white/50">
+                                        <p className="text-gray-700 mb-6">"Finally, a social network that values quality
+                                            over quantity. I feel
+                                            heard and seen on Facelinked."</p>
+                                        <div className="flex items-center">
+                                            <div
+                                                className="h-12 w-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full mr-4 flex items-center justify-center">
+                                                <span className="text-white font-bold">LM</span>
+                                            </div>
+                                            <div>
+                                                <h4 className="font-medium text-gray-800">Lukas M.</h4>
+                                                <p className="text-gray-500">Member since 2025</p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div
+                                        className="backdrop-blur-md bg-white/40 rounded-2xl p-8 shadow-xl border border-white/50">
+                                        <p className="text-gray-700 mb-12">"Real friends. Real Connections. Real
+                                            stories."</p>
+                                        <div className="flex items-center">
+                                            <div
+                                                className="h-12 w-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full mr-4 flex items-center justify-center">
+                                                <span className="text-white font-bold">RT</span>
+                                            </div>
+                                            <div>
+                                                <h4 className="font-medium text-gray-800">Raphael T.</h4>
+                                                <p className="text-gray-500">Member since 2024</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </>)}
+
+                    <Footer navigateTo={navigateTo} scrollContent={scrollContent}/>
+                </View>
+            </MotiScrollView>)
+    } else {
+        return (
+        <MotiView
+            from={{opacity: 0, scale: 1}}
+            animate={{opacity: 1, scale: 1}}
             transition={{
                 type: 'timing',
                 duration: 175,
             }}
-            ref={scrollContent}
         >
         <View style={Platform.OS !== "web" ? {backgroundColor: "#E5E7EB"} : {}} className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
             <NavigationBar navigateTo={navigateTo} scrollContent={scrollContent} />
 
             {Platform.OS !== "web" && (
-            <View className="flex-1 items-center justify-center min-h-screen pt-safe-or-12 py-20 px-4" style={Platform.OS === "ios" ? {marginTop: 50} : {}}>
-                <View
+                <View className="flex-1 items-center justify-center min-h-screen pt-safe-or-12 py-20 px-4" style={Platform.OS === "ios" ? {marginTop: 50} : {}}>
+                    <View
                         className="relative z-10 backdrop-blur-sm mb-safe-offset-10 bg-white rounded-3xl border border-white/50 p-8 w-full max-w-4xl mx-auto flex-1 flex flex-col justify-between">
-                    <View className="flex-1 justify-start mt-32 items-center">
-                    <Text style={{fontSize: 32, fontWeight: 'bold', textAlign: 'center', color: '#1f2937'}}>
-                            Welcome to <Text style={{color: '#2563eb'}}>Facelinked</Text>
-                    </Text>
-                        <Text style={{fontSize: 16, textAlign: 'center', color: '#4b5563', maxWidth: 320, alignSelf: 'center', marginTop: 16}}>
-                        A platform designed for authentic connections, real friendships, and meaningful interactions.
-                    </Text>
-                    </View>
+                        <View className="flex-1 justify-start mt-32 items-center">
+                            <Text style={{fontSize: 32, fontWeight: 'bold', textAlign: 'center', color: '#1f2937'}}>
+                                Welcome to <Text style={{color: '#2563eb'}}>Facelinked</Text>
+                            </Text>
+                            <Text style={{fontSize: 16, textAlign: 'center', color: '#4b5563', maxWidth: 320, alignSelf: 'center', marginTop: 16}}>
+                                A platform designed for authentic connections, real friendships, and meaningful interactions.
+                            </Text>
+                        </View>
 
-                    <View className="flex flex-col gap-4 items-center w-full mt-auto">
+                        <View className="flex flex-col gap-4 items-center w-full mt-auto">
                             <TouchableOpacity activeOpacity={0.7} onPress={() => navigateTo("register")}
-                                style={{
-                                    backgroundColor: '#3b82f6',
-                                    paddingHorizontal: 32,
-                                    paddingVertical: 16,
-                                    borderRadius: 100,
-                                    shadowColor: '#93c5fd',
-                                    shadowOffset: {width: 0, height: 4},
-                                    shadowOpacity: 0.3,
-                                    shadowRadius: 6,
-                                    elevation: 4,
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    width: '100%'
-                                }}>
+                                              style={{
+                                                  backgroundColor: '#3b82f6',
+                                                  paddingHorizontal: 32,
+                                                  paddingVertical: 16,
+                                                  borderRadius: 100,
+                                                  shadowColor: '#93c5fd',
+                                                  shadowOffset: {width: 0, height: 4},
+                                                  shadowOpacity: 0.3,
+                                                  shadowRadius: 6,
+                                                  elevation: 4,
+                                                  flexDirection: 'row',
+                                                  alignItems: 'center',
+                                                  justifyContent: 'center',
+                                                  width: '100%'
+                                              }}>
                                 <Text style={{color: 'white', fontWeight: '500', fontSize: 18, marginRight: 8}}>Join Now</Text>
                             </TouchableOpacity>
                             <TouchableOpacity activeOpacity={0.7} onPress={() => navigateTo("login")}
-                                style={{
-                                    backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                                    paddingHorizontal: 32,
-                                    paddingVertical: 16,
-                                    borderRadius: 100,
-                                    borderWidth: 1,
-                                    borderColor: '#bfdbfe',
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    width: '100%'
-                                }}>
+                                              style={{
+                                                  backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                                                  paddingHorizontal: 32,
+                                                  paddingVertical: 16,
+                                                  borderRadius: 100,
+                                                  borderWidth: 1,
+                                                  borderColor: '#bfdbfe',
+                                                  flexDirection: 'row',
+                                                  alignItems: 'center',
+                                                  justifyContent: 'center',
+                                                  width: '100%'
+                                              }}>
                                 <Text style={{color: '#2563eb', fontWeight: '500', fontSize: 18}}>Login</Text>
                             </TouchableOpacity>
+                        </View>
+                        <View className="mt-8 flex-row items-center justify-center">
+                            <View className="h-1 w-1 bg-blue-400 rounded-full mr-1 opacity-70"></View>
+                            <View className="h-1 w-1 bg-blue-500 rounded-full mr-1 opacity-80"></View>
+                            <View className="h-1 w-1 bg-blue-600 rounded-full opacity-90"></View>
+                        </View>
                     </View>
-                    <View className="mt-8 flex-row items-center justify-center">
-                        <View className="h-1 w-1 bg-blue-400 rounded-full mr-1 opacity-70"></View>
-                        <View className="h-1 w-1 bg-blue-500 rounded-full mr-1 opacity-80"></View>
-                        <View className="h-1 w-1 bg-blue-600 rounded-full opacity-90"></View>
-                    </View>
-                </View>
-            </View>)}
-
-            {Platform.OS === "web" && ( <>
-            <View className="relative flex items-center justify-center py-20 px-4">
-                <View className="absolute inset-0 z-0">
-                    <View
-                        className="absolute top-0 left-1/4 w-64 h-64 rounded-full bg-blue-300/20 filter blur-3xl"></View>
-                    <View
-                        className="absolute bottom-0 right-1/4 w-80 h-80 rounded-full bg-blue-400/20 filter blur-3xl"></View>
-                </View>
-
-                <View
-                    className="relative z-10 backdrop-blur-sm bg-white/40 rounded-3xl shadow-xl border border-white/50 p-14 max-w-4xl mx-auto text-center">
-                    <Text className="text-4xl text-center md:text-6xl font-bold text-gray-800 mb-8">
-                        Welcome to the <Text
-                        className="bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">new social media.</Text>
-                    </Text>
-                    <Text className="text-xl text-center text-gray-700 mb-10 max-w-2xl mx-auto">
-                        A platform designed for authentic connections, real friendships, and meaningful interactions.
-                    </Text>
-                    <View className="flex flex-col sm:flex-row gap-5 justify-center">
-                        <Pressable onPress={() => navigateTo("register")}
-                                className="px-8 py-4 rounded-full bg-gradient-to-r from-blue-500 to-blue-700 text-white font-medium text-lg hover:from-blue-600 hover:to-blue-800 shadow-lg shadow-blue-200/50 transition duration-300">
-                            Join Now
-                        </Pressable>
-                        <Pressable onPress={() => navigateTo("login")}
-                                className="px-8 py-4 rounded-full backdrop-blur-md bg-white/70 border border-blue-200 text-blue-600 font-medium text-lg hover:bg-white transition duration-300">
-                            Login
-                        </Pressable>
-                    </View>
-                </View>
-            </View>
-
-            <div className="py-20 px-4">
-                <div className="max-w-6xl mx-auto">
-                    <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">What
-                        We're About</h2>
-
-                    <div className="grid md:grid-cols-3 gap-8">
-                        {/* Chat Feature */}
-                        <div
-                            className="backdrop-blur-md bg-white/40 rounded-2xl p-8 shadow-xl border border-white/50 flex flex-col items-center text-center transform hover:scale-105 transition duration-300">
-                            <div className="bg-gradient-to-br from-blue-400 to-blue-600 p-5 rounded-full mb-6 shadow-lg">
-                                <MessageCircle className="h-8 w-8 text-white"/>
-                            </div>
-                            <h3 className="text-2xl font-bold mb-4 text-gray-800">Chat</h3>
-                            <p className="text-gray-700">
-                                Get to know the people around you better. Start meaningful conversations that
-                                matter.
-                            </p>
-                        </div>
-
-                        {/* Connect Feature */}
-                        <div
-                            className="backdrop-blur-md bg-white/40 rounded-2xl p-8 shadow-xl border border-white/50 flex flex-col items-center text-center transform hover:scale-105 transition duration-300">
-                            <div className="bg-gradient-to-br from-blue-400 to-blue-600 p-5 rounded-full mb-6 shadow-lg">
-                                <Users className="h-8 w-8 text-white"/>
-                            </div>
-                            <h3 className="text-2xl font-bold mb-4 text-gray-800">Connect</h3>
-                            <p className="text-gray-700">
-                                Connect with others in a meaningful way. We are not about fake profiles, but about real friends.
-                            </p>
-                        </div>
-
-                        {/* Share Feature */}
-                        <div
-                            className="backdrop-blur-md bg-white/40 rounded-2xl p-8 shadow-xl border border-white/50 flex flex-col items-center text-center transform hover:scale-105 transition duration-300">
-                            <div className="bg-gradient-to-br from-blue-400 to-blue-600 p-5 rounded-full mb-6 shadow-lg">
-                                <Share2 className="h-8 mr-1 w-8 text-white"/>
-                            </div>
-                            <h3 className="text-2xl font-bold mb-4 text-gray-800">Share</h3>
-                            <p className="text-gray-700">
-                                We are not about likes, but about real connections. We are not about fake news, but about real
-                                stories.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* How It Works - With Flowing Background */}
-            <div className="relative py-20 px-4">
-                <div className="absolute inset-0 z-0">
-                    <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-blue-200/30 filter blur-3xl"></div>
-                    <div className="absolute bottom-0 left-0 w-96 h-96 rounded-full bg-blue-300/30 filter blur-3xl"></div>
-                </div>
-
-                <div className="relative z-10 max-w-6xl mx-auto">
-                    <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">How
-                        It Works</h2>
-
-                    <div className="grid md:grid-cols-3 gap-10">
-                        <div
-                            className="backdrop-blur-md bg-white/40 rounded-2xl p-8 shadow-xl border border-white/50 flex flex-col items-center text-center">
-                            <div
-                                className="h-16 w-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-xl font-bold mb-6 shadow-lg">1
-                            </div>
-                            <h3 className="text-2xl font-bold mb-4 text-gray-800">Create Your Profile</h3>
-                            <p className="text-gray-700">Show your authentic self with a simple, genuine profile that highlights
-                                your real interests.</p>
-                        </div>
-
-                        <div
-                            className="backdrop-blur-md bg-white/40 rounded-2xl p-8 shadow-xl border border-white/50 flex flex-col items-center text-center">
-                            <div
-                                className="h-16 w-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-xl font-bold mb-6 shadow-lg">2
-                            </div>
-                            <h3 className="text-2xl font-bold mb-4 text-gray-800">Connect With People</h3>
-                            <p className="text-gray-700">Find friends and meet people near you who share your values and
-                                interests.</p>
-                        </div>
-
-                        <div
-                            className="backdrop-blur-md bg-white/40 rounded-2xl p-8 shadow-xl border border-white/50 flex flex-col items-center text-center">
-                            <div
-                                className="h-16 w-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white text-xl font-bold mb-6 shadow-lg">3
-                            </div>
-                            <h3 className="text-2xl font-bold mb-4 text-gray-800">Build Real Relationships</h3>
-                            <p className="text-gray-700">Enjoy meaningful conversations and experiences that strengthen your
-                                connections.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Community Section */}
-            <div className="relative py-20 px-4 overflow-hidden">
-                <div className="absolute inset-0 z-0 bg-gradient-to-r from-blue-500 to-blue-700">
-                    <div className="absolute top-0 left-1/3 w-64 h-64 rounded-full bg-white/10 filter blur-3xl"></div>
-                    <div className="absolute bottom-0 right-1/3 w-80 h-80 rounded-full bg-white/10 filter blur-3xl"></div>
-                </div>
-
-                <div
-                    className="relative z-10 backdrop-blur-md bg-white/10 rounded-3xl border border-white/20 p-10 max-w-4xl mx-auto text-center">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Join Our Growing Community</h2>
-                    <p className="text-xl text-white/90 mb-10">
-                        Many people are already rediscovering what social media should be about - real people, real
-                        connections, and real stories.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-5 justify-center">
-                        <button onClick={() => navigateTo("register")}
-                                className="px-8 py-4 rounded-full bg-white text-blue-600 font-medium text-lg hover:bg-blue-50 shadow-lg transition duration-300">
-                            Join Now
-                        </button>
-                        <button onClick={() => navigateTo("login")}
-                                className="px-8 py-4 rounded-full bg-transparent border border-white text-white font-medium text-lg hover:bg-white/10 transition duration-300">
-                            Login
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Testimonials */}
-            <div className="py-20 px-4">
-                <div className="max-w-6xl mx-auto">
-                    <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">What
-                        Our Users Say</h2>
-
-                    <div className="grid md:grid-cols-3 gap-8">
-                        <div className="backdrop-blur-md bg-white/40 rounded-2xl p-8 shadow-xl border border-white/50">
-                            <p className="text-gray-700 mb-6">"I've made more meaningful connections in one month on Facelinked than
-                                I did in years on other platforms."</p>
-                            <div className="flex items-center">
-                                <div
-                                    className="h-12 w-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full mr-4 flex items-center justify-center">
-                                    <span className="text-white font-bold">T</span>
-                                </div>
-                                <div>
-                                    <h4 className="font-medium text-gray-800">Tom</h4>
-                                    <p className="text-gray-500">Member since 2024</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="backdrop-blur-md bg-white/40 rounded-2xl p-8 shadow-xl border border-white/50">
-                            <p className="text-gray-700 mb-6">"Finally, a social network that values quality over quantity. I feel
-                                heard and seen on Facelinked."</p>
-                            <div className="flex items-center">
-                                <div
-                                    className="h-12 w-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full mr-4 flex items-center justify-center">
-                                    <span className="text-white font-bold">LM</span>
-                                </div>
-                                <div>
-                                    <h4 className="font-medium text-gray-800">Lukas M.</h4>
-                                    <p className="text-gray-500">Member since 2025</p>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div className="backdrop-blur-md bg-white/40 rounded-2xl p-8 shadow-xl border border-white/50">
-                            <p className="text-gray-700 mb-12">"Real friends. Real Connections. Real stories."</p>
-                            <div className="flex items-center">
-                                <div
-                                    className="h-12 w-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full mr-4 flex items-center justify-center">
-                                    <span className="text-white font-bold">RT</span>
-                                </div>
-                                <div>
-                                    <h4 className="font-medium text-gray-800">Raphael T.</h4>
-                                    <p className="text-gray-500">Member since 2024</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            </>)}
-
-            <Footer navigateTo={navigateTo} scrollContent={scrollContent} />
+                </View>)}
         </View>
-        </MotiScrollView>)
+        </MotiView>)
+    }
 }
 
 const AuthPages = ({ navigateTo, currentPage, previousPage, showPassword, setShowPassword}) => {

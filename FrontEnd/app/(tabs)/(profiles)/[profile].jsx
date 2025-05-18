@@ -28,8 +28,7 @@
                 export default function Profile() {
 
                     const navigation = useNavigation();
-                    let {profile} = useLocalSearchParams();
-                    const searchParams = useSearchParams()
+                    let {profile, post} = useLocalSearchParams();
                     const router = useRouter();
                     const insets = useSafeAreaInsets();
 
@@ -182,9 +181,8 @@
                                 const posts = await data.json();
                                 setPosts(posts);
 
-                                const post = searchParams.get('post');
-                                if (post) {
-                                    const postId = posts.find((postId) => postId.id.millis === post);
+                                if (post !== undefined) {
+                                    const postId = posts.find((postItem) => Number.parseInt(postItem.id.millis) === Number.parseInt(post));
                                     if (postId) {
                                         setSelectedPost(postId);
                                         setShowPostModal(true);
