@@ -23,11 +23,13 @@
                 import {showAlert} from "../../../components/PopUpModalView";
                 import {SafeAreaProvider, SafeAreaView, useSafeAreaInsets} from "react-native-safe-area-context";
                 import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
+                import {useSearchParams} from "expo-router/build/hooks";
 
                 export default function Profile() {
 
                     const navigation = useNavigation();
-                    let {profile, post} = useLocalSearchParams();
+                    let {profile} = useLocalSearchParams();
+                    const searchParams = useSearchParams()
                     const router = useRouter();
                     const insets = useSafeAreaInsets();
 
@@ -159,7 +161,6 @@
                                     }
                                 }
 
-                                // Mock friend requests
                                 if (profileName.current === username.current) {
                                     setFriendRequests(profileInfos.friendRequests);
                                     setHasFriendRequests(profileInfos.friendRequests.length > 0);
@@ -181,6 +182,7 @@
                                 const posts = await data.json();
                                 setPosts(posts);
 
+                                const post = searchParams.get('post');
                                 if (post) {
                                     const postId = posts.find((postId) => postId.id.millis === post);
                                     if (postId) {
