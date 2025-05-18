@@ -15,6 +15,7 @@ import net.orion.facelinked.chats.ChatMessage;
 import net.orion.facelinked.chats.ChatService;
 import net.orion.facelinked.config.AutoPrimaryKey;
 import net.orion.facelinked.config.PrimaryKey;
+import net.orion.facelinked.profile.service.ProfileService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -41,6 +42,7 @@ public class ChatController {
     private final ApnsClient apnsClient;
     private final UserService userService;
     private final ChatService chatService;
+    private final ProfileService profileService;
     private SimpMessagingTemplate template;
 
     @MessageMapping("/chat")
@@ -50,6 +52,7 @@ public class ChatController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
         String sender = senderDetails.getName();
+        String senderProfilePicturePath = profileService.findByUsername(sender).getProfilePicturePath();
 
         if(sender == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
@@ -60,10 +63,10 @@ public class ChatController {
         template.convertAndSendToUser(message.getReceiver(), "/queue/messages",
                new ChatMessage(sender, message.getReceiver(), message.getContent(), new AutoPrimaryKey(null, id), message.getImages() == null ? new ArrayList<>() : message.getImages()));
 
-        sendPushNotification(message.getReceiver(), message.getContent(), sender);
+        sendPushNotification(message.getReceiver(), message.getContent(), sender, senderProfilePicturePath);
     }
 
-    public void sendPushNotification(String receiver, String message, String sender) {
+    public void sendPushNotification(String receiver, String message, String sender, String profilePictureUrl) {
         var receiverAccount = userService.findByUsername(receiver);
         if (receiverAccount.getDeviceTokens() == null) {
             return;
@@ -86,17 +89,16 @@ public class ChatController {
             if (type.equals("ios")) {
                 String escapedMessage = message.replace("\"", "\\\"").replace("\n", "\\n");
                 String escapedSender = sender.replace("\"", "\\\"");
+                String escapedProfilePictureUrl = profilePictureUrl.replace("\"", "\\\"");
 
                 String payload = "{"
                         + "\"aps\":{"
                         + "\"alert\":{\"title\":\"" + escapedSender + "\",\"body\":\"" + escapedMessage + "\"},"
                         + "\"sound\":\"default\","
                         + "\"badge\":1,"
-                        + "\"content-available\":1,"
                         + "\"mutable-content\":1"
                         + "},"
-                        + "\"sender\":\"" + escapedSender + "\","
-                        + "\"message\":\"" + escapedMessage + "\""
+                        + "\"profile_picture\":\"" + escapedProfilePictureUrl + "\""
                         + "}";
 
 
