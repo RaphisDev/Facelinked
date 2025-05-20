@@ -18,7 +18,7 @@ class WebsocketController{
 
     restart () {
         this.reset();
-        setTimeout(() => this.stompClient.activate(), 1000);
+        setTimeout(() => webSocketInstance = new WebsocketController(), 100);
     }
 
     reset ()  {

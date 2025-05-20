@@ -13,6 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService
@@ -33,6 +35,7 @@ public class AuthService
                 .name(request.getName())
                 .userName(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .deviceTokens(Collections.emptyList())
                 .build();
 
         userRepository.save(user);

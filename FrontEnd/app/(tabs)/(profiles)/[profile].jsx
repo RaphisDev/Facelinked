@@ -27,7 +27,6 @@
 
                 export default function Profile() {
 
-                    const navigation = useNavigation();
                     let {profile, post} = useLocalSearchParams();
                     const router = useRouter();
                     const insets = useSafeAreaInsets();
@@ -408,9 +407,6 @@
                             if (token.current === null) {router.replace("/")}
                         })
 
-                        navigation.setOptions({
-                            headerTitle: profileName.current !== username.current ? profileName.current : "Profile",
-                        });
                         if (cachedProfileName.at(-1) !== profileName.current) {
                             setCachedProfileName(prevState => [...prevState, profileName.current]);
                         }
