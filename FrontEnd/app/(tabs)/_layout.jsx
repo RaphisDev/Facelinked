@@ -90,11 +90,7 @@ export default function TabsLayout() {
                     headerTitleAlign: "center",
                     tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "home-sharp" : "home-outline"} size={30}/>,
                 }}/>
-                <Tabs.Screen name="networks" options={{headerTitle: "Networks",
-                    headerTitleAlign: "center",
-                    headerLeft: () => <TouchableOpacity onPress={() => router.navigate("/networks/create")}>
-                        <Ionicons className="ml-2 mb-1" name="add" size={25}/>
-                    </TouchableOpacity>,
+                <Tabs.Screen name="networks" options={{headerShown: false,
                     tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "git-merge-sharp" : "git-merge-outline"} size={30}/>
                 }}/>
                 <Tabs.Screen name="chats" options={{headerShown: false,
