@@ -38,7 +38,11 @@ class WebsocketController{
         AppState.addEventListener('change', nextAppState => {
             if (this.appState?.match(/inactive|background/) &&
                 nextAppState === 'active') {
-                if (!this.stompClient.connected) {
+                if (this.stompClient) {
+                    if (!this.stompClient.connected) {
+                        this.restart();
+                    }
+                } else {
                     this.restart();
                 }
             }
