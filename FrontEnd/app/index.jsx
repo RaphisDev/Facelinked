@@ -1998,14 +1998,14 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
     ];
 
     const handleDateChange = (event, selectedDate) => {
-        setShowDatePicker(false);
+        setShowDatePicker(!Platform.OS === 'ios');
         if (selectedDate) {
             updateFormData('birthDate', {
                 day: selectedDate.getDate(),
                 month: monthNames[selectedDate.getMonth()],
                 year: selectedDate.getFullYear()
             });
-        }
+            }
     };
 
     const renderWebDatePicker = () => (

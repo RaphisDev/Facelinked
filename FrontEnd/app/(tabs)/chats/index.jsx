@@ -71,7 +71,9 @@ export default function Chats() {
                 setFilteredChats(loadedChats.filter(chat => {
                     if (!searchQuery) return true;
                     return chat.name.toLowerCase().includes(searchQuery.toLowerCase());
-                }))
+                }));
+                await asyncStorage.setItem("chats", JSON.stringify(loadedChats));
+
             }
             stateManager.setChatState(true);
 
