@@ -22,7 +22,10 @@ public class ChatService {
     }
 
     public List<ChatMessage> findByIdAfter(Long id, String senderId) {
-        return chatRepository.findByMillisGreaterThanAndReceiverId(id, senderId);
+        var afterIdChats = new ArrayList<>(chatRepository.findByMillisGreaterThanAndReceiverId(id, senderId));
+        afterIdChats.addAll(chatRepository.findByMillisGreaterThanAndSenderId(id, senderId));
+        afterIdChats.sort(Comparator.comparing(ChatMessage::getMillis));
+        return afterIdChats;
     }
 
     public List<ChatMessage> findBySenderOrReceiverId(String senderId) {

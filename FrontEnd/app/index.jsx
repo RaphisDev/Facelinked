@@ -1287,7 +1287,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                                            'August', 'September', 'October', 'November', 'December'].indexOf(formData.birthDate.month)
                                         : formData.birthDate.month - 1,
                                     formData.birthDate.day).toISOString(),
-                        hobbies: formData.interests,
+                        hobbies: formData.interests.trim(),
                         inRelationship: formData.relationship,
                         location: formData.location,
                     }),

@@ -401,7 +401,7 @@ export default function ChatRoom() {
             await asyncStorage.setItem("lastMessageId", Date.now().toString());
         }
         catch (e) {
-            //setMessages(prevState => prevState.filter((chat) => !chat.isOptimistic)); letting the message vanish isnt a good approach to network failure either
+            //setMessages(prevState => prevState.filter((chat) => !chat.isOptimistic)); letting the message just vanish isnt a good approach to network failure either
             console.error(e);
         }
     }
@@ -589,6 +589,10 @@ export default function ChatRoom() {
                         }, 50);
                     }}
                     showsVerticalScrollIndicator={false}
+                    initialScrollIndex={messages.length > 0 ? messages.length - 1 : 0}
+                    maintainVisibleContentPosition={{
+                        minIndexForVisible: 0,
+                    }}
                     ListEmptyComponent={
                         <View style={styles.emptyChat}>
                             <Text style={styles.emptyChatText}>No messages yet.</Text>

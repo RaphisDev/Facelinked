@@ -10,6 +10,7 @@ import org.socialsignin.spring.data.dynamodb.repository.config.EnableDynamoDBRep
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 @EnableScan
@@ -24,4 +25,6 @@ public interface ChatRepository extends CrudRepository<ChatMessage, AutoPrimaryK
     void deleteAllBySenderId(String senderId);
 
     void deleteAllByReceiverId(String receiverId);
+
+    public List<ChatMessage> findByMillisGreaterThanAndSenderId(Long id, String senderId);
 }
