@@ -593,6 +593,19 @@ export default function ChatRoom() {
                     maintainVisibleContentPosition={{
                         minIndexForVisible: 0,
                     }}
+                    getItemLayout={(data, index) => {
+                        const height = 80;
+                        const dateHeaderHeight = 60;
+
+                        const item = data[index];
+                        const itemHeight = item?.type === 'date-header' ? dateHeaderHeight : height;
+
+                        return {
+                            length: itemHeight,
+                            offset: height * index,
+                            index,
+                        };
+                    }}
                     ListEmptyComponent={
                         <View style={styles.emptyChat}>
                             <Text style={styles.emptyChatText}>No messages yet.</Text>

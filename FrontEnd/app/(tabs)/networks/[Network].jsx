@@ -11,7 +11,8 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-    Text, Share, Alert
+    Text, Share, Alert,
+    KeyboardAvoidingView
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import WebSocketProvider from "../../../components/WebSocketProvider";
@@ -23,10 +24,13 @@ import ip from "../../../components/AppManager";
 import * as SecureStore from "expo-secure-store";
 import StateManager from "../../../components/StateManager";
 import {showAlert} from "../../../components/PopUpModalView";
+import * as ImagePicker from "expo-image-picker";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
+import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
 
 export default function Network() {
-
     const {Network} = useLocalSearchParams();
+    const insets = useSafeAreaInsets();
 
     const navigator = useNavigation("../");
     const router = useRouter();
@@ -36,11 +40,21 @@ export default function Network() {
     const [messages, addMessage] = useState([]);
     const messageList = useRef(null);
     const input = useRef(null);
-    const message = useRef("");
+    const [inputText, setInputText] = useState("");
     const [DataCollapse, setDataCollapse] = useState(true);
+
+    // UI state variables
+    const [keyboardHeight, setKeyboardHeight] = useState(0);
+    const [keyboardVisible, setKeyboardVisible] = useState(false);
+    const [selectedImages, setSelectedImages] = useState([]);
+    const [inputHeight, setInputHeight] = useState(40);
+    const [inputContainerHeight, setInputContainerHeight] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
 
     const initializedMessages = useRef(false);
     const loadingAdditionalMessages = useRef(false);
+    const oldestMessageId = useRef(null);
+    const hasMoreMessages = useRef(true);
 
     const token = useRef("");
     const username = useRef("");
@@ -120,15 +134,26 @@ export default function Network() {
         loadNetwork();
 
         const loadMessages = async () => {
+            setIsLoading(true);
             const loadedMessages = await asyncStorage.getItem(`networks/${Network}`) || null;
             if (loadedMessages !== null) {
-                addMessage(JSON.parse(loadedMessages));
+                const parsedMessages = JSON.parse(loadedMessages);
+                addMessage(parsedMessages);
+
+                // Set oldest message ID for pagination
+                if (parsedMessages.length > 0) {
+                    const sortedMessages = [...parsedMessages].sort((a, b) => a.millis - b.millis);
+                    oldestMessageId.current = sortedMessages[0].millis;
+                }
+
                 setTimeout(() => {
                     initializedMessages.current = true;
-                }, 1000);
+                    setIsLoading(false);
+                }, 500);
+            } else {
+                setIsLoading(false);
             }
-        }
-        loadMessages();
+        };
 
         const receiveNetworkMessages = async () => {
             let parsedNetworks = await asyncStorage.getItem("networks") || [];
@@ -138,12 +163,22 @@ export default function Network() {
 
             if (!parsedNetworks.some((network) => network.networkId === Network)) {
                 if (ws.stompClient.connected) {
+                    // Subscribe to new messages
                     ws.stompClient.subscribe(`/networks/${Network}`, async (message) => {
                         const parsedMessage = JSON.parse(message.body);
                         if (parsedMessage.senderId.memberId === username.current) {return;}
-                        addMessage((prevMessages) => [...prevMessages, {sender: parsedMessage.senderId.memberId, senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath.split(",")[0], content: parsedMessage.content, millis: parsedMessage.millis}]);
+
+                        // Add new message to state
+                        addMessage((prevMessages) => [...prevMessages, {
+                            sender: parsedMessage.senderId.memberId, 
+                            senderProfilePicturePath: parsedMessage.senderId.memberProfilePicturePath.split(",")[0], 
+                            content: parsedMessage.content, 
+                            millis: parsedMessage.millis,
+                            images: parsedMessage.images || []
+                        }]);
                     });
 
+                    // Fetch initial messages
                     const receivedMessages = await fetch(`${ip}/networks/${Network}/messages`, {
                         method: "GET",
                         headers: {
@@ -151,18 +186,35 @@ export default function Network() {
                             "Content-Type": "application/json"
                         }
                     });
+
                     if (receivedMessages.ok) {
                         const data = await receivedMessages.json();
+
+                        // Set oldest message ID for pagination
+                        if (data.length > 0) {
+                            const sortedMessages = [...data].sort((a, b) => a.millis - b.millis);
+                            oldestMessageId.current = sortedMessages[0].millis;
+                        }
+
+                        // Add messages to state
                         addMessage(prevState => [...prevState, ...data.map((message) => {
-                            return {senderProfilePicturePath: message.senderId.memberProfilePicturePath.split(",")[0], sender: message.senderId.memberId, content: message.content, millis: message.millis};
+                            return {
+                                senderProfilePicturePath: message.senderId.memberProfilePicturePath.split(",")[0], 
+                                sender: message.senderId.memberId, 
+                                content: message.content, 
+                                millis: message.millis,
+                                images: message.images || []
+                            };
                         })]);
+
                         setTimeout(() => {
                             initializedMessages.current = true;
-                        }, 1000);
+                            setIsLoading(false);
+                        }, 500);
                     }
                 }
-            }
-            else {
+            } else {
+                // For favorited networks, fetch new messages since last visit
                 if (await asyncStorage.getItem(`lastNetworkMessageId/${Network}`)) {
                     const receivedMessages = await fetch(`${ip}/networks/${Network}/afterId?id=${encodeURIComponent(await asyncStorage.getItem(`lastNetworkMessageId/${Network}`))}`, {
                         method: "GET",
@@ -175,33 +227,44 @@ export default function Network() {
                     if (receivedMessages.ok) {
                         const data = await receivedMessages.json();
 
-                        addMessage(prevState => [...prevState, ...data.map((message) => {
-                            return {
-                                senderProfilePicturePath: message.senderId.memberProfilePicturePath.split(",")[0],
-                                sender: message.senderId.memberId,
-                                content: message.content,
-                                millis: message.millis,
-                            };
-                        })]);
+                        if (data.length > 0) {
+                            // Add new messages to state
+                            addMessage(prevState => [...prevState, ...data.map((message) => {
+                                return {
+                                    senderProfilePicturePath: message.senderId.memberProfilePicturePath.split(",")[0],
+                                    sender: message.senderId.memberId,
+                                    content: message.content,
+                                    millis: message.millis,
+                                    images: message.images || []
+                                };
+                            })]);
 
-                        await asyncStorage.setItem(`lastNetworkMessageId/${Network}`, data[data.length - 1].millis.toString());
+                            // Update last message ID
+                            await asyncStorage.setItem(`lastNetworkMessageId/${Network}`, data[data.length - 1].millis.toString());
 
-                        let messages = await asyncStorage.getItem(`networks/${Network}`) || [];
-                        if (messages.length !== 0) {
-                            messages = JSON.parse(messages);
+                            // Update stored messages
+                            let messages = await asyncStorage.getItem(`networks/${Network}`) || [];
+                            if (messages.length !== 0) {
+                                messages = JSON.parse(messages);
+                            }
+                            await asyncStorage.setItem(`networks/${Network}`, JSON.stringify([...messages, ...data.map((message) => {
+                                return {
+                                    senderProfilePicturePath: message.senderId.memberProfilePicturePath.split(",")[0],
+                                    sender: message.senderId.memberId,
+                                    content: message.content,
+                                    millis: message.millis,
+                                    images: message.images || []
+                                };
+                            })]));
                         }
-                        await asyncStorage.setItem(`networks/${Network}`, JSON.stringify([...messages, ...data.map((message) => {
-                            return {
-                                senderProfilePicturePath: message.senderId.memberProfilePicturePath.split(",")[0],
-                                sender: message.senderId.memberId,
-                                content: message.content,
-                                millis: message.millis
-                            };
-                        })]));
                     }
                 }
+
+                setIsLoading(false);
             }
-        }
+        };
+
+        loadMessages();
         receiveNetworkMessages();
 
         ws.messageReceived.addListener("networkMessageReceived", async (e) => {
@@ -223,31 +286,131 @@ export default function Network() {
         }
     }, []);
 
-    async function sendMessage(message) {
+    const pickImage = async () => {
+        try {
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: "images",
+                allowsMultipleSelection: true,
+                quality: 0.8,
+            });
 
-        input.current.clear();
-        input.current.blur();
+            if (!result.canceled) {
+                setSelectedImages(prevState => [...prevState, ...result.assets.map(asset => asset.uri)]);
+            }
+        } catch (error) {
+            console.error('Error picking image:', error);
+        }
+    };
 
-        if (message === "") {return;}
+    const renderSelectedImages = () => {
+        if (!selectedImages || selectedImages.length === 0) return null;
+
+        return (
+            <View style={styles.selectedImagesContainer}>
+                <FlatList
+                    horizontal
+                    data={selectedImages}
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={({ item, index }) => (
+                        <View style={styles.selectedImageWrapper}>
+                            <Image
+                                source={{ uri: item }}
+                                style={styles.selectedImage}
+                                contentFit="cover"
+                                transition={200}
+                            />
+                            <TouchableOpacity
+                                style={styles.removeImageButton}
+                                onPress={() => {
+                                    const newImages = [...selectedImages];
+                                    newImages.splice(index, 1);
+                                    setSelectedImages(newImages);
+                                }}
+                            >
+                                <Ionicons name="close" size={16} color="white" />
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                    showsHorizontalScrollIndicator={false}
+                />
+            </View>
+        );
+    };
+
+    async function sendMessage() {
+        if (inputText.trim() === '' && selectedImages.length === 0) return;
 
         try {
+            if (ws.stompClient === null) {
+                console.error("Connect to Websocket manually");
+                return;
+            }
+
+            const messageContent = inputText.trim();
+
+            // Optimistically add message to UI
+            addMessage((prevMessages) => [...prevMessages, {
+                sender: username.current, 
+                senderProfilePicturePath: Platform.OS === "web" 
+                    ? localStorage.getItem("profilePicture")?.split(",")[0] 
+                    : SecureStore.getItem("profilePicture")?.split(",")[0], 
+                content: messageContent, 
+                millis: Date.now(),
+                isOptimistic: true,
+                images: selectedImages
+            }]);
+
+            setInputText("");
+            setSelectedImages([]);
+            setInputHeight(40);
+
+            // Upload images if any
+            let imageURls = [];
+            if (selectedImages.length > 0) {
+                for (const image of selectedImages) {
+                    let tempImage;
+                    const manipResult = await ImageManipulator.manipulate(
+                        image).resize({width: 500});
+                    const renderedImage = await manipResult.renderAsync();
+                    const savedImage = await renderedImage.saveAsync({format: SaveFormat.JPEG, compress: 0.7});
+                    tempImage = savedImage.uri;
+
+                    const bucketResponse = await fetch(`${ip}/networks/upload`, {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${token.current}`,
+                        }
+                    });
+
+                    if (bucketResponse.ok) {
+                        const url = await bucketResponse.text();
+
+                        const response = await fetch(tempImage);
+                        const blob = await response.blob();
+
+                        await fetch(url, {
+                            method: "PUT",
+                            headers: {
+                                "Content-Type": blob.type
+                            },
+                            body: blob,
+                        });
+                        imageURls.push(url.split("?")[0]);
+                    }
+                }
+            }
+
+            // Send message via WebSocket
             ws.stompClient.publish({
                 destination: `/app/networks/send`,
                 body: JSON.stringify({
                     receiver: Network,
-                    content: message,
+                    content: messageContent,
+                    images: imageURls
                 })
             });
-            let profilePicture = "";
-            if (Platform.OS === "web") {
-                profilePicture = localStorage.getItem("profilePicture");
-            }
-            else {
-                profilePicture = SecureStore.getItem("profilePicture");
-            }
 
-            addMessage((prevMessages) => [...prevMessages, {sender: username.current, senderProfilePicturePath: profilePicture.split(",")[0], content: message, millis: Date.now()}]);
-
+            // Update local storage
             if (JSON.parse(await asyncStorage.getItem("networks"))?.some((network) => network.networkId === Network)) {
                 let loadedMessages = await asyncStorage.getItem(`networks/${Network}`) || [];
                 if (loadedMessages.length !== 0) {
@@ -255,14 +418,27 @@ export default function Network() {
                 }
                 await asyncStorage.setItem(`networks/${Network}`, JSON.stringify([...loadedMessages, {
                     sender: username.current,
-                    content: message,
-                    millis: Date.now()
+                    content: messageContent,
+                    millis: Date.now(),
+                    images: imageURls
                 }]));
 
                 let loadedNetworks = await asyncStorage.getItem("networks") || [];
                 if (loadedNetworks.length !== 0) {loadedNetworks = JSON.parse(loadedNetworks);}
                 await asyncStorage.setItem("networks", JSON.stringify([...loadedNetworks.filter(network => network.networkId === Network), ...loadedNetworks.filter(network => network.networkId !== Network)]));
             }
+
+            // Update optimistic message with actual image URLs
+            addMessage(prevState => prevState.map(message => {
+                if (message.isOptimistic) {
+                    return {
+                        ...message,
+                        isOptimistic: false,
+                        images: imageURls
+                    };
+                }
+                return message;
+            }));
         }
         catch (e) {
             console.error(e);
@@ -272,6 +448,7 @@ export default function Network() {
     const translateY = useRef(new Animated.Value(0)).current;
     const translateY2 = useRef(new Animated.Value(230)).current;
     const translateY3 = useRef(new Animated.Value(150)).current;
+    const inputBarAnimation = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         const keyboardWillShow = Keyboard.addListener(
@@ -284,6 +461,15 @@ export default function Network() {
                     useNativeDriver: true,
                     easing: Easing.out(Easing.poly(1.5)),
                 }).start();
+                
+                Animated.timing(inputBarAnimation, {
+                    toValue: 1,
+                    duration: 200,
+                    useNativeDriver: false,
+                    easing: Easing.out(Easing.poly(1.5)),
+                }).start();
+                
+                setKeyboardVisible(true);
             }
         );
 
@@ -296,6 +482,15 @@ export default function Network() {
                     useNativeDriver: true,
                     easing: Easing.out(Easing.poly(4)),
                 }).start();
+                
+                Animated.timing(inputBarAnimation, {
+                    toValue: 0,
+                    duration: 200,
+                    useNativeDriver: false,
+                    easing: Easing.out(Easing.poly(4)),
+                }).start();
+                
+                setKeyboardVisible(false);
             }
         );
 
@@ -305,12 +500,247 @@ export default function Network() {
         };
     }, []);
 
-    const styles = StyleSheet.create({
-        inputContainer: {
-            padding: 8,
-            borderTopWidth: 0.2,
-            borderTopColor: '#000',
+    // Message date formatting and grouping functions
+    const formatMessageDate = (timestamp) => {
+        const messageDate = new Date(timestamp);
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        const messageDay = new Date(messageDate.getFullYear(), messageDate.getMonth(), messageDate.getDate());
+        const todayDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const yesterdayDay = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate());
+
+        if (messageDay.getTime() === todayDay.getTime()) {
+            return "Today";
+        } else if (messageDay.getTime() === yesterdayDay.getTime()) {
+            return "Yesterday";
+        } else {
+            const options = { weekday: 'long', month: 'short', day: 'numeric' };
+
+            if (messageDay.getFullYear() !== today.getFullYear()) {
+                options.year = 'numeric';
+            }
+
+            return messageDate.toLocaleDateString(undefined, options);
         }
+    };
+
+    const groupMessagesByDate = (messages) => {
+        if (!messages || messages.length === 0) return [];
+
+        const groups = [];
+        let currentDate = null;
+
+        messages.forEach(message => {
+            const timestamp = message.millis;
+            const dateString = formatMessageDate(timestamp);
+
+            if (dateString !== currentDate) {
+                currentDate = dateString;
+                groups.push({
+                    type: 'date-header',
+                    date: dateString,
+                    id: `date-${timestamp}`
+                });
+            }
+
+            groups.push({...message, id: `message-${timestamp}`});
+        });
+
+        return groups;
+    };
+
+    const DateHeader = ({ date }) => {
+        return (
+            <View style={headerStyles.container}>
+                <View style={headerStyles.line} />
+                <Text style={headerStyles.dateText}>{date}</Text>
+                <View style={headerStyles.line} />
+            </View>
+        );
+    };
+
+    const headerStyles = StyleSheet.create({
+        container: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginVertical: 16,
+            paddingHorizontal: 10,
+        },
+        line: {
+            flex: 1,
+            height: 1,
+            backgroundColor: '#E2E8F0',
+        },
+        dateText: {
+            fontSize: 12,
+            fontWeight: '500',
+            color: '#64748B',
+            marginHorizontal: 10,
+            paddingHorizontal: 12,
+            paddingVertical: 4,
+            backgroundColor: '#F1F5F9',
+            borderRadius: 12,
+            overflow: 'hidden',
+        },
+    });
+
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+        },
+        contentContainer: {
+            flex: 1,
+            backgroundColor: '#F8FAFC',
+        },
+        loadingContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#F8FAFC',
+        },
+        loadingIndicator: {
+            padding: 16,
+            borderRadius: 12,
+            backgroundColor: 'white',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.05,
+            shadowRadius: 10,
+            elevation: 3,
+        },
+        loadingText: {
+            fontSize: 16,
+            fontWeight: '500',
+            color: '#64748B',
+        },
+        header: {
+            backgroundColor: 'white',
+            borderBottomWidth: 1,
+            borderBottomColor: '#E2E8F0',
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            shadowColor: "#000",
+            shadowOffset: {
+                width: 0,
+                height: 1,
+            },
+            shadowOpacity: 0.05,
+            shadowRadius: 2,
+            elevation: 2,
+            zIndex: 10,
+        },
+        messagesContent: {
+            paddingHorizontal: 16,
+            paddingTop: 16,
+        },
+        messagesList: {
+            flex: 1,
+        },
+        emptyChat: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 20,
+            marginTop: 100,
+        },
+        emptyChatText: {
+            fontSize: 16,
+            fontWeight: '500',
+            color: '#64748B',
+        },
+        emptyChatSubtext: {
+            fontSize: 14,
+            color: '#94A3B8',
+            marginTop: 8,
+        },
+        inputContainer: {
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: 'white',
+            borderTopWidth: 1,
+            borderTopColor: '#E2E8F0',
+            paddingTop: 10,
+            paddingHorizontal: 12,
+            shadowColor: "#000",
+            shadowOffset: {
+                width: 0,
+                height: -3,
+            },
+            shadowOpacity: 0.05,
+            shadowRadius: 4,
+            elevation: 3,
+            zIndex: 100,
+        },
+        inputWrapper: {
+            flexDirection: 'row',
+            alignItems: 'flex-end',
+            backgroundColor: '#F1F5F9',
+            borderRadius: 24,
+            paddingHorizontal: 12,
+            marginHorizontal: 2,
+        },
+        attachButton: {
+            paddingVertical: 10,
+            paddingHorizontal: 4,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        textInput: {
+            flex: 1,
+            paddingHorizontal: 10,
+            paddingVertical: 10,
+            fontSize: 16,
+            maxHeight: 120,
+            color: '#334155',
+        },
+        sendButton: {
+            width: 36,
+            height: 36,
+            borderRadius: 18,
+            backgroundColor: '#3B82F6',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginLeft: 8,
+            marginBottom: 4,
+        },
+        selectedImagesContainer: {
+            padding: 10,
+            backgroundColor: '#F8FAFC',
+            borderTopWidth: 1,
+            borderTopColor: '#E2E8F0',
+            marginBottom: 8,
+            borderRadius: 12,
+        },
+        selectedImageWrapper: {
+            marginRight: 10,
+            position: 'relative',
+        },
+        selectedImage: {
+            width: 70,
+            height: 70,
+            borderRadius: 10,
+            borderWidth: 1,
+            borderColor: 'rgba(203, 213, 225, 0.5)',
+        },
+        removeImageButton: {
+            position: 'absolute',
+            top: -6,
+            right: -6,
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            borderRadius: 12,
+            width: 24,
+            height: 24,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 1.5,
+            borderColor: 'white',
+        },
     });
 
     const [isModalVisible, setModalVisible] = useState(false);
@@ -386,66 +816,191 @@ export default function Network() {
     return(
         <View className="h-full w-full bg-primary dark:bg-dark-primary">
             <View className="h-full">
-                <FlatList onStartReachedThreshold={0.4} onStartReached={async () => {
-                    if (messages.length === 20 && initializedMessages.current) {
-                        const loadedNetworks = await asyncStorage.getItem("networks") || null;
-                        if (loadedNetworks !== null) {
-                            const parsedNetworks = JSON.parse(loadedNetworks);
-                            if (!parsedNetworks.some((network) => network.networkId === Network)) {
-                                if (ws.stompClient.connected) {
-                                    const receivedMessages = await fetch(`${ip}/networks/${Network}/messages?additional=${encodeURIComponent(true)}`, {
+                {isLoading ? (
+                    <View style={styles.loadingContainer}>
+                        <View style={styles.loadingIndicator}>
+                            <Text style={styles.loadingText}>Loading conversation...</Text>
+                        </View>
+                    </View>
+                ) : (
+                    <FlatList
+                        ref={messageList}
+                        data={groupMessagesByDate(messages)}
+                        keyExtractor={(item) => item.id || `${item.millis}-${item.sender}`}
+                        renderItem={({ item }) => {
+                            if (item.type === 'date-header') {
+                                return <DateHeader date={item.date} />;
+                            } else {
+                                return (
+                                    <NetworkMessage 
+                                        content={item.content} 
+                                        sender={item.sender} 
+                                        senderProfilePicturePath={item.senderProfilePicturePath} 
+                                        timestamp={new Date(item.millis).toLocaleString()}
+                                        images={item.images}
+                                    />
+                                );
+                            }
+                        }}
+                        contentContainerStyle={styles.messagesContent}
+                        style={[styles.messagesList, {marginBottom: inputContainerHeight}]}
+                        onContentSizeChange={() => {
+                            if (!loadingAdditionalMessages.current) {
+                                setTimeout(() => {
+                                    messageList.current?.scrollToEnd({animated: true});
+                                }, 50);
+                            }
+                        }}
+                        showsVerticalScrollIndicator={false}
+                        maintainVisibleContentPosition={{
+                            minIndexForVisible: 0,
+                        }}
+                        onEndReached={() => {
+                            // This would be used if we wanted to load newer messages when scrolling down
+                            // Not needed for this implementation
+                        }}
+                        onStartReached={async () => {
+                            // Load older messages when scrolling to the top
+                            if (initializedMessages.current && !loadingAdditionalMessages.current && hasMoreMessages.current && oldestMessageId.current) {
+                                loadingAdditionalMessages.current = true;
+
+                                try {
+                                    const receivedMessages = await fetch(`${ip}/networks/${Network}/beforeId?id=${encodeURIComponent(oldestMessageId.current)}`, {
                                         method: "GET",
                                         headers: {
                                             "Authorization": `Bearer ${token.current}`,
-                                            "Application-Type": "application/json"
+                                            "Content-Type": "application/json"
                                         }
                                     });
+
                                     if (receivedMessages.ok) {
-                                        loadingAdditionalMessages.current = true;
                                         const data = await receivedMessages.json();
-                                        addMessage([...data.map((message) => {
-                                            return {
-                                                senderProfilePicturePath: message.senderId.memberProfilePicturePath.split(",")[0],
-                                                sender: message.senderId.memberId,
-                                                content: message.content,
-                                                millis: message.millis,
-                                            };
-                                        })]);
-                                        setTimeout(() => {
-                                            if (messageList.current !== null && messages.length >= 20) {
-                                                messageList.current.scrollToIndex({index: 23, animated: false});
+
+                                        if (data.length > 0) {
+                                            // Update oldest message ID for next pagination
+                                            const sortedMessages = [...data].sort((a, b) => a.millis - b.millis);
+                                            oldestMessageId.current = sortedMessages[0].millis;
+
+                                            // Prepend older messages to the state
+                                            addMessage(prevState => [
+                                                ...data.map((message) => ({
+                                                    senderProfilePicturePath: message.senderId.memberProfilePicturePath.split(",")[0],
+                                                    sender: message.senderId.memberId,
+                                                    content: message.content,
+                                                    millis: message.millis,
+                                                    images: message.images || []
+                                                })),
+                                                ...prevState
+                                            ]);
+
+                                            // Update local storage with older messages
+                                            let storedMessages = await asyncStorage.getItem(`networks/${Network}`) || [];
+                                            if (storedMessages.length !== 0) {
+                                                storedMessages = JSON.parse(storedMessages);
                                             }
-                                        }, 100);
-                                        setTimeout(() => {
-                                            loadingAdditionalMessages.current = false;
-                                        }, 1000);
+
+                                            await asyncStorage.setItem(`networks/${Network}`, JSON.stringify([
+                                                ...data.map((message) => ({
+                                                    senderProfilePicturePath: message.senderId.memberProfilePicturePath.split(",")[0],
+                                                    sender: message.senderId.memberId,
+                                                    content: message.content,
+                                                    millis: message.millis,
+                                                    images: message.images || []
+                                                })),
+                                                ...storedMessages
+                                            ]));
+                                        } else {
+                                            // No more messages to load
+                                            hasMoreMessages.current = false;
+                                        }
                                     }
+                                } catch (error) {
+                                    console.error('Error loading older messages:', error);
+                                } finally {
+                                    // Reset loading state after a short delay
+                                    setTimeout(() => {
+                                        loadingAdditionalMessages.current = false;
+                                    }, 500);
                                 }
                             }
+                        }}
+                        onStartReachedThreshold={0.1}
+                        ListEmptyComponent={
+                            <View style={styles.emptyChat}>
+                                <Text style={styles.emptyChatText}>No messages yet.</Text>
+                                <Text style={styles.emptyChatSubtext}>Start the conversation!</Text>
+                            </View>
                         }
+                    />
+                )}
+            </View>
+            <Animated.View
+                onLayout={(event) => {
+                    const { height } = event.nativeEvent.layout;
+                    setInputContainerHeight(height);
+                }}
+                style={[
+                    styles.inputContainer,
+                    {
+                        paddingBottom: Platform.OS === 'ios'
+                            ? keyboardVisible ? 10 : Math.max(insets.bottom, 16)
+                            : 16,
+                        backgroundColor: inputBarAnimation.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: ['rgba(255, 255, 255, 0.98)', 'rgba(255, 255, 255, 1)']
+                        }),
+                        shadowOpacity: inputBarAnimation.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [0.05, 0.1]
+                        }),
                     }
-                }} ref={messageList} style={{marginTop: 5, marginBottom: 50}} onContentSizeChange={(size) => {
-                    if(!loadingAdditionalMessages.current) {messageList.current.scrollToEnd()}
-                    }} data={messages} renderItem={(item) =>
-                    <NetworkMessage content={item.item.content} sender={item.item.sender} senderProfilePicturePath={item.item.senderProfilePicturePath.split(",")[0]} timestamp={new Date(item.item.millis).toLocaleString()}/>}
-                          keyExtractor={(item, index) => index.toString()}>
-                </FlatList>
-            </View>
-            <Pressable className="h-full w-full" onPress={Keyboard.dismiss}></Pressable>
-            <View className="bottom-0 absolute w-full">
-                <Animated.View className="bg-gray-100 dark:bg-gray-700" style={[styles.inputContainer, { transform: [{ translateY }] }]}>
-                    <View className="ml-0.5 flex-row justify-around items-center">
-                        <TextInput ref={input} autoCapitalize='none' onSubmitEditing={
-                            (e) => {
-                                sendMessage(e.nativeEvent.text);
-                            }
-                        } className="bg-white dark:bg-gray-700 w-11/12 dark:text-dark-text text-text border-gray-700/80 active:bg-gray-600/10 rounded-lg dark:border-black/30 border-4 font-medium h-10 p-0.5 pl-2.5" placeholder="Type a message" onChangeText={(text) => message.current = text}></TextInput>
-                        <TouchableOpacity className="ml-2.5" activeOpacity={0.7} onPress={() => sendMessage(message.current)}>
-                            <Ionicons name={"send"} size={24}></Ionicons>
-                        </TouchableOpacity>
-                    </View>
-                </Animated.View>
-            </View>
+                ]}
+            >
+                {renderSelectedImages()}
+
+                <View style={styles.inputWrapper}>
+                    <TouchableOpacity
+                        onPress={pickImage}
+                        style={styles.attachButton}
+                        activeOpacity={0.7}
+                    >
+                        <Ionicons name="image-outline" size={24} color="#64748B" />
+                    </TouchableOpacity>
+
+                    <TextInput
+                        ref={input}
+                        style={[styles.textInput, {height: Math.min(Math.max(40, inputHeight), 120)}]}
+                        placeholder="Type a message..."
+                        placeholderTextColor="#9CA3AF"
+                        value={inputText}
+                        className="outline-none"
+                        onChangeText={setInputText}
+                        multiline
+                        onContentSizeChange={(e) => {
+                            const height = e.nativeEvent.contentSize.height;
+                            setInputHeight(inputText.length <= 1 ? 40 : Math.min(Math.max(40, height), 120));
+                        }}
+                        onKeyPress={(e) => {
+                          if (Platform.OS === "web" && e.nativeEvent.key === "Enter" && !e.nativeEvent.shiftKey) {
+                            e.preventDefault();
+                            sendMessage();
+                          }
+                        }}
+                    />
+
+                    <TouchableOpacity
+                        onPress={sendMessage}
+                        disabled={inputText.trim() === '' && selectedImages.length === 0}
+                        style={[
+                            styles.sendButton,
+                            { backgroundColor: inputText.trim() === '' && selectedImages.length === 0 ? '#CBD5E1' : '#3B82F6' }
+                        ]}
+                        activeOpacity={inputText.trim() === '' && selectedImages.length === 0 ? 1 : 0.7}
+                    >
+                        <Ionicons name="send" size={18} color="white" />
+                    </TouchableOpacity>
+                </View>
+            </Animated.View>
             <Modal animationType="slide" presentationStyle="formSheet" visible={isModalVisible} onRequestClose={() => setModalVisible(false)}>
                 <View className="h-full w-full dark:bg-dark-primary">
                     {Platform.OS === "web" && <TouchableOpacity className="p-4 bg-gray-700 rounded-xl self-end mr-4 mt-4" onPress={() => setModalVisible(false)}><Ionicons size={23} color="white" name="close"/></TouchableOpacity>}
