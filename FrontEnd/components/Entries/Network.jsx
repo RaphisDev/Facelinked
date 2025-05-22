@@ -6,15 +6,25 @@ import { Image } from "expo-image";
 
 export default function Network(props) {
     const router = useRouter();
+    const isDesktop = props.isDesktop;
 
     return (
         <TouchableOpacity 
             activeOpacity={0.7} 
-            style={styles.container} 
+            style={[
+                styles.container,
+                isDesktop && styles.desktopContainer
+            ]} 
             onPress={() => router.navigate(`/networks/${props.id}`)}
         >
-            <View style={styles.card}>
-                <View style={styles.imageContainer}>
+            <View style={[
+                styles.card,
+                isDesktop && styles.desktopCard
+            ]}>
+                <View style={[
+                    styles.imageContainer,
+                    isDesktop && styles.desktopImageContainer
+                ]}>
                     {props.networkPicturePath ? (
                         <Image 
                             style={styles.image} 
@@ -24,36 +34,51 @@ export default function Network(props) {
                         />
                     ) : (
                         <View style={styles.imagePlaceholder}>
-                            <Ionicons name="people" size={24} color="#94A3B8" />
+                            <Ionicons name="people" size={isDesktop ? 32 : 24} color="#94A3B8" />
                         </View>
                     )}
                 </View>
 
                 <View style={styles.contentContainer}>
                     <View style={styles.headerContainer}>
-                        <Text style={styles.title} numberOfLines={1}>{props.network}</Text>
+                        <Text style={[
+                            styles.title,
+                            isDesktop && styles.desktopTitle
+                        ]} numberOfLines={1}>{props.network}</Text>
                         {props.isPrivate && (
-                            <Ionicons name="lock-closed" size={16} color="#64748B" style={styles.lockIcon} />
+                            <Ionicons name="lock-closed" size={isDesktop ? 20 : 16} color="#64748B" style={styles.lockIcon} />
                         )}
                     </View>
 
-                    <Text style={styles.description} numberOfLines={2}>{props.description}</Text>
+                    <Text style={[
+                        styles.description,
+                        isDesktop && styles.desktopDescription
+                    ]} numberOfLines={isDesktop ? 3 : 2}>{props.description}</Text>
 
                     <View style={styles.footer}>
                         {props.creator ? (
                             <View style={styles.creatorContainer}>
-                                <Ionicons name="person" size={14} color="#64748B" />
-                                <Text style={styles.creatorText}>Created by {props.creator}</Text>
+                                <Ionicons name="person" size={isDesktop ? 16 : 14} color="#64748B" />
+                                <Text style={[
+                                    styles.creatorText,
+                                    isDesktop && styles.desktopFooterText
+                                ]}>Created by {props.creator}</Text>
                             </View>
                         ) : (
                             <View style={styles.statsContainer}>
-                                <Ionicons name="heart" size={14} color="#F43F5E" />
-                                <Text style={styles.statsText}>{props.member}</Text>
-                                <Ionicons name="people" size={14} color="#64748B" style={styles.peopleIcon} />
-                                <Text style={styles.statsText}>Members</Text>
+                                <Ionicons name="heart" size={isDesktop ? 16 : 14} color="#F43F5E" />
+                                <Text style={[
+                                    styles.statsText,
+                                    isDesktop && styles.desktopFooterText
+                                ]}>{props.member}</Text>
+                                <Ionicons name="people" size={isDesktop ? 16 : 14} color="#64748B" style={styles.peopleIcon} />
+                                <Text style={[
+                                    styles.statsText,
+                                    isDesktop && styles.desktopFooterText
+                                ]}>Members</Text>
                             </View>
                         )}
-                        <Ionicons name="chevron-forward" size={16} color="#94A3B8" />
+                        <Ionicons name="chevron-forward" size={isDesktop ? 20 : 16} color="#94A3B8" />
                     </View>
                 </View>
             </View>
@@ -66,6 +91,10 @@ const styles = StyleSheet.create({
         marginHorizontal: 16,
         marginBottom: 12,
     },
+    desktopContainer: {
+        marginHorizontal: 20,
+        marginBottom: 16,
+    },
     card: {
         flexDirection: 'row',
         backgroundColor: 'white',
@@ -77,6 +106,13 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         elevation: 2,
     },
+    desktopCard: {
+        padding: 16,
+        borderRadius: 20,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+    },
     imageContainer: {
         width: 60,
         height: 60,
@@ -84,6 +120,12 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         backgroundColor: '#F1F5F9',
         marginRight: 12,
+    },
+    desktopImageContainer: {
+        width: 80,
+        height: 80,
+        borderRadius: 16,
+        marginRight: 16,
     },
     image: {
         width: '100%',
@@ -111,6 +153,10 @@ const styles = StyleSheet.create({
         color: '#1E293B',
         flex: 1,
     },
+    desktopTitle: {
+        fontSize: 18,
+        fontWeight: '700',
+    },
     lockIcon: {
         marginLeft: 6,
     },
@@ -119,6 +165,11 @@ const styles = StyleSheet.create({
         color: '#64748B',
         marginBottom: 8,
         lineHeight: 18,
+    },
+    desktopDescription: {
+        fontSize: 15,
+        lineHeight: 20,
+        marginBottom: 12,
     },
     footer: {
         flexDirection: 'row',
@@ -142,6 +193,10 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#64748B',
         marginLeft: 4,
+    },
+    desktopFooterText: {
+        fontSize: 14,
+        marginLeft: 6,
     },
     peopleIcon: {
         marginLeft: 8,

@@ -5,13 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/_layout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/_layout.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/networks/[Network].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/networks/[Network].jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/networks/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/networks/index.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/Entries/Network.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Entries/Network.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/Entries/NetworkMessage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Entries/NetworkMessage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -308,7 +305,7 @@
       <workItem from="1747927064026" duration="3648000" />
       <workItem from="1747935812674" duration="212000" />
       <workItem from="1747936041215" duration="2742000" />
-      <workItem from="1747938836838" duration="5993000" />
+      <workItem from="1747938836838" duration="7709000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />

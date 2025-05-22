@@ -1,6 +1,7 @@
 import "../../../global.css"
 import {
     Animated,
+    BackHandler,
     Dimensions,
     FlatList,
     Keyboard,
@@ -43,6 +44,9 @@ export default function Networks() {
     const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
     const [isDesktop, setIsDesktop] = useState(windowWidth > MOBILE_WIDTH_THRESHOLD);
 
+    // Animation value for tab sliding
+    const tabSlideAnimation = useRef(new Animated.Value(0)).current;
+
     const stateManager = new StateManager();
 
     const [isSearching, setIsSearching] = useState(false);
@@ -67,6 +71,8 @@ export default function Networks() {
     // For the "Meet new People" page
     const translateX = useRef(new Animated.Value(0)).current;
     const [currentPage, setCurrentPage] = useState(0);
+    const [currentPersonIndex, setCurrentPersonIndex] = useState(0);
+    const peopleListRef = useRef(null);
     const [people, setPeople] = useState([
         { 
             id: 1, 
@@ -165,6 +171,22 @@ export default function Networks() {
 
         stateManager.setNetworkState(true);
     }, []);
+
+    // Handle Android back button
+    useEffect(() => {
+        if (Platform.OS === 'android') {
+            const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+                if (currentPage === 1) {
+                    // If in Meet People page, go back to Networks page
+                    navigateToNetworks();
+                    return true; // Prevent default back behavior
+                }
+                return false; // Let default back behavior happen
+            });
+
+            return () => backHandler.remove();
+        }
+    }, [currentPage]);
 
     // Create Network Functions
     const togglePrivate = () => {
@@ -376,13 +398,14 @@ export default function Networks() {
 
     const handleGesture = (event) => {
         if (event.nativeEvent.translationX < -50 && currentPage === 0) {
-            // Swipe left to Meet People page
-            Animated.timing(translateX, {
-                toValue: -windowWidth,
+            // Swipe left to Friends tab instead of Meet People page
+            // Animate the tab transition
+            Animated.timing(tabSlideAnimation, {
+                toValue: 1,
                 duration: 300,
-                useNativeDriver: true
+                useNativeDriver: false // We need to use false for layout animations
             }).start(() => {
-                setCurrentPage(1);
+                setSelected(1); // Switch to Friends tab after animation completes
             });
         } else if (event.nativeEvent.translationX > 50 && currentPage === 1) {
             // Swipe right to Networks page
@@ -393,6 +416,57 @@ export default function Networks() {
             }).start(() => {
                 setCurrentPage(0);
             });
+        } else if (event.nativeEvent.translationX > 50 && selected === 1) {
+            // Swipe right from Friends tab to Favorites tab
+            Animated.timing(tabSlideAnimation, {
+                toValue: 0,
+                duration: 300,
+                useNativeDriver: false
+            }).start(() => {
+                setSelected(0); // Switch to Favorites tab after animation completes
+            });
+        }
+    };
+
+    // Navigation functions for the people list
+    const goToNextPerson = () => {
+        if (currentPersonIndex < people.length - 1) {
+            peopleListRef.current?.scrollToIndex({
+                index: currentPersonIndex + 1,
+                animated: true
+            });
+            setCurrentPersonIndex(currentPersonIndex + 1);
+        }
+    };
+
+    const goToPreviousPerson = () => {
+        if (currentPersonIndex > 0) {
+            peopleListRef.current?.scrollToIndex({
+                index: currentPersonIndex - 1,
+                animated: true
+            });
+            setCurrentPersonIndex(currentPersonIndex - 1);
+        }
+    };
+
+    // This function handles swipe gestures for the people list
+    const handlePersonSwipe = (event) => {
+        // Check if the swipe is significant enough
+        if (Math.abs(event.nativeEvent.translationX) > 50) {
+            // Determine swipe direction
+            if (event.nativeEvent.translationX < 0 && currentPersonIndex < people.length - 1) {
+                // Swipe left to next person
+                peopleListRef.current?.scrollToIndex({
+                    index: currentPersonIndex + 1,
+                    animated: true
+                });
+            } else if (event.nativeEvent.translationX > 0 && currentPersonIndex > 0) {
+                // Swipe right to previous person
+                peopleListRef.current?.scrollToIndex({
+                    index: currentPersonIndex - 1,
+                    animated: true
+                });
+            }
         }
     };
 
@@ -515,83 +589,150 @@ export default function Networks() {
                     </View>
                 ) : (
                     <>
-                        <View style={styles.tabContainer}>
+                        <Animated.View 
+                            style={[
+                                styles.tabContainer,
+                                {
+                                    transform: [
+                                        {
+                                            translateX: tabSlideAnimation.interpolate({
+                                                inputRange: [0, 1],
+                                                outputRange: [0, -20] // Slide left when going to Friends tab
+                                            })
+                                        }
+                                    ]
+                                }
+                            ]}
+                        >
                             <TouchableOpacity 
                                 style={[styles.tabButton, selected === 0 && styles.activeTabButton]} 
-                                onPress={() => setSelected(0)}
+                                onPress={() => {
+                                    // Animate back to Favorites tab
+                                    Animated.timing(tabSlideAnimation, {
+                                        toValue: 0,
+                                        duration: 300,
+                                        useNativeDriver: false
+                                    }).start();
+                                    setSelected(0);
+                                }}
                             >
-                                <Ionicons 
-                                    name="heart" 
-                                    size={20} 
-                                    color={selected === 0 ? "#3B82F6" : "#64748B"} 
-                                    style={styles.tabIcon} 
-                                />
-                                <Text style={[styles.tabText, selected === 0 && styles.activeTabText]}>Favorites</Text>
+                                <Animated.View style={{ 
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    opacity: tabSlideAnimation.interpolate({
+                                        inputRange: [0, 1],
+                                        outputRange: [1, 0.6] // Fade out when going to Friends tab
+                                    })
+                                }}>
+                                    <Ionicons 
+                                        name="heart" 
+                                        size={20} 
+                                        color={selected === 0 ? "#3B82F6" : "#64748B"} 
+                                        style={styles.tabIcon} 
+                                    />
+                                    <Text style={[styles.tabText, selected === 0 && styles.activeTabText]}>Favorites</Text>
+                                </Animated.View>
                             </TouchableOpacity>
 
                             <TouchableOpacity 
                                 style={[styles.tabButton, selected === 1 && styles.activeTabButton]} 
-                                onPress={() => setSelected(1)}
+                                onPress={() => {
+                                    // Animate to Friends tab
+                                    Animated.timing(tabSlideAnimation, {
+                                        toValue: 1,
+                                        duration: 300,
+                                        useNativeDriver: false
+                                    }).start();
+                                    setSelected(1);
+                                }}
                             >
-                                <Ionicons 
-                                    name="people" 
-                                    size={20} 
-                                    color={selected === 1 ? "#3B82F6" : "#64748B"} 
-                                    style={styles.tabIcon} 
-                                />
-                                <Text style={[styles.tabText, selected === 1 && styles.activeTabText]}>Friends</Text>
+                                <Animated.View style={{ 
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    opacity: tabSlideAnimation.interpolate({
+                                        inputRange: [0, 1],
+                                        outputRange: [0.6, 1] // Fade in when going to Friends tab
+                                    })
+                                }}>
+                                    <Ionicons 
+                                        name="people" 
+                                        size={20} 
+                                        color={selected === 1 ? "#3B82F6" : "#64748B"} 
+                                        style={styles.tabIcon} 
+                                    />
+                                    <Text style={[styles.tabText, selected === 1 && styles.activeTabText]}>Friends</Text>
+                                </Animated.View>
                             </TouchableOpacity>
-                        </View>
+                        </Animated.View>
 
-                        {selected === 0 ? (
-                            <FlatList 
-                                data={favoriteNetworks}
-                                keyExtractor={(item) => item.networkId.toString()}
-                                renderItem={(items) => (
-                                    <Network 
-                                        id={items.item.networkId} 
-                                        network={items.item.name} 
-                                        networkPicturePath={items.item.networkPicturePath} 
-                                        description={items.item.description} 
-                                        member={items.item.memberCount} 
-                                        isPrivate={items.item.private}
-                                    />
-                                )}
-                                ListEmptyComponent={() => (
-                                    <View style={styles.emptyContainer}>
-                                        <Ionicons name="heart-outline" size={60} color="#CBD5E1" style={styles.emptyIcon} />
-                                        <Text style={styles.emptyText}>No favorite networks</Text>
-                                        <Text style={styles.emptySubtext}>Networks you favorite will appear here</Text>
-                                    </View>
-                                )}
-                                contentContainerStyle={styles.networksList}
-                                showsVerticalScrollIndicator={false}
-                            />
-                        ) : (
-                            <FlatList 
-                                data={[]} // Replace with actual friends networks data
-                                keyExtractor={(item) => item.networkId.toString()}
-                                renderItem={(items) => (
-                                    <Network 
-                                        id={items.item.networkId} 
-                                        network={items.item.name} 
-                                        networkPicturePath={items.item.networkPicturePath} 
-                                        description={items.item.description} 
-                                        creator={items.item.creatorId} 
-                                        isPrivate={items.item.private}
-                                    />
-                                )}
-                                ListEmptyComponent={() => (
-                                    <View style={styles.emptyContainer}>
-                                        <Ionicons name="people-outline" size={60} color="#CBD5E1" style={styles.emptyIcon} />
-                                        <Text style={styles.emptyText}>No friend networks</Text>
-                                        <Text style={styles.emptySubtext}>Networks created by your friends will appear here</Text>
-                                    </View>
-                                )}
-                                contentContainerStyle={styles.networksList}
-                                showsVerticalScrollIndicator={false}
-                            />
-                        )}
+                        <Animated.View style={{
+                            flexDirection: 'row',
+                            width: windowWidth * 2,
+                            transform: [
+                                {
+                                    translateX: tabSlideAnimation.interpolate({
+                                        inputRange: [0, 1],
+                                        outputRange: [0, -windowWidth] // Slide content left when going to Friends tab
+                                    })
+                                }
+                            ]
+                        }}>
+                            {/* Favorites Tab Content */}
+                            <View style={{ width: windowWidth }}>
+                                <FlatList 
+                                    data={favoriteNetworks}
+                                    keyExtractor={(item) => item.networkId.toString()}
+                                    renderItem={(items) => (
+                                        <Network 
+                                            id={items.item.networkId} 
+                                            network={items.item.name} 
+                                            networkPicturePath={items.item.networkPicturePath} 
+                                            description={items.item.description} 
+                                            member={items.item.memberCount} 
+                                            isPrivate={items.item.private}
+                                            isDesktop={isDesktop}
+                                        />
+                                    )}
+                                    ListEmptyComponent={() => (
+                                        <View style={styles.emptyContainer}>
+                                            <Ionicons name="heart-outline" size={60} color="#CBD5E1" style={styles.emptyIcon} />
+                                            <Text style={styles.emptyText}>No favorite networks</Text>
+                                            <Text style={styles.emptySubtext}>Networks you favorite will appear here</Text>
+                                        </View>
+                                    )}
+                                    contentContainerStyle={styles.networksList}
+                                    showsVerticalScrollIndicator={false}
+                                />
+                            </View>
+
+                            {/* Friends Tab Content */}
+                            <View style={{ width: windowWidth }}>
+                                <FlatList 
+                                    data={[]} // Replace with actual friends networks data
+                                    keyExtractor={(item) => item.networkId.toString()}
+                                    renderItem={(items) => (
+                                        <Network 
+                                            id={items.item.networkId} 
+                                            network={items.item.name} 
+                                            networkPicturePath={items.item.networkPicturePath} 
+                                            description={items.item.description} 
+                                            creator={items.item.creatorId} 
+                                            isPrivate={items.item.private}
+                                            isDesktop={isDesktop}
+                                        />
+                                    )}
+                                    ListEmptyComponent={() => (
+                                        <View style={styles.emptyContainer}>
+                                            <Ionicons name="people-outline" size={60} color="#CBD5E1" style={styles.emptyIcon} />
+                                            <Text style={styles.emptyText}>No friend networks</Text>
+                                            <Text style={styles.emptySubtext}>Networks created by your friends will appear here</Text>
+                                        </View>
+                                    )}
+                                    contentContainerStyle={styles.networksList}
+                                    showsVerticalScrollIndicator={false}
+                                />
+                            </View>
+                        </Animated.View>
                     </>
                 )}
             </View>
@@ -611,77 +752,109 @@ export default function Networks() {
                     <Text style={styles.meetPeopleTitle}>Meet New People</Text>
                 </View>
 
-                <FlatList
-                    data={people}
-                    horizontal
-                    pagingEnabled
-                    showsHorizontalScrollIndicator={false}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={({item}) => (
-                        <View style={[styles.personCard, {width: windowWidth}]}>
-                            <View style={styles.personImageContainer}>
-                                <Image 
-                                    source={{uri: item.profilePicture}} 
-                                    style={styles.personImage}
-                                    contentFit="cover"
-                                    transition={200}
-                                />
-                            </View>
-                            <Text style={styles.personName}>{item.name}</Text>
-                            <Text style={styles.personUsername}>@{item.username}</Text>
+                <View style={{flex: 1}}>
+                    <PanGestureHandler onGestureEvent={handlePersonSwipe}>
+                        <Animated.View style={{flex: 1}}>
+                            <FlatList
+                                ref={peopleListRef}
+                                data={people}
+                                horizontal
+                                pagingEnabled
+                                showsHorizontalScrollIndicator={false}
+                                keyExtractor={(item) => item.id.toString()}
+                                onMomentumScrollEnd={(e) => {
+                                    const newIndex = Math.round(e.nativeEvent.contentOffset.x / windowWidth);
+                                    setCurrentPersonIndex(newIndex);
+                                }}
+                                renderItem={({item}) => (
+                                    <View style={[styles.personCard, {width: windowWidth}]}>
+                                        <View style={styles.personImageContainer}>
+                                            <Image 
+                                                source={{uri: item.profilePicture}} 
+                                                style={styles.personImage}
+                                                contentFit="cover"
+                                                transition={200}
+                                            />
+                                        </View>
+                                        <Text style={styles.personName}>{item.name}</Text>
+                                        <Text style={styles.personUsername}>@{item.username}</Text>
 
-                            <View style={styles.personInfoBox}>
-                                <View style={styles.personInfoRow}>
-                                    <Ionicons name="calendar-outline" size={16} color="#64748B" style={styles.infoIcon} />
-                                    <Text style={styles.personInfoText}>{item.age} years old</Text>
-                                </View>
-                                <View style={styles.personInfoRow}>
-                                    <Ionicons name="heart-outline" size={16} color="#64748B" style={styles.infoIcon} />
-                                    <Text style={styles.personInfoText}>{item.relationshipStatus}</Text>
-                                </View>
-                                <View style={styles.personInfoRow}>
-                                    <Ionicons name="star-outline" size={16} color="#64748B" style={styles.infoIcon} />
-                                    <Text style={styles.personInfoText}>Hobbies: {item.hobbies.join(', ')}</Text>
-                                </View>
-                            </View>
+                                        <View style={styles.personInfoBox}>
+                                            <View style={styles.personInfoRow}>
+                                                <Ionicons name="calendar-outline" size={16} color="#64748B" style={styles.infoIcon} />
+                                                <Text style={styles.personInfoText}>{item.age} years old</Text>
+                                            </View>
+                                            <View style={styles.personInfoRow}>
+                                                <Ionicons name="heart-outline" size={16} color="#64748B" style={styles.infoIcon} />
+                                                <Text style={styles.personInfoText}>{item.relationshipStatus}</Text>
+                                            </View>
+                                            <View style={styles.personInfoRow}>
+                                                <Ionicons name="star-outline" size={16} color="#64748B" style={styles.infoIcon} />
+                                                <Text style={styles.personInfoText}>Hobbies: {item.hobbies.join(', ')}</Text>
+                                            </View>
+                                        </View>
 
-                            <View style={styles.personActions}>
-                                <TouchableOpacity style={styles.messageButton}>
-                                    <Ionicons name="chatbubble" size={20} color="white" style={styles.actionButtonIcon} />
-                                    <Text style={styles.actionButtonText}>Message</Text>
-                                </TouchableOpacity>
+                                        <View style={styles.personActions}>
+                                            <TouchableOpacity style={styles.messageButton}>
+                                                <Ionicons name="chatbubble" size={20} color="white" style={styles.actionButtonIcon} />
+                                                <Text style={styles.actionButtonText}>Message</Text>
+                                            </TouchableOpacity>
 
-                                <TouchableOpacity style={styles.addFriendButton}>
-                                    <Ionicons name="person-add" size={20} color="white" style={styles.actionButtonIcon} />
-                                    <Text style={styles.actionButtonText}>Add Friend</Text>
-                                </TouchableOpacity>
-                            </View>
+                                            <TouchableOpacity style={styles.addFriendButton}>
+                                                <Ionicons name="person-add" size={20} color="white" style={styles.actionButtonIcon} />
+                                                <Text style={styles.actionButtonText}>Add Friend</Text>
+                                            </TouchableOpacity>
+                                        </View>
 
-                            <TouchableOpacity 
-                                style={styles.viewProfileButton}
-                                onPress={() => router.navigate(`/${item.username}`)}
-                            >
-                                <Text style={styles.viewProfileText}>View Profile</Text>
-                            </TouchableOpacity>
-                        </View>
-                    )}
-                />
-
-                <View style={styles.paginationContainer}>
-                    {people.map((_, index) => (
-                        <View 
-                            key={index} 
-                            style={[
-                                styles.paginationDot, 
-                                Math.floor(windowWidth * currentPage / windowWidth) === index && styles.paginationDotActive
-                            ]} 
-                        />
-                    ))}
+                                        <TouchableOpacity 
+                                            style={styles.viewProfileButton}
+                                            onPress={() => router.navigate(`/${item.username}`)}
+                                        >
+                                            <Text style={styles.viewProfileText}>View Profile</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                            />
+                        </Animated.View>
+                    </PanGestureHandler>
                 </View>
+
 
                 <View style={styles.swipeHintContainer}>
                     <Ionicons name="swap-horizontal" size={20} color="#94A3B8" />
                     <Text style={styles.swipeHintText}>Swipe to see more people</Text>
+                </View>
+
+                <View style={styles.navigationButtonsContainer}>
+                    <TouchableOpacity 
+                        style={[
+                            styles.navigationButton, 
+                            currentPersonIndex === 0 && styles.disabledButton
+                        ]}
+                        onPress={goToPreviousPerson}
+                        disabled={currentPersonIndex === 0}
+                    >
+                        <Ionicons name="chevron-back" size={24} color={currentPersonIndex === 0 ? "#CBD5E1" : "#3B82F6"} />
+                        <Text style={[
+                            styles.navigationButtonText,
+                            currentPersonIndex === 0 && styles.disabledButtonText
+                        ]}>Previous</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity 
+                        style={[
+                            styles.navigationButton, 
+                            currentPersonIndex === people.length - 1 && styles.disabledButton
+                        ]}
+                        onPress={goToNextPerson}
+                        disabled={currentPersonIndex === people.length - 1}
+                    >
+                        <Text style={[
+                            styles.navigationButtonText,
+                            currentPersonIndex === people.length - 1 && styles.disabledButtonText
+                        ]}>Next</Text>
+                        <Ionicons name="chevron-forward" size={24} color={currentPersonIndex === people.length - 1 ? "#CBD5E1" : "#3B82F6"} />
+                    </TouchableOpacity>
                 </View>
             </View>
         );
@@ -862,25 +1035,38 @@ export default function Networks() {
         <SafeAreaView style={styles.safeArea}>
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
             <GestureHandlerRootView style={{flex: 1}}>
-                <PanGestureHandler onGestureEvent={handleGesture}>
-                    <Animated.View 
-                        style={[
-                            styles.container,
-                            {
-                                flexDirection: 'row',
-                                width: windowWidth * 2,
-                                transform: [{ translateX }]
-                            }
-                        ]}
-                    >
-                        <View style={{width: windowWidth}}>
+                {isDesktop ? (
+                    // Desktop layout - side by side view
+                    <View style={styles.desktopContainer}>
+                        <View style={styles.desktopSidebar}>
                             {renderNetworksContent()}
                         </View>
-                        <View style={{width: windowWidth}}>
+                        <View style={styles.desktopContent}>
                             {renderMeetPeopleContent()}
                         </View>
-                    </Animated.View>
-                </PanGestureHandler>
+                    </View>
+                ) : (
+                    // Mobile layout - swipeable view
+                    <PanGestureHandler onGestureEvent={handleGesture}>
+                        <Animated.View 
+                            style={[
+                                styles.container,
+                                {
+                                    flexDirection: 'row',
+                                    width: windowWidth * 2,
+                                    transform: [{ translateX }]
+                                }
+                            ]}
+                        >
+                            <View style={{width: windowWidth}}>
+                                {renderNetworksContent()}
+                            </View>
+                            <View style={{width: windowWidth}}>
+                                {renderMeetPeopleContent()}
+                            </View>
+                        </Animated.View>
+                    </PanGestureHandler>
+                )}
             </GestureHandlerRootView>
 
             {renderCreateNetworkModal()}
@@ -895,6 +1081,23 @@ const styles = StyleSheet.create({
         paddingTop: 0, // Remove extra padding, use insets instead
     },
     container: {
+        flex: 1,
+        backgroundColor: '#F8FAFC',
+    },
+    // Desktop styles
+    desktopContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        backgroundColor: '#F8FAFC',
+    },
+    desktopSidebar: {
+        width: '35%',
+        maxWidth: 450,
+        borderRightWidth: 1,
+        borderRightColor: '#E2E8F0',
+        backgroundColor: '#FFFFFF',
+    },
+    desktopContent: {
         flex: 1,
         backgroundColor: '#F8FAFC',
     },
@@ -1196,7 +1399,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingTop: 60,
+        paddingTop: 150,
     },
     emptyIcon: {
         marginBottom: 16,
@@ -1446,5 +1649,29 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#94A3B8',
         marginLeft: 6,
+    },
+    navigationButtonsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        paddingVertical: 16,
+        marginBottom: 20,
+    },
+    navigationButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+        borderRadius: 12,
+    },
+    navigationButtonText: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: '#3B82F6',
+        marginHorizontal: 4,
+    },
+    disabledButtonText: {
+        color: '#CBD5E1',
     }
 });

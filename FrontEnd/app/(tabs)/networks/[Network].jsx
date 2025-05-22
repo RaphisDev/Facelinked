@@ -973,6 +973,7 @@ export default function Network() {
                     sender={item.sender} 
                     senderProfilePicturePath={item.senderProfilePicturePath} 
                     timestamp={item.millis}
+                    isDesktop={isDesktop}
                 />
             );
         }
@@ -992,34 +993,153 @@ export default function Network() {
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
-            {renderHeader()}
+            {isDesktop ? (
+                // Desktop layout
+                <View style={styles.desktopContainer}>
+                    {/* Network info sidebar */}
+                    <View style={styles.desktopSidebar}>
+                        <View style={styles.desktopHeader}>
+                            <TouchableOpacity 
+                                style={styles.backButton}
+                                onPress={() => router.back()}
+                            >
+                                <Ionicons name="arrow-back" size={22} color="#3B82F6" />
+                            </TouchableOpacity>
 
-            <FlatList
-                ref={flatListRef}
-                data={groupMessagesByDate(messages)}
-                keyExtractor={(item) => item.id}
-                renderItem={renderListItem}
-                contentContainerStyle={[
-                    styles.messagesList,
-                    { paddingBottom: keyboardVisible ? 80 : 100 }
-                ]}
-                inverted={false}
-                onEndReached={loadMoreMessages}
-                onEndReachedThreshold={0.3}
-                ListHeaderComponent={renderLoadingIndicator}
-                ListEmptyComponent={renderEmptyComponent}
-                showsVerticalScrollIndicator={false}
-                onContentSizeChange={() => {
-                    if (isInitialLoad.current) {
-                        flatListRef.current?.scrollToEnd({ animated: false });
-                    }
-                }}
-                maintainVisibleContentPosition={{
-                    minIndexForVisible: 0,
-                }}
-            />
+                            <View style={styles.headerContent}>
+                                <Text style={styles.headerTitle} numberOfLines={1}>
+                                    {currentNetwork.current?.name || 'Network'}
+                                </Text>
+                                {currentNetwork.current?.private && (
+                                    <Ionicons name="lock-closed" size={16} color="#64748B" style={styles.lockIcon} />
+                                )}
+                            </View>
+                        </View>
 
-            {renderFooter()}
+                        {/* Network info */}
+                        <View style={styles.desktopNetworkInfo}>
+                            {currentNetwork.current?.networkPicturePath ? (
+                                <Image 
+                                    source={{uri: currentNetwork.current.networkPicturePath}} 
+                                    style={styles.desktopNetworkImage}
+                                    contentFit="cover"
+                                    transition={150}
+                                />
+                            ) : (
+                                <View style={styles.desktopNetworkImagePlaceholder}>
+                                    <Ionicons name="people" size={40} color="#94A3B8" />
+                                </View>
+                            )}
+
+                            <Text style={styles.desktopNetworkName}>{currentNetwork.current?.name}</Text>
+                            <Text style={styles.desktopNetworkDescription}>{currentNetwork.current?.description}</Text>
+
+                            <View style={styles.desktopNetworkStats}>
+                                <View style={styles.statItem}>
+                                    <Ionicons name="people" size={16} color="#64748B" />
+                                    <Text style={styles.statText}>{currentNetwork.current?.memberCount} members</Text>
+                                </View>
+
+                                <View style={styles.statItem}>
+                                    <Ionicons name="person" size={16} color="#64748B" />
+                                    <Text style={styles.statText}>Created by {currentNetwork.current?.creatorId}</Text>
+                                </View>
+                            </View>
+
+                            <View style={styles.desktopActionButtons}>
+                                <TouchableOpacity 
+                                    style={styles.desktopActionButton}
+                                    onPress={() => {
+                                        setIsFavorite(prev => {
+                                            setFavorite(!prev);
+                                            return !prev;
+                                        });
+                                    }}
+                                >
+                                    <Ionicons 
+                                        name={isFavorite ? "heart" : "heart-outline"} 
+                                        size={22} 
+                                        color={isFavorite ? "#F43F5E" : "#64748B"} 
+                                    />
+                                    <Text style={styles.desktopActionButtonText}>
+                                        {isFavorite ? "Favorited" : "Favorite"}
+                                    </Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity 
+                                    style={styles.desktopActionButton}
+                                    onPress={() => setModalVisible(true)}
+                                >
+                                    <Ionicons name="information-circle-outline" size={22} color="#64748B" />
+                                    <Text style={styles.desktopActionButtonText}>Network Info</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+
+                    {/* Messages content */}
+                    <View style={styles.desktopContent}>
+                        <FlatList
+                            ref={flatListRef}
+                            data={groupMessagesByDate(messages)}
+                            keyExtractor={(item) => item.id}
+                            renderItem={renderListItem}
+                            contentContainerStyle={[
+                                styles.messagesList,
+                                { paddingBottom: keyboardVisible ? 80 : 100 }
+                            ]}
+                            inverted={false}
+                            onEndReached={loadMoreMessages}
+                            onEndReachedThreshold={0.3}
+                            ListHeaderComponent={renderLoadingIndicator}
+                            ListEmptyComponent={renderEmptyComponent}
+                            showsVerticalScrollIndicator={false}
+                            onContentSizeChange={() => {
+                                if (isInitialLoad.current) {
+                                    flatListRef.current?.scrollToEnd({ animated: false });
+                                }
+                            }}
+                            maintainVisibleContentPosition={{
+                                minIndexForVisible: 0,
+                            }}
+                        />
+
+                        {renderFooter()}
+                    </View>
+                </View>
+            ) : (
+                // Mobile layout
+                <>
+                    {renderHeader()}
+
+                    <FlatList
+                        ref={flatListRef}
+                        data={groupMessagesByDate(messages)}
+                        keyExtractor={(item) => item.id}
+                        renderItem={renderListItem}
+                        contentContainerStyle={[
+                            styles.messagesList,
+                            { paddingBottom: keyboardVisible ? 80 : 100 }
+                        ]}
+                        inverted={false}
+                        onEndReached={loadMoreMessages}
+                        onEndReachedThreshold={0.3}
+                        ListHeaderComponent={renderLoadingIndicator}
+                        ListEmptyComponent={renderEmptyComponent}
+                        showsVerticalScrollIndicator={false}
+                        onContentSizeChange={() => {
+                            if (isInitialLoad.current) {
+                                flatListRef.current?.scrollToEnd({ animated: false });
+                            }
+                        }}
+                        maintainVisibleContentPosition={{
+                            minIndexForVisible: 0,
+                        }}
+                    />
+
+                    {renderFooter()}
+                </>
+            )}
 
             <Modal
                 visible={isModalVisible}
@@ -1161,6 +1281,88 @@ export default function Network() {
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
+        backgroundColor: '#F8FAFC',
+    },
+    // Desktop styles
+    desktopContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        backgroundColor: '#F8FAFC',
+    },
+    desktopSidebar: {
+        width: '30%',
+        maxWidth: 400,
+        borderRightWidth: 1,
+        borderRightColor: '#E2E8F0',
+        backgroundColor: '#FFFFFF',
+    },
+    desktopHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#E2E8F0',
+    },
+    desktopNetworkInfo: {
+        padding: 20,
+        alignItems: 'center',
+    },
+    desktopNetworkImage: {
+        width: 120,
+        height: 120,
+        borderRadius: 20,
+        marginBottom: 16,
+    },
+    desktopNetworkImagePlaceholder: {
+        width: 120,
+        height: 120,
+        borderRadius: 20,
+        backgroundColor: '#F1F5F9',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    desktopNetworkName: {
+        fontSize: 22,
+        fontWeight: '700',
+        color: '#1E293B',
+        marginBottom: 8,
+        textAlign: 'center',
+    },
+    desktopNetworkDescription: {
+        fontSize: 16,
+        color: '#64748B',
+        marginBottom: 20,
+        textAlign: 'center',
+        paddingHorizontal: 10,
+    },
+    desktopNetworkStats: {
+        width: '100%',
+        marginBottom: 24,
+    },
+    desktopActionButtons: {
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginTop: 10,
+    },
+    desktopActionButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#F1F5F9',
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+        borderRadius: 12,
+    },
+    desktopActionButtonText: {
+        fontSize: 14,
+        color: '#64748B',
+        fontWeight: '500',
+        marginLeft: 8,
+    },
+    desktopContent: {
         flex: 1,
         backgroundColor: '#F8FAFC',
     },
