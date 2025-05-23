@@ -9,7 +9,9 @@ import {
     ScrollView, 
     Dimensions,
     TextInput,
-    ActivityIndicator
+    ActivityIndicator,
+    Modal,
+    KeyboardAvoidingView
 } from "react-native";
 import "../../../global.css"
 import {router} from "expo-router";
@@ -20,9 +22,9 @@ import Post from "../../../components/Entries/Post";
 import {Image} from "expo-image";
 import {SafeAreaView} from "react-native-safe-area-context";
 import ip from "../../../components/AppManager";
+import {LinearGradient} from "expo-linear-gradient";
 
 export default function Index() {
-    const [selected, setSelected] = useState(0);
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -31,6 +33,17 @@ export default function Index() {
     const [searchText, setSearchText] = useState("");
     const [showSearch, setShowSearch] = useState(false);
     const searchInput = useRef(null);
+
+    // State for image viewing
+    const [showImageModal, setShowImageModal] = useState(false);
+    const [currentImage, setCurrentImage] = useState(null);
+    const [imageGallery, setImageGallery] = useState([]);
+
+    // State for commenting
+    const [showCommentInput, setShowCommentInput] = useState(false);
+    const [commentText, setCommentText] = useState("");
+    const [currentPost, setCurrentPost] = useState(null);
+    const [comments, setComments] = useState([]);
 
     const token = useRef("");
     const username = useRef("");
@@ -200,28 +213,119 @@ export default function Index() {
     };
 
     const handleCommentPress = (post) => {
-        // Navigate to post detail or open comment modal
-        router.push(`/${post.username}?post=${post.id.millis}`);
+        // Open comment input for this post
+        setCurrentPost(post);
+        setShowCommentInput(true);
+
+        // Initialize comments (in a real app, you would fetch comments from the server)
+        // For now, we'll just use an empty array
+        setComments([]);
     };
 
     const handleImagePress = (post, image) => {
-        // Navigate to post detail or open image viewer
+        // Open image viewer directly on the homepage
+        setCurrentImage(image);
+
         if (post.content.length > 1) {
-            // Open image gallery
-            router.push(`/${post.username}?post=${post.id.millis}`);
+            // Set the image gallery for multiple images
+            setImageGallery(post.content);
         } else {
-            // Open post detail
-            router.push(`/${post.username}?post=${post.id.millis}`);
+            // Set a single image in the gallery
+            setImageGallery([image]);
         }
+
+        setShowImageModal(true);
     };
 
     const handleProfilePress = (username) => {
         router.push(`/${username}`);
     };
 
+    const addComment = async () => {
+        if (commentText.trim() === "") return;
+
+        // Get user profile picture
+        let profilePath = "";
+        if (Platform.OS === "web") {
+            const profile = localStorage.getItem('profile');
+            if (profile) {
+                profilePath = JSON.parse(profile).profilePicturePath;
+            }
+        } else {
+            const profile = await SecureStore.getItem('profile');
+            if (profile) {
+                profilePath = JSON.parse(profile).profilePicturePath;
+            }
+        }
+
+        // Create a new comment
+        const newComment = {
+            id: comments.length,
+            author: username.current,
+            text: commentText,
+            profilePicturePath: profilePath ? profilePath.split(',')[0] : "",
+        };
+
+        // Add the comment to the local state
+        setComments(prevState => [...prevState, newComment]);
+
+        // Update the post's comment count
+        setPosts(prevPosts => 
+            prevPosts.map(p => {
+                if (p.id.millis === currentPost.id.millis) {
+                    return {
+                        ...p,
+                        comments: typeof p.comments === 'number' ? p.comments + 1 : 1
+                    };
+                }
+                return p;
+            })
+        );
+
+        // Clear the comment text
+        setCommentText("");
+
+        // In a real app, you would send the comment to the server
+        // For now, we'll just simulate a successful comment
+        /*
+        try {
+            const response = await fetch(`${ip}/profile/posts/${currentPost.username}/${currentPost.id.millis}`, {
+                method: 'POST',
+                headers: {
+                    "Authorization": `Bearer ${token.current}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    comment: commentText,
+                })
+            });
+
+            if (!response.ok) {
+                // If the request fails, remove the comment from the local state
+                setComments(prevState => prevState.slice(0, -1));
+
+                // And revert the comment count
+                setPosts(prevPosts => 
+                    prevPosts.map(p => {
+                        if (p.id.millis === currentPost.id.millis) {
+                            return {
+                                ...p,
+                                comments: p.comments - 1
+                            };
+                        }
+                        return p;
+                    })
+                );
+            }
+        } catch (error) {
+            console.error('Error adding comment:', error);
+        }
+        */
+    };
+
     const renderPostItem = ({ item }) => (
-        <View className={`w-full ${isDesktop ? "px-8" : "px-4"} mt-4`}>
-            <View className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        <View className={`w-full ${isDesktop ? "mb-6" : "px-4 mt-4"}`}>
+            <View className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200">
                 {/* Post Header with Profile Info */}
                 <View className="flex-row items-center p-4">
                     <TouchableOpacity 
@@ -230,13 +334,13 @@ export default function Index() {
                     >
                         <Image 
                             source={{ uri: item.profilePicture }}
-                            style={{ width: 40, height: 40, borderRadius: 20 }}
+                            style={{ width: isDesktop ? 48 : 40, height: isDesktop ? 48 : 40, borderRadius: isDesktop ? 24 : 20 }}
                             contentFit="cover"
                         />
                     </TouchableOpacity>
                     <View className="ml-3">
                         <TouchableOpacity onPress={() => handleProfilePress(item.username)}>
-                            <Text className="text-gray-800 font-bold">{item.name}</Text>
+                            <Text className={`text-gray-800 font-bold ${isDesktop ? "text-lg" : ""}`}>{item.name}</Text>
                         </TouchableOpacity>
                         <Text className="text-gray-500 text-xs">@{item.username}</Text>
                     </View>
@@ -248,6 +352,7 @@ export default function Index() {
                     onLikePress={() => handleLikePost(item)} 
                     onCommentPress={() => handleCommentPress(item)} 
                     onImagePress={(image) => handleImagePress(item, image)} 
+                    isDesktop={isDesktop}
                 />
             </View>
         </View>
@@ -265,43 +370,30 @@ export default function Index() {
         </View>
     );
 
-    const renderContent = () => {
-        switch (selected) {
-            case 0: // Friends tab
-                return (
-                    <FlatList
-                        data={posts}
-                        renderItem={renderPostItem}
-                        keyExtractor={item => item.id.millis}
-                        contentContainerStyle={{
-                            paddingBottom: 40,
-                            maxWidth: isDesktop ? '1200px' : '100%',
-                            alignSelf: 'center',
-                            width: '100%'
-                        }}
-                        ListEmptyComponent={!loading && renderEmptyList()}
-                        refreshControl={
-                            <RefreshControl
-                                refreshing={refreshing}
-                                onRefresh={onRefresh}
-                                colors={["#3B82F6"]}
-                                tintColor="#3B82F6"
-                            />
-                        }
+    // Render friends' posts
+    const renderFriendsPosts = () => {
+        return (
+            <FlatList
+                data={posts}
+                renderItem={renderPostItem}
+                keyExtractor={item => item.id.millis}
+                contentContainerStyle={{
+                    paddingBottom: 40,
+                    maxWidth: isDesktop ? '1200px' : '100%',
+                    alignSelf: 'center',
+                    width: '100%'
+                }}
+                ListEmptyComponent={!loading && renderEmptyList()}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        colors={["#3B82F6"]}
+                        tintColor="#3B82F6"
                     />
-                );
-            case 1: // Explore tab
-                return (
-                    <View className="flex-1 items-center justify-center">
-                        <Text className="text-xl font-semibold text-gray-800 mb-2">Explore Coming Soon</Text>
-                        <Text className="text-gray-500 text-center px-10">
-                            We're working on bringing you exciting content to explore.
-                        </Text>
-                    </View>
-                );
-            default:
-                return null;
-        }
+                }
+            />
+        );
     };
 
     const toggleSearch = () => {
@@ -344,7 +436,7 @@ export default function Index() {
 
             {/* Search Bar */}
             {showSearch && (
-                <View className="px-4 pt-2 pb-2">
+                <View className={`px-4 pt-2 pb-2 ${isDesktop ? "max-w-7xl mx-auto" : ""}`}>
                     <View className="flex-row items-center bg-white/90 rounded-full px-4 py-2 border border-gray-200 shadow-sm">
                         <Ionicons name="search" size={18} color="#64748B" />
                         <TextInput
@@ -364,50 +456,226 @@ export default function Index() {
                 </View>
             )}
 
-            {/* Tabs */}
-            <View className="flex-row justify-around items-center border-b border-gray-200 bg-white">
-                <TouchableOpacity 
-                    activeOpacity={0.7} 
-                    onPress={() => setSelected(0)}
-                    className={`py-3 px-6 ${selected === 0 ? 'border-b-2 border-blue-500' : ''}`}
-                >
-                    <Text 
-                        style={{
-                            color: selected === 0 ? "#3B82F6" : "#64748B",
-                            fontWeight: selected === 0 ? "700" : "500"
-                        }}
-                        className="text-base"
-                    >
-                        Friends
-                    </Text>
-                </TouchableOpacity>
+            {/* Desktop Layout */}
+            {isDesktop ? (
+                <View className="flex-row max-w-7xl mx-auto">
 
-                <TouchableOpacity 
-                    activeOpacity={0.7} 
-                    onPress={() => setSelected(1)}
-                    className={`py-3 px-6 ${selected === 1 ? 'border-b-2 border-blue-500' : ''}`}
-                >
-                    <Text 
-                        style={{
-                            color: selected === 1 ? "#3B82F6" : "#64748B",
-                            fontWeight: selected === 1 ? "700" : "500"
-                        }}
-                        className="text-base"
-                    >
-                        Explore
-                    </Text>
-                </TouchableOpacity>
-            </View>
-
-            {/* Loading Indicator */}
-            {loading ? (
-                <View className="flex-1 items-center justify-center">
-                    <ActivityIndicator size="large" color="#3B82F6" />
-                    <Text className="text-gray-500 mt-4">Loading posts...</Text>
+                    {/* Main Content */}
+                    <View className="w-3/4 p-4">
+                        {loading ? (
+                            <View className="flex-1 items-center justify-center py-20">
+                                <ActivityIndicator size="large" color="#3B82F6" />
+                                <Text className="text-gray-500 mt-4">Loading posts...</Text>
+                            </View>
+                        ) : (
+                            renderFriendsPosts()
+                        )}
+                    </View>
                 </View>
             ) : (
-                renderContent()
+                /* Mobile Layout */
+                <>
+                    {loading ? (
+                        <View className="flex-1 items-center justify-center">
+                            <ActivityIndicator size="large" color="#3B82F6" />
+                            <Text className="text-gray-500 mt-4">Loading posts...</Text>
+                        </View>
+                    ) : (
+                        renderFriendsPosts()
+                    )}
+                </>
             )}
+
+            {/* Image Viewing Modal */}
+            <Modal
+                visible={showImageModal}
+                transparent={true}
+                onRequestClose={() => setShowImageModal(false)}
+                animationType="fade"
+            >
+                <View className="flex-1 bg-black/90 justify-center items-center">
+                    <View className={`absolute top-0 left-0 right-0 flex-row justify-between items-center p-4 z-10 ${isDesktop ? "max-w-6xl mx-auto" : ""}`}>
+                        <TouchableOpacity
+                            onPress={() => setShowImageModal(false)}
+                            className="w-10 h-10 rounded-full bg-black/50 items-center justify-center"
+                        >
+                            <Ionicons name="close" size={24} color="white" />
+                        </TouchableOpacity>
+
+                        {imageGallery.length > 1 && (
+                            <Text className="text-white font-medium">
+                                {imageGallery.indexOf(currentImage) + 1} / {imageGallery.length}
+                            </Text>
+                        )}
+
+                        <View style={{ width: 40 }} />
+                    </View>
+
+                    {isDesktop ? (
+                        <View className="max-w-6xl w-full mx-auto flex-row justify-center items-center">
+                            {imageGallery.length > 1 && (
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        const currentIndex = imageGallery.indexOf(currentImage);
+                                        if (currentIndex > 0) {
+                                            setCurrentImage(imageGallery[currentIndex - 1]);
+                                        }
+                                    }}
+                                    className="w-12 h-12 rounded-full bg-black/50 items-center justify-center mr-4"
+                                    disabled={imageGallery.indexOf(currentImage) === 0}
+                                    style={{ opacity: imageGallery.indexOf(currentImage) === 0 ? 0.5 : 1 }}
+                                >
+                                    <Ionicons name="chevron-back" size={28} color="white" />
+                                </TouchableOpacity>
+                            )}
+
+                            <Image
+                                source={{ uri: currentImage }}
+                                style={{ width: '80%', height: '80%', maxHeight: 800 }}
+                                contentFit="contain"
+                            />
+
+                            {imageGallery.length > 1 && (
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        const currentIndex = imageGallery.indexOf(currentImage);
+                                        if (currentIndex < imageGallery.length - 1) {
+                                            setCurrentImage(imageGallery[currentIndex + 1]);
+                                        }
+                                    }}
+                                    className="w-12 h-12 rounded-full bg-black/50 items-center justify-center ml-4"
+                                    disabled={imageGallery.indexOf(currentImage) === imageGallery.length - 1}
+                                    style={{ opacity: imageGallery.indexOf(currentImage) === imageGallery.length - 1 ? 0.5 : 1 }}
+                                >
+                                    <Ionicons name="chevron-forward" size={28} color="white" />
+                                </TouchableOpacity>
+                            )}
+                        </View>
+                    ) : (
+                        <FlatList
+                            data={imageGallery}
+                            horizontal
+                            pagingEnabled
+                            initialScrollIndex={imageGallery.indexOf(currentImage)}
+                            getItemLayout={(data, index) => ({
+                                length: windowWidth,
+                                offset: windowWidth * index,
+                                index,
+                            })}
+                            showsHorizontalScrollIndicator={false}
+                            keyExtractor={(item, index) => index.toString()}
+                            renderItem={({ item }) => (
+                                <View style={{ width: windowWidth, height: '100%' }} className="items-center justify-center">
+                                    <Image
+                                        source={{ uri: item }}
+                                        style={{ width: '90%', height: '80%' }}
+                                        contentFit="contain"
+                                    />
+                                </View>
+                            )}
+                            onMomentumScrollEnd={(e) => {
+                                const index = Math.round(e.nativeEvent.contentOffset.x / windowWidth);
+                                setCurrentImage(imageGallery[index]);
+                            }}
+                        />
+                    )}
+                </View>
+            </Modal>
+
+            {/* Comment Input Modal */}
+            <Modal
+                visible={showCommentInput}
+                transparent={true}
+                onRequestClose={() => setShowCommentInput(false)}
+                animationType={isDesktop ? "fade" : "slide"}
+            >
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    style={{ flex: 1 }}
+                    keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+                >
+                    <View className="flex-1 bg-black/50 justify-center items-center">
+                        <View className={`${isDesktop ? "max-w-2xl w-full mx-auto bg-white rounded-xl shadow-xl" : "bg-white rounded-t-xl w-full mt-auto"}`}>
+                            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
+                                <TouchableOpacity
+                                    onPress={() => setShowCommentInput(false)}
+                                    className="p-2"
+                                >
+                                    <Ionicons name="close" size={24} color="#3B82F6" />
+                                </TouchableOpacity>
+                                <Text className="text-lg font-bold text-gray-800">Add Comment</Text>
+                                <View style={{ width: 40 }} />
+                            </View>
+
+                            {currentPost && (
+                                <View className="px-4 py-3 border-b border-gray-100 bg-gray-50">
+                                    <View className="flex-row items-center">
+                                        <Image
+                                            source={{ uri: currentPost.profilePicture }}
+                                            style={{ width: 36, height: 36, borderRadius: 18 }}
+                                            contentFit="cover"
+                                        />
+                                        <View className="ml-2">
+                                            <Text className="font-bold text-gray-800">{currentPost.name}</Text>
+                                            <Text className="text-gray-500 text-xs">@{currentPost.username}</Text>
+                                        </View>
+                                    </View>
+                                    <Text className="text-gray-700 mt-2" numberOfLines={2}>{currentPost.title}</Text>
+                                </View>
+                            )}
+
+                            {/* Comments List */}
+                            {comments.length > 0 ? (
+                                <FlatList
+                                    data={comments}
+                                    keyExtractor={(item) => item.id.toString()}
+                                    style={{ maxHeight: isDesktop ? 400 : 300 }}
+                                    renderItem={({ item }) => (
+                                        <View className="bg-gray-50 rounded-lg p-4 mx-4 my-2">
+                                            <View className="flex-row items-center mb-2">
+                                                <View className="w-8 h-8 rounded-full bg-blue-100 items-center justify-center mr-2">
+                                                    <Image
+                                                        source={{ uri: item.profilePicturePath }}
+                                                        style={{ width: 30, height: 30, borderRadius: 15 }}
+                                                    />
+                                                </View>
+                                                <Text className="font-bold text-gray-800">{item.author}</Text>
+                                            </View>
+                                            <Text className="text-gray-700">{item.text}</Text>
+                                        </View>
+                                    )}
+                                />
+                            ) : (
+                                <View className="items-center py-8 bg-gray-50 mx-4 my-4 rounded-lg">
+                                    <Ionicons name="chatbubble-outline" size={40} color="#CBD5E1" />
+                                    <Text className="text-gray-500 mt-2">No comments yet</Text>
+                                    <Text className="text-gray-400 text-sm">Be the first to comment</Text>
+                                </View>
+                            )}
+
+                            {/* Comment Input */}
+                            <View className="px-4 py-3 border-t border-gray-200">
+                                <View className="flex-row items-center bg-gray-100 rounded-full px-4 py-2">
+                                    <TextInput
+                                        className="flex-1 text-gray-700 outline-none py-2"
+                                        placeholder="Add a comment..."
+                                        value={commentText}
+                                        onChangeText={setCommentText}
+                                        multiline
+                                    />
+                                    <TouchableOpacity
+                                        onPress={addComment}
+                                        disabled={commentText.trim() === ""}
+                                        className={`ml-2 p-2 rounded-full ${commentText.trim() === "" ? "bg-gray-300" : "bg-blue-500"}`}
+                                    >
+                                        <Ionicons name="send" size={20} color="white" />
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+                </KeyboardAvoidingView>
+            </Modal>
         </SafeAreaView>
     );
 }
