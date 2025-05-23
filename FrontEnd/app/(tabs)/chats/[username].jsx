@@ -9,7 +9,7 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-    Dimensions, Pressable
+    Dimensions, Pressable, BackHandler
 } from "react-native";
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {useLocalSearchParams, useNavigation, useRouter, useSegments} from "expo-router";
@@ -167,6 +167,20 @@ export default function ChatRoom() {
         }
     }, []);
 
+    useEffect(() => {
+        if (Platform.OS === 'android') {
+            const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+                if (!isDesktop) {
+                    router.navigate('/chats');
+                    return true;
+                }
+                return false;
+            });
+
+            return () => backHandler.remove();
+        }
+    }, []);
+
     const bottomPadding = Platform.OS === 'ios'
         ? keyboardVisible
             ? 10
@@ -190,7 +204,7 @@ export default function ChatRoom() {
             window.history.pushState({}, '', newUrl);
             router.back();
         } else {
-            router.back();
+            router.navigate("/chats")
         }
     };
 

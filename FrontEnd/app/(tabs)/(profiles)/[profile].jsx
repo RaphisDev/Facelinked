@@ -1582,7 +1582,7 @@
                                                     </View>
 
                                                     <View className="flex-row">
-                                                        {profileName.current !== username.current && <TouchableOpacity
+                                                        {item.item.memberId !== username.current && <TouchableOpacity
                                                             onPress={() => {setShowModal(false);router.navigate(`/chats/${item.item.memberId}`)}}
                                                             className="mr-2 w-10 h-10 rounded-full bg-blue-100 items-center justify-center"
                                                         >

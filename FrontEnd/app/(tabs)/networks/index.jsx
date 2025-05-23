@@ -987,8 +987,9 @@ export default function Networks() {
                                 >
                                     {selectedImage ? (
                                         <Image 
-                                            source={{ uri: selectedImage.assets[0].uri }}
+                                            source={{ uri: selectedImage.assets[0].uri}}
                                             style={styles.selectedNetworkImage}
+                                            aspectRatio={1}
                                             contentFit="cover"
                                             transition={200}
                                         />
@@ -1135,6 +1136,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        width: '100%',
     },
     createModalContent: {
         width: '95%', // Wider to fill more of the screen
@@ -1294,6 +1296,8 @@ const styles = StyleSheet.create({
     selectedNetworkImage: {
         width: '100%',
         height: '100%',
+        alignSelf: "center",
+        borderRadius: 12,
     },
     modalFooter: {
         flexDirection: 'row',

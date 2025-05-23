@@ -1099,8 +1099,22 @@ export default function Network() {
                                     flatListRef.current?.scrollToEnd({ animated: false });
                                 }
                             }}
+                            initialScrollIndex={messages.length > 0 ? messages.length - 1 : 0}
                             maintainVisibleContentPosition={{
                                 minIndexForVisible: 0,
+                            }}
+                            getItemLayout={(data, index) => {
+                                const height = 80;
+                                const dateHeaderHeight = 60;
+
+                                const item = data[index];
+                                const itemHeight = item?.type === 'date-header' ? dateHeaderHeight : height;
+
+                                return {
+                                    length: itemHeight,
+                                    offset: height * index,
+                                    index,
+                                };
                             }}
                         />
 
@@ -1132,8 +1146,22 @@ export default function Network() {
                                 flatListRef.current?.scrollToEnd({ animated: false });
                             }
                         }}
+                        initialScrollIndex={messages.length > 0 ? messages.length - 1 : 0}
                         maintainVisibleContentPosition={{
                             minIndexForVisible: 0,
+                        }}
+                        getItemLayout={(data, index) => {
+                            const height = 80;
+                            const dateHeaderHeight = 60;
+
+                            const item = data[index];
+                            const itemHeight = item?.type === 'date-header' ? dateHeaderHeight : height;
+
+                            return {
+                                length: itemHeight,
+                                offset: height * index,
+                                index,
+                            };
                         }}
                     />
 
@@ -1510,6 +1538,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        width: '100%',
     },
     modalContent: {
         width: '95%', // Wider to fill more of the screen

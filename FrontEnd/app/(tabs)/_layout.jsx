@@ -84,17 +84,13 @@ export default function TabsLayout() {
                     }
                 }
             }} tabBar={(props) => <CustomTabBar {...props}/>}>
-                <Tabs.Screen name="home/index" options={{headerTitle: () => <Pressable onPress={() => router.replace("/home", {animationEnabled: false})}>
-                        <Text className="font-courier text-xl">Facelinked</Text>
-                </Pressable>,
-                    headerTitleAlign: "center",
+                <Tabs.Screen name="home/index" options={{headerShown: false,
                     tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "home-sharp" : "home-outline"} size={30}/>,
                 }}/>
                 <Tabs.Screen name="networks" options={{headerShown: false,
                     tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "git-merge-sharp" : "git-merge-outline"} size={30}/>
                 }}/>
                 <Tabs.Screen name="chats" options={{headerShown: false,
-                    headerTitleAlign: "center",
                     tabBarIcon: ({focused, color}) => <Ionicons name={focused ? "chatbubbles-sharp" : "chatbubble-outline"} size={30}/>,
                 }}/>
 
