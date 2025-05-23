@@ -458,8 +458,8 @@ export default function Index() {
 
             {/* Desktop Layout */}
             {isDesktop ? (
-                <View className="flex-row max-w-7xl mx-auto">
-
+                <View className="flex-row max-w-7xl mx-auto" style={{ height: '100%', overflow: 'auto' }}
+                >
                     {/* Main Content */}
                     <View className="w-3/4 p-4">
                         {loading ? (
