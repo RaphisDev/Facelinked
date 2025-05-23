@@ -507,20 +507,38 @@ export default function Networks() {
                             <Ionicons name="add-outline" size={24} color="#3B82F6" />
                         </TouchableOpacity>
 
-                        <TouchableOpacity 
-                            style={styles.headerActionButton}
-                            onPress={navigateToMeetPeople}
-                        >
-                            <Ionicons name="people-outline" size={24} color="#3B82F6" />
-                        </TouchableOpacity>
+                        {isDesktop ? (
+                            <TouchableOpacity 
+                                style={[styles.headerActionButton, styles.desktopActionButton]}
+                                onPress={() => {
+                                    setCurrentPage(1);
+                                }}
+                            >
+                                <Ionicons name="people-outline" size={24} color="#3B82F6" />
+                                <Text style={styles.desktopActionButtonText}>Meet People</Text>
+                            </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity 
+                                style={styles.headerActionButton}
+                                onPress={navigateToMeetPeople}
+                            >
+                                <Ionicons name="people-outline" size={24} color="#3B82F6" />
+                            </TouchableOpacity>
+                        )}
                     </View>
                 </View>
 
                 {/* Search Bar */}
-                <View style={styles.searchContainer}>
-                    <Ionicons name="search" size={20} color="#64748B" style={styles.searchIcon} />
+                <View style={[
+                    styles.searchContainer,
+                    isDesktop && styles.desktopSearchContainer
+                ]}>
+                    <Ionicons name="search" size={isDesktop ? 24 : 20} color="#64748B" style={styles.searchIcon} />
                     <TextInput
-                        style={styles.searchInput}
+                        style={[
+                            styles.searchInput,
+                            isDesktop && styles.desktopSearchInput
+                        ]}
                         placeholder="Search networks..."
                         placeholderTextColor="#9CA3AF"
                         value={searchText}
@@ -536,20 +554,29 @@ export default function Networks() {
                             }}
                             style={styles.clearButton}
                         >
-                            <Ionicons name="close-circle" size={18} color="#64748B" />
+                            <Ionicons name="close-circle" size={isDesktop ? 22 : 18} color="#64748B" />
                         </TouchableOpacity>
                     )}
                 </View>
 
                 {isSearching ? (
-                    <View style={styles.searchResultsContainer}>
+                    <View style={[
+                        styles.searchResultsContainer,
+                        isDesktop && styles.desktopSearchResultsContainer
+                    ]}>
                         <FlatList 
                             data={searchResults} 
                             keyExtractor={(item) => item.id.toString()}
                             ListEmptyComponent={() => (
                                 <View style={styles.emptySearchContainer}>
-                                    <Text style={styles.emptySearchText}>No results found</Text>
-                                    <Text style={styles.emptySearchSubtext}>Try a different search term</Text>
+                                    <Text style={[
+                                        styles.emptySearchText,
+                                        isDesktop && styles.desktopEmptySearchText
+                                    ]}>No results found</Text>
+                                    <Text style={[
+                                        styles.emptySearchSubtext,
+                                        isDesktop && styles.desktopEmptySearchSubtext
+                                    ]}>Try a different search term</Text>
                                 </View>
                             )}
                             renderItem={({item}) => (
@@ -560,9 +587,15 @@ export default function Networks() {
                                         setIsSearching(false);
                                         Keyboard.dismiss();
                                     }} 
-                                    style={styles.searchResultItem}
+                                    style={[
+                                        styles.searchResultItem,
+                                        isDesktop && styles.desktopSearchResultItem
+                                    ]}
                                 >
-                                    <View style={styles.searchResultImageContainer}>
+                                    <View style={[
+                                        styles.searchResultImageContainer,
+                                        isDesktop && styles.desktopSearchResultImageContainer
+                                    ]}>
                                         {item.networkPicturePath ? (
                                             <Image 
                                                 source={{uri: item.networkPicturePath}} 
@@ -572,19 +605,31 @@ export default function Networks() {
                                             />
                                         ) : (
                                             <View style={styles.searchResultImagePlaceholder}>
-                                                <Ionicons name="people" size={20} color="#94A3B8" />
+                                                <Ionicons name="people" size={isDesktop ? 24 : 20} color="#94A3B8" />
                                             </View>
                                         )}
                                     </View>
                                     <View style={styles.searchResultTextContainer}>
-                                        <Text style={styles.searchResultTitle}>{item.name}</Text>
-                                        <Text style={styles.searchResultDescription} numberOfLines={1}>{item.description}</Text>
+                                        <Text style={[
+                                            styles.searchResultTitle,
+                                            isDesktop && styles.desktopSearchResultTitle
+                                        ]}>{item.name}</Text>
+                                        <Text style={[
+                                            styles.searchResultDescription,
+                                            isDesktop && styles.desktopSearchResultDescription
+                                        ]} numberOfLines={1}>{item.description}</Text>
                                     </View>
-                                    <Ionicons name="chevron-forward" size={18} color="#64748B" />
+                                    <Ionicons name="chevron-forward" size={isDesktop ? 22 : 18} color="#64748B" />
                                 </TouchableOpacity>
                             )}
-                            ItemSeparatorComponent={() => <View style={styles.separator} />}
-                            contentContainerStyle={styles.searchResultsList}
+                            ItemSeparatorComponent={() => <View style={[
+                                styles.separator,
+                                isDesktop && styles.desktopSeparator
+                            ]} />}
+                            contentContainerStyle={[
+                                styles.searchResultsList,
+                                isDesktop && styles.desktopSearchResultsList
+                            ]}
                         />
                     </View>
                 ) : (
@@ -744,10 +789,14 @@ export default function Networks() {
             <View style={styles.meetPeopleContainer}>
                 <View style={styles.meetPeopleHeader}>
                     <TouchableOpacity 
-                        style={styles.backButton}
-                        onPress={navigateToNetworks}
+                        style={[
+                            styles.backButton,
+                            isDesktop && { width: 'auto', paddingHorizontal: 16 }
+                        ]}
+                        onPress={isDesktop ? () => setCurrentPage(0) : navigateToNetworks}
                     >
                         <Ionicons name="arrow-back" size={24} color="#3B82F6" />
+                        {isDesktop && <Text style={styles.desktopBackButtonText}>Back to Networks</Text>}
                     </TouchableOpacity>
                     <Text style={styles.meetPeopleTitle}>Meet New People</Text>
                 </View>
@@ -869,9 +918,8 @@ export default function Networks() {
             onRequestClose={() => setCreateModalVisible(false)}
         >
             <BlurView intensity={Platform.OS === 'ios' ? 50 : 100} style={styles.modalOverlay}>
-                <Pressable 
+                <View
                     style={styles.modalOverlay} 
-                    onPress={() => setCreateModalVisible(false)}
                 >
                     <View 
                         style={styles.createModalContent}
@@ -1027,7 +1075,7 @@ export default function Networks() {
                             </TouchableOpacity>
                         </View>
                     </View>
-                </Pressable>
+                </View>
             </BlurView>
         </Modal>
     );
@@ -1037,13 +1085,10 @@ export default function Networks() {
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
             <GestureHandlerRootView style={{flex: 1}}>
                 {isDesktop ? (
-                    // Desktop layout - side by side view
+                    // Desktop layout - centered content with max width
                     <View style={styles.desktopContainer}>
-                        <View style={styles.desktopSidebar}>
-                            {renderNetworksContent()}
-                        </View>
                         <View style={styles.desktopContent}>
-                            {renderMeetPeopleContent()}
+                            {currentPage === 0 ? renderNetworksContent() : renderMeetPeopleContent()}
                         </View>
                     </View>
                 ) : (
@@ -1088,19 +1133,14 @@ const styles = StyleSheet.create({
     // Desktop styles
     desktopContainer: {
         flex: 1,
-        flexDirection: 'row',
         backgroundColor: '#F8FAFC',
-    },
-    desktopSidebar: {
-        width: '35%',
-        maxWidth: 450,
-        borderRightWidth: 1,
-        borderRightColor: '#E2E8F0',
-        backgroundColor: '#FFFFFF',
+        alignItems: 'center',
     },
     desktopContent: {
-        flex: 1,
+        width: '100%',
+        maxWidth: 1024, // Similar to max-w-7xl in Tailwind
         backgroundColor: '#F8FAFC',
+        paddingHorizontal: 20,
     },
     contentContainer: {
         flex: 1,
@@ -1127,6 +1167,16 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(59, 130, 246, 0.1)',
         justifyContent: 'center',
         alignItems: 'center',
+        marginLeft: 8,
+    },
+    desktopActionButton: {
+        width: 'auto',
+        paddingHorizontal: 16,
+        flexDirection: 'row',
+    },
+    desktopActionButtonText: {
+        color: '#3B82F6',
+        fontWeight: '500',
         marginLeft: 8,
     },
 
@@ -1348,6 +1398,15 @@ const styles = StyleSheet.create({
         shadowRadius: 2,
         elevation: 2,
     },
+    desktopSearchContainer: {
+        paddingHorizontal: 16,
+        paddingVertical: 14,
+        borderRadius: 16,
+        marginBottom: 24,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+    },
     searchIcon: {
         marginRight: 8,
     },
@@ -1356,6 +1415,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#1E293B',
         padding: 0,
+    },
+    desktopSearchInput: {
+        fontSize: 18,
+        paddingVertical: 2,
     },
     clearButton: {
         padding: 4,
@@ -1423,14 +1486,35 @@ const styles = StyleSheet.create({
     searchResultsContainer: {
         flex: 1,
     },
+    desktopSearchResultsContainer: {
+        backgroundColor: 'white',
+        borderRadius: 16,
+        padding: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+    },
     searchResultsList: {
         paddingTop: 8,
+    },
+    desktopSearchResultsList: {
+        paddingTop: 12,
+        paddingHorizontal: 8,
     },
     searchResultItem: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 12,
         paddingHorizontal: 4,
+    },
+    desktopSearchResultItem: {
+        paddingVertical: 16,
+        paddingHorizontal: 12,
+        borderRadius: 12,
+        backgroundColor: '#F8FAFC',
+        marginVertical: 4,
     },
     searchResultImageContainer: {
         width: 48,
@@ -1441,6 +1525,12 @@ const styles = StyleSheet.create({
         marginRight: 12,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    desktopSearchResultImageContainer: {
+        width: 60,
+        height: 60,
+        borderRadius: 12,
+        marginRight: 16,
     },
     searchResultImage: {
         width: '100%',
@@ -1462,14 +1552,24 @@ const styles = StyleSheet.create({
         color: '#1E293B',
         marginBottom: 4,
     },
+    desktopSearchResultTitle: {
+        fontSize: 18,
+        fontWeight: '700',
+    },
     searchResultDescription: {
         fontSize: 14,
         color: '#64748B',
+    },
+    desktopSearchResultDescription: {
+        fontSize: 15,
     },
     separator: {
         height: 1,
         backgroundColor: '#E2E8F0',
         marginVertical: 4,
+    },
+    desktopSeparator: {
+        marginVertical: 8,
     },
     emptySearchContainer: {
         alignItems: 'center',
@@ -1481,9 +1581,15 @@ const styles = StyleSheet.create({
         color: '#64748B',
         marginBottom: 8,
     },
+    desktopEmptySearchText: {
+        fontSize: 22,
+    },
     emptySearchSubtext: {
         fontSize: 14,
         color: '#94A3B8',
+    },
+    desktopEmptySearchSubtext: {
+        fontSize: 16,
     },
 
     // Meet People styles
@@ -1506,6 +1612,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
+        flexDirection: 'row',
+    },
+    desktopBackButtonText: {
+        color: '#3B82F6',
+        fontWeight: '500',
+        marginLeft: 8,
     },
     meetPeopleTitle: {
         fontSize: 20, // Smaller font size to match chats and profiles
