@@ -723,7 +723,7 @@ export default function Networks() {
                             ]
                         }}>
                             {/* Favorites Tab Content */}
-                            <View style={{ width: windowWidth }}>
+                            <View style={{ width: windowWidth, marginLeft: -16 }}>
                                 <FlatList 
                                     data={favoriteNetworks}
                                     keyExtractor={(item) => item.networkId.toString()}
