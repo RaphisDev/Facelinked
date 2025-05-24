@@ -125,25 +125,18 @@ export default function AccountSettings() {
 
     return (
         <SafeAreaView className="flex-1 bg-blue-50/50 dark:bg-black">
-            {/* Header */}
-            <View className="flex-row justify-between items-center px-4 pt-2 pb-4">
-                <View className="flex-row items-center">
-                    <Text className="text-2xl font-bold text-blue-600 dark:text-blue-400">Account Settings</Text>
-                </View>
-            </View>
-
             {/* Content */}
             <ScrollView 
                 className="flex-1 px-4"
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{
-                    paddingBottom: 40,
+                    paddingBottom: 100,
                     maxWidth: isDesktop ? '800px' : '100%',
                     alignSelf: 'center',
                     width: '100%'
                 }}
             >
-                <View className={`${isDesktop ? "max-w-2xl mx-auto" : ""} w-full`}>
+                <View className={`${isDesktop ? "max-w-2xl mx-auto" : ""} w-full mt-4`}>
                     {/* Account Section */}
                     <View className="mb-6">
                         <Text className="text-lg font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1">Account Management</Text>
@@ -152,7 +145,14 @@ export default function AccountSettings() {
                         <TouchableOpacity 
                             activeOpacity={0.7}
                             onPress={handleLogout}
-                            className="flex-row items-center p-4 bg-white dark:bg-dark-primary rounded-xl shadow-sm mb-3 hover:shadow-md transition-shadow duration-200"
+                            style={{
+                                shadowColor: '#000',
+                                shadowOpacity: 0.2,
+                                shadowRadius: 1.5,
+                                elevation: 2,
+                            }}
+
+                            className="flex-row items-center p-4 bg-white dark:bg-dark-primary rounded-xl mb-3 hover:shadow-md transition-shadow duration-200"
                         >
                             <View className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 items-center justify-center">
                                 <Ionicons name="log-out-outline" size={22} color="#3B82F6" />

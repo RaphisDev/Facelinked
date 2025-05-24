@@ -685,19 +685,7 @@ export default function Networks() {
                 ) : (
                     <>
                         <Animated.View 
-                            style={[
-                                styles.tabContainer,
-                                {
-                                    transform: [
-                                        {
-                                            translateX: tabSlideAnimation.interpolate({
-                                                inputRange: [0, 1],
-                                                outputRange: [0, -20] // Slide left when going to Friends tab
-                                            })
-                                        }
-                                    ]
-                                }
-                            ]}
+                            style={styles.tabContainer}
                         >
                             <TouchableOpacity 
                                 style={[styles.tabButton, selected === 0 && styles.activeTabButton]} 

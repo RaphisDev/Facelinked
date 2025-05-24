@@ -54,25 +54,18 @@ export default function Credits() {
 
     return (
         <SafeAreaView className="flex-1 bg-blue-50/50 dark:bg-black">
-            {/* Header */}
-            <View className="flex-row justify-between items-center px-4 pt-2 pb-4">
-                <View className="flex-row items-center">
-                    <Text className="text-2xl font-bold text-blue-600 dark:text-blue-400">Credits</Text>
-                </View>
-            </View>
-
             {/* Content */}
-            <ScrollView 
+            <ScrollView
                 className="flex-1 px-4"
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{
-                    paddingBottom: 40,
+                    paddingBottom: 100,
                     maxWidth: isDesktop ? '800px' : '100%',
                     alignSelf: 'center',
                     width: '100%'
                 }}
             >
-                <View className={`${isDesktop ? "max-w-2xl mx-auto" : ""} w-full`}>
+                <View className={`${isDesktop ? "max-w-2xl mx-auto" : ""} w-full mt-4`}>
                     {/* Developer Section */}
                     <View className="mb-6">
                         <Text className="text-lg font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1">Developer</Text>
@@ -93,7 +86,7 @@ export default function Credits() {
                         <View className="bg-white dark:bg-dark-primary p-5 rounded-xl shadow-sm">
                             <Text className="text-xl font-bold text-gray-800 dark:text-dark-text mb-4">Special Thanks To</Text>
 
-                            <View className="space-y-3">
+                            <View className="gap-3">
                                 {technologies.map((tech, index) => (
                                     <Link 
                                         key={index}

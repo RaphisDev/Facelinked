@@ -1,11 +1,33 @@
 import "../../../../global.css"
-import {View, Text, ScrollView, Platform} from "react-native";
+import {View, Text, ScrollView, Platform, Dimensions} from "react-native";
 import {Link, useRouter} from "expo-router";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import * as SecureStore from "expo-secure-store";
 
 export default function PrivacySettings() {
     const router = useRouter();
+
+    const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
+    const [isDesktop, setIsDesktop] = useState(windowWidth > 768);
+
+    // Handle window resize for responsive layout
+    useEffect(() => {
+        const handleResize = () => {
+            const newWidth = Dimensions.get('window').width;
+            setWindowWidth(newWidth);
+            setIsDesktop(newWidth > 768);
+        };
+
+        if (Platform.OS === 'web') {
+            window.addEventListener('resize', handleResize);
+        }
+
+        return () => {
+            if (Platform.OS === 'web') {
+                window.removeEventListener('resize', handleResize);
+            }
+        };
+    }, []);
 
     useEffect(() => {
         setTimeout(() => {
@@ -18,7 +40,10 @@ export default function PrivacySettings() {
     return (
         <View className="bg-primary min-h-screen">
             <View className="self-center w-full items-center">
-                <ScrollView className="w-full" style={{ height: '100vh' }}>
+                <ScrollView className="w-full" style={{ height: '100vh'}} contentContainerStyle={{paddingBottom: 80,
+                    maxWidth: isDesktop ? '800px' : '100%',
+                    alignSelf: 'center',
+                    width: '100%'}}>
                     <View className="mx-8 mt-7 pb-8">
                         <Text className="text-lg font-bold mt-4">PRIVACY POLICY</Text>
 
