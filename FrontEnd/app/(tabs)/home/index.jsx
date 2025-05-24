@@ -416,16 +416,20 @@ export default function Index() {
             {/* Header */}
             <View className="flex-row justify-between items-center px-4 pt-2 pb-2">
                 <View className="flex-row items-center">
-                    <Text className="text-3xl font-bold text-blue-700">Facelinked</Text>
+                    <LinearGradient style={{borderRadius: 15}} start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={["#184dbf", "#1030b8", "#042481"]} className="w-48 h-12 items-center justify-center mr-2">
+                        <Image source={require("assets/images/icon_wo_bg.png")} size={24} color="white" className="mr-2" />
+                        <Text className="text-3xl font-bold text-white">Facelinked</Text>
+                    </LinearGradient>
                 </View>
 
                 <View className="flex-row">
                     <TouchableOpacity
                         onPress={() => router.push('/profile')}
-                        className="w-10 h-10 rounded-full bg-gray-500/20 items-center justify-center"
-                        activeOpacity={0.7}
+                        className= "rounded-full items-center justify-center"
+                        style={{ width: 40, height: 40, backgroundColor: 'rgba(59, 130, 246, 0.1)', justifyContent: 'center',
+                            alignItems: 'center',}}                        activeOpacity={0.7}
                     >
-                        <Ionicons name="person" size={22} color="#3B82F6" />
+                        <Ionicons name="person" size={23} color="#3B82F6" />
                     </TouchableOpacity>
                 </View>
             </View>

@@ -186,9 +186,11 @@ export default function Chats() {
                         </Text>
                         <TouchableOpacity 
                             onPress={toggleSearch}
-                            className="h-10 w-10 rounded-full bg-white/90 shadow-sm items-center justify-center"
+                            className= "rounded-full items-center justify-center"
+                            style={{ width: 40, height: 40, backgroundColor: 'rgba(59, 130, 246, 0.1)', justifyContent: 'center',
+                                alignItems: 'center',}}
                         >
-                            <Ionicons name="search" size={20} color="#3B82F6" />
+                            <Ionicons name="search" size={23} color="#3B82F6" />
                         </TouchableOpacity>
                     </>
                 ) : (

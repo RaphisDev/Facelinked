@@ -890,18 +890,20 @@
                                 <View className="flex-row justify-between items-center px-4 pt-2 pb-2">
                                     <TouchableOpacity
                                         onPress={() => router.push('/settings')}
-                                        className="w-10 h-10 rounded-full bg-gray-500/20 items-center justify-center"
-                                        activeOpacity={0.7}
+                                        className= "rounded-full items-center justify-center"
+                                        style={{ width: 40, height: 40, backgroundColor: 'rgba(59, 130, 246, 0.1)', justifyContent: 'center',
+                                            alignItems: 'center',}}                                        activeOpacity={0.7}
                                     >
-                                        <Ionicons name="settings-outline" size={22} color="#3B82F6" />
+                                        <Ionicons name="settings-outline" size={23} color="#3B82F6" />
                                     </TouchableOpacity>
 
                                     <TouchableOpacity
                                         onPress={handleAddBar}
-                                        className="w-10 h-10 rounded-full bg-gray-500/20 items-center justify-center"
+                                        className= "rounded-full items-center justify-center"
+                                        style={{ width: 40, height: 40, backgroundColor: 'rgba(59, 130, 246, 0.1)', }}
                                         activeOpacity={0.7}
                                     >
-                                        <Ionicons name="search" size={22} color="#3B82F6" />
+                                        <Ionicons name="search" size={23} color="#3B82F6" />
                                     </TouchableOpacity>
                                 </View>
                                 {showInput && (

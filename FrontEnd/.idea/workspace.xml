@@ -5,12 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/account.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/account.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/credits.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/credits.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/legal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/legal.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/privacy.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/privacy.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/terms.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/terms.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile].jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/chats/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chats/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/home/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/home/index.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/networks/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/networks/index.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -311,7 +308,7 @@
       <workItem from="1747938836838" duration="7709000" />
       <workItem from="1748009744410" duration="2461000" />
       <workItem from="1748034989573" duration="9690000" />
-      <workItem from="1748085206493" duration="6946000" />
+      <workItem from="1748085206493" duration="8873000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />

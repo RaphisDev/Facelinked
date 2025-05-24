@@ -556,7 +556,7 @@ export default function Networks() {
                                 setCreateModalVisible(true);
                             }}
                         >
-                            <Ionicons name="add-outline" size={24} color="#3B82F6" />
+                            <Ionicons name="add-outline" size={23} color="#3B82F6" />
                         </TouchableOpacity>
 
                         {isDesktop ? (
@@ -572,7 +572,7 @@ export default function Networks() {
                                 style={styles.headerActionButton}
                                 onPress={navigateToMeetPeople}
                             >
-                                <Ionicons name="people-outline" size={24} color="#3B82F6" />
+                                <Ionicons name="people-outline" size={23} color="#3B82F6" />
                             </TouchableOpacity>
                         )}
                     </View>
@@ -881,7 +881,7 @@ export default function Networks() {
                                             </View>
                                             <View style={styles.personInfoRow}>
                                                 <Ionicons name="book" size={16} color="#64748B" style={styles.infoIcon} />
-                                                <Text style={styles.personInfoText}>Hobbies: {item.hobbies}</Text>
+                                                <Text style={styles.personInfoText}>{item.hobbies}</Text>
                                             </View>
                                         </View>
 
@@ -1165,23 +1165,23 @@ export default function Networks() {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#F8FAFC',
+        backgroundColor: '#f1f4f9',
         paddingTop: 0, // Remove extra padding, use insets instead
     },
     container: {
         flex: 1,
-        backgroundColor: '#F8FAFC',
+        backgroundColor: '#f1f4f9',
     },
     // Desktop styles
     desktopContainer: {
         flex: 1,
-        backgroundColor: '#F8FAFC',
+        backgroundColor: '#f1f4f9',
         alignItems: 'center',
     },
     desktopContent: {
         width: '100%',
         maxWidth: 1024, // Similar to max-w-7xl in Tailwind
-        backgroundColor: '#F8FAFC',
+        backgroundColor: '#f1f4f9',
         paddingHorizontal: 20,
     },
     contentContainer: {
