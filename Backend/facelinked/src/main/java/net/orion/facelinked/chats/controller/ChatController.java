@@ -95,7 +95,6 @@ public class ChatController {
                         + "\"aps\":{"
                         + "\"alert\":{\"title\":\"" + escapedSender + "\",\"body\":\"" + escapedMessage + "\"},"
                         + "\"sound\":\"default\","
-                        + "\"badge\":1,"
                         + "\"mutable-content\":1"
                         + "},"
                         + "\"profile_picture\":\"" + escapedProfilePictureUrl + "\""
