@@ -1,17 +1,17 @@
 import {
-    Platform, 
-    Pressable, 
-    Text, 
-    TouchableOpacity, 
-    View, 
-    FlatList, 
-    RefreshControl, 
-    ScrollView, 
+    Platform,
+    Pressable,
+    Text,
+    TouchableOpacity,
+    View,
+    FlatList,
+    RefreshControl,
+    ScrollView,
     Dimensions,
     TextInput,
     ActivityIndicator,
     Modal,
-    KeyboardAvoidingView
+    KeyboardAvoidingView, StyleSheet
 } from "react-native";
 import "../../../global.css"
 import {router} from "expo-router";
@@ -325,7 +325,11 @@ export default function Index() {
 
     const renderPostItem = ({ item }) => (
         <View className={`w-full ${isDesktop ? "mb-6" : "px-4 mt-4"}`}>
-            <View className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200">
+            <View style={{
+                shadowColor: '#000',
+                shadowOpacity: 0.2,
+                shadowRadius: 1.5,
+                elevation: 2}} className="bg-white border border-gray-200 rounded-xl hover:shadow-md transition-shadow overflow-hidden duration-200">
                 {/* Post Header with Profile Info */}
                 <View className="flex-row items-center p-4">
                     <TouchableOpacity 
@@ -378,7 +382,7 @@ export default function Index() {
                 renderItem={renderPostItem}
                 keyExtractor={item => item.id.millis}
                 contentContainerStyle={{
-                    paddingBottom: 40,
+                    paddingBottom: 120,
                     maxWidth: isDesktop ? '1200px' : '100%',
                     alignSelf: 'center',
                     width: '100%'
@@ -412,18 +416,10 @@ export default function Index() {
             {/* Header */}
             <View className="flex-row justify-between items-center px-4 pt-2 pb-2">
                 <View className="flex-row items-center">
-                    <Text className="text-2xl font-bold text-blue-600">FaceLinked</Text>
+                    <Text className="text-3xl font-bold text-blue-700">Facelinked</Text>
                 </View>
 
                 <View className="flex-row">
-                    <TouchableOpacity
-                        onPress={toggleSearch}
-                        className="w-10 h-10 rounded-full bg-gray-500/20 items-center justify-center mr-2"
-                        activeOpacity={0.7}
-                    >
-                        <Ionicons name="search" size={22} color="#3B82F6" />
-                    </TouchableOpacity>
-
                     <TouchableOpacity
                         onPress={() => router.push('/profile')}
                         className="w-10 h-10 rounded-full bg-gray-500/20 items-center justify-center"

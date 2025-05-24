@@ -1,16 +1,16 @@
                 import {
-                    Alert, Animated, Dimensions,
-                    FlatList,
-                    Keyboard, KeyboardAvoidingView, Modal,
-                    Platform,
-                    Pressable,
-                    ScrollView,
-                    StyleSheet,
-                    Text,
-                    TextInput,
-                    TouchableOpacity,
-                    View
-                } from "react-native";
+    Alert, Animated, Dimensions,
+    FlatList,
+    Keyboard, KeyboardAvoidingView, Modal,
+    Platform,
+    Pressable, RefreshControl,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
+} from "react-native";
                 import "../../../global.css"
                 import {router, useGlobalSearchParams, useLocalSearchParams, useNavigation, useRouter, useSegments} from "expo-router";
                 import {Image} from "expo-image";
@@ -43,6 +43,7 @@
                     const input = useRef(null);
                     const [isSearching, setIsSearching] = useState(false);
                     const [searchResults, setSearchResults] = useState([]);
+                    const [refreshing, setRefreshing] = useState(false);
 
                     const scrollView = useRef(null);
                     const [posts, setPosts] = useState([]);
@@ -192,6 +193,8 @@
                         catch (error) {
                             console.error('Error fetching data:', error);
                         }
+
+                        setRefreshing(false);
                     }
 
                     function calculateAge(birthDate) {
@@ -199,6 +202,11 @@
                         const ageDate = new Date(ageDiff);
                         return Math.abs(ageDate.getUTCFullYear() - 1970);
                     }
+
+                    const onRefresh = () => {
+                        setRefreshing(true);
+                        fetchData();
+                    };
 
                     async function newMainProfilePicture(path) {
                         let profilePictures = [...profileImages];
@@ -997,6 +1005,14 @@
                                         alignSelf: 'center',
                                         width: '100%'
                                     }}
+                                    refreshControl={
+                                        <RefreshControl
+                                            refreshing={refreshing}
+                                            onRefresh={onRefresh}
+                                            colors={["#3B82F6"]}
+                                            tintColor="#3B82F6"
+                                        />
+                                    }
                                     onScroll={async ({nativeEvent}) => {
                                         if (isCloseToBottom(nativeEvent)) {
                                             if (posts.length === 5) {
@@ -1190,7 +1206,7 @@
 
                                                         <View className="flex-row items-center mr-6 mb-3">
                                                             <View className="w-8 h-8 rounded-full bg-blue-100 items-center justify-center mr-2">
-                                                                <Ionicons name="heart" size={16} color="#3B82F6" />
+                                                                <Ionicons name="book" size={16} color="#3B82F6" />
                                                             </View>
                                                             <Text className="text-base font-medium text-gray-700 dark:text-dark-text">
                                                                 {profileInfos.hobbies}
@@ -1199,7 +1215,7 @@
 
                                                         <View className="flex-row items-center mb-3">
                                                             <View className="w-8 h-8 rounded-full bg-blue-100 items-center justify-center mr-2">
-                                                                <Ionicons name="people" size={16} color="#3B82F6" />
+                                                                <Ionicons name="heart" size={16} color="#3B82F6" />
                                                             </View>
                                                             <Text className="text-base font-medium text-gray-700 dark:text-dark-text">
                                                                 {profileInfos.inRelationship ? "In a relationship" : "Single"}
@@ -1225,13 +1241,13 @@
                                                             data={[
                                                                 {id: "age", icon: "calendar", value: `${calculateAge(new Date(profileInfos?.dateOfBirth))} years old`},
                                                                 {id: "location", icon: "location", value: profileInfos.location},
-                                                                {id: "hobbies", icon: "heart", value: profileInfos.hobbies},
-                                                                {id: "relationshipStatus", icon: "people", value: profileInfos.inRelationship ? "In a relationship" : "Single"},
+                                                                {id: "hobbies", icon: "book", value: profileInfos.hobbies},
+                                                                {id: "relationshipStatus", icon: "heart", value: profileInfos.inRelationship ? "In a relationship" : "Single"},
                                                             ]}
                                                             renderItem={({item}) => (
                                                                 <View className="flex-row items-center mb-3">
                                                                     <View className="w-8 h-8 rounded-full bg-blue-100 items-center justify-center mr-3">
-                                                                        <Ionicons name={item.icon} size={16} color="#3B82F6" />
+                                                                        <Ionicons className={item.id === "hobbies" ? "mt-0.5" : ''} name={item.icon} size={16} color="#3B82F6" />
                                                                     </View>
                                                                     <Text className="text-base font-medium text-gray-700 dark:text-dark-text" id={item.id}>{item.value}</Text>
                                                                 </View>

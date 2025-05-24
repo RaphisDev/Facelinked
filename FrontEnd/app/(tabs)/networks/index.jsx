@@ -28,7 +28,7 @@ import ip from "../../../components/AppManager";
 import {Image} from "expo-image";
 import * as SecureStore from "expo-secure-store";
 import StateManager from "../../../components/StateManager";
-import { GestureHandlerRootView, PanGestureHandler } from 'react-native-gesture-handler';
+import {GestureHandlerRootView, PanGestureHandler, State} from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
 import * as ImagePicker from "expo-image-picker";
@@ -81,7 +81,7 @@ export default function Networks() {
             profilePicture: 'https://randomuser.me/api/portraits/men/1.jpg',
             age: 28,
             relationshipStatus: 'Single',
-            hobbies: ['Photography', 'Hiking', 'Cooking']
+            hobbies: "Photography, Hiking, Cooking"
         },
         { 
             id: 2, 
@@ -90,7 +90,7 @@ export default function Networks() {
             profilePicture: 'https://randomuser.me/api/portraits/women/1.jpg',
             age: 24,
             relationshipStatus: 'In a relationship',
-            hobbies: ['Reading', 'Yoga', 'Traveling']
+            hobbies: "Reading, Yoga, Traveling"
         },
         { 
             id: 3, 
@@ -99,7 +99,7 @@ export default function Networks() {
             profilePicture: 'https://randomuser.me/api/portraits/men/2.jpg',
             age: 32,
             relationshipStatus: 'Married',
-            hobbies: ['Gaming', 'Cycling', 'Music']
+            hobbies: "Gaming, Music, Fitness"
         },
         { 
             id: 4, 
@@ -108,7 +108,7 @@ export default function Networks() {
             profilePicture: 'https://randomuser.me/api/portraits/women/2.jpg',
             age: 26,
             relationshipStatus: 'Single',
-            hobbies: ['Dancing', 'Painting', 'Swimming']
+            hobbies: "Dancing, Painting, Cooking"
         },
         { 
             id: 5, 
@@ -117,7 +117,7 @@ export default function Networks() {
             profilePicture: 'https://randomuser.me/api/portraits/men/3.jpg',
             age: 30,
             relationshipStatus: 'Divorced',
-            hobbies: ['Running', 'Cooking', 'Photography']
+            hobbies: "Football, Reading, Traveling"
         },
     ]);
 
@@ -472,17 +472,20 @@ export default function Networks() {
             setCurrentPersonIndex(prevIndex);
         }
     };
+    const isSwipeInProgress = useRef(false);
 
-    // This function handles swipe gestures for the people list
     const handlePersonSwipe = (event) => {
-        // Check if the swipe is significant enough
-        if (Math.abs(event.nativeEvent.translationX) > 50) {
-            // Determine swipe direction
-            if (event.nativeEvent.translationX < 0 && currentPersonIndex < people.length - 1) {
-                // Swipe left to next person
-                const nextIndex = currentPersonIndex + 1;
+        if (isSwipeInProgress.current) {
+            return;
+        }
 
-                // For desktop mode, we need to ensure the FlatList scrolls correctly
+        if (Math.abs(event.nativeEvent.translationX) > 50) {
+            isSwipeInProgress.current = true;
+
+            if (event.nativeEvent.translationX < 0 && currentPersonIndex < people.length - 1) {
+                const nextIndex = currentPersonIndex + 1;
+                setCurrentPersonIndex(nextIndex);
+
                 if (isDesktop) {
                     const cardWidth = Math.min(windowWidth, 1024);
                     peopleListRef.current?.scrollToOffset({
@@ -495,13 +498,10 @@ export default function Networks() {
                         animated: true
                     });
                 }
-
-                setCurrentPersonIndex(nextIndex);
             } else if (event.nativeEvent.translationX > 0 && currentPersonIndex > 0) {
-                // Swipe right to previous person
                 const prevIndex = currentPersonIndex - 1;
+                setCurrentPersonIndex(prevIndex);
 
-                // For desktop mode, we need to ensure the FlatList scrolls correctly
                 if (isDesktop) {
                     const cardWidth = Math.min(windowWidth, 1024);
                     peopleListRef.current?.scrollToOffset({
@@ -514,9 +514,11 @@ export default function Networks() {
                         animated: true
                     });
                 }
-
-                setCurrentPersonIndex(prevIndex);
             }
+
+            setTimeout(() => {
+                isSwipeInProgress.current = false;
+            }, 500);
         }
     };
 
@@ -721,7 +723,7 @@ export default function Networks() {
                                         name="heart" 
                                         size={20} 
                                         color={selected === 0 ? "#3B82F6" : "#64748B"} 
-                                        style={styles.tabIcon} 
+                                        style={styles.tabIcon}
                                     />
                                     <Text style={[styles.tabText, selected === 0 && styles.activeTabText]}>Favorites</Text>
                                 </Animated.View>
@@ -882,16 +884,16 @@ export default function Networks() {
 
                                         <View style={styles.personInfoBox}>
                                             <View style={styles.personInfoRow}>
-                                                <Ionicons name="calendar-outline" size={16} color="#64748B" style={styles.infoIcon} />
+                                                <Ionicons name="calendar" size={16} color="#64748B" style={styles.infoIcon} />
                                                 <Text style={styles.personInfoText}>{item.age} years old</Text>
                                             </View>
                                             <View style={styles.personInfoRow}>
-                                                <Ionicons name="heart-outline" size={16} color="#64748B" style={styles.infoIcon} />
+                                                <Ionicons name="heart" size={16} color="#64748B" style={styles.infoIcon} />
                                                 <Text style={styles.personInfoText}>{item.relationshipStatus}</Text>
                                             </View>
                                             <View style={styles.personInfoRow}>
-                                                <Ionicons name="star-outline" size={16} color="#64748B" style={styles.infoIcon} />
-                                                <Text style={styles.personInfoText}>Hobbies: {item.hobbies.join(', ')}</Text>
+                                                <Ionicons name="book" size={16} color="#64748B" style={styles.infoIcon} />
+                                                <Text style={styles.personInfoText}>Hobbies: {item.hobbies}</Text>
                                             </View>
                                         </View>
 
@@ -1694,8 +1696,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 8,
         elevation: 5,
-        borderWidth: 3,
-        borderColor: 'rgba(59, 130, 246, 0.2)',
+        borderWidth: 0
     },
     personImage: {
         width: '100%',
@@ -1810,8 +1811,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 12,
-        marginBottom: 20,
+        marginBottom: 32,
     },
     swipeHintText: {
         fontSize: 14,

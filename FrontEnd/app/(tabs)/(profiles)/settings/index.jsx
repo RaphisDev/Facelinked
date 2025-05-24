@@ -6,6 +6,8 @@ import {useRouter} from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {useEffect, useState} from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
+import {showAlert} from "../../../../components/PopUpModalView";
+import WebSocketProvider from "../../../../components/WebSocketProvider";
 
 export default function Index() {
     const router = useRouter();
@@ -79,6 +81,31 @@ export default function Index() {
         </TouchableOpacity>
     );
 
+    const handleLogout = async () => {
+        showAlert({
+            title: "Are you sure?",
+            message: "Do you want to log out?",
+            buttons: [
+                {text: "Cancel", onPress: () => {}},
+                {
+                    text: "Continue", onPress: async () => {
+                        await asyncStorage.clear();
+                        if (Platform.OS === "web") {
+                            localStorage.clear();
+                        } else {
+                            await SecureStore.deleteItemAsync("token");
+                            await SecureStore.deleteItemAsync("username");
+                            await SecureStore.deleteItemAsync("profilePicture");
+                            await SecureStore.deleteItemAsync("profile");
+                        }
+                        new WebSocketProvider().reset();
+                        router.replace("/");
+                    }
+                }
+            ]
+        });
+    };
+
     return (
         <SafeAreaView className="flex-1 bg-blue-50/50 dark:bg-black">
             {/* Header */}
@@ -109,17 +136,7 @@ export default function Index() {
                     {/* Logout Button */}
                     <TouchableOpacity 
                         activeOpacity={0.7}
-                        onPress={() => {
-                            if (Platform.OS === "web") {
-                                localStorage.removeItem("token");
-                                localStorage.removeItem("username");
-                                router.replace("/");
-                            } else {
-                                SecureStore.deleteItemAsync("token");
-                                SecureStore.deleteItemAsync("username");
-                                router.replace("/");
-                            }
-                        }}
+                        onPress={handleLogout}
                         className="flex-row items-center p-4 bg-red-50 dark:bg-red-900/30 rounded-xl border border-red-200 dark:border-red-800 mb-3"
                     >
                         <View className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900 items-center justify-center">
