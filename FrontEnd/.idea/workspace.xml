@@ -8,7 +8,6 @@
       <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile].jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/chats/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chats/index.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/home/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/home/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/networks/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/networks/index.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -308,7 +307,7 @@
       <workItem from="1747938836838" duration="7709000" />
       <workItem from="1748009744410" duration="2461000" />
       <workItem from="1748034989573" duration="9690000" />
-      <workItem from="1748085206493" duration="8873000" />
+      <workItem from="1748085206493" duration="10547000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />

@@ -307,7 +307,7 @@ export default function Chats() {
             className="flex-1 bg-blue-50/50 dark:bg-dark-primary"
             style={{
                 paddingTop: Platform.OS !== 'web' ? insets.top : 0,
-                paddingBottom: 100, // Add padding for mobile tab bar
+                paddingBottom: 80, // Add padding for mobile tab bar
             }}
         >
             {renderHeader()}

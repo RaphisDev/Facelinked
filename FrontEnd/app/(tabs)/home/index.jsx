@@ -416,10 +416,8 @@ export default function Index() {
             {/* Header */}
             <View className="flex-row justify-between items-center px-4 pt-2 pb-2">
                 <View className="flex-row items-center">
-                    <LinearGradient style={{borderRadius: 15}} start={{x: 0, y: 0}} end={{x: 1, y: 0}} colors={["#184dbf", "#1030b8", "#042481"]} className="w-48 h-12 items-center justify-center mr-2">
-                        <Image source={require("assets/images/icon_wo_bg.png")} size={24} color="white" className="mr-2" />
-                        <Text className="text-3xl font-bold text-white">Facelinked</Text>
-                    </LinearGradient>
+                    <Text className="text-3xl font-bold text-blue-600">Face</Text>
+                    <Text className="text-3xl font-light text-gray-700">linked</Text>
                 </View>
 
                 <View className="flex-row">

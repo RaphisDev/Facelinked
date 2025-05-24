@@ -1002,7 +1002,7 @@
                                     scrollEventThrottle={400}
                                     ref={scrollView}
                                     contentContainerStyle={{
-                                        paddingBottom: 40,
+                                        paddingBottom: 80,
                                         maxWidth: isDesktop ? '1200px' : '100%',
                                         alignSelf: 'center',
                                         width: '100%'
