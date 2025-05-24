@@ -431,21 +431,45 @@ export default function Networks() {
     // Navigation functions for the people list
     const goToNextPerson = () => {
         if (currentPersonIndex < people.length - 1) {
-            peopleListRef.current?.scrollToIndex({
-                index: currentPersonIndex + 1,
-                animated: true
-            });
-            setCurrentPersonIndex(currentPersonIndex + 1);
+            const nextIndex = currentPersonIndex + 1;
+
+            // For desktop mode, we need to ensure the FlatList scrolls correctly
+            if (isDesktop) {
+                const cardWidth = Math.min(windowWidth, 1024);
+                peopleListRef.current?.scrollToOffset({
+                    offset: nextIndex * cardWidth,
+                    animated: true
+                });
+            } else {
+                peopleListRef.current?.scrollToIndex({
+                    index: nextIndex,
+                    animated: true
+                });
+            }
+
+            setCurrentPersonIndex(nextIndex);
         }
     };
 
     const goToPreviousPerson = () => {
         if (currentPersonIndex > 0) {
-            peopleListRef.current?.scrollToIndex({
-                index: currentPersonIndex - 1,
-                animated: true
-            });
-            setCurrentPersonIndex(currentPersonIndex - 1);
+            const prevIndex = currentPersonIndex - 1;
+
+            // For desktop mode, we need to ensure the FlatList scrolls correctly
+            if (isDesktop) {
+                const cardWidth = Math.min(windowWidth, 1024);
+                peopleListRef.current?.scrollToOffset({
+                    offset: prevIndex * cardWidth,
+                    animated: true
+                });
+            } else {
+                peopleListRef.current?.scrollToIndex({
+                    index: prevIndex,
+                    animated: true
+                });
+            }
+
+            setCurrentPersonIndex(prevIndex);
         }
     };
 
@@ -456,16 +480,42 @@ export default function Networks() {
             // Determine swipe direction
             if (event.nativeEvent.translationX < 0 && currentPersonIndex < people.length - 1) {
                 // Swipe left to next person
-                peopleListRef.current?.scrollToIndex({
-                    index: currentPersonIndex + 1,
-                    animated: true
-                });
+                const nextIndex = currentPersonIndex + 1;
+
+                // For desktop mode, we need to ensure the FlatList scrolls correctly
+                if (isDesktop) {
+                    const cardWidth = Math.min(windowWidth, 1024);
+                    peopleListRef.current?.scrollToOffset({
+                        offset: nextIndex * cardWidth,
+                        animated: true
+                    });
+                } else {
+                    peopleListRef.current?.scrollToIndex({
+                        index: nextIndex,
+                        animated: true
+                    });
+                }
+
+                setCurrentPersonIndex(nextIndex);
             } else if (event.nativeEvent.translationX > 0 && currentPersonIndex > 0) {
                 // Swipe right to previous person
-                peopleListRef.current?.scrollToIndex({
-                    index: currentPersonIndex - 1,
-                    animated: true
-                });
+                const prevIndex = currentPersonIndex - 1;
+
+                // For desktop mode, we need to ensure the FlatList scrolls correctly
+                if (isDesktop) {
+                    const cardWidth = Math.min(windowWidth, 1024);
+                    peopleListRef.current?.scrollToOffset({
+                        offset: prevIndex * cardWidth,
+                        animated: true
+                    });
+                } else {
+                    peopleListRef.current?.scrollToIndex({
+                        index: prevIndex,
+                        animated: true
+                    });
+                }
+
+                setCurrentPersonIndex(prevIndex);
             }
         }
     };
@@ -510,9 +560,7 @@ export default function Networks() {
                         {isDesktop ? (
                             <TouchableOpacity 
                                 style={[styles.headerActionButton, styles.desktopActionButton]}
-                                onPress={() => {
-                                    setCurrentPage(1);
-                                }}
+                                onPress={navigateToMeetPeople}
                             >
                                 <Ionicons name="people-outline" size={24} color="#3B82F6" />
                                 <Text style={styles.desktopActionButtonText}>Meet People</Text>
@@ -793,7 +841,7 @@ export default function Networks() {
                             styles.backButton,
                             isDesktop && { width: 'auto', paddingHorizontal: 16 }
                         ]}
-                        onPress={isDesktop ? () => setCurrentPage(0) : navigateToNetworks}
+                        onPress={navigateToNetworks}
                     >
                         <Ionicons name="arrow-back" size={24} color="#3B82F6" />
                         {isDesktop && <Text style={styles.desktopBackButtonText}>Back to Networks</Text>}
@@ -812,11 +860,15 @@ export default function Networks() {
                                 showsHorizontalScrollIndicator={false}
                                 keyExtractor={(item) => item.id.toString()}
                                 onMomentumScrollEnd={(e) => {
-                                    const newIndex = Math.round(e.nativeEvent.contentOffset.x / windowWidth);
+                                    const cardWidth = isDesktop ? Math.min(windowWidth, 1024) : windowWidth;
+                                    const newIndex = Math.round(e.nativeEvent.contentOffset.x / cardWidth);
                                     setCurrentPersonIndex(newIndex);
                                 }}
                                 renderItem={({item}) => (
-                                    <View style={[styles.personCard, {width: windowWidth}]}>
+                                    <View style={[
+                                        styles.personCard, 
+                                        {width: isDesktop ? Math.min(windowWidth, 1024) : windowWidth}
+                                    ]}>
                                         <View style={styles.personImageContainer}>
                                             <Image 
                                                 source={{uri: item.profilePicture}} 
