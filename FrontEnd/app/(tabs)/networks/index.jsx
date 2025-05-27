@@ -916,7 +916,7 @@ export default function Networks() {
                     <Text style={styles.swipeHintText}>Swipe to see more people</Text>
                 </View>
 
-                <View style={styles.navigationButtonsContainer}>
+                {isDesktop && <View style={styles.navigationButtonsContainer}>
                     <TouchableOpacity 
                         style={[
                             styles.navigationButton, 
@@ -946,7 +946,7 @@ export default function Networks() {
                         ]}>Next</Text>
                         <Ionicons name="chevron-forward" size={24} color={currentPersonIndex === people.length - 1 ? "#CBD5E1" : "#3B82F6"} />
                     </TouchableOpacity>
-                </View>
+                </View>}
             </View>
         );
     };

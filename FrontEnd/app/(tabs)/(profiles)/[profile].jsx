@@ -354,7 +354,7 @@
                         if (response.ok) {
                             setPosts(prevState => {
                                 const newPosts = [...prevState];
-                                const index = newPosts.findIndex(post => post.id.millis === post.id.millis);
+                                const index = newPosts.findIndex(a => a.id.millis === post.id.millis);
                                 if (newPosts[index].likes.some((item) => item === username.current)) {
                                     newPosts[index].likes = newPosts[index].likes.filter(like => like !== username.current);
                                 } else {

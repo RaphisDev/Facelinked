@@ -52,18 +52,20 @@ public class ChatController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
         String sender = senderDetails.getName();
-        String senderProfilePicturePath = profileService.findByUsername(sender).getProfilePicturePath();
 
         if(sender == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
+        var senderProfile = profileService.findByUsername(sender);
+        var senderProfilePicturePath = senderProfile.getProfilePicturePath();
+        String senderName = senderProfile.getName();
 
         var id = chatService.saveToDatabase(new ChatMessage(sender, message.getReceiver(), message.getContent(), new AutoPrimaryKey(null, System.currentTimeMillis()), message.getImages() == null ? new ArrayList<>() : message.getImages()));
 
         template.convertAndSendToUser(message.getReceiver(), "/queue/messages",
                new ChatMessage(sender, message.getReceiver(), message.getContent(), new AutoPrimaryKey(null, id), message.getImages() == null ? new ArrayList<>() : message.getImages()));
 
-        sendPushNotification(message.getReceiver(), message.getContent(), sender, senderProfilePicturePath);
+        sendPushNotification(message.getReceiver(), message.getContent(), senderName, senderProfilePicturePath);
     }
 
     public void sendPushNotification(String receiver, String message, String sender, String profilePictureUrl) {

@@ -3,11 +3,12 @@ import {FlatList, Platform, Share, Text, TouchableOpacity, View} from "react-nat
 import {Image} from "expo-image";
 import * as SecureStore from "expo-secure-store";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import {useState} from "react";
+import {useRef, useState} from "react";
 
 export default function Post(props) {
     // Check if we're in desktop mode
     const isDesktop = props.isDesktop || false;
+    const username = useRef(Platform.OS === "web" ? localStorage.getItem("username") : SecureStore.getItem("username"));
 
     const renderImages = () => {
         if (!props.content || props.content.length === 0) return null;
@@ -98,7 +99,7 @@ export default function Post(props) {
                         activeOpacity={0.7}
                         onPress={props.onLikePress}
                     >
-                        <Ionicons name="heart-outline" size={isDesktop ? 22 : 20} color="#6B7280" />
+                        <Ionicons name={props.likes.some((item) => item === username.current) ? "heart" : "heart-outline"} size={isDesktop ? 22 : 20} color={props.likes.some((item) => item === username.current) ? "#f81212" : "#6B7280"} />
                         <Text className={`ml-2 text-gray-600 font-medium ${isDesktop ? "text-base" : ""}`}>
                             {props.likes.length > 0 ? props.likes.length : "Like"}
                         </Text>

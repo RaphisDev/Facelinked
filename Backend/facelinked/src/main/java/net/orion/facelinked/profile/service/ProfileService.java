@@ -1,7 +1,15 @@
 package net.orion.facelinked.profile.service;
 
 import com.amazonaws.services.dynamodbv2.document.Item;
+import com.eatthepath.pushy.apns.ApnsClient;
+import com.eatthepath.pushy.apns.PushNotificationResponse;
+import com.eatthepath.pushy.apns.util.SimpleApnsPushNotification;
+import com.eatthepath.pushy.apns.util.concurrent.PushNotificationFuture;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
+import net.orion.facelinked.auth.services.UserService;
 import net.orion.facelinked.config.PrimaryKey;
 import net.orion.facelinked.networks.NetworkMember;
 import net.orion.facelinked.networks.NetworkMemberListConverter;
@@ -13,6 +21,7 @@ import net.orion.facelinked.profile.repository.ProfileRepository;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +31,8 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class ProfileService {
+    private final UserService userService;
+    private final ApnsClient apnsClient;
     private ProfileRepository profileRepository;
     private PostRepository postRepository;
 
@@ -101,6 +112,72 @@ public class ProfileService {
         toAdd.setFriendRequests(newFriendRequests);
 
         profileRepository.save(toAdd);
+
+        sendPushNotification(toAdd.getUsername(), user.getName(), user.getProfilePicturePath());
+    }
+
+    public void sendPushNotification(String receiver, String sender, String profilePictureUrl) {
+        var receiverAccount = userService.findByUsername(receiver);
+        if (receiverAccount.getDeviceTokens() == null) {
+            return;
+        }
+
+        for (String token : receiverAccount.getDeviceTokens()) {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = null;
+            try {
+                root = mapper.readTree(token);
+            } catch (JsonProcessingException e) {
+                continue;
+            }
+
+            JsonNode tokenNode = root.path("token");
+
+            String type = tokenNode.path("type").asText();
+            String data = tokenNode.path("data").asText();
+
+            if (type.equals("ios")) {
+                String escapedSender = sender.replace("\"", "\\\"");
+                String escapedProfilePictureUrl = profilePictureUrl.replace("\"", "\\\"");
+
+                String payload = "{"
+                        + "\"aps\":{"
+                        + "\"alert\":{\"title\":\"" + "New friend request" + "\",\"body\":\"" + escapedSender + " sent you a friend request!" + "\"},"
+                        + "\"sound\":\"default\","
+                        + "\"mutable-content\":1"
+                        + "},"
+                        + "\"profile_picture\":\"" + escapedProfilePictureUrl + "\""
+                        + "}";
+
+
+                SimpleApnsPushNotification pushNotification = new SimpleApnsPushNotification(
+                        data, "com.orion.friendslinked", payload, Instant.now());
+
+                PushNotificationFuture<SimpleApnsPushNotification, PushNotificationResponse<SimpleApnsPushNotification>> future = apnsClient.sendNotification(pushNotification);
+
+                future.whenComplete((response, exception) -> {
+                    if (exception != null) {
+                        System.err.println("Failed to send notification: " + exception.getMessage());
+                        exception.printStackTrace();
+                    } else if (!response.isAccepted()) {
+                        System.err.println("Notification rejected by the device: " + response.getRejectionReason());
+                        if (response.getRejectionReason().orElseThrow().contains("BadDeviceToken") ||
+                                response.getRejectionReason().orElseThrow().contains("Unregistered")) {
+                            removeInvalidToken(sender, data);
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    private void removeInvalidToken(String username, String token) {
+        var user = userService.findByUsername(username);
+        if (user != null && user.getDeviceTokens() != null) {
+            user.getDeviceTokens().remove(token);
+            userService.save(user);
+            System.out.println("Removed invalid token for user: " + username);
+        }
     }
 
     public void addComment(Long millis, Profile user, String comment) {

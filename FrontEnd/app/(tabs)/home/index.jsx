@@ -20,7 +20,7 @@ import {useEffect, useState, useRef} from "react";
 import * as SecureStore from "expo-secure-store";
 import Post from "../../../components/Entries/Post";
 import {Image} from "expo-image";
-import {SafeAreaView} from "react-native-safe-area-context";
+import {SafeAreaProvider, SafeAreaView} from "react-native-safe-area-context";
 import ip from "../../../components/AppManager";
 import {LinearGradient} from "expo-linear-gradient";
 
@@ -419,17 +419,6 @@ export default function Index() {
                     <Text className="text-3xl font-bold text-blue-600">Face</Text>
                     <Text className="text-3xl font-light text-gray-700">linked</Text>
                 </View>
-
-                <View className="flex-row">
-                    <TouchableOpacity
-                        onPress={() => router.push('/profile')}
-                        className= "rounded-full items-center justify-center"
-                        style={{ width: 40, height: 40, backgroundColor: 'rgba(59, 130, 246, 0.1)', justifyContent: 'center',
-                            alignItems: 'center',}}                        activeOpacity={0.7}
-                    >
-                        <Ionicons name="person" size={23} color="#3B82F6" />
-                    </TouchableOpacity>
-                </View>
             </View>
 
             {/* Search Bar */}
@@ -491,6 +480,8 @@ export default function Index() {
                 onRequestClose={() => setShowImageModal(false)}
                 animationType="fade"
             >
+                <SafeAreaProvider>
+                <SafeAreaView className="flex-1">
                 <View className="flex-1 bg-black/90 justify-center items-center">
                     <View className={`absolute top-0 left-0 right-0 flex-row justify-between items-center p-4 z-10 ${isDesktop ? "max-w-6xl mx-auto" : ""}`}>
                         <TouchableOpacity
@@ -578,6 +569,8 @@ export default function Index() {
                         />
                     )}
                 </View>
+                </SafeAreaView>
+                </SafeAreaProvider>
             </Modal>
 
             {/* Comment Input Modal */}
