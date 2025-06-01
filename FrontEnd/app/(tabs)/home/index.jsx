@@ -419,6 +419,14 @@ export default function Index() {
                     <Text className="text-3xl font-bold text-blue-600">Face</Text>
                     <Text className="text-3xl font-light text-gray-700">linked</Text>
                 </View>
+                    <TouchableOpacity
+                        onPress={null}
+                        className= "rounded-full items-center justify-center"
+                        style={{ width: 40, height: 40, backgroundColor: 'rgba(59, 130, 246, 0.1)', justifyContent: 'center',
+                            alignItems: 'center',}}                                        activeOpacity={0.7}
+                    >
+                        <Ionicons name="add" size={23} color="#3B82F6" />
+                    </TouchableOpacity>
             </View>
 
             {/* Search Bar */}

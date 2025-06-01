@@ -661,6 +661,14 @@
 
                         setComments(prevState => [...prevState, newComment]);
                         setCommentText("");
+                        setPosts(prevState => {
+                            return prevState.map(item => {
+                                if (item.id.millis === selectedPost.id.millis) {
+                                    item.comments = [...item.comments, (`${username.current}Ð${profilePath.split(',')[0]}Ð${JSON.stringify({comment: newComment.text})}`)];
+                                }
+                                return item
+                            })
+                        })
 
                         const status = await fetch(`${ip}/profile/posts/${profileName.current}/${selectedPost.id.millis}`, {
                             method: 'POST',
@@ -1693,7 +1701,7 @@
                                             <>
                                                 <FlatList
                                                     data={comments}
-                                                    keyExtractor={(item) => item.id.toString()}
+                                                    keyExtractor={(item, index) => index.toString()}
                                                     ListHeaderComponent={() => (
                                                         <View className="px-4">
                                                             <View className="bg-white rounded-xl shadow-sm overflow-hidden mt-4 mb-6">
@@ -1739,7 +1747,7 @@
 
                                                                     <View className="flex-row justify-between items-center pt-2 border-t border-gray-100">
                                                                         <View className="flex-row items-center">
-                                                                            <Ionicons name="heart-outline" size={18} color="#6B7280" />
+                                                                            <Ionicons name={selectedPost.likes.some(like => like === username.current) ? "heart" : "heart-outline"} size={18} color={selectedPost.likes.some(like => like === username.current) ? "#f81212" : "#6B7280"} />
                                                                             <Text className="text-gray-500 ml-1">{selectedPost.likes.length || 0}</Text>
                                                                         </View>
                                                                         <Text className="text-gray-500 text-sm">{comments.length} {comments.length === 1 ? "comment" : "comments"}</Text>

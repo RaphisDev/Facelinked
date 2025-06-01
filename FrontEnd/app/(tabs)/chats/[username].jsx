@@ -171,7 +171,7 @@ export default function ChatRoom() {
         if (Platform.OS === 'android') {
             const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
                 if (!isDesktop) {
-                    router.navigate('/chats');
+                    router.back();
                     return true;
                 }
                 return false;
@@ -204,7 +204,7 @@ export default function ChatRoom() {
             window.history.pushState({}, '', newUrl);
             router.back();
         } else {
-            router.navigate("/chats")
+            router.back()
         }
     };
 
@@ -608,7 +608,7 @@ export default function ChatRoom() {
                         minIndexForVisible: 0,
                     }}
                     getItemLayout={(data, index) => {
-                        const height = 80;
+                        const height = 140;
                         const dateHeaderHeight = 60;
 
                         const item = data[index];
