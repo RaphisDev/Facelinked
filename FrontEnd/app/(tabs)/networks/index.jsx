@@ -59,10 +59,15 @@ export default function Networks() {
     const [networkDescription, setNetworkDescription] = useState("");
     const [isPrivate, setIsPrivate] = useState(false);
     const [members, setMembers] = useState([]);
-    const [memberInput, setMemberInput] = useState("");
+    const [friendsSearch, setFriendsSearch] = useState("");
     const [selectedImage, setSelectedImage] = useState(null);
     const [isCreating, setIsCreating] = useState(false);
     const [createError, setCreateError] = useState("");
+
+    // Friends list for network invitation
+    const [friendsList, setFriendsList] = useState([]);
+    const [selectedFriends, setSelectedFriends] = useState([]);
+    const [loadingFriends, setLoadingFriends] = useState(false);
 
     const router = useRouter();
     const token = useRef(null);
@@ -194,30 +199,6 @@ export default function Networks() {
         if (!isPrivate) {
             setMembers([]);
         }
-    };
-
-    const addMember = () => {
-        if (!memberInput.trim()) return;
-
-        if (memberInput === username.current) {
-            setCreateError("You cannot add yourself to a network.");
-            return;
-        }
-
-        if (members.some(m => m.memberId === memberInput)) {
-            setCreateError("This member is already in the network.");
-            return;
-        }
-
-        setMembers([...members, { memberId: memberInput }]);
-        setMemberInput("");
-        setCreateError("");
-    };
-
-    const removeMember = (index) => {
-        const newMembers = [...members];
-        newMembers.splice(index, 1);
-        setMembers(newMembers);
     };
 
     const pickImage = async () => {
@@ -361,10 +342,30 @@ export default function Networks() {
         setNetworkDescription("");
         setIsPrivate(false);
         setMembers([]);
-        setMemberInput("");
+        setFriendsSearch("");
         setSelectedImage(null);
         setCreateError("");
         setIsCreating(false);
+        setSelectedFriends([]);
+    };
+
+    // Fetch user's friends list
+    const fetchFriendsList = async () => {
+        try {
+            let profile;
+            if (Platform.OS === "web") {
+                profile = JSON.parse(localStorage.getItem("profile"));
+            }
+            else {
+                profile = JSON.parse(SecureStore.getItem("profile"));
+            }
+            setFriendsList(profile.friends);
+        } catch (error) {
+            console.error("Error fetching friends list:", error);
+            setFriendsList([]);
+        } finally {
+            setLoadingFriends(false);
+        }
     };
 
     const handleSearch = (text) => {
@@ -554,6 +555,7 @@ export default function Networks() {
                             onPress={() => {
                                 resetCreateForm();
                                 setCreateModalVisible(true);
+                                fetchFriendsList();
                             }}
                         >
                             <Ionicons name="add-outline" size={23} color="#3B82F6" />
@@ -1032,38 +1034,107 @@ export default function Networks() {
                             {isPrivate && (
                                 <View style={styles.formGroup}>
                                     <Text style={styles.formLabel}>Add Members</Text>
-                                    <View style={styles.addMemberContainer}>
-                                        <TextInput
-                                            style={styles.memberInput}
-                                            placeholder="Enter username"
-                                            placeholderTextColor="#9CA3AF"
-                                            value={memberInput}
-                                            onChangeText={setMemberInput}
-                                            autoCapitalize="none"
-                                            className="outline-none"
-                                        />
+
+                                    {/* Friends List Selection */}
+                                    <View style={styles.friendsSelectionContainer}>
+                                        {/* Select All Button */}
                                         <TouchableOpacity 
-                                            style={styles.addMemberButton}
-                                            onPress={addMember}
+                                            style={styles.selectAllButton}
+                                            onPress={() => {
+                                                if (selectedFriends.length === friendsList.length) {
+                                                    // Deselect all
+                                                    setSelectedFriends([]);
+                                                    setMembers([]);
+                                                } else {
+                                                    // Select all
+                                                    const allFriends = friendsList.map(friend => friend.memberId);
+                                                    setSelectedFriends(allFriends);
+                                                    setMembers(friendsList.map(friend => ({ memberId: friend.memberId })));
+                                                }
+                                            }}
                                         >
-                                            <Ionicons name="add" size={24} color="white" />
+                                            <Text style={styles.selectAllButtonText}>
+                                                {selectedFriends.length === friendsList.length ? "Deselect All" : "Select All Friends"}
+                                            </Text>
                                         </TouchableOpacity>
+
+                                        {/* Manual Input Option */}
+                                        <View style={styles.addMemberContainer}>
+                                            <TextInput
+                                                style={styles.memberInput}
+                                                placeholder="Search for friends"
+                                                placeholderTextColor="#9CA3AF"
+                                                value={friendsSearch}
+                                                onChangeText={(text) => setFriendsSearch(text)}
+                                                autoCapitalize="none"
+                                                className="outline-none"
+                                            />
+                                        </View>
+
+                                        {/* Friends List */}
+                                        {loadingFriends ? (
+                                            <View style={styles.loadingContainer}>
+                                                <ActivityIndicator size="small" color="#3B82F6" />
+                                                <Text style={styles.loadingText}>Loading friends...</Text>
+                                            </View>
+                                        ) : friendsList.length > 0 ? (
+                                            <ScrollView style={styles.friendsListScrollView}>
+                                                {friendsList.filter(item => friendsSearch === "" ? true : item.memberName?.toLowerCase().includes(friendsSearch.toLowerCase())).map((friend, index) => (
+                                                    <TouchableOpacity 
+                                                        key={index} 
+                                                        style={styles.friendItem}
+                                                        onPress={() => {
+                                                            const isSelected = selectedFriends.includes(friend.memberId);
+                                                            if (isSelected) {
+                                                                // Remove from selected
+                                                                setSelectedFriends(selectedFriends.filter(id => id !== friend.memberId));
+                                                                setMembers(members.filter(m => m.memberId !== friend.memberId));
+                                                            } else {
+                                                                // Add to selected
+                                                                setSelectedFriends([...selectedFriends, friend.memberId]);
+                                                                setMembers([...members, { memberId: friend.memberId }]);
+                                                            }
+                                                        }}
+                                                    >
+                                                        <View style={styles.friendItemContent}>
+                                                            {friend.memberProfilePicturePath ? (
+                                                                <Image 
+                                                                    source={{ uri: friend.memberProfilePicturePath }} 
+                                                                    style={styles.friendAvatar}
+                                                                    contentFit="cover"
+                                                                />
+                                                            ) : (
+                                                                <View style={styles.friendAvatarPlaceholder}>
+                                                                    <Ionicons name="person" size={16} color="#94A3B8" />
+                                                                </View>
+                                                            )}
+                                                            <Text style={styles.friendName}>
+                                                                {friend.memberName || friend.memberId}
+                                                            </Text>
+                                                        </View>
+                                                        <View style={[
+                                                            styles.checkboxContainer,
+                                                            selectedFriends.includes(friend.memberId) && styles.checkboxSelected
+                                                        ]}>
+                                                            {selectedFriends.includes(friend.memberId) && (
+                                                                <Ionicons name="checkmark" size={16} color="white" />
+                                                            )}
+                                                        </View>
+                                                    </TouchableOpacity>
+                                                ))}
+                                            </ScrollView>
+                                        ) : (
+                                            <View style={styles.emptyFriendsContainer}>
+                                                <Text style={styles.emptyFriendsText}>You don't have any friends yet</Text>
+                                                <Text style={styles.emptyFriendsSubtext}>Add friends to invite them to your network</Text>
+                                            </View>
+                                        )}
                                     </View>
 
+                                    {/* Selected Members List */}
                                     {members.length > 0 && (
                                         <View style={styles.membersListContainer}>
-                                            <Text style={styles.membersListTitle}>Members to invite:</Text>
-                                            {members.map((member, index) => (
-                                                <View key={index} style={styles.memberItem}>
-                                                    <Text style={styles.memberName}>{member.memberId}</Text>
-                                                    <TouchableOpacity 
-                                                        style={styles.removeMemberButton}
-                                                        onPress={() => removeMember(index)}
-                                                    >
-                                                        <Ionicons name="close-circle" size={20} color="#EF4444" />
-                                                    </TouchableOpacity>
-                                                </View>
-                                            ))}
+                                            <Text style={styles.membersListTitle}>Selected members: {members.length}</Text>
                                         </View>
                                     )}
                                 </View>
@@ -1425,6 +1496,110 @@ const styles = StyleSheet.create({
     disabledButton: {
         backgroundColor: '#93C5FD',
         opacity: 0.7,
+    },
+
+    // Friends List Selection Styles
+    friendsSelectionContainer: {
+        marginTop: 12,
+    },
+    selectAllButton: {
+        backgroundColor: '#EBF5FF',
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+        borderRadius: 8,
+        alignItems: 'center',
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: '#BFDBFE',
+    },
+    selectAllButtonText: {
+        fontSize: 16,
+        color: '#3B82F6',
+        fontWeight: '500',
+    },
+    friendsListScrollView: {
+        maxHeight: 200,
+        marginTop: 12,
+        backgroundColor: '#F8FAFC',
+        borderRadius: 8,
+        padding: 8,
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
+    },
+    friendItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: '#F1F5F9',
+        borderRadius: 6,
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        marginBottom: 8,
+    },
+    friendItemContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1,
+    },
+    friendAvatar: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        marginRight: 12,
+    },
+    friendAvatarPlaceholder: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: '#E2E8F0',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
+    friendName: {
+        fontSize: 14,
+        color: '#334155',
+        flex: 1,
+    },
+    checkboxContainer: {
+        width: 24,
+        height: 24,
+        borderRadius: 4,
+        borderWidth: 2,
+        borderColor: '#CBD5E1',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    checkboxSelected: {
+        backgroundColor: '#3B82F6',
+        borderColor: '#3B82F6',
+    },
+    loadingContainer: {
+        padding: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    loadingText: {
+        marginTop: 8,
+        fontSize: 14,
+        color: '#64748B',
+    },
+    emptyFriendsContainer: {
+        padding: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    emptyFriendsText: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: '#64748B',
+        textAlign: 'center',
+    },
+    emptyFriendsSubtext: {
+        marginTop: 4,
+        fontSize: 14,
+        color: '#94A3B8',
+        textAlign: 'center',
     },
     searchContainer: {
         flexDirection: 'row',
