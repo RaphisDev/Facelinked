@@ -37,7 +37,6 @@
                     // State for responsive layout
                     const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
                     const [isDesktop, setIsDesktop] = useState(windowWidth > 768);
-                    const [cachedProfileName, setCachedProfileName] = useState([]);
 
                     const [showInput, setShowInput] = useState(false);
                     const input = useRef(null);
@@ -167,7 +166,6 @@
                             }
                         }
                         catch (error) {
-                            console.error('Error fetching data:', error);
                         }
 
                         try {
@@ -186,6 +184,26 @@
                                     if (postId) {
                                         setSelectedPost(postId);
                                         setShowPostModal(true);
+                                    } else {
+                                        const allData = await fetch(`${ip}/profile/posts/all/${profileName.current}`, {
+                                            method: 'GET',
+                                            headers: {
+                                                "Authorization": `Bearer ${token.current}`
+                                            }
+                                        });
+                                        if (allData.ok) {
+                                            const allPosts = await allData.json();
+                                            setPosts(allPosts);
+                                            const postId = allPosts.find((postItem) => Number.parseInt(postItem.id.millis) === Number.parseInt(post));
+                                            if (postId) {
+                                                setSelectedPost(postId);
+                                                setShowPostModal(true);
+                                            } else {
+                                                console.warn("Post not found");
+                                            }
+                                        } else {
+                                            console.error("Failed to fetch all posts");
+                                        }
                                     }
                                 }
                             }
@@ -415,9 +433,6 @@
                             if (token.current === null) {router.replace("/")}
                         })
 
-                        if (cachedProfileName.at(-1) !== profileName.current) {
-                            setCachedProfileName(prevState => [...prevState, profileName.current]);
-                        }
                         fetchData();
                     }, [profile]);
 
@@ -1033,19 +1048,10 @@
                                     }}
                                 >
                                     {/* Back button for navigation */}
-                                    {profileName.current !== username.current && (
-                                        <View className={`${isDesktop ? 'mx-auto max-w-4xl' : 'mx-4'} mt-4`}>
+                                    {(profileName.current !== username.current && isDesktop) && (
+                                        <View className={`mx-auto max-w-4xl mt-4`}>
                                             <TouchableOpacity
-                                                onPress={() => {
-
-                                                    if(cachedProfileName.length === 0)
-                                                    {
-                                                        router.navigate("/profile")
-                                                    } else {
-                                                        router.navigate(`/${cachedProfileName.at(-2)}`);
-                                                        setCachedProfileName(prevState => prevState.slice(0, -1));
-                                                    }
-                                                }}
+                                                onPress={router.back}
                                                 className="flex-row items-center"
                                                 activeOpacity={0.7}
                                             >
@@ -1734,9 +1740,9 @@
                                                                     <View className="flex-row justify-between items-center pt-2 border-t border-gray-100">
                                                                         <View className="flex-row items-center">
                                                                             <Ionicons name="heart-outline" size={18} color="#6B7280" />
-                                                                            <Text className="text-gray-500 ml-1">{selectedPost.likes || 0} likes</Text>
+                                                                            <Text className="text-gray-500 ml-1">{selectedPost.likes.length || 0}</Text>
                                                                         </View>
-                                                                        <Text className="text-gray-500 text-sm">{comments.length} comments</Text>
+                                                                        <Text className="text-gray-500 text-sm">{comments.length} {comments.length === 1 ? "comment" : "comments"}</Text>
                                                                     </View>
                                                                 </View>
                                                             </View>
