@@ -450,7 +450,6 @@
                     }
 
                     async function sendPost() {
-                        // Create a temporary post with optimistic UI update
                         setPosts([{
                             title: postInputText,
                             content: selectedPostImages,

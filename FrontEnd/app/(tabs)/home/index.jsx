@@ -11,7 +11,9 @@ import {
     TextInput,
     ActivityIndicator,
     Modal,
-    KeyboardAvoidingView, StyleSheet
+    KeyboardAvoidingView, 
+    StyleSheet,
+    Alert
 } from "react-native";
 import "../../../global.css"
 import {router} from "expo-router";
@@ -23,6 +25,9 @@ import {Image} from "expo-image";
 import {SafeAreaProvider, SafeAreaView} from "react-native-safe-area-context";
 import ip from "../../../components/AppManager";
 import {LinearGradient} from "expo-linear-gradient";
+import * as ImagePicker from "expo-image-picker";
+import {showAlert} from "../../../components/PopUpModalView";
+import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
 
 export default function Index() {
     const [posts, setPosts] = useState([]);
@@ -44,6 +49,11 @@ export default function Index() {
     const [commentText, setCommentText] = useState("");
     const [currentPost, setCurrentPost] = useState(null);
     const [comments, setComments] = useState([]);
+
+    // State for post creation
+    const [showPostCreation, setShowPostCreation] = useState(false);
+    const [postText, setPostText] = useState("");
+    const [selectedImages, setSelectedImages] = useState([]);
 
     const token = useRef("");
     const username = useRef("");
@@ -323,6 +333,146 @@ export default function Index() {
         */
     };
 
+    // Function to pick images from gallery
+    const pickImages = async () => {
+        // Request permission to access the media library
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+        if (status !== 'granted') {
+            Alert.alert('Permission Required', 'Sorry, we need camera roll permissions to make this work!');
+            return;
+        }
+
+        // Launch the image picker
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsMultipleSelection: true,
+            quality: 0.8,
+            aspect: [4, 3],
+        });
+
+        if (!result.canceled && result.assets) {
+            // Add the selected images to the state
+            // Limit to 5 images total
+            const newImages = result.assets.map(asset => asset.uri);
+            const updatedImages = [...selectedImages, ...newImages].slice(0, 5);
+            setSelectedImages(updatedImages);
+        }
+    };
+
+    const removeImage = (index) => {
+        setSelectedImages(prevImages => prevImages.filter((_, i) => i !== index));
+    };
+
+    const createPost = async () => {
+        if (postText.trim() === "" && selectedImages.length === 0) {
+            showAlert({
+                title: 'Empty Post',
+                message: 'Please add some text or images to your post',
+                buttons: [
+                    {
+                        text: "Okay",
+                        onPress: () => {}
+                    }
+                ]}
+            );
+            return;
+        }
+
+        const title = postText;
+        let imageUrls = [];
+        try {
+            if (selectedImages.length > 0) {
+                for (const image of selectedImages) {
+                    let tempImage;
+                    const manipResult = await ImageManipulator.manipulate(
+                        image).resize({width: 500});
+                    const renderedImage = await manipResult.renderAsync();
+                    const savedImage = await renderedImage.saveAsync({format: SaveFormat.JPEG, compress: 0.7});
+                    tempImage = savedImage.uri;
+
+                    const uploadResponse = await fetch(`${ip}/profile/upload`, {
+                        method: 'GET',
+                        headers: {
+                            "Authorization": `Bearer ${token.current}`
+                        }
+                    });
+
+                    if (uploadResponse.ok) {
+                        const uploadUrl = await uploadResponse.text();
+
+                        const response = await fetch(tempImage);
+                        const blob = await response.blob();
+
+                        await fetch(uploadUrl, {
+                            method: 'PUT',
+                            headers: {
+                                "Content-Type": blob.type
+                            },
+                            body: blob
+                        });
+
+                        imageUrls.push(uploadUrl.split('?')[0]);
+                    }
+                }
+            }
+
+            const data = await fetch(`${ip}/profile/post`, {
+                method: 'POST',
+                headers: {
+                    "Authorization": `Bearer ${token.current}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    title: title,
+                    content: imageUrls,
+                })
+            });
+
+            if (!data.ok) {
+                setShowPostCreation(false);
+
+                showAlert({
+                    title: 'Error',
+                    message: 'An error occurred while sending your post. Please try again later.',
+                    buttons: [
+                        {
+                            text: 'OK',
+                            onPress: () => {}
+                        },
+                    ],
+                });
+            } else {
+                setShowPostCreation(false);
+                setPostText("");
+                setSelectedImages([]);
+
+                showAlert({
+                    title: 'Success',
+                    message: 'Your post has been created!',
+                    buttons: [
+                        {
+                            text: "Okay",
+                            onPress: () => {}
+                        }
+                    ]}
+                );
+            }
+        } catch (error) {
+            console.error('Error sending post:', error);
+            showAlert({
+                title: 'Error',
+                message: 'An error occurred while sending your post. Please try again later.',
+                buttons: [
+                    {
+                        text: 'OK',
+                        onPress: () => {}
+                    },
+                ],
+            });
+        }
+    };
+
     const renderPostItem = ({ item }) => (
         <View className={`w-full ${isDesktop ? "mb-6" : "px-4 mt-4"}`}>
             <View style={{
@@ -400,18 +550,8 @@ export default function Index() {
         );
     };
 
-    const toggleSearch = () => {
-        setShowSearch(!showSearch);
-        if (!showSearch) {
-            setTimeout(() => {
-                searchInput.current?.focus();
-            }, 100);
-        } else {
-            setSearchText("");
-        }
-    };
-
     return (
+        <SafeAreaProvider>
         <SafeAreaView className="flex-1 bg-blue-50/50 dark:bg-dark-primary">
             {/* Header */}
             <View className="flex-row justify-between items-center px-4 pt-2 pb-2">
@@ -420,7 +560,7 @@ export default function Index() {
                     <Text className="text-3xl font-light text-gray-700">linked</Text>
                 </View>
                     <TouchableOpacity
-                        onPress={null}
+                        onPress={() => setShowPostCreation(true)}
                         className= "rounded-full items-center justify-center"
                         style={{ width: 40, height: 40, backgroundColor: 'rgba(59, 130, 246, 0.1)', justifyContent: 'center',
                             alignItems: 'center',}}                                        activeOpacity={0.7}
@@ -675,6 +815,99 @@ export default function Index() {
                     </View>
                 </KeyboardAvoidingView>
             </Modal>
+
+            {/* Post Creation Modal */}
+            <Modal
+                visible={showPostCreation}
+                transparent={true}
+                onRequestClose={() => setShowPostCreation(false)}
+                animationType={isDesktop ? "fade" : "slide"}
+            >
+            <SafeAreaProvider>
+                <SafeAreaView style={{flex: 1}}>
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    style={{ flex: 1 }}
+                >
+                    <View className="flex-1 bg-black/50 justify-center items-center">
+                        <View className={`${isDesktop ? "max-w-2xl w-full mx-auto bg-white rounded-xl shadow-xl" : "bg-white rounded-t-xl w-full mt-auto"}`}>
+                            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        setShowPostCreation(false);
+                                        setPostText("");
+                                        setSelectedImages([]);
+                                    }}
+                                    className="p-2"
+                                >
+                                    <Ionicons name="close" size={24} color="#3B82F6" />
+                                </TouchableOpacity>
+                                <Text className="text-lg font-bold text-gray-800">Create Post</Text>
+                                <TouchableOpacity
+                                    onPress={createPost}
+                                    disabled={postText.trim() === "" && selectedImages.length === 0}
+                                    className={`p-2 ${postText.trim() === "" && selectedImages.length === 0 ? "opacity-50" : ""}`}
+                                >
+                                    <Text className="text-blue-500 font-bold">Post</Text>
+                                </TouchableOpacity>
+                            </View>
+
+                            {/* Post Content Input */}
+                            <View className="p-4">
+                                <TextInput
+                                    className="text-gray-800 min-h-[100px] text-base"
+                                    placeholder="What's on your mind?"
+                                    placeholderTextColor="#94A3B8"
+                                    value={postText}
+                                    onChangeText={setPostText}
+                                    multiline
+                                    autoFocus
+                                />
+                            </View>
+
+                            {/* Selected Images Preview */}
+                            {selectedImages.length > 0 && (
+                                <View className="px-4 pb-4">
+                                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                                        {selectedImages.map((image, index) => (
+                                            <View key={index} className="relative mr-2">
+                                                <Image
+                                                    source={{ uri: image }}
+                                                    style={{ width: 100, height: 100, borderRadius: 8 }}
+                                                    contentFit="cover"
+                                                />
+                                                <TouchableOpacity
+                                                    onPress={() => removeImage(index)}
+                                                    className="absolute top-1 right-1 bg-black/70 rounded-full p-1"
+                                                >
+                                                    <Ionicons name="close" size={16} color="white" />
+                                                </TouchableOpacity>
+                                            </View>
+                                        ))}
+                                    </ScrollView>
+                                </View>
+                            )}
+
+                            {/* Action Buttons */}
+                            <View className="flex-row px-4 py-3 border-t border-gray-200">
+                                <TouchableOpacity
+                                    onPress={pickImages}
+                                    className="flex-row items-center p-2 rounded-lg bg-gray-100"
+                                    disabled={selectedImages.length >= 5}
+                                >
+                                    <Ionicons name="image" size={22} color={selectedImages.length >= 5 ? "#94A3B8" : "#3B82F6"} />
+                                    <Text className={`ml-2 ${selectedImages.length >= 5 ? "text-gray-400" : "text-blue-500"}`}>
+                                        {selectedImages.length >= 5 ? "Max 5 images" : "Add Photos"}
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </KeyboardAvoidingView>
+                </SafeAreaView>
+                </SafeAreaProvider>
+            </Modal>
         </SafeAreaView>
+        </SafeAreaProvider>
     );
 }

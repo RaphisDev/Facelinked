@@ -860,14 +860,13 @@ export default function Network() {
     );
 
     const renderFooter = () => (
+        <KeyboardAvoidingView>
         <Animated.View 
             style={[
                 styles.inputContainer,
                 { 
                     transform: [{ translateY: inputBarAnimation }],
-                    paddingBottom: Platform.OS === 'ios' 
-                        ? keyboardVisible ? 10 : Math.max(insets.bottom, 16)
-                        : 16
+                    paddingBottom: keyboardVisible ? 10 : 0,
                 }
             ]}
         >
@@ -909,6 +908,7 @@ export default function Network() {
                 </TouchableOpacity>
             </View>
         </Animated.View>
+        </KeyboardAvoidingView>
     );
 
     const DateHeader = ({ date }) => {
@@ -1531,7 +1531,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginLeft: 8,
-        marginBottom: 4,
+        marginBottom: 2,
     },
     modalOverlay: {
         flex: 1,
