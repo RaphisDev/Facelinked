@@ -11,4 +11,5 @@ import java.util.List;
 @EnableScan
 public interface NetworkRepository extends CrudRepository<Network, String> {
     public List<Network> searchTop5BySearchNameContains(String name);
+    public List<Network> findByFavoriteMembersContaining(String username);
 }

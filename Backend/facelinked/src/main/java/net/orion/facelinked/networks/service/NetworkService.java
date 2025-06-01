@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -36,6 +37,10 @@ public class NetworkService {
 
     public List<Network> searchForNetwork(String searchName) {
         return networkRepository.searchTop5BySearchNameContains(searchName);
+    }
+
+    public List<Network> getFavoriteNetworks(String username) {
+        return networkRepository.findByFavoriteMembersContaining(username);
     }
 
     public Network getNetwork(String networkId) {
@@ -69,17 +74,16 @@ public class NetworkService {
         return networkMessageRepository.findByNetworkId(networkId).reversed();
     }
 
-    public void favorite(String network, boolean b) {
+    public void favorite(String network, String username) {
         var networkResponseEntity = networkRepository.findById(network).orElseThrow();
-    
-        if (networkResponseEntity.getMemberCount() <= 0 && !b) {
-            return;
-        }
-        if (b) {
-            networkResponseEntity.setMemberCount(networkResponseEntity.getMemberCount() + 1);
+
+        var newFavorites = new ArrayList<>(networkResponseEntity.getFavoriteMembers());
+        if (networkResponseEntity.getFavoriteMembers().contains(username)) {
+            newFavorites.remove(username);
         } else {
-            networkResponseEntity.setMemberCount(networkResponseEntity.getMemberCount() - 1);
+            newFavorites.add(username);
         }
+        networkResponseEntity.setFavoriteMembers(newFavorites);
         networkRepository.save(networkResponseEntity);
     }
 

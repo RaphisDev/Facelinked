@@ -1,6 +1,7 @@
 package net.orion.facelinked.networks.controller;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.xspec.N;
 import lombok.AllArgsConstructor;
 import net.orion.facelinked.auth.services.UserService;
 import net.orion.facelinked.chats.ChatMessage;
@@ -65,7 +66,7 @@ public class NetworkController {
                 isPrivate(network.isPrivate()).
                 members(network.getMembers() == null ? Collections.emptyList() : network.getMembers()).
                 networkPicturePath(network.getNetworkPicturePath()).
-                memberCount(1).
+                favoriteMembers(Collections.emptyList()).
                 searchName(network.getName().toLowerCase()).
                 build());
 
@@ -143,6 +144,13 @@ public class NetworkController {
             }
         }
         return ResponseEntity.ok(networkResponseEntity);
+    }
+
+    @GetMapping("/favoriteNetworks")
+    public ResponseEntity<List<Network>> getFavoriteNetwork(@AuthenticationPrincipal UserDetails userDetails) {
+        var username = userService.findByEmail(userDetails.getUsername()).getUserName();
+
+        return ResponseEntity.ok(networkService.getFavoriteNetworks(username));
     }
 
     @GetMapping("/search")
@@ -228,9 +236,10 @@ public class NetworkController {
     }
 
     @PostMapping("{network}/favorite")
-    public void favorite(@PathVariable String network, @RequestParam boolean b) {
+    public void favorite(@PathVariable String network, @AuthenticationPrincipal UserDetails userDetails) {
+        var username = userService.findByEmail(userDetails.getUsername()).getUserName();
 
-        networkService.favorite(network, b);
+        networkService.favorite(network, username);
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)

@@ -17,7 +17,7 @@ import {
     SafeAreaView,
     Switch,
     ActivityIndicator,
-    ScrollView
+    ScrollView, RefreshControl
 } from "react-native";
 import Network from "../../../components/Entries/Network";
 import {useEffect, useRef, useState} from "react";
@@ -52,6 +52,7 @@ export default function Networks() {
     const [isSearching, setIsSearching] = useState(false);
     const [searchResults, setSearchResults] = useState([]);
     const [searchText, setSearchText] = useState("");
+    const [refreshing, setRefreshing] = useState(false);
 
     // Create Network Modal State
     const [isCreateModalVisible, setCreateModalVisible] = useState(false);
@@ -152,10 +153,7 @@ export default function Networks() {
     useEffect(() => {
         if (selected === 0) {
             const loadNetworks = async () => {
-                let networks = await AsyncStorage.getItem("networks") || [];
-                if (networks.length !== 0) {
-                    setNetworks(JSON.parse(networks));
-                }
+                fetchFavoriteNetworks()
             }
             loadNetworks();
         }
@@ -309,7 +307,7 @@ export default function Networks() {
                     description: networkDescription, 
                     creator: data.creatorId, 
                     private: isPrivate, 
-                    memberCount: 1, 
+                    favoriteMember: data.favoriteMember,
                     members: data.members, 
                     networkPicturePath: imageUrl ? imageUrl.split('?')[0] : ""
                 }
@@ -336,6 +334,37 @@ export default function Networks() {
             setIsCreating(false);
         }
     };
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        fetchFavoriteNetworks();
+    };
+
+        async function fetchFavoriteNetworks() {
+            try {
+                const response = await fetch(`${ip}/networks/favoriteNetworks`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token.current}`
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setNetworks(JSON.parse(data));
+                    await AsyncStorage.setItem("networks", JSON.stringify(data));
+                } else {
+                    let networks = await AsyncStorage.getItem("networks") || [];
+                    if (networks.length !== 0) {
+                        setNetworks(JSON.parse(networks));
+                    }
+                }
+            } catch (error) {
+                let networks = await AsyncStorage.getItem("networks") || [];
+                if (networks.length !== 0) {
+                    setNetworks(JSON.parse(networks));
+                }
+            }
+        }
 
     const resetCreateForm = () => {
         setNetworkName("");
@@ -766,6 +795,14 @@ export default function Networks() {
                             <View style={{ width: windowWidth, marginLeft: -16 }}>
                                 <FlatList 
                                     data={favoriteNetworks}
+                                    refreshControl={
+                                        <RefreshControl
+                                            refreshing={refreshing}
+                                            onRefresh={onRefresh}
+                                            colors={["#3B82F6"]}
+                                            tintColor="#3B82F6"
+                                        />
+                                    }
                                     keyExtractor={(item) => item.networkId.toString()}
                                     renderItem={(items) => (
                                         <Network 
@@ -773,7 +810,7 @@ export default function Networks() {
                                             network={items.item.name} 
                                             networkPicturePath={items.item.networkPicturePath} 
                                             description={items.item.description} 
-                                            member={items.item.memberCount} 
+                                            member={items.item.favoriteMember}
                                             isPrivate={items.item.private}
                                             isDesktop={isDesktop}
                                         />

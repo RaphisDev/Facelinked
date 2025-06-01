@@ -29,8 +29,8 @@ public class Network {
     private List<NetworkMember> members;
     @DynamoDBAttribute(attributeName = "networkPicturePath")
     private String networkPicturePath;
-    @DynamoDBAttribute(attributeName = "memberCount")
-    private Integer memberCount;
+    @DynamoDBAttribute(attributeName = "favoriteMembers")
+    private List<String> favoriteMembers;
     @DynamoDBAttribute(attributeName = "searchName")
     private String searchName;
 }

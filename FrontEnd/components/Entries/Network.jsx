@@ -70,7 +70,7 @@ export default function Network(props) {
                                 <Text style={[
                                     styles.statsText,
                                     isDesktop && styles.desktopFooterText
-                                ]}>{props.member}</Text>
+                                ]}>{props.member.length}</Text>
                                 <Ionicons name="people" size={isDesktop ? 16 : 14} color="#64748B" style={styles.peopleIcon} />
                                 <Text style={[
                                     styles.statsText,
