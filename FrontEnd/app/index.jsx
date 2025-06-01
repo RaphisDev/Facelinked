@@ -85,7 +85,7 @@ const Index = () => {
             } else {
                 setLoggedIn(true);
             }
-       }, Platform.OS === "web" ? 0 : 1500);
+       }, Platform.OS === "web" ? 0 : 500);
     }, []);
 
     if (loggedIn) {
