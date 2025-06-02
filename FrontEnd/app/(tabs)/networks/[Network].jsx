@@ -238,7 +238,7 @@ export default function Network() {
                     description: data.description,
                     creatorId: data.creatorId,
                     private: data.private,
-                    favoriteMember: data.favoriteMember,
+                    favoriteMembers: data.favoriteMembers,
                     networkPicturePath: data.networkPicturePath
                 };
 
@@ -258,7 +258,7 @@ export default function Network() {
                                 creatorId: data.creatorId,
                                 private: data.private,
                                 members: member,
-                                favoriteMember: data.favoriteMember,
+                                favoriteMembers: data.favoriteMembers,
                                 networkPicturePath: data.networkPicturePath
                             };
                         }
@@ -479,7 +479,7 @@ export default function Network() {
                     name: currentNetwork.current.name,
                     description: currentNetwork.current.description,
                     creatorId: currentNetwork.current.creatorId,
-                    favoriteMember: currentNetwork.current.favoriteMember,
+                    favoriteMembers: currentNetwork.current.favoriteMembers,
                     networkPicturePath: currentNetwork.current.networkPicturePath,
                     private: currentNetwork.current.private,
                     members: member
@@ -636,7 +636,7 @@ export default function Network() {
                                                         description: description,
                                                         creatorId: currentNetwork.current.creatorId,
                                                         private: currentNetwork.current.private,
-                                                        favoriteMember: currentNetwork.current.favoriteMember,
+                                                        favoriteMembers: currentNetwork.current.favoriteMembers,
                                                         networkPicturePath: currentNetwork.current.networkPicturePath
                                                     };
 
@@ -649,7 +649,7 @@ export default function Network() {
                                                                 creatorId: currentNetwork.current.creatorId,
                                                                 private: currentNetwork.current.private,
                                                                 members: member,
-                                                                favoriteMember: currentNetwork.current.favoriteMember,
+                                                                favoriteMembers: currentNetwork.current.favoriteMembers,
                                                                 networkPicturePath: currentNetwork.current.networkPicturePath
                                                             };
                                                         }
@@ -1037,7 +1037,7 @@ export default function Network() {
                             <View style={styles.desktopNetworkStats}>
                                 <View style={styles.statItem}>
                                     <Ionicons name="people" size={16} color="#64748B" />
-                                    <Text style={styles.statText}>{currentNetwork.current?.favoriteMember.length} members</Text>
+                                    <Text style={styles.statText}>{currentNetwork.current?.favoriteMembers.length} members</Text>
                                 </View>
 
                                 <View style={styles.statItem}>
@@ -1227,7 +1227,7 @@ export default function Network() {
                                     <View style={styles.networkStats}>
                                         <View style={styles.statItem}>
                                             <Ionicons name="people" size={16} color="#64748B" />
-                                            <Text style={styles.statText}>{currentNetwork.current?.favoriteMember.length} members</Text>
+                                            <Text style={styles.statText}>{currentNetwork.current?.favoriteMembers.length} members</Text>
                                         </View>
 
                                         <View style={styles.statItem}>

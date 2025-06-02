@@ -47,17 +47,11 @@ public class NetworkController {
         var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
 
         if (network.getMembers() != null) {
-            var members = network.getMembers();
-            members.forEach(member -> {
-                if (network.getMembers().stream().anyMatch(existingMember -> existingMember.getMemberId().equals(member.getMemberId()))) {
-                    throw new IllegalArgumentException("User already in network");
-                }
-                var user = profileService.findByUsername(member.getMemberId());
-                member.setMemberProfilePicturePath(user.getProfilePicturePath());
-                member.setMemberName(user.getName());
-            });
+            var members = getNetworkMembers(network);
             network.setMembers(members);
         }
+        var favoriteMembers = new ArrayList<String>();
+        favoriteMembers.add(sender);
 
         var id = networkService.createNetwork(Network.builder().
                 name(network.getName()).
@@ -66,11 +60,21 @@ public class NetworkController {
                 isPrivate(network.isPrivate()).
                 members(network.getMembers() == null ? Collections.emptyList() : network.getMembers()).
                 networkPicturePath(network.getNetworkPicturePath()).
-                favoriteMembers(Collections.emptyList()).
+                favoriteMembers(favoriteMembers).
                 searchName(network.getName().toLowerCase()).
                 build());
 
         return ResponseEntity.ok(NetworkResponse.builder().id(id).members(network.getMembers()).creatorId(sender).build());
+    }
+
+    private List<NetworkMember> getNetworkMembers(NetworkRequest network) {
+        var members = network.getMembers().stream().distinct().toList();
+        members.forEach(member -> {
+            var user = profileService.findByUsername(member.getMemberId());
+            member.setMemberProfilePicturePath(user.getProfilePicturePath());
+            member.setMemberName(user.getName());
+        });
+        return members;
     }
 
     @MessageMapping("/networks/send")

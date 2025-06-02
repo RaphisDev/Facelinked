@@ -33,6 +33,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
 import * as ImagePicker from "expo-image-picker";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
+import asyncStorage from "@react-native-async-storage/async-storage";
 
 const MOBILE_WIDTH_THRESHOLD = 768;
 
@@ -53,6 +54,7 @@ export default function Networks() {
     const [searchResults, setSearchResults] = useState([]);
     const [searchText, setSearchText] = useState("");
     const [refreshing, setRefreshing] = useState(false);
+    const [refreshingFriends, setRefreshingFriend] = useState(false);
 
     // Create Network Modal State
     const [isCreateModalVisible, setCreateModalVisible] = useState(false);
@@ -307,7 +309,7 @@ export default function Networks() {
                     description: networkDescription, 
                     creator: data.creatorId, 
                     private: isPrivate, 
-                    favoriteMember: data.favoriteMember,
+                    favoriteMembers: [username.current],
                     members: data.members, 
                     networkPicturePath: imageUrl ? imageUrl.split('?')[0] : ""
                 }
@@ -326,6 +328,7 @@ export default function Networks() {
             if (loadedNetworks.length !== 0) {
                 setNetworks(JSON.parse(loadedNetworks));
             }
+            //Doch fetchFavoriteNetworks()?
 
         } catch (error) {
             console.error("Error creating network:", error);
@@ -340,6 +343,11 @@ export default function Networks() {
         fetchFavoriteNetworks();
     };
 
+    const onRefreshFriends = () => {
+        setRefreshingFriend(true);
+        fetchFriendsList();
+    }
+
         async function fetchFavoriteNetworks() {
             try {
                 const response = await fetch(`${ip}/networks/favoriteNetworks`, {
@@ -350,8 +358,8 @@ export default function Networks() {
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    setNetworks(JSON.parse(data));
-                    await AsyncStorage.setItem("networks", JSON.stringify(data));
+                    setNetworks(data);
+                    await asyncStorage.setItem("networks", JSON.stringify(data));
                 } else {
                     let networks = await AsyncStorage.getItem("networks") || [];
                     if (networks.length !== 0) {
@@ -363,6 +371,9 @@ export default function Networks() {
                 if (networks.length !== 0) {
                     setNetworks(JSON.parse(networks));
                 }
+            }
+            finally {
+                setRefreshing(false);
             }
         }
 
@@ -394,6 +405,7 @@ export default function Networks() {
             setFriendsList([]);
         } finally {
             setLoadingFriends(false);
+            setRefreshingFriend(false);
         }
     };
 
@@ -782,6 +794,7 @@ export default function Networks() {
                         <Animated.View style={{
                             flexDirection: 'row',
                             width: windowWidth * 2,
+                            height: '100%',
                             transform: [
                                 {
                                     translateX: tabSlideAnimation.interpolate({
@@ -809,8 +822,8 @@ export default function Networks() {
                                             id={items.item.networkId} 
                                             network={items.item.name} 
                                             networkPicturePath={items.item.networkPicturePath} 
-                                            description={items.item.description} 
-                                            member={items.item.favoriteMember}
+                                            description={items.item.description}
+                                            member={items.item.favoriteMembers}
                                             isPrivate={items.item.private}
                                             isDesktop={isDesktop}
                                         />
@@ -843,7 +856,14 @@ export default function Networks() {
                                             isDesktop={isDesktop}
                                         />
                                     )}
-                                    ListEmptyComponent={() => (
+                                    refreshControl={
+                                        <RefreshControl
+                                            refreshing={refreshingFriends}
+                                            onRefresh={onRefreshFriends}
+                                            colors={["#3B82F6"]}
+                                            tintColor="#3B82F6"
+                                        />
+                                    }                                    ListEmptyComponent={() => (
                                         <View style={styles.emptyContainer}>
                                             <Ionicons name="people-outline" size={60} color="#CBD5E1" style={styles.emptyIcon} />
                                             <Text style={styles.emptyText}>No friend networks</Text>
@@ -1017,7 +1037,8 @@ export default function Networks() {
                             </TouchableOpacity>
                         </View>
 
-                        <ScrollView style={styles.createFormContainer}>
+                        <ScrollView nestedScrollEnabled={true} style={styles.createFormContainer}>
+                            <Pressable>
                             {createError ? (
                                 <View style={styles.errorContainer}>
                                     <Text style={styles.errorText}>{createError}</Text>
@@ -1199,6 +1220,7 @@ export default function Networks() {
                                     )}
                                 </TouchableOpacity>
                             </View>
+                            </Pressable>
                         </ScrollView>
 
                         <View style={styles.modalFooter}>
@@ -1555,7 +1577,7 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     friendsListScrollView: {
-        maxHeight: 200,
+        maxHeight: 400,
         marginTop: 12,
         backgroundColor: '#F8FAFC',
         borderRadius: 8,
@@ -1717,7 +1739,6 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
     },
     emptyContainer: {
-        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         paddingTop: 150,
