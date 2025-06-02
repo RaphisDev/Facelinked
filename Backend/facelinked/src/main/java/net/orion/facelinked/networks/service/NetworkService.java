@@ -10,18 +10,18 @@ import net.orion.facelinked.networks.repository.NetworkMessageRepository;
 import net.orion.facelinked.networks.repository.NetworkRepository;
 import net.orion.facelinked.networks.controller.NetworkUpdateRequest;
 import net.orion.facelinked.profile.Profile;
+import net.orion.facelinked.profile.service.ProfileService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
 public class NetworkService {
 
+    private final ProfileService profileService;
     private NetworkRepository networkRepository;
     private NetworkMessageRepository networkMessageRepository;
 
@@ -98,5 +98,54 @@ public class NetworkService {
         networkMember.setMemberProfilePicturePath(username.getProfilePicturePath());
 
         networkMessageRepository.deleteAllBySenderId(networkMember);
+    }
+
+    public List<Profile> getMeetNewPeople(String sender) {
+        var profile = profileService.findByUsername(sender);
+        var friends = new ArrayList<>(profile.getFriends());
+        Collections.shuffle(friends);
+        var friendsArray = new ArrayList<Profile>();
+
+        for (var friend : friends) {
+            if (friendsArray.size() >= 5) {
+                break;
+            }
+            var friendsOfFriends = new ArrayList<>(profileService.findByUsername(friend.getMemberId()).getFriends());
+            Collections.shuffle(friendsOfFriends);
+            for (var friendOfFriend : friendsOfFriends) {
+                if (friendsArray.size() >= 5) {
+                    break;
+                }
+                if (friendOfFriend.getMemberId().equals(sender))
+                    continue;
+                if (friends.stream().anyMatch(f -> f.getMemberId().equals(friendOfFriend.getMemberId())))
+                    continue;
+                friendsArray.add(profileService.findByUsername(friendOfFriend.getMemberId()));
+            }
+        }
+        return friendsArray;
+    }
+
+    public List<Network> getFriendsNetworks(Profile profile) {
+        var networks = new ArrayList<Network>();
+        var friends = new ArrayList<>(profile.getFriends());
+        Collections.shuffle(friends);
+        for (var friend : friends) {
+            if (networks.size() >= 9) {
+                break;
+            }
+            var friendNetworks = networkRepository.findTop3ByCreatorId(friend.getMemberId());
+            for (Network friendNetwork : friendNetworks) {
+                var networkMember = new NetworkMember();
+                networkMember.setMemberName(profile.getName());
+                networkMember.setMemberProfilePicturePath(profile.getProfilePicturePath());
+                networkMember.setMemberId(profile.getUsername());
+
+                if (!networks.contains(friendNetwork) && !friendNetwork.getMembers().contains(networkMember)) {
+                    networks.add(friendNetwork);
+                }
+            }
+        }
+        return networks;
     }
 }

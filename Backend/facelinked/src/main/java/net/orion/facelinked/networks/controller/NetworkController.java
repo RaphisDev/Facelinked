@@ -77,6 +77,20 @@ public class NetworkController {
         return members;
     }
 
+    @GetMapping("/meetnewpeople")
+    public ResponseEntity<List<Profile>> getMeetNewPeople(@AuthenticationPrincipal UserDetails userDetails) {
+        var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
+        return ResponseEntity.ok(networkService.getMeetNewPeople(sender));
+    }
+
+    @GetMapping("/friendsNetworks")
+    public ResponseEntity<List<Network>> getFriendsNetworks(@AuthenticationPrincipal UserDetails userDetails) {
+        var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
+        var profile = profileService.findByUsername(sender);
+
+        return ResponseEntity.ok(networkService.getFriendsNetworks(profile));
+    }
+
     @MessageMapping("/networks/send")
     public void sendMessage(MessageRequest message, Principal senderDetails) {
         if (senderDetails == null) {

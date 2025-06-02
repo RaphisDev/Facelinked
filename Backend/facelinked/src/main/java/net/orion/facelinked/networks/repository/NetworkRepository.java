@@ -15,4 +15,5 @@ public interface NetworkRepository extends CrudRepository<Network, String> {
     public List<Network> searchTop5BySearchNameContains(String name);
     @Query(fields = "SELECT n FROM Network n JOIN n.favoriteMembers fm WHERE fm = :username")
     public List<Network> findByFavoriteMembersContaining(@Param(value = "username") String username);
+    public List<Network> findTop3ByCreatorId(String creatorId);
 }

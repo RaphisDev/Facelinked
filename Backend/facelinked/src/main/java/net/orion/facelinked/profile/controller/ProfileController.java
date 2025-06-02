@@ -51,6 +51,26 @@ public class ProfileController {
         return ResponseEntity.ok(profile);
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/homefeed")
+    public ResponseEntity<List<Post>> getHomeFeed(@AuthenticationPrincipal UserDetails userDetails) {
+        var username = userService.findByEmail(userDetails.getUsername()).getUserName();
+        var profile = profileService.findByUsername(username);
+
+        var homeFeedPosts = new ArrayList<Post>();
+        var friends = new ArrayList<>(profile.getFriends());
+        Collections.shuffle(friends);
+
+        for (var friend : friends) {
+            if (homeFeedPosts.size() >= 8) {
+                break;
+            }
+            homeFeedPosts.addAll(profileService.getLast5Posts(friend.getMemberId()));
+        }
+
+        return ResponseEntity.ok(homeFeedPosts);
+    }
+
     @ResponseStatus(HttpStatus.FOUND)
     @GetMapping("/search/{name}")
     private ResponseEntity<List<Profile>> SearchProfile(@PathVariable String name) {
