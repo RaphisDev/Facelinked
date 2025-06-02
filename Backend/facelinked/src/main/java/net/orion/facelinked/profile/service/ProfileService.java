@@ -22,10 +22,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -252,5 +249,9 @@ public class ProfileService {
 
     public void deletePosts(String username) {
         postRepository.deleteAllByUserId(username);
+    }
+
+    public List<Post> getLast3Posts(String memberId) {
+        return postRepository.findTop3ByUserIdOrderByMillisDesc(memberId);
     }
 }

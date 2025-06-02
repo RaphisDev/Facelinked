@@ -65,8 +65,9 @@ public class ProfileController {
             if (homeFeedPosts.size() >= 8) {
                 break;
             }
-            homeFeedPosts.addAll(profileService.getLast5Posts(friend.getMemberId()));
+            homeFeedPosts.addAll(profileService.getLast3Posts(friend.getMemberId()));
         }
+        Collections.shuffle(homeFeedPosts);
 
         return ResponseEntity.ok(homeFeedPosts);
     }
