@@ -566,7 +566,7 @@ export default function ChatRoom() {
                         activeOpacity={0.8}
                     >
                         <Image
-                            source={{ uri: userData.image }}
+                            source={{ uri: userData.image.split(",")[0] }}
                             style={styles.profileImage}
                             className="bg-gray-200"
                             cachePolicy="memory"
