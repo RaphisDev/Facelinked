@@ -40,11 +40,14 @@
       "expo-secure-store",
       "expo-build-properties",
       "expo-font",
-      ["expo-notification-service-extension-plugin",
-      {
-        "mode": "production",
-        "iosNSEFilePath": "./assets/NotificationService.m"
-      }]
+      [
+        "expo-notification-service-extension-plugin",
+        {
+          "mode": "production",
+          "iosNSEFilePath": "./assets/NotificationService.m"
+        }
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true

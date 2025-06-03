@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import "../global.css";
 import {router, useRouter} from "expo-router";
+import '../i18n';
 import * as SecureStore from "expo-secure-store";
 import WebSocketProvider from "../components/WebSocketProvider";
 import {Image} from "expo-image";

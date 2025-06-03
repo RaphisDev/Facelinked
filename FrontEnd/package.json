@@ -33,6 +33,7 @@
     "@stomp/stompjs": "^7.0.0",
     "expo": "^53.0.9",
     "expo-auth-session": "~6.1.5",
+    "expo-blur": "~14.1.4",
     "expo-build-properties": "~0.14.6",
     "expo-dev-client": "~5.1.8",
     "expo-device": "~7.1.4",
@@ -40,7 +41,9 @@
     "expo-image": "~2.1.7",
     "expo-image-manipulator": "~13.1.7",
     "expo-image-picker": "~16.1.4",
+    "expo-linear-gradient": "~14.1.4",
     "expo-linking": "~7.1.5",
+    "expo-localization": "~16.1.5",
     "expo-media-library": "~17.1.6",
     "expo-navigation-bar": "~4.2.4",
     "expo-notification-service-extension-plugin": "^1.0.2",
@@ -51,12 +54,14 @@
     "expo-status-bar": "~2.2.3",
     "expo-system-ui": "~5.0.7",
     "expo-web-browser": "~14.1.6",
+    "i18next": "^25.2.1",
     "lightningcss": "^1.28.1",
     "lucide-react-native": "^0.482.0",
     "moti": "^0.30.0",
     "nativewind": "^4.1.21",
     "react": "19.0.0",
     "react-dom": "19.0.0",
+    "react-i18next": "^15.5.2",
     "react-native": "0.79.2",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-reanimated": "~3.17.4",
@@ -66,9 +71,7 @@
     "react-native-web": "^0.20.0",
     "react-native-webview": "13.13.5",
     "tailwindcss": "^3.4.14",
-    "text-encoding": "^0.7.0",
-    "expo-blur": "~14.1.4",
-    "expo-linear-gradient": "~14.1.4"
+    "text-encoding": "^0.7.0"
   },
   "resolutions": {
     "expo-linear-gradient": "~11.4.0"
