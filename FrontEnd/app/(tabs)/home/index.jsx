@@ -546,10 +546,10 @@ export default function Index() {
 
             {/* Desktop Layout */}
             {isDesktop ? (
-                <View className="flex-row max-w-7xl mx-auto" style={{ height: '100%', overflow: 'auto' }}
+                <View className="flex-row w-3/4 mx-auto" style={{ height: '100%', overflow: 'auto' }}
                 >
                     {/* Main Content */}
-                    <View className="w-3/4 p-4">
+                    <View className="p-4 w-full item-center">
                         {loading ? (
                             <View className="flex-1 items-center justify-center py-20">
                                 <ActivityIndicator size="large" color="#3B82F6" />
@@ -859,7 +859,7 @@ export default function Index() {
                             {/* Post Content Input */}
                             <View className="p-4">
                                 <TextInput
-                                    className="text-gray-800 min-h-[100px] text-base"
+                                    className="text-gray-800 min-h-[100px] text-base outline-none"
                                     placeholder="What's on your mind?"
                                     placeholderTextColor="#94A3B8"
                                     value={postText}
