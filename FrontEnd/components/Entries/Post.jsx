@@ -1,5 +1,5 @@
 import "../../global.css";
-import {FlatList, Platform, Share, Text, TouchableOpacity, View} from "react-native";
+import {FlatList, Platform, Pressable, Share, Text, TouchableOpacity, View} from "react-native";
 import {Image} from "expo-image";
 import * as SecureStore from "expo-secure-store";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -112,7 +112,7 @@ export default function Post(props) {
                     >
                         <Ionicons name="chatbubble-outline" size={isDesktop ? 22 : 20} color="#6B7280" />
                         <Text className={`ml-2 text-gray-600 font-medium ${isDesktop ? "text-base" : ""}`}>
-                            {props.comments > 0 ? props.comments : "Comment"}
+                            {props.comments.length > 0 ? props.comments.length : "Comment"}
                         </Text>
                     </TouchableOpacity>
 

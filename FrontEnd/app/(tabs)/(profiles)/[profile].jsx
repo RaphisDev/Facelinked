@@ -30,6 +30,7 @@
                     let {profile, post} = useLocalSearchParams();
                     const router = useRouter();
                     const insets = useSafeAreaInsets();
+                    const segments = useSegments();
 
                     // State for badge notification
                     const [hasFriendRequests, setHasFriendRequests] = useState(false);
@@ -183,6 +184,14 @@
                                     const postId = posts.find((postItem) => Number.parseInt(postItem.id.millis) === Number.parseInt(post));
                                     if (postId) {
                                         setSelectedPost(postId);
+                                        setComments(postId.comments.map((comment, index) => {
+                                            return {
+                                                id: index,
+                                                profilePicturePath: comment.split('Ð')[1],
+                                                author: comment.split('Ð')[0],
+                                                text: JSON.parse(comment.split('Ð')[2]).comment
+                                            }
+                                        }));
                                         setShowPostModal(true);
                                     } else {
                                         const allData = await fetch(`${ip}/profile/posts/all/${profileName.current}`, {
@@ -211,8 +220,9 @@
                         catch (error) {
                             console.error('Error fetching data:', error);
                         }
-
-                        setRefreshing(false);
+                        finally {
+                            setRefreshing(false);
+                        }
                     }
 
                     function calculateAge(birthDate) {
@@ -1684,6 +1694,7 @@
                                     style={{ flex: 1 }}
                                     keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
                                 >
+                                    <SafeAreaView>
                                     <View className="bg-white dark:bg-dark-primary h-full w-full" style={isDesktop ? {maxWidth: 800, marginHorizontal: 'auto'} : {}}>
                                         <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
                                             <TouchableOpacity
@@ -1803,6 +1814,7 @@
                                             </>
                                         )}
                                     </View>
+                                    </SafeAreaView>
                                 </KeyboardAvoidingView>
                             </Modal>
 

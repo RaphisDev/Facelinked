@@ -194,8 +194,8 @@ export default function Chats() {
                         </TouchableOpacity>
                     </>
                 ) : (
-                    <View className="flex-row items-center flex-1 bg-white/90 rounded-full px-3 shadow-sm border border-gray-100">
-                        <Ionicons name="search" size={18} color="#6B7280" />
+                    <View className="flex-row items-center min-h-14 flex-1 bg-white/90 rounded-full px-3 shadow-sm border border-gray-100">
+                        <Ionicons name="search" size={20} color="#6B7280" />
                         <TextInput
                             ref={searchInputRef}
                             className="flex-1 py-2 px-2 text-gray-700 outline-none"
@@ -205,7 +205,7 @@ export default function Chats() {
                             onChangeText={setSearchQuery}
                         />
                         <TouchableOpacity onPress={toggleSearch}>
-                            <Ionicons name="close" size={18} color="#6B7280" />
+                            <Ionicons name="close" size={20} color="#6B7280" />
                         </TouchableOpacity>
                     </View>
                 )}

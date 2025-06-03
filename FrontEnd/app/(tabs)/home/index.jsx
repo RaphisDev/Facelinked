@@ -11,9 +11,9 @@ import {
     TextInput,
     ActivityIndicator,
     Modal,
-    KeyboardAvoidingView, 
+    KeyboardAvoidingView,
     StyleSheet,
-    Alert
+    Alert, Animated
 } from "react-native";
 import "../../../global.css"
 import {router} from "expo-router";
@@ -58,71 +58,32 @@ export default function Index() {
     const token = useRef("");
     const username = useRef("");
 
-    // Placeholder data for demonstration
-    const placeholderPosts = [
-        {
-            id: { millis: "1" },
-            title: "Just had an amazing day at the beach! 🏖️",
-            content: ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1000&auto=format&fit=crop"],
-            likes: ["user1", "user2", "user3"],
-            comments: 5,
-            username: "sarah_beach",
-            profilePicture: "https://randomuser.me/api/portraits/women/44.jpg",
-            name: "Sarah Johnson"
-        },
-        {
-            id: { millis: "2" },
-            title: "Check out my new photography project! What do you think?",
-            content: [
-                "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=1000&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1554080353-a576cf803bda?q=80&w=1000&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1520390138845-fd2d229dd553?q=80&w=1000&auto=format&fit=crop"
-            ],
-            likes: ["user1"],
-            comments: 12,
-            username: "mike_photo",
-            profilePicture: "https://randomuser.me/api/portraits/men/32.jpg",
-            name: "Mike Peterson"
-        },
-        {
-            id: { millis: "3" },
-            title: "Made this delicious pasta for dinner tonight! Recipe in comments 🍝",
-            content: ["https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?q=80&w=1000&auto=format&fit=crop"],
-            likes: ["user1", "user2", "user3", "user4", "user5"],
-            comments: 8,
-            username: "chef_julia",
-            profilePicture: "https://randomuser.me/api/portraits/women/65.jpg",
-            name: "Julia Chen"
-        },
-        {
-            id: { millis: "4" },
-            title: "Hiking trip with friends this weekend was incredible!",
-            content: [
-                "https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=1000&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1527201987695-67c06571957e?q=80&w=1000&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1530541930197-ff16ac917b0e?q=80&w=1000&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1000&auto=format&fit=crop",
-                "https://images.unsplash.com/photo-1471513671800-b09c87e1497c?q=80&w=1000&auto=format&fit=crop"
-            ],
-            likes: ["user1", "user2"],
-            comments: 3,
-            username: "adventure_tom",
-            profilePicture: "https://randomuser.me/api/portraits/men/22.jpg",
-            name: "Tom Wilson"
-        },
-        {
-            id: { millis: "5" },
-            title: "Just finished reading this book. Highly recommend!",
-            content: ["https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=1000&auto=format&fit=crop"],
-            likes: ["user1", "user2", "user3"],
-            comments: 7,
-            username: "bookworm_amy",
-            profilePicture: "https://randomuser.me/api/portraits/women/33.jpg",
-            name: "Amy Rodriguez"
-        }
-    ];
+    const fadeAnim = useRef(new Animated.Value(0)).current;
 
-    // Handle window resize for responsive layout
+    useEffect(() => {
+        if (showCommentInput) {
+            Animated.timing(fadeAnim, {
+                toValue: 0.5,
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
+        } else {
+            fadeAnim.setValue(0);
+        }
+    }, [showCommentInput]);
+
+    useEffect(() => {
+        if (showPostCreation) {
+            Animated.timing(fadeAnim, {
+                toValue: 0.5,
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
+        } else {
+            fadeAnim.setValue(0);
+        }
+    }, [showPostCreation]);
+
     useEffect(() => {
         const handleResize = () => {
             const newWidth = Dimensions.get('window').width;
@@ -164,18 +125,8 @@ export default function Index() {
     const fetchPosts = async () => {
         setLoading(true);
 
-        // In a real implementation, you would fetch posts from the server
-        // For now, we'll use the placeholder data
-        setTimeout(() => {
-            setPosts(placeholderPosts);
-            setLoading(false);
-            setRefreshing(false);
-        }, 1000);
-
-        // Example of how the actual fetch would look:
-        /*
         try {
-            const response = await fetch(`${ip}/posts/friends`, {
+            const response = await fetch(`${ip}/profile/homefeed`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token.current}`,
@@ -185,6 +136,21 @@ export default function Index() {
 
             if (response.ok) {
                 const data = await response.json();
+                for (const post of data) {
+                    post.username = post.userId;
+                    const response = await fetch(`${ip}/profile/${post.userId}`, {
+                        method: 'GET',
+                        headers: {
+                            "Authorization": `Bearer ${token.current}`,
+                            "Content-Type": "application/json"
+                        }
+                    });
+                    if (response.ok) {
+                        const profile = await response.json();
+                        post.profilePicture = profile.profilePicturePath.split(",")[0];
+                        post.name = profile.name;
+                    }
+                }
                 setPosts(data);
             } else {
                 console.error('Failed to fetch posts');
@@ -195,7 +161,6 @@ export default function Index() {
             setLoading(false);
             setRefreshing(false);
         }
-        */
     };
 
     const onRefresh = () => {
@@ -203,23 +168,31 @@ export default function Index() {
         fetchPosts();
     };
 
-    const handleLikePost = (post) => {
-        // In a real implementation, you would send a request to the server
-        // For now, we'll just update the local state
-        setPosts(prevPosts => 
-            prevPosts.map(p => {
-                if (p.id.millis === post.id.millis) {
-                    const userLiked = p.likes.includes(username.current);
-                    return {
-                        ...p,
-                        likes: userLiked 
-                            ? p.likes.filter(user => user !== username.current)
-                            : [...p.likes, username.current]
-                    };
-                }
-                return p;
-            })
-        );
+    const handleLikePost = async (post, user) => {
+
+        const response = await fetch(`${ip}/profile/posts/like/${user}/${post.id.millis}`, {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${token.current}`
+            }
+        })
+
+        if (response.ok) {
+            setPosts(prevPosts =>
+                prevPosts.map(p => {
+                    if (p.id.millis === post.id.millis) {
+                        const userLiked = p.likes.includes(username.current);
+                        return {
+                            ...p,
+                            likes: userLiked
+                                ? p.likes.filter(user => user !== username.current)
+                                : [...p.likes, username.current]
+                        };
+                    }
+                    return p;
+                })
+            );
+        }
     };
 
     const handleCommentPress = (post) => {
@@ -227,9 +200,14 @@ export default function Index() {
         setCurrentPost(post);
         setShowCommentInput(true);
 
-        // Initialize comments (in a real app, you would fetch comments from the server)
-        // For now, we'll just use an empty array
-        setComments([]);
+        setComments(post.comments.map((comment, index) => {
+            return {
+                id: index,
+                profilePicturePath: comment.split('Ð')[1].split(',')[0],
+                author: comment.split('Ð')[0],
+                text: JSON.parse(comment.split('Ð')[2]).comment
+            }
+        }));
     };
 
     const handleImagePress = (post, image) => {
@@ -254,83 +232,56 @@ export default function Index() {
     const addComment = async () => {
         if (commentText.trim() === "") return;
 
-        // Get user profile picture
-        let profilePath = "";
+        let profilePath;
         if (Platform.OS === "web") {
-            const profile = localStorage.getItem('profile');
-            if (profile) {
-                profilePath = JSON.parse(profile).profilePicturePath;
-            }
+            profilePath = JSON.parse(localStorage.getItem('profile')).profilePicturePath;
         } else {
-            const profile = await SecureStore.getItem('profile');
-            if (profile) {
-                profilePath = JSON.parse(profile).profilePicturePath;
-            }
+            profilePath = JSON.parse(SecureStore.getItem('profile')).profilePicturePath;
         }
 
-        // Create a new comment
         const newComment = {
             id: comments.length,
             author: username.current,
             text: commentText,
-            profilePicturePath: profilePath ? profilePath.split(',')[0] : "",
+            profilePicturePath: profilePath.split(',')[0],
         };
 
-        // Add the comment to the local state
         setComments(prevState => [...prevState, newComment]);
-
-        // Update the post's comment count
-        setPosts(prevPosts => 
-            prevPosts.map(p => {
-                if (p.id.millis === currentPost.id.millis) {
-                    return {
-                        ...p,
-                        comments: typeof p.comments === 'number' ? p.comments + 1 : 1
-                    };
-                }
-                return p;
-            })
-        );
-
-        // Clear the comment text
         setCommentText("");
+        setPosts(prevState => {
+            return prevState.map(item => {
+                if (item.id.millis === currentPost.id.millis) {
+                    item.comments = [...item.comments, (`${username.current}Ð${profilePath.split(',')[0]}Ð${JSON.stringify({comment: newComment.text})}`)];
+                }
+                return item
+            })
+        })
 
-        // In a real app, you would send the comment to the server
-        // For now, we'll just simulate a successful comment
-        /*
-        try {
-            const response = await fetch(`${ip}/profile/posts/${currentPost.username}/${currentPost.id.millis}`, {
-                method: 'POST',
-                headers: {
-                    "Authorization": `Bearer ${token.current}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    comment: commentText,
-                })
-            });
+        const status = await fetch(`${ip}/profile/posts/${currentPost.username}/${currentPost.id.millis}`, {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${token.current}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                comment: commentText,
+            })
+        });
 
-            if (!response.ok) {
-                // If the request fails, remove the comment from the local state
-                setComments(prevState => prevState.slice(0, -1));
+        if (!status.ok) {
+            setComments(prevState => prevState.slice(0, -1));
 
-                // And revert the comment count
-                setPosts(prevPosts => 
-                    prevPosts.map(p => {
-                        if (p.id.millis === currentPost.id.millis) {
-                            return {
-                                ...p,
-                                comments: p.comments - 1
-                            };
-                        }
-                        return p;
-                    })
-                );
-            }
-        } catch (error) {
-            console.error('Error adding comment:', error);
+            showAlert({
+                title: 'Error',
+                message: 'An error occurred while sending your comment. Please try again later.',
+                buttons: [
+                    {
+                        text: 'OK',
+                        onPress: () => {}
+                    }
+                ]
+            })
         }
-        */
     };
 
     // Function to pick images from gallery
@@ -345,7 +296,7 @@ export default function Index() {
 
         // Launch the image picker
         let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            mediaTypes: "images",
             allowsMultipleSelection: true,
             quality: 0.8,
             aspect: [4, 3],
@@ -501,13 +452,15 @@ export default function Index() {
                 </View>
 
                 {/* Post Content */}
-                <Post 
-                    {...item} 
-                    onLikePress={() => handleLikePost(item)} 
-                    onCommentPress={() => handleCommentPress(item)} 
-                    onImagePress={(image) => handleImagePress(item, image)} 
-                    isDesktop={isDesktop}
-                />
+                <TouchableOpacity activeOpacity={0.7} onPress={() => router.navigate(`/${item.username}?post=` + item.id.millis)}>
+                    <Post
+                        {...item}
+                        onLikePress={() => handleLikePost(item, item.username)}
+                        onCommentPress={() => handleCommentPress(item)}
+                        onImagePress={(image) => handleImagePress(item, image)}
+                        isDesktop={isDesktop}
+                    />
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -728,93 +681,125 @@ export default function Index() {
                 onRequestClose={() => setShowCommentInput(false)}
                 animationType={isDesktop ? "fade" : "slide"}
             >
-                <KeyboardAvoidingView
-                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                    style={{ flex: 1 }}
-                    keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-                >
-                    <View className="flex-1 bg-black/50 justify-center items-center">
-                        <View className={`${isDesktop ? "max-w-2xl w-full mx-auto bg-white rounded-xl shadow-xl" : "bg-white rounded-t-xl w-full mt-auto"}`}>
-                            <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
-                                <TouchableOpacity
-                                    onPress={() => setShowCommentInput(false)}
-                                    className="p-2"
+                    <Animated.View
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            backgroundColor: fadeAnim.interpolate({
+                                inputRange: [0, 0.5],
+                                outputRange: ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.5)']
+                            })
+                        }}
+                    >
+                        <SafeAreaProvider>
+                            <SafeAreaView style={{ flex: 1 }}>
+                                <KeyboardAvoidingView
+                                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                                    style={{ flex: 1 }}
                                 >
-                                    <Ionicons name="close" size={24} color="#3B82F6" />
-                                </TouchableOpacity>
-                                <Text className="text-lg font-bold text-gray-800">Add Comment</Text>
-                                <View style={{ width: 40 }} />
-                            </View>
-
-                            {currentPost && (
-                                <View className="px-4 py-3 border-b border-gray-100 bg-gray-50">
-                                    <View className="flex-row items-center">
-                                        <Image
-                                            source={{ uri: currentPost.profilePicture }}
-                                            style={{ width: 36, height: 36, borderRadius: 18 }}
-                                            contentFit="cover"
-                                        />
-                                        <View className="ml-2">
-                                            <Text className="font-bold text-gray-800">{currentPost.name}</Text>
-                                            <Text className="text-gray-500 text-xs">@{currentPost.username}</Text>
-                                        </View>
-                                    </View>
-                                    <Text className="text-gray-700 mt-2" numberOfLines={2}>{currentPost.title}</Text>
-                                </View>
-                            )}
-
-                            {/* Comments List */}
-                            {comments.length > 0 ? (
-                                <FlatList
-                                    data={comments}
-                                    keyExtractor={(item) => item.id.toString()}
-                                    style={{ maxHeight: isDesktop ? 400 : 300 }}
-                                    renderItem={({ item }) => (
-                                        <View className="bg-gray-50 rounded-lg p-4 mx-4 my-2">
-                                            <View className="flex-row items-center mb-2">
-                                                <View className="w-8 h-8 rounded-full bg-blue-100 items-center justify-center mr-2">
-                                                    <Image
-                                                        source={{ uri: item.profilePicturePath }}
-                                                        style={{ width: 30, height: 30, borderRadius: 15 }}
-                                                    />
-                                                </View>
-                                                <Text className="font-bold text-gray-800">{item.author}</Text>
-                                            </View>
-                                            <Text className="text-gray-700">{item.text}</Text>
-                                        </View>
-                                    )}
-                                />
-                            ) : (
-                                <View className="items-center py-8 bg-gray-50 mx-4 my-4 rounded-lg">
-                                    <Ionicons name="chatbubble-outline" size={40} color="#CBD5E1" />
-                                    <Text className="text-gray-500 mt-2">No comments yet</Text>
-                                    <Text className="text-gray-400 text-sm">Be the first to comment</Text>
-                                </View>
-                            )}
-
-                            {/* Comment Input */}
-                            <View className="px-4 py-3 border-t border-gray-200">
-                                <View className="flex-row items-center bg-gray-100 rounded-full px-4 py-2">
-                                    <TextInput
-                                        className="flex-1 text-gray-700 outline-none py-2"
-                                        placeholder="Add a comment..."
-                                        value={commentText}
-                                        onChangeText={setCommentText}
-                                        multiline
-                                    />
+                    <Pressable
+                        style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
+                        onPress={(e) => {
+                        if (e.currentTarget === e.target) {
+                            setShowCommentInput(false);
+                        }
+                        }}>
+                        <View className={`${isDesktop ? "max-w-2xl w-full mx-auto bg-white rounded-xl shadow-xl" : "bg-white rounded-t-xl w-full mt-auto"}`}>
+                                <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
                                     <TouchableOpacity
-                                        onPress={addComment}
-                                        disabled={commentText.trim() === ""}
-                                        className={`ml-2 p-2 rounded-full ${commentText.trim() === "" ? "bg-gray-300" : "bg-blue-500"}`}
+                                        onPress={() => setShowCommentInput(false)}
+                                        className="p-2"
                                     >
-                                        <Ionicons name="send" size={20} color="white" />
+                                        <Ionicons name="close" size={24} color="#3B82F6" />
                                     </TouchableOpacity>
+                                    <Text className="text-lg font-bold text-gray-800">Add Comment</Text>
+                                    <View style={{ width: 40 }} />
+                                </View>
+
+                                {currentPost && (
+                                    <View className="px-4 py-3 border-b border-gray-100 bg-gray-50">
+                                        <View className="flex-row items-center">
+                                            <Image
+                                                source={{ uri: currentPost.profilePicture }}
+                                                style={{ width: 36, height: 36, borderRadius: 18 }}
+                                                contentFit="cover"
+                                            />
+                                            <View className="ml-2">
+                                                <Text className="font-bold text-gray-800">{currentPost.name}</Text>
+                                                <Text className="text-gray-500 text-xs">@{currentPost.username}</Text>
+                                            </View>
+                                        </View>
+                                        <Text className="text-gray-700 mt-2" numberOfLines={2}>{currentPost.title}</Text>
+                                    </View>
+                                )}
+
+                                {/* Comments List */}
+                                {comments.length > 0 ? (
+                                    <FlatList
+                                        data={comments}
+                                        scrollEnabled={true}
+                                        keyExtractor={(item) => item.id.toString()}
+                                        style={{ maxHeight: isDesktop ? 400 : 250 }}
+                                        renderItem={({ item }) => (
+                                            <Pressable className="bg-gray-50 rounded-lg p-4 mx-4 my-2">
+                                                <TouchableOpacity activeOpacity={0.7} onPress={() => {
+                                                    router.navigate(`/${item.author}`);
+                                                    setShowCommentInput(false);
+                                                }} className="flex-row items-center mb-2">
+                                                    <View className="w-8 h-8 rounded-full bg-blue-100 items-center justify-center mr-2">
+                                                        <Image
+                                                            source={{ uri: item.profilePicturePath }}
+                                                            style={{ width: 30, height: 30, borderRadius: 15 }}
+                                                        />
+                                                    </View>
+                                                    <Text className="font-bold text-gray-800">{item.author}</Text>
+                                                </TouchableOpacity>
+                                                <Text className="text-gray-700">{item.text}</Text>
+                                            </Pressable>
+                                        )}
+                                    />
+                                ) : (
+                                    <View className="items-center py-8 bg-gray-50 mx-4 my-4 rounded-lg">
+                                        <Ionicons name="chatbubble-outline" size={40} color="#CBD5E1" />
+                                        <Text className="text-gray-500 mt-2">No comments yet</Text>
+                                        <Text className="text-gray-400 text-sm">Be the first to comment</Text>
+                                    </View>
+                                )}
+
+                                {/* Comment Input */}
+                                <View className="px-4 py-3 border-t border-gray-200">
+                                    <View className="flex-row items-center bg-gray-100 rounded-full px-4 py-2">
+                                        <TextInput
+                                            className="flex-1 text-gray-700 outline-none py-2"
+                                            placeholder="Add a comment..."
+                                            value={commentText}
+                                            onChangeText={setCommentText}
+                                            onSubmitEditing={() => {
+                                                if (commentText.trim() !== "") {
+                                                    addComment();
+                                                }
+                                            }}
+                                        />
+                                        <TouchableOpacity
+                                            onPress={addComment}
+                                            disabled={commentText.trim() === ""}
+                                            className={`ml-2 p-2 rounded-full ${commentText.trim() === "" ? "bg-gray-300" : "bg-blue-500"}`}
+                                        >
+                                            <Ionicons name="send" size={20} color="white" />
+                                        </TouchableOpacity>
+                                    </View>
                                 </View>
                             </View>
-                        </View>
-                    </View>
-                </KeyboardAvoidingView>
-            </Modal>
+                        </Pressable>
+                                </KeyboardAvoidingView>
+                            </SafeAreaView>
+                        </SafeAreaProvider>
+                    </Animated.View>
+
+        </Modal>
 
             {/* Post Creation Modal */}
             <Modal
@@ -823,13 +808,32 @@ export default function Index() {
                 onRequestClose={() => setShowPostCreation(false)}
                 animationType={isDesktop ? "fade" : "slide"}
             >
-            <SafeAreaProvider>
-                <SafeAreaView style={{flex: 1}}>
-                <KeyboardAvoidingView
-                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                    style={{ flex: 1 }}
+                <Animated.View
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: fadeAnim.interpolate({
+                            inputRange: [0, 0.5],
+                            outputRange: ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.5)']
+                        })
+                    }}
                 >
-                    <View className="flex-1 bg-black/50 justify-center items-center">
+                    <SafeAreaProvider>
+                        <SafeAreaView style={{ flex: 1 }}>
+                            <KeyboardAvoidingView
+                                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                                style={{ flex: 1 }}
+                            >
+                                <Pressable
+                                    style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
+                                    onPress={(e) => {
+                                        if (e.currentTarget === e.target) {
+                                            setShowPostCreation(false);
+                                        }
+                                    }}>
                         <View className={`${isDesktop ? "max-w-2xl w-full mx-auto bg-white rounded-xl shadow-xl" : "bg-white rounded-t-xl w-full mt-auto"}`}>
                             <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
                                 <TouchableOpacity
@@ -902,10 +906,11 @@ export default function Index() {
                                 </TouchableOpacity>
                             </View>
                         </View>
-                    </View>
+                    </Pressable>
                 </KeyboardAvoidingView>
                 </SafeAreaView>
                 </SafeAreaProvider>
+                </Animated.View>
             </Modal>
         </SafeAreaView>
         </SafeAreaProvider>

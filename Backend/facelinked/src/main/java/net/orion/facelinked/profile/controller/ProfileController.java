@@ -223,7 +223,9 @@ public class ProfileController {
         var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
         var senderProfile = profileService.findByUsername(sender);
 
-        profileService.addComment(id, senderProfile, comment);
+        var userProfile = profileService.findByUsername(profile);
+
+        profileService.addComment(id, senderProfile, comment, userProfile);
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)

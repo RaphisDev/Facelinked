@@ -177,9 +177,9 @@ public class ProfileService {
         }
     }
 
-    public void addComment(Long millis, Profile user, String comment) {
+    public void addComment(Long millis, Profile sender, String comment, Profile user) {
 
-        comment = user.getUsername() + "Ð" + user.getProfilePicturePath() + "Ð" + comment;
+        comment = sender.getUsername() + "Ð" + sender.getProfilePicturePath() + "Ð" + comment;
 
         var post = postRepository.findById(new PrimaryKey(user.getUsername(), millis)).orElseThrow();
         var currentComment = new ArrayList<>(post.getComments());

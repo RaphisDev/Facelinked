@@ -1054,6 +1054,7 @@ export default function Networks() {
                                     value={networkName}
                                     onChangeText={setNetworkName}
                                     className="outline-none"
+                                    autoFocus
                                 />
                             </View>
 
