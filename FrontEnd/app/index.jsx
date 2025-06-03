@@ -39,6 +39,7 @@ import CustomAlertProvider, {showAlert} from "../components/PopUpModalView";
 import {MotiScrollView, MotiView} from "moti";
 import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
 import {useDerivedValue} from "react-native-reanimated";
+import {useTranslation} from "react-i18next";
 
 global.TextEncoder = TextEncoder;
 
@@ -320,6 +321,7 @@ const Footer = ({navigateTo, scrollContent}) => {
 }
 
 const LandingPage = ({navigateTo, scrollContent}) => {
+    const {t} = useTranslation();
 
     if (Platform.OS === "web") {
         return (
@@ -591,7 +593,7 @@ const LandingPage = ({navigateTo, scrollContent}) => {
                                 Welcome to <Text style={{color: '#2563eb'}}>Facelinked</Text>
                             </Text>
                             <Text style={{fontSize: 16, textAlign: 'center', color: '#4b5563', maxWidth: 320, alignSelf: 'center', marginTop: 16}}>
-                                A platform designed for authentic connections, real friendships, and meaningful interactions.
+                                {t('landingPage.description')}
                             </Text>
                         </View>
 
@@ -612,7 +614,7 @@ const LandingPage = ({navigateTo, scrollContent}) => {
                                                   justifyContent: 'center',
                                                   width: '100%'
                                               }}>
-                                <Text style={{color: 'white', fontWeight: '500', fontSize: 18, marginRight: 8}}>Join Now</Text>
+                                <Text style={{color: 'white', fontWeight: '500', fontSize: 18, marginRight: 8}}>{t("join.now")}</Text>
                             </TouchableOpacity>
                             <TouchableOpacity activeOpacity={0.7} onPress={() => navigateTo("login")}
                                               style={{
@@ -627,7 +629,7 @@ const LandingPage = ({navigateTo, scrollContent}) => {
                                                   justifyContent: 'center',
                                                   width: '100%'
                                               }}>
-                                <Text style={{color: '#2563eb', fontWeight: '500', fontSize: 18}}>Login</Text>
+                                <Text style={{color: '#2563eb', fontWeight: '500', fontSize: 18}}>{t("login")}</Text>
                             </TouchableOpacity>
                         </View>
                         <View className="mt-8 flex-row items-center justify-center">
@@ -1858,6 +1860,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
 };
 
 const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, setShowPassword, rememberMe, setRememberMe, formData, updateFormData}) => {
+    const { t } = useTranslation();
 
     return (
         <View style={{marginBottom: 110, justifyContent: "center", width: "100%", flexGrow: 1}}>
@@ -1876,8 +1879,8 @@ const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, se
                 >
                     <X size={20} color="#000000" />
                 </TouchableOpacity>
-                <Text className="text-3xl text-center font-bold text-blue-600">Welcome Back</Text>
-                <Text className="text-gray-600 text-center mt-2">Sign in to your account</Text>
+                <Text className="text-3xl text-center font-bold text-blue-600">{t("welcome.back")}</Text>
+                <Text className="text-gray-600 text-center mt-2">{t("login.account")}</Text>
             </View>
 
             <View className="space-y-6">
@@ -1890,7 +1893,7 @@ const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, se
                         <TextInput
                             onChangeText={(value) => updateFormData("email", value)}
                             className="pl-10 block w-full rounded-lg border border-gray-300 py-3"
-                            placeholder="Enter your email"
+                            placeholder={t("enter.email")}
                             placeholderTextColor="#9CA3AF"
                         />
                     </View>
@@ -1906,7 +1909,7 @@ const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, se
                             secureTextEntry={!showPassword}
                             onChangeText={(value) => updateFormData("password", value)}
                             className="pl-10 pr-10 block w-full rounded-lg border border-gray-300 py-3"
-                            placeholder="Enter your password"
+                            placeholder={t("enter.password")}
                             placeholderTextColor="#9CA3AF"
                         />
                         <TouchableOpacity
@@ -1929,12 +1932,12 @@ const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, se
                             )}
                         </Pressable>
                         <Text className="ml-2 block text-sm text-gray-700">
-                            Remember me
+                            {t("remember.me")}
                         </Text>
                     </View>
                     <TouchableOpacity>
                         <Text className="text-sm font-medium text-blue-500">
-                            Forgot password?
+                            {t("password.forgot")}
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -1944,13 +1947,13 @@ const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, se
                     onPress={loginEmail}
                     className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm bg-blue-600"
                 >
-                    <Text className="text-white text-center font-medium">Sign in</Text>
+                    <Text className="text-white text-center font-medium">{t("sign.in")}</Text>
                 </TouchableOpacity>
 
                 <View className="mt-6">
                     <View className="flex-row items-center">
                         <View className="flex-1 h-px bg-gray-300" />
-                        <Text className="mx-2 text-gray-500 text-sm">Or continue with</Text>
+                        <Text className="mx-2 text-gray-500 text-sm">{t("continue.alternatives")}</Text>
                         <View className="flex-1 h-px bg-gray-300" />
                     </View>
 
@@ -1975,12 +1978,12 @@ const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, se
 
             <View className="mt-8">
                 <Text className="text-center text-sm text-gray-600">
-                    Don't have an account?{' '}
+                    {t("no.account")}{' '}
                     <Text
                         onPress={() => navigateTo('register')}
                         className="font-medium text-blue-600"
                     >
-                        Sign up
+                        {t("sign.up")}
                     </Text>
                 </Text>
             </View>
@@ -1992,6 +1995,7 @@ const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, se
 const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousPage, step, activeStep, acceptLegals, setAcceptLegals, prevStep, nextStep, registered, jumpToStep, updateFormData, formData }) => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const totalSteps = 5;
+    const { t } = useTranslation();
 
     const monthNames = [
         'January', 'February', 'March', 'April', 'May', 'June',

@@ -1,3 +1,15 @@
-[
-
-]
+{
+  "landingPage.description": "Eine Plattform entwickelt für nahe Communities, echte Freundschaften, and bedeutsame Interatkionen.",
+  "join.now": "Trete bei",
+  "login": "Anmelden,",
+  "welcome.back": "Willkommen zurück",
+  "login.account": "Melde dich in deinem Account an",
+  "enter.email": "Gib deine Email ein",
+  "enter.password": "Wähle ein Passwort",
+  "remember.me": "Eingeloggt bleiben",
+  "password.forgot": "Passwort vergessen?",
+  "sign.in": "Einloggen",
+  "sign.up": "Registrieren",
+  "no.account": "Du besitzt noch keinen Account?",
+  "continue.alternatives": "oder"
+}

@@ -1,3 +1,15 @@
-[
-
-]
+{
+  "landingPage.description": "A platform designed for authentic connections, real friendships, and meaningful interactions.",
+  "join.now": "Join Now",
+  "login": "Login",
+  "welcome.back": "Welcome back",
+  "login.account": "Sign in to your account",
+  "enter.email": "Enter your email",
+  "enter.password": "Enter your password",
+  "remember.me": "Remember me",
+  "password.forgot": "Forgot password?",
+  "sign.in": "Sign in",
+  "sign.up": "Sign up",
+  "no.account": "Don't have an account?",
+  "continue.alternatives": "Or continue with"
+}
