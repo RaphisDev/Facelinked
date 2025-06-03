@@ -41,6 +41,7 @@ export default function Networks() {
     const insets = useSafeAreaInsets();
     const [selected, setSelected] = useState(0);
     const [favoriteNetworks, setNetworks] = useState([]);
+    const [friendNetworks, setFriendNetworks] = useState([]);
     const segments = useSegments();
     const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
     const [isDesktop, setIsDesktop] = useState(windowWidth > MOBILE_WIDTH_THRESHOLD);
@@ -81,53 +82,7 @@ export default function Networks() {
     const [currentPage, setCurrentPage] = useState(0);
     const [currentPersonIndex, setCurrentPersonIndex] = useState(0);
     const peopleListRef = useRef(null);
-    const [people, setPeople] = useState([
-        { 
-            id: 1, 
-            name: 'John Doe', 
-            username: 'johndoe', 
-            profilePicture: 'https://randomuser.me/api/portraits/men/1.jpg',
-            age: 28,
-            relationshipStatus: 'Single',
-            hobbies: "Photography, Hiking, Cooking"
-        },
-        { 
-            id: 2, 
-            name: 'Jane Smith', 
-            username: 'janesmith', 
-            profilePicture: 'https://randomuser.me/api/portraits/women/1.jpg',
-            age: 24,
-            relationshipStatus: 'In a relationship',
-            hobbies: "Reading, Yoga, Traveling"
-        },
-        { 
-            id: 3, 
-            name: 'Alex Johnson', 
-            username: 'alexj', 
-            profilePicture: 'https://randomuser.me/api/portraits/men/2.jpg',
-            age: 32,
-            relationshipStatus: 'Married',
-            hobbies: "Gaming, Music, Fitness"
-        },
-        { 
-            id: 4, 
-            name: 'Sarah Williams', 
-            username: 'sarahw', 
-            profilePicture: 'https://randomuser.me/api/portraits/women/2.jpg',
-            age: 26,
-            relationshipStatus: 'Single',
-            hobbies: "Dancing, Painting, Cooking"
-        },
-        { 
-            id: 5, 
-            name: 'Michael Brown', 
-            username: 'michaelb', 
-            profilePicture: 'https://randomuser.me/api/portraits/men/3.jpg',
-            age: 30,
-            relationshipStatus: 'Divorced',
-            hobbies: "Football, Reading, Traveling"
-        },
-    ]);
+    const [people, setPeople] = useState([]);
 
     useEffect(() => {
         const handleResize = () => {
@@ -158,20 +113,31 @@ export default function Networks() {
                 fetchFavoriteNetworks()
             }
             loadNetworks();
+        } else if (selected === 1) {
+            const loadFriends = async () => {
+                setLoadingFriends(true);
+                fetchFriendNetworks();
+            }
+            loadFriends();
         }
     }, [segments, selected]);
+
+    useEffect(() => {
+        loadPeople()
+    }, []);
 
     useEffect(() => {
         if (Platform.OS === "web") {
             token.current = localStorage.getItem("token");
             username.current = localStorage.getItem("username");
-        }
-        else {
+        } else {
             token.current = SecureStore.getItem("token");
             username.current = SecureStore.getItem("username");
         }
         setTimeout(() => {
-            if (token.current === null) {router.replace("/")}
+            if (token.current === null) {
+                router.replace("/")
+            }
         })
 
         stateManager.setNetworkState(true);
@@ -217,6 +183,37 @@ export default function Networks() {
             console.error('Error picking image:', error);
         }
     };
+
+    const loadPeople = async () => {
+        try {
+            const response = await fetch(`${ip}/networks/meetnewpeople`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token.current}`}
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setPeople(data.map(person => {
+                        return {
+                            ...person,
+                            profilePicturePath: person.profilePicturePath.split(",")[0] ,
+                            age: calculateAge(new Date(person.dateOfBirth)),
+                            relationshipStatus: person.inRelationship ? "in relationship" : "Single",
+                            isFriend: false,
+                        }
+                    }
+                ));
+            }
+        } catch (error) {
+            console.error("Error fetching people:", error);
+        }
+    }
+
+    function calculateAge(birthDate) {
+        const ageDiff = Date.now() - birthDate.getTime();
+        const ageDate = new Date(ageDiff);
+        return Math.abs(ageDate.getUTCFullYear() - 1970);
+    }
 
     const createNetwork = async () => {
         if (!networkName.trim() || !networkDescription.trim()) {
@@ -302,15 +299,15 @@ export default function Networks() {
             }
 
             await AsyncStorage.setItem("networks", JSON.stringify([
-                ...networks, 
+                ...networks,
                 {
-                    networkId: data.id, 
-                    name: networkName, 
-                    description: networkDescription, 
-                    creator: data.creatorId, 
-                    private: isPrivate, 
+                    networkId: data.id,
+                    name: networkName,
+                    description: networkDescription,
+                    creator: data.creatorId,
+                    private: isPrivate,
                     favoriteMembers: [username.current],
-                    members: data.members, 
+                    members: data.members,
                     networkPicturePath: imageUrl ? imageUrl.split('?')[0] : ""
                 }
             ]));
@@ -345,37 +342,36 @@ export default function Networks() {
 
     const onRefreshFriends = () => {
         setRefreshingFriend(true);
-        fetchFriendsList();
+        fetchFriendNetworks();
     }
 
-        async function fetchFavoriteNetworks() {
-            try {
-                const response = await fetch(`${ip}/networks/favoriteNetworks`, {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `Bearer ${token.current}`
-                    }
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    setNetworks(data);
-                    await asyncStorage.setItem("networks", JSON.stringify(data));
-                } else {
-                    let networks = await AsyncStorage.getItem("networks") || [];
-                    if (networks.length !== 0) {
-                        setNetworks(JSON.parse(networks));
-                    }
+    async function fetchFavoriteNetworks() {
+        try {
+            const response = await fetch(`${ip}/networks/favoriteNetworks`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token.current}`
                 }
-            } catch (error) {
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setNetworks(data);
+                await asyncStorage.setItem("networks", JSON.stringify(data));
+            } else {
                 let networks = await AsyncStorage.getItem("networks") || [];
                 if (networks.length !== 0) {
                     setNetworks(JSON.parse(networks));
                 }
             }
-            finally {
-                setRefreshing(false);
+        } catch (error) {
+            let networks = await AsyncStorage.getItem("networks") || [];
+            if (networks.length !== 0) {
+                setNetworks(JSON.parse(networks));
             }
+        } finally {
+            setRefreshing(false);
         }
+    }
 
     const resetCreateForm = () => {
         setNetworkName("");
@@ -388,6 +384,27 @@ export default function Networks() {
         setIsCreating(false);
         setSelectedFriends([]);
     };
+
+    const fetchFriendNetworks = async () => {
+        try {
+            const response = await fetch(`${ip}/networks/friendsNetworks`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token.current}`,
+                    "Content-Type": "application/json"
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setFriendNetworks(data);
+            }
+        } catch (error) {
+            console.error("Error fetching friends networks:", error);
+        } finally {
+            setLoadingFriends(false);
+            setRefreshingFriend(false);
+        }
+    }
 
     // Fetch user's friends list
     const fetchFriendsList = async () => {
@@ -403,9 +420,6 @@ export default function Networks() {
         } catch (error) {
             console.error("Error fetching friends list:", error);
             setFriendsList([]);
-        } finally {
-            setLoadingFriends(false);
-            setRefreshingFriend(false);
         }
     };
 
@@ -843,11 +857,11 @@ export default function Networks() {
                             {/* Friends Tab Content */}
                             <View style={{ width: windowWidth }}>
                                 <FlatList 
-                                    data={[]} // Replace with actual friends networks data
-                                    keyExtractor={(item) => item.networkId.toString()}
+                                    data={friendNetworks}
+                                    keyExtractor={(item) => item.id.toString()}
                                     renderItem={(items) => (
                                         <Network 
-                                            id={items.item.networkId} 
+                                            id={items.item.id}
                                             network={items.item.name} 
                                             networkPicturePath={items.item.networkPicturePath} 
                                             description={items.item.description} 
@@ -881,6 +895,26 @@ export default function Networks() {
         );
     };
 
+    async function AddFriend(username) {
+        const response = await fetch(`${ip}/profile/friend/${username}`, {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${token.current}`
+            }
+        });
+
+        if (response.ok) {
+            setPeople(prevState => prevState.map(person => {
+                if (person.username === username) {
+                    return {
+                        ...person,
+                        isFriend: true
+                    };
+                }
+            }));
+        }
+    }
+
     const renderMeetPeopleContent = () => {
         return (
             <View style={styles.meetPeopleContainer}>
@@ -907,16 +941,24 @@ export default function Networks() {
                                 horizontal
                                 pagingEnabled
                                 showsHorizontalScrollIndicator={false}
-                                keyExtractor={(item) => item.id.toString()}
+                                keyExtractor={(item) => item.username.toString()}
                                 onMomentumScrollEnd={(e) => {
                                     const cardWidth = isDesktop ? Math.min(windowWidth, 1024) : windowWidth;
                                     const newIndex = Math.round(e.nativeEvent.contentOffset.x / cardWidth);
                                     setCurrentPersonIndex(newIndex);
                                 }}
+                                ListEmptyComponent={() => (
+                                    <View style={{width: isDesktop ? Math.min(windowWidth, 1024) : windowWidth}}
+                                          className="flex flex-col items-center justify-center h-full px-4">
+                                        <Ionicons name="people-outline" size={70} color="#CBD5E1" className="mb-4" />
+                                        <Text className="text-xl font-semibold text-gray-500 mb-2">No people found</Text>
+                                        <Text className="text-gray-400 text-center">Try refreshing or check back later</Text>
+                                    </View>
+                                )}
                                 renderItem={({item}) => (
                                     <View style={[
                                         styles.personCard, 
-                                        {width: isDesktop ? Math.min(windowWidth, 1024) : windowWidth}
+                                        {width: isDesktop ? Math.min(windowWidth, 1024) : windowWidth},
                                     ]}>
                                         <View style={styles.personImageContainer}>
                                             <Image 
@@ -945,19 +987,20 @@ export default function Networks() {
                                         </View>
 
                                         <View style={styles.personActions}>
-                                            <TouchableOpacity style={styles.messageButton}>
+                                            <TouchableOpacity activeOpacity={0.7} onPress={() => router.navigate(`/chats/${item.username}`)} style={styles.messageButton}>
                                                 <Ionicons name="chatbubble" size={20} color="white" style={styles.actionButtonIcon} />
                                                 <Text style={styles.actionButtonText}>Message</Text>
                                             </TouchableOpacity>
 
-                                            <TouchableOpacity style={styles.addFriendButton}>
-                                                <Ionicons name="person-add" size={20} color="white" style={styles.actionButtonIcon} />
-                                                <Text style={styles.actionButtonText}>Add Friend</Text>
+                                            <TouchableOpacity activeOpacity={0.55} onPress={() => AddFriend(item.username)} style={[styles.addFriendButton, {backgroundColor: item.isFriend ? "#10B981" : '#059669'}]}>
+                                                <Ionicons name={item.isFriend ? "checkmark" : "person-add"} size={20} color="white" style={styles.actionButtonIcon} />
+                                                <Text style={styles.actionButtonText}>{item.isFriend ? "Sent request" : "Add Friend"}</Text>
                                             </TouchableOpacity>
                                         </View>
 
                                         <TouchableOpacity 
                                             style={styles.viewProfileButton}
+                                            activeOpacity={0.7}
                                             onPress={() => router.navigate(`/${item.username}`)}
                                         >
                                             <Text style={styles.viewProfileText}>View Profile</Text>
@@ -1980,7 +2023,6 @@ const styles = StyleSheet.create({
     addFriendButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#10B981',
         paddingVertical: 12,
         paddingHorizontal: 20,
         borderRadius: 12,
