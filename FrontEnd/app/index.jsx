@@ -2003,7 +2003,7 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
     ];
 
     const handleDateChange = (event, selectedDate) => {
-        setShowDatePicker(!Platform.OS === 'ios');
+        setShowDatePicker(true);
         if (selectedDate) {
             updateFormData('birthDate', {
                 day: selectedDate.getDate(),
@@ -2064,7 +2064,7 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
         return (
             <View>
                 <TouchableOpacity
-                    onPress={() => setShowDatePicker(true)}
+                    onPress={() => setShowDatePicker(prevState => !prevState)}
                     className="p-3 border border-gray-300 rounded-lg flex flex-row justify-center"
                 >
                     <Text className="text-gray-700">
