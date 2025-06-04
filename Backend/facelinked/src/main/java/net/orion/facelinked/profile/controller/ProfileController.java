@@ -67,7 +67,8 @@ public class ProfileController {
             }
             homeFeedPosts.addAll(profileService.getLast3Posts(friend.getMemberId()));
         }
-        Collections.shuffle(homeFeedPosts);
+        homeFeedPosts.sort(Post::id.millis);
+        weakShuffle.randomizeTiny(homeFeedPosts);
 
         return ResponseEntity.ok(homeFeedPosts);
     }
