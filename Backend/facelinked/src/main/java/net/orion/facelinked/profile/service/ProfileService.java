@@ -61,9 +61,9 @@ public class ProfileService {
         postRepository.save(post);
     }
 
-    public List<Post> getPosts(String username, User user) {
+    public List<Post> getPosts(String username, String user) {
         var profile = profileRepository.findById(username).orElseThrow();
-        if (profile.getFriends().stream().noneMatch(friend -> friend.getMemberId().equals(user.getUserName()))) {
+        if (!profile.getUsername().equals(user) && profile.getFriends().stream().noneMatch(friend -> friend.getMemberId().equals(user))) {
             return Collections.emptyList();
         }
         return postRepository.findByUserIdOrderByMillisDesc(username);
@@ -73,9 +73,9 @@ public class ProfileService {
         postRepository.deleteById(new PrimaryKey(username, millis));
     }
 
-    public List<Post> getLast5Posts(String username, User user) {
+    public List<Post> getLast5Posts(String username, String userName) {
         var profile = profileRepository.findById(username).orElseThrow();
-        if (profile.getFriends().stream().noneMatch(friend -> friend.getMemberId().equals(user.getUserName()))) {
+        if (!profile.getUsername().equals(userName) || profile.getFriends().stream().noneMatch(friend -> friend.getMemberId().equals(userName))) {
             return Collections.emptyList();
         }
         return postRepository.findTop5ByUserIdOrderByMillisDesc(username);

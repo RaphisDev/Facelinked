@@ -40,7 +40,7 @@ public class NetworkService {
     }
 
     public List<Network> getFavoriteNetworks(String username) {
-        return networkRepository.findByFavoriteMembersContaining(username);
+        return networkRepository.findByFavoriteMembersContains(username);
     }
 
     public Network getNetwork(String networkId) {

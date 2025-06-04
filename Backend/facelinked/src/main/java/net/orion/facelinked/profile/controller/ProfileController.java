@@ -38,7 +38,7 @@ public class ProfileController {
     private final NetworkService networkService;
 
     @ResponseStatus(HttpStatus.FOUND)
-    @GetMapping("/{username}")
+    @GetMapping(value = "/{username}", produces = "application/json")
     private ResponseEntity<Profile> GetProfile(@PathVariable String username) {
         var profile = profileService.findByUsername(username);
         return ResponseEntity.ok(profile);
@@ -172,7 +172,7 @@ public class ProfileController {
     @GetMapping("/posts/all/{username}")
     public ResponseEntity<List<Post>> GetPosts(@PathVariable String username, @AuthenticationPrincipal UserDetails userDetails)
     {
-        var user = userService.findByUsername(userDetails.getUsername());
+        var user = userService.findByEmail(userDetails.getUsername()).getUserName();
         return ResponseEntity.ok(profileService.getPosts(username, user));
     }
 
@@ -187,7 +187,7 @@ public class ProfileController {
     @GetMapping("/posts/last5/{username}")
     public ResponseEntity<List<Post>> GetLast5Posts(@PathVariable String username, @AuthenticationPrincipal UserDetails userDetails)
     {
-        var user = userService.findByUsername(userDetails.getUsername());
+        var user = userService.findByEmail(userDetails.getUsername()).getUserName();
         return ResponseEntity.ok(profileService.getLast5Posts(username, user));
     }
 

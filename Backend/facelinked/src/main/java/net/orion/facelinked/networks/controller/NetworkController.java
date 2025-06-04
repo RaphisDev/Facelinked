@@ -175,7 +175,7 @@ public class NetworkController {
     public ResponseEntity<List<Network>> searchNetwork(@RequestParam String searchName, @AuthenticationPrincipal UserDetails userDetails) {
         var networks = new ArrayList<>(networkService.searchForNetwork(searchName.toLowerCase()));
         if (networks.stream().anyMatch(Network::isPrivate)) {
-            var user = userService.findByUsername(userDetails.getUsername());
+            var user = userService.findByEmail(userDetails.getUsername());
             networks.removeIf(network -> {
                 if (network.isPrivate()) {
                     return network.getMembers().stream().noneMatch(member -> member.getMemberId().equals(user.getUserName()));
