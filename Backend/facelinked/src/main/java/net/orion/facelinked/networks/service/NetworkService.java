@@ -136,6 +136,11 @@ public class NetworkService {
             }
             var friendNetworks = networkRepository.findTop3ByCreatorId(friend.getMemberId());
             for (Network friendNetwork : friendNetworks) {
+                if (friendNetwork.isPrivate()) {
+                    if (friendNetwork.getMembers().stream().noneMatch(u -> u.getMemberId().equals(profile.getUsername()))) {
+                        continue;
+                    }
+                }
                 var networkMember = new NetworkMember();
                 networkMember.setMemberName(profile.getName());
                 networkMember.setMemberProfilePicturePath(profile.getProfilePicturePath());

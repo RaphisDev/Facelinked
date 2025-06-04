@@ -170,16 +170,25 @@ public class ProfileController {
 
     @ResponseStatus(HttpStatus.FOUND)
     @GetMapping("/posts/all/{username}")
-    public ResponseEntity<List<Post>> GetPosts(@PathVariable String username)
+    public ResponseEntity<List<Post>> GetPosts(@PathVariable String username, @AuthenticationPrincipal UserDetails userDetails)
     {
-        return ResponseEntity.ok(profileService.getPosts(username));
+        var user = userService.findByUsername(userDetails.getUsername());
+        return ResponseEntity.ok(profileService.getPosts(username, user));
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/posts/{id}")
+    public void DeletePost(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
+        profileService.deletePost(sender, id);
     }
 
     @ResponseStatus(HttpStatus.FOUND)
     @GetMapping("/posts/last5/{username}")
-    public ResponseEntity<List<Post>> GetLast5Posts(@PathVariable String username)
+    public ResponseEntity<List<Post>> GetLast5Posts(@PathVariable String username, @AuthenticationPrincipal UserDetails userDetails)
     {
-        return ResponseEntity.ok(profileService.getLast5Posts(username));
+        var user = userService.findByUsername(userDetails.getUsername());
+        return ResponseEntity.ok(profileService.getLast5Posts(username, user));
     }
 
     @ResponseStatus(HttpStatus.ACCEPTED)

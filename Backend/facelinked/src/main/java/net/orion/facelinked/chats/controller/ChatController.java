@@ -52,11 +52,13 @@ public class ChatController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
         String sender = senderDetails.getName();
-
         if(sender == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
         var senderProfile = profileService.findByUsername(sender);
+        if (senderProfile.getFriends().stream().noneMatch((friend) -> friend.getMemberId().equals(message.getReceiver()))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only send messages to your friends.");
+        }
         var senderProfilePicturePath = senderProfile.getProfilePicturePath();
         String senderName = senderProfile.getName();
 

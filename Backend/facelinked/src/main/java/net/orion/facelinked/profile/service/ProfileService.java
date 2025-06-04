@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
+import net.orion.facelinked.auth.User;
 import net.orion.facelinked.auth.services.UserService;
 import net.orion.facelinked.config.PrimaryKey;
 import net.orion.facelinked.networks.NetworkMember;
@@ -18,7 +19,9 @@ import net.orion.facelinked.profile.Profile;
 import net.orion.facelinked.profile.controller.UpdateProfile;
 import net.orion.facelinked.profile.repository.PostRepository;
 import net.orion.facelinked.profile.repository.ProfileRepository;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.parameters.P;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -58,11 +61,23 @@ public class ProfileService {
         postRepository.save(post);
     }
 
-    public List<Post> getPosts(String username) {
+    public List<Post> getPosts(String username, User user) {
+        var profile = profileRepository.findById(username).orElseThrow();
+        if (profile.getFriends().stream().noneMatch(friend -> friend.getMemberId().equals(user.getUserName()))) {
+            return Collections.emptyList();
+        }
         return postRepository.findByUserIdOrderByMillisDesc(username);
     }
 
-    public List<Post> getLast5Posts(String username) {
+    public void deletePost(String username, Long millis) {
+        postRepository.deleteById(new PrimaryKey(username, millis));
+    }
+
+    public List<Post> getLast5Posts(String username, User user) {
+        var profile = profileRepository.findById(username).orElseThrow();
+        if (profile.getFriends().stream().noneMatch(friend -> friend.getMemberId().equals(user.getUserName()))) {
+            return Collections.emptyList();
+        }
         return postRepository.findTop5ByUserIdOrderByMillisDesc(username);
     }
 

@@ -174,11 +174,11 @@ public class NetworkController {
     @GetMapping("/search")
     public ResponseEntity<List<Network>> searchNetwork(@RequestParam String searchName, @AuthenticationPrincipal UserDetails userDetails) {
         var networks = new ArrayList<>(networkService.searchForNetwork(searchName.toLowerCase()));
-        if (networks.stream().anyMatch(network -> network.isPrivate())) {
-            var user = profileService.findByUsername(userDetails.getUsername());
+        if (networks.stream().anyMatch(Network::isPrivate)) {
+            var user = userService.findByUsername(userDetails.getUsername());
             networks.removeIf(network -> {
                 if (network.isPrivate()) {
-                    return network.getMembers().stream().noneMatch(member -> member.getMemberId().equals(user.getUsername()));
+                    return network.getMembers().stream().noneMatch(member -> member.getMemberId().equals(user.getUserName()));
                 }
                 return false;
             });
