@@ -837,7 +837,8 @@ export default function Networks() {
                                             network={items.item.name} 
                                             networkPicturePath={items.item.networkPicturePath} 
                                             description={items.item.description}
-                                            member={items.item.favoriteMembers}
+                                            member={items.item.members}
+                                            favoriteMembers={items.item.favoriteMembers}
                                             isPrivate={items.item.private}
                                             isDesktop={isDesktop}
                                         />
@@ -865,7 +866,9 @@ export default function Networks() {
                                             network={items.item.name} 
                                             networkPicturePath={items.item.networkPicturePath} 
                                             description={items.item.description} 
-                                            creator={items.item.creatorId} 
+                                            creator={items.item.creatorId}
+                                            member={items.item.members}
+                                            favoriteMembers={items.item.favoriteMembers}
                                             isPrivate={items.item.private}
                                             isDesktop={isDesktop}
                                         />

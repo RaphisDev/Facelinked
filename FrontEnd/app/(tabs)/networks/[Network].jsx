@@ -31,7 +31,7 @@ import ip from "../../../components/AppManager";
 import * as SecureStore from "expo-secure-store";
 import StateManager from "../../../components/StateManager";
 import { showAlert } from "../../../components/PopUpModalView";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {SafeAreaProvider, useSafeAreaInsets} from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
 
 const MOBILE_WIDTH_THRESHOLD = 768;
@@ -58,6 +58,7 @@ export default function Network() {
     const [inputHeight, setInputHeight] = useState(40);
     const [keyboardVisible, setKeyboardVisible] = useState(false);
 
+    const flatListRefDesk = useRef(null);
     const flatListRef = useRef(null);
     const inputRef = useRef(null);
     const token = useRef("");
@@ -200,7 +201,12 @@ export default function Network() {
         const groups = [];
         let currentDate = null;
 
-        messages.forEach(message => {
+        messages.sort((a, b) => {
+            // Handle date headers which don't have millis property
+            const millisA = a.millis || 0;
+            const millisB = b.millis || 0;
+            return millisA - millisB; // Ascending order (older first, newer last)
+        }).forEach(message => {
             const timestamp = message.millis;
             const dateString = formatMessageDate(timestamp);
 
@@ -682,101 +688,58 @@ export default function Network() {
             ]
         });
     };
+    const [modalVisible, setFriendsModalVisible] = useState(false);
 
     const addUser = () => {
         setModalVisible(false);
-        showAlert({
-            title: 'Add User',
-            message: 'Enter the username of the user you want to add to the network',
-            hasInput: true,
-            inputConfig: {
-                placeholder: 'Username'
-            },
-            buttons: [
-                {
-                    text: 'Cancel',
-                    onPress: () => {}
+    setFriendsModalVisible(true);
+    }
+
+    const handleAddFriends = async (selectedFriendIds) => {
+        try {
+            const response = await fetch(`${ip}/networks/${Network}/add`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token.current}`
                 },
-                {
-                    text: 'Add',
-                    onPress: async (text) => {
-                        if (text.length <= 3) {
-                            setTimeout(() => {
-                                showAlert({
-                                    title: 'Error',
-                                    message: 'User not found',
-                                    buttons: [
-                                        {
-                                            text: 'OK',
-                                            onPress: () => {}
-                                        },
-                                    ],
-                                });
-                            }, 300)
-                            return;
-                        }
+                body: JSON.stringify(selectedFriendIds.map(id => ({ memberId: id })))
+            });
 
-                        try {
-                            const response = await fetch(`${ip}/networks/${Network}/add`, {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "Authorization": `Bearer ${token.current}`
-                                },
-                                body: JSON.stringify([{memberId: text}])
-                            });
-
-                            if (response.ok) {
-                                // Refresh member list
-                                const receivedData = await fetch(`${ip}/networks/${Network}`, {
-                                    method: "GET",
-                                    headers: {
-                                        "Authorization": `Bearer ${token.current}`,
-                                        "Application-Type": "application/json"
-                                    }
-                                });
-
-                                const data = await receivedData.json();
-                                setMember(data.members);
-
-                                setTimeout(() => {
-                                    showAlert({
-                                        title: 'Success',
-                                        message: 'User added',
-                                        buttons: [
-                                            {
-                                                text: 'OK',
-                                                onPress: () => {}
-                                            },
-                                        ],
-                                    });
-                                }, 300);
-                            } else {
-                                setTimeout(() => {
-                                    showAlert({
-                                        title: 'Error',
-                                        message: 'User not found',
-                                        buttons: [
-                                            {
-                                                text: 'OK',
-                                                onPress: () => {}
-                                            },
-                                        ],
-                                    });
-                                }, 300)
-                            }
-                        } catch (error) {
-                            console.error("Error adding user:", error);
-                            showAlert({
-                                title: 'Error',
-                                message: 'Failed to add user',
-                                buttons: [{ text: 'OK', onPress: () => {} }]
-                            });
-                        }
+            if (response.ok) {
+                // Refresh member list
+                const receivedData = await fetch(`${ip}/networks/${Network}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token.current}`,
+                        "Application-Type": "application/json"
                     }
-                },
-            ],
-        });
+                });
+
+                const data = await receivedData.json();
+                setMember(data.members);
+
+                showAlert({
+                    title: 'Success',
+                    message: `${selectedFriendIds.length} ${selectedFriendIds.length === 1 ? 'friend' : 'friends'} added to network`,
+                    buttons: [{ text: 'OK', onPress: () => {} }]
+                });
+            } else {
+                showAlert({
+                    title: 'Error',
+                    message: 'Failed to add selected friends',
+                    buttons: [{ text: 'OK', onPress: () => {} }]
+                });
+            }
+        } catch (error) {
+            console.error("Error adding users:", error);
+            showAlert({
+                title: 'Error',
+                message: 'Failed to add friends to network',
+                buttons: [{ text: 'OK', onPress: () => {} }]
+            });
+        }
+        setFriendsModalVisible(false);
     };
 
     const renderMemberItem = ({ item }) => (
@@ -933,6 +896,68 @@ export default function Network() {
             height: 1,
             backgroundColor: '#E2E8F0',
         },
+        friendsLoadingContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 20,
+        },
+        friendsList: {
+            paddingVertical: 12,
+        },
+        friendsModalContent: {
+            width: '90%',
+            maxWidth: 500,
+            maxHeight: '80%',
+            backgroundColor: 'white',
+            borderRadius: 16,
+            overflow: 'hidden',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 10,
+            elevation: 5,
+        },
+        selectedFriendItem: {
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderColor: '#3B82F6',
+            borderWidth: 1,
+        },
+        friendsModalFooter: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            borderTopWidth: 1,
+            borderTopColor: '#E2E8F0',
+            backgroundColor: '#FFFFFF',
+        },
+        cancelButton: {
+            paddingVertical: 10,
+            paddingHorizontal: 16,
+            borderRadius: 8,
+            backgroundColor: '#F1F5F9',
+        },
+        cancelButtonText: {
+            fontSize: 16,
+            fontWeight: '500',
+            color: '#64748B',
+        },
+        addButton: {
+            paddingVertical: 10,
+            paddingHorizontal: 20,
+            borderRadius: 8,
+            backgroundColor: '#3B82F6',
+        },
+        disabledAddButton: {
+            backgroundColor: '#93C5FD',
+            opacity: 0.7,
+        },
+        addButtonText: {
+            fontSize: 16,
+            fontWeight: '500',
+            color: '#FFFFFF',
+        },
         dateText: {
             fontSize: 12,
             fontWeight: '500',
@@ -1080,7 +1105,7 @@ export default function Network() {
                     {/* Messages content */}
                     <View style={styles.desktopContent}>
                         <FlatList
-                            ref={flatListRef}
+                            ref={flatListRefDesk}
                             data={groupMessagesByDate(messages)}
                             keyExtractor={(item) => item.id}
                             renderItem={renderListItem}
@@ -1096,7 +1121,7 @@ export default function Network() {
                             showsVerticalScrollIndicator={false}
                             onContentSizeChange={() => {
                                 if (isInitialLoad.current) {
-                                    flatListRef.current?.scrollToEnd({ animated: false });
+                                    flatListRefDesk.current?.scrollToEnd({ animated: false });
                                 }
                             }}
                             initialScrollIndex={messages.length > 0 ? messages.length - 1 : 0}
@@ -1125,45 +1150,46 @@ export default function Network() {
                 // Mobile layout
                 <>
                     {renderHeader()}
+                    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                                          style={{ flex: 1 }}>
+                        <FlatList
+                            ref={flatListRef}
+                            data={groupMessagesByDate(messages)}
+                            keyExtractor={(item) => item.id}
+                            renderItem={renderListItem}
+                            contentContainerStyle={[
+                                styles.messagesList,
+                            ]}
+                            inverted={false}
+                            onEndReached={loadMoreMessages}
+                            onEndReachedThreshold={0.3}
+                            ListHeaderComponent={renderLoadingIndicator}
+                            ListEmptyComponent={renderEmptyComponent}
+                            showsVerticalScrollIndicator={false}
+                            onContentSizeChange={() => {
+                                if (isInitialLoad.current) {
+                                    flatListRef.current?.scrollToEnd({ animated: false });
+                                }
+                            }}
+                            initialScrollIndex={messages.length > 0 ? messages.length - 1 : 0}
+                            maintainVisibleContentPosition={{
+                                minIndexForVisible: 0,
+                            }}
+                            getItemLayout={(data, index) => {
+                                const height = 100;
+                                const dateHeaderHeight = 60;
 
-                    <FlatList
-                        ref={flatListRef}
-                        data={groupMessagesByDate(messages)}
-                        keyExtractor={(item) => item.id}
-                        renderItem={renderListItem}
-                        contentContainerStyle={[
-                            styles.messagesList,
-                            { paddingBottom: keyboardVisible ? 80 : 100 }
-                        ]}
-                        inverted={false}
-                        onEndReached={loadMoreMessages}
-                        onEndReachedThreshold={0.3}
-                        ListHeaderComponent={renderLoadingIndicator}
-                        ListEmptyComponent={renderEmptyComponent}
-                        showsVerticalScrollIndicator={false}
-                        onContentSizeChange={() => {
-                            if (isInitialLoad.current) {
-                                flatListRef.current?.scrollToEnd({ animated: false });
-                            }
-                        }}
-                        initialScrollIndex={messages.length > 0 ? messages.length - 1 : 0}
-                        maintainVisibleContentPosition={{
-                            minIndexForVisible: 0,
-                        }}
-                        getItemLayout={(data, index) => {
-                            const height = 80;
-                            const dateHeaderHeight = 60;
+                                const item = data[index];
+                                const itemHeight = item?.type === 'date-header' ? dateHeaderHeight : height;
 
-                            const item = data[index];
-                            const itemHeight = item?.type === 'date-header' ? dateHeaderHeight : height;
-
-                            return {
-                                length: itemHeight,
-                                offset: height * index,
-                                index,
-                            };
-                        }}
-                    />
+                                return {
+                                    length: itemHeight,
+                                    offset: height * index,
+                                    index,
+                                };
+                            }}
+                        />
+                    </KeyboardAvoidingView>
 
                     {renderFooter()}
                 </>
@@ -1226,8 +1252,8 @@ export default function Network() {
 
                                     <View style={styles.networkStats}>
                                         <View style={styles.statItem}>
-                                            <Ionicons name="people" size={16} color="#64748B" />
-                                            <Text style={styles.statText}>{currentNetwork.current?.favoriteMembers.length} members</Text>
+                                            <Ionicons name="heart" size={16} color="#64748B" />
+                                            <Text style={styles.statText}>{currentNetwork.current?.favoriteMembers.length} favorites</Text>
                                         </View>
 
                                         <View style={styles.statItem}>
@@ -1275,9 +1301,10 @@ export default function Network() {
                                 </TouchableOpacity>
                             </View>
 
+                            {currentNetwork.current?.private && (
                             <View style={styles.membersSection}>
                                 <View style={styles.membersSectionHeader}>
-                                    <Text style={styles.sectionTitle}>Members</Text>
+                                    <Text style={styles.sectionTitle}>Members ({member?.length})</Text>
 
                                     {(currentNetwork.current?.private && currentNetwork.current?.creatorId === username.current) && (
                                         <TouchableOpacity 
@@ -1290,19 +1317,34 @@ export default function Network() {
                                     )}
                                 </View>
 
+                                {member && member.length > 0 ? (
                                 <FlatList
                                     data={member}
                                     keyExtractor={(item) => item.memberId}
                                     renderItem={renderMemberItem}
                                     ItemSeparatorComponent={() => <View style={styles.memberSeparator} />}
                                     style={styles.membersList}
+                                        contentContainerStyle={{ paddingBottom: 20 }}
                                     showsVerticalScrollIndicator={false}
                                 />
+                                ) : (
+                                    <View style={styles.emptyMembersContainer}>
+                                        <Text style={styles.emptyMembersText}>No members found</Text>
                             </View>
+                                )}
+                            </View>)}
                         </View>
                     </Pressable>
                 </BlurView>
             </Modal>
+            <FriendsSelectionModal
+                visible={modalVisible}
+                onClose={() => setFriendsModalVisible(false)}
+                onSubmit={handleAddFriends}
+                username={username.current}
+                token={token.current}
+                member={member}
+            />
         </SafeAreaView>
     );
 }
@@ -1311,6 +1353,21 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F8FAFC',
+    },
+    memberSeparator: {
+        height: 1,
+        backgroundColor: '#E2E8F0',
+        marginLeft: 68,
+    },
+    emptyMembersContainer: {
+        padding: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    emptyMembersText: {
+        fontSize: 14,
+        color: '#94A3B8',
+        fontStyle: 'italic',
     },
     // Desktop styles
     desktopContainer: {
@@ -1523,6 +1580,55 @@ const styles = StyleSheet.create({
         maxHeight: 120,
         color: '#334155',
     },
+    friendsModalFooter: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        paddingVertical: 16,
+        borderTopWidth: 1,
+        borderTopColor: '#E2E8F0',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 3,
+        elevation: 2,
+    },
+    cancelButton: {
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 10,
+        backgroundColor: '#F1F5F9',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+        elevation: 1,
+    },
+    cancelButtonText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#64748B',
+    },
+    addButton: {
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 10,
+        backgroundColor: '#3B82F6',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+        elevation: 2,
+    },
+    disabledAddButton: {
+        backgroundColor: '#93C5FD',
+        opacity: 0.6,
+    },
+    addButtonText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#FFFFFF',
+    },
     sendButton: {
         width: 36,
         height: 36,
@@ -1539,6 +1645,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         width: '100%',
+        height: '100%',
     },
     modalContent: {
         width: '95%', // Wider to fill more of the screen
@@ -1565,7 +1672,7 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#1E293B',
+        color: '#FFFFFF',
     },
     closeButton: {
         padding: 4,
@@ -1645,7 +1752,7 @@ const styles = StyleSheet.create({
         marginLeft: 6,
     },
     membersSection: {
-        flex: 1,
+        maxHeight: "50%"
     },
     membersSectionHeader: {
         flexDirection: 'row',
@@ -1676,7 +1783,6 @@ const styles = StyleSheet.create({
         marginLeft: 4,
     },
     membersList: {
-        flex: 1,
     },
     memberItem: {
         flexDirection: 'row',
@@ -1702,11 +1808,11 @@ const styles = StyleSheet.create({
     memberName: {
         fontSize: 16,
         fontWeight: '500',
-        color: '#1E293B',
+        color: '#cfcfcf',
     },
     memberUsername: {
         fontSize: 14,
-        color: '#64748B',
+        color: '#808c9e',
     },
     removeButton: {
         backgroundColor: '#EF4444',
@@ -1716,9 +1822,172 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    memberSeparator: {
-        height: 1,
-        backgroundColor: '#E2E8F0',
-        marginLeft: 68,
-    },
 });
+
+const FriendsSelectionModal = ({ visible, onClose, onSubmit, username, token, member }) => {
+    const [friendsList, setFriendsList] = useState([]);
+    const [isLoadingFriends, setIsLoadingFriends] = useState(true);
+    const [selectedFriends, setSelectedFriends] = useState([]);
+
+    useEffect(() => {
+        const loadFriends = async () => {
+            setIsLoadingFriends(true);
+            try {
+                const response = await fetch(`${ip}/profile/${username}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    let selectableFriends = data.friends.filter(friend => !member.some(m => m.memberId === friend.memberId));
+                    setFriendsList(selectableFriends);
+                } else {
+                    console.error("Failed to fetch friends");
+                }
+            } catch (error) {
+                console.error("Error loading friends:", error);
+            } finally {
+                setIsLoadingFriends(false);
+            }
+        };
+
+        if (visible) {
+            loadFriends();
+        }
+    }, [visible]);
+
+    const toggleFriendSelection = (friendId) => {
+        if (selectedFriends.includes(friendId)) {
+            setSelectedFriends(selectedFriends.filter(id => id !== friendId));
+        } else {
+            setSelectedFriends([...selectedFriends, friendId]);
+        }
+    };
+
+    const handleSubmit = async () => {
+        if (selectedFriends.length === 0) {
+            showAlert({
+                title: 'No Selection',
+                message: 'Please select at least one friend',
+                buttons: [{ text: 'OK', onPress: () => {} }]
+            });
+            return;
+        }
+
+        onSubmit(selectedFriends);
+    };
+
+    const renderFriendItem = ({ item }) => (
+        <TouchableOpacity
+            style={[
+                styles.friendItem,
+                selectedFriends.includes(item.memberId) && styles.selectedFriendItem,
+                {flexDirection: "row", justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12}
+            ]}
+            onPress={() => toggleFriendSelection(item.memberId)}
+        >
+            <View style={styles.memberInfo}>
+                {item.memberProfilePicturePath ? (
+                    <Image
+                        source={{ uri: item.memberProfilePicturePath.split(',')[0] }}
+                        style={styles.memberAvatar}
+                        contentFit="cover"
+                    />
+                ) : (
+                    <View style={[styles.memberAvatar, { backgroundColor: '#E2E8F0' }]}>
+                        <Ionicons name="person" size={20} color="#94A3B8" />
+                    </View>
+                )}
+                <View style={styles.memberTextContainer}>
+                    <Text style={styles.memberName}>{item.memberName || item.memberId}</Text>
+                    <Text style={styles.memberUsername}>@{item.memberId}</Text>
+                </View>
+            </View>
+            <Ionicons
+                name={selectedFriends.includes(item.memberId) ? "checkmark-circle" : "ellipse-outline"}
+                size={24}
+                color={selectedFriends.includes(item.memberId) ? "#3B82F6" : "#CBD5E1"}
+            />
+        </TouchableOpacity>
+    );
+
+    return (
+        <Modal
+            visible={visible}
+            animationType="fade"
+            transparent={true}
+            onRequestClose={onClose}
+        >
+            <SafeAreaProvider>
+                <SafeAreaView style={{flex: 1}}>
+                    <BlurView intensity={Platform.OS === 'ios' ? 50 : 100} style={styles.modalOverlay}>
+                        <Pressable style={styles.modalOverlay} onPress={onClose}>
+                            <View
+                                style={styles.friendsModalContent}
+                                onStartShouldSetResponder={() => true}
+                                onTouchEnd={(e) => e.stopPropagation()}
+                            >
+                                <View style={styles.modalHeader}>
+                                    <Text style={styles.modalTitle}>Add Friends to Network</Text>
+                                    <TouchableOpacity
+                                        onPress={onClose}
+                                        style={styles.closeButton}
+                                    >
+                                        <Ionicons name="close" size={24} color="#64748B" />
+                                    </TouchableOpacity>
+                                </View>
+
+                                {isLoadingFriends ? (
+                                    <View style={styles.friendsLoadingContainer}>
+                                        <ActivityIndicator size="large" color="#3B82F6" />
+                                        <Text style={styles.loadingText}>Loading friends...</Text>
+                                    </View>
+                                ) : friendsList.length > 0 ? (
+                                    <FlatList
+                                        data={friendsList}
+                                        renderItem={renderFriendItem}
+                                        keyExtractor={item => item.memberId}
+                                        contentContainerStyle={styles.friendsList}
+                                        ItemSeparatorComponent={() => <View style={styles.memberSeparator} />}
+                                        showsVerticalScrollIndicator={false}
+                                    />
+                                ) : (
+                                    <View style={styles.emptyFriendsContainer}>
+                                        <Ionicons name="people" size={50} color="#CBD5E1" />
+                                        <Text style={styles.emptyFriendsText}>No friends found</Text>
+                                        <Text style={styles.emptyFriendsSubtext}>Add friends to invite them to your network</Text>
+                                    </View>
+                                )}
+
+                                <View style={styles.friendsModalFooter}>
+                                    <TouchableOpacity
+                                        style={styles.cancelButton}
+                                        onPress={onClose}
+                                    >
+                                        <Text style={styles.cancelButtonText}>Cancel</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={[
+                                            styles.addButton,
+                                            selectedFriends.length === 0 && styles.disabledAddButton
+                                        ]}
+                                        onPress={handleSubmit}
+                                        disabled={selectedFriends.length === 0}
+                                    >
+                                        <Text style={styles.addButtonText}>
+                                            Add {selectedFriends.length > 0 ? `(${selectedFriends.length})` : ''}
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </Pressable>
+                    </BlurView>
+                </SafeAreaView>
+            </SafeAreaProvider>
+        </Modal>
+    );
+};

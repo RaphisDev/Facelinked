@@ -46,9 +46,9 @@ public class NetworkService {
     }
 
     public void removeUser(List<NetworkMember> members, Network networkResponseEntity) {
-        var userToRemove = networkResponseEntity.getMembers();
-        userToRemove.removeIf(member -> members.stream().anyMatch(m -> m.getMemberId().equals(member.getMemberId())));
-        networkResponseEntity.setMembers(userToRemove);
+        var newMembers = new ArrayList<>(networkResponseEntity.getMembers());
+        newMembers.removeIf(member -> members.stream().anyMatch(m -> m.getMemberId().equals(member.getMemberId())));
+        networkResponseEntity.setMembers(newMembers);
         networkRepository.save(networkResponseEntity);
     }
 
