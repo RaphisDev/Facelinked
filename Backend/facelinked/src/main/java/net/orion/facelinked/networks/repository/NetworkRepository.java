@@ -11,6 +11,7 @@ import java.util.List;
 @EnableScan
 public interface NetworkRepository extends CrudRepository<Network, String> {
     public List<Network> searchTop5BySearchNameContains(String name);
-    public List<Network> findByFavoriteMembersContains(List<String> favoriteMembers);
+    @Query(filterExpression = "contains(favoriteNetworks, :val)")
+    List<Network> findByFavoriteNetworksContaining(@Param("val") String val);
     public List<Network> findTop3ByCreatorId(String creatorId);
 }
