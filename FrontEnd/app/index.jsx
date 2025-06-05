@@ -1063,7 +1063,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
             age--;
         }
 
-        if (emailRegex.test(formData.email) && formData.password.length > 3 && formData.username.length >= 3 && formData.name.length > 3 && !formData.username.includes("/") && !bannedUsernames.includes(formData.username)) {
+        if (emailRegex.test(formData.email.trim()) && formData.password.trim().length > 3 && formData.username.trim().length >= 3 && formData.name.length > 3 && !formData.username.includes("/") && !bannedUsernames.includes(formData.username.trim())) {
             if(age <= 13 || formData.interests.length < 3 || formData.location.length <= 3 || !formData.profilePicture) {
                 if (Platform.OS !== "android") {
                     showAlert({
@@ -1090,9 +1090,9 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        email: formData.email,
-                        password: formData.password,
-                        username: formData.username,
+                        email: formData.email.trim(),
+                        password: formData.password.trim(),
+                        username: formData.username.trim(),
                         name: formData.name,
                     }),
                 });
@@ -1281,7 +1281,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                         "Authorization": `Bearer ${token.current}`,
                     },
                     body: JSON.stringify({
-                        username: formData.username,
+                        username: formData.username.trim(),
                         name: formData.name,
                         profilePicturePath: imageUrl.current,
                         dateOfBirth: new Date(formData.birthDate.year,
@@ -1299,7 +1299,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                 if (response.ok) {
                     if (Platform.OS === "web") {
                         localStorage.setItem("token", token.current);
-                        localStorage.setItem("username", formData.username);
+                        localStorage.setItem("username", formData.username.trim());
                         localStorage.setItem("profilePicture", imageUrl.current);
                         localStorage.setItem("profile", JSON.stringify({
                             name: formData.name,
@@ -1312,7 +1312,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                         }));
                     } else {
                         await SecureStore.setItemAsync("token", token.current);
-                        await SecureStore.setItemAsync("username", formData.username);
+                        await SecureStore.setItemAsync("username", formData.username.trim());
                         await SecureStore.setItemAsync("profilePicture", imageUrl.current);
                         await SecureStore.setItemAsync("profile", JSON.stringify({
                             name: formData.name,
