@@ -49,7 +49,7 @@ export default function Apps() {
             </main>
             
             <footer className="footer">
-                <p>© 2023 FaceLinked</p>
+                <p>© 2025 FaceLinked</p>
             </footer>
             
             <style jsx>{`

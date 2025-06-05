@@ -105,6 +105,7 @@ class WebsocketController{
                     }
 
                     const saveChats = async (senderId, loadedChats, oldMessage, message, receiverId) => {
+                        //Add last message to the chat
                         if (senderId === username) {
                             await asyncStorage.setItem("chats", JSON.stringify(loadedChats.map((chat) => {
                                 if (chat.username === receiverId) {
@@ -143,7 +144,7 @@ class WebsocketController{
                                 if (chat.username === senderId) {
                                     return {
                                         ...chat,
-                                        unread: oldMessage ? chat.unread : true,
+                                        unread: !oldMessage,
                                         lastMessage: senderId + ": " + message
                                     }
                                 }
@@ -153,39 +154,99 @@ class WebsocketController{
                             this.messageReceived.emit("newMessageReceived");
                         }
                     }
-                    const saveMessages = async (message) => {
-                        const loadedMessages = await getMessages(message.senderId);
+                    const processMessage = async (message, isNewMessage = false) => {
+                        try {
+                            const loadedChats = await getChats();
+                            const { senderId, receiverId, content, millis, images } = message;
 
-                        await asyncStorage.setItem(`messages/${message.senderId}`, JSON.stringify([...loadedMessages, {
-                            isSender: username === message.senderId,
-                            content: message.content,
-                            millis: message.millis,
-                            images: message.images,
-                        }]));
-                    }
-                    const processMessage = async (parsedMessage) => {
-                        const loadedChats = await getChats();
+                            const messageUserName = senderId === username ? receiverId : senderId;
 
-                        await saveChats(parsedMessage.senderId, loadedChats, false, parsedMessage.content, parsedMessage.receiverId);
-                        await saveMessages(parsedMessage);
-                        await asyncStorage.setItem("lastMessageId", parsedMessage.millis.toString());
-                    }
-                    const processOldMessages = async (parsedMessage) => {
-                        const loadedChats = await getChats();
+                            await saveChats(senderId, loadedChats, !isNewMessage, content, receiverId);
 
-                        await saveChats(parsedMessage.senderId, loadedChats, true, parsedMessage.content, parsedMessage.receiverId);
+                            const loadedMessages = await getMessages(messageUserName);
+                            await asyncStorage.setItem(`messages/${messageUserName}`, JSON.stringify([
+                                ...loadedMessages,
+                                {
+                                    isSender: username === senderId,
+                                    content,
+                                    millis,
+                                    images,
+                                }
+                            ]));
 
-                        const messageUserName = parsedMessage.senderId === username ? parsedMessage.receiverId : parsedMessage.senderId;
+                            await asyncStorage.setItem("lastMessageId", millis.toString());
 
-                        const loadedMessages = await getMessages(messageUserName);
-                        await asyncStorage.setItem(`messages/${messageUserName}`, JSON.stringify([...loadedMessages, {
-                            isSender: username === parsedMessage.senderId,
-                            content: parsedMessage.content,
-                            millis: parsedMessage.millis,
-                            images: parsedMessage.images,
-                        }]));
-                        await asyncStorage.setItem("lastMessageId", parsedMessage.millis.toString());
-                    }
+                            if (isNewMessage && senderId !== username) {
+                                this.messageReceived.emit("newMessageReceived");
+                            }
+
+                            return true;
+                        } catch (error) {
+                            console.error("Error processing message:", error);
+                            return false;
+                        }
+                    };
+
+                    const processBatchMessages = async (messages, isNewMessages = false) => {
+                        try {
+                            const batchSize = 20;
+                            let processedCount = 0;
+
+                            for (let i = 0; i < messages.length; i += batchSize) {
+                                const batch = messages.slice(i, i + batchSize);
+                                const results = await Promise.allSettled(
+                                    batch.map(message => processMessage(message, isNewMessages))
+                                );
+
+                                processedCount += results.filter(r => r.status === 'fulfilled' && r.value).length;
+                            }
+
+                            console.log(`Processed ${processedCount}/${messages.length} messages`);
+                            return processedCount === messages.length;
+                        } catch (error) {
+                            console.error("Error processing message batch:", error);
+                            return false;
+                        }
+                    };
+
+                    const fetchAndProcessMessages = async (url, isNewMessages = false) => {
+                        const maxRetries = 4;
+                        let retries = 0;
+
+                        while (retries < maxRetries) {
+                            try {
+                                const response = await fetch(url, {
+                                    method: "GET",
+                                    headers: {
+                                        "Application-Type": "application/json",
+                                        "Authorization": `Bearer ${token}`
+                                    }
+                                });
+
+                                if (!response.ok) {
+                                    throw new Error(`Network response error: ${response.status}`);
+                                }
+
+                                const parsedMessages = await response.json();
+                                const success = await processBatchMessages(parsedMessages, isNewMessages);
+
+                                if (success) {
+                                    return true;
+                                } else {
+                                    throw new Error("Failed to process some messages");
+                                }
+                            } catch (error) {
+                                retries++;
+                                console.error(`Fetch attempt ${retries} failed:`, error);
+                                if (retries >= maxRetries) {
+                                    alert("Failed to load messages. Please check your connection and try again.");
+                                    return false;
+                                }
+                                // Wait before retrying (exponential backoff)
+                                await new Promise(r => setTimeout(r, 1000 * Math.pow(2, retries)));
+                            }
+                        }
+                    };
 
                     const receiveNetworkMessages = async () => {
                         let networks = await asyncStorage.getItem("networks") || [];
@@ -234,44 +295,16 @@ class WebsocketController{
                     }
 
                     if (lastMessageId) {
-                        const messages = await fetch(`${ip}/messages/afterId?id=${encodeURIComponent(lastMessageId)}`, {
-                            method: "GET",
-                            headers: {
-                                "Application-Type": "application/json",
-                                "Authorization": `Bearer ${token}`
-                            }
-                        });
-
-                        if (messages.ok) {
-                            const parsedMessages = await messages.json();
-
-                            for (const message of parsedMessages) {
-                                await processMessage(message);
-                            }
-                        } else {
-                            alert("Network error. Please check your internet connection.");
-                        }
+                        await fetchAndProcessMessages(
+                            `${ip}/messages/afterId?id=${encodeURIComponent(lastMessageId)}`,
+                            true
+                        );
                     } else {
-                        const messages = await fetch(`${ip}/messages/all`, {
-                            method: "GET",
-                            headers: {
-                                "Application-Type": "application/json",
-                                "Authorization": `Bearer ${token}`
-                            }
-                        });
-
-                        if (messages.ok) {
-                            const parsedMessages = await messages.json();
-                            console.log(parsedMessages);
-
-                            for (const message of parsedMessages) {
-                                await processOldMessages(message);
-                            }
-                        } else {
-                            alert("Network error. Please check your internet connection.");
-                        }
+                        await fetchAndProcessMessages(
+                            `${ip}/messages/all`,
+                            false
+                        );
                     }
-
                     this.stompClient.subscribe(`/user/${username}/queue/messages`, async (message) => {
                         const parsedMessage = JSON.parse(message.body);
                         this.messageReceived.emit("messageReceived", {
