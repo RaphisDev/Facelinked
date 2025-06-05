@@ -7,7 +7,6 @@
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
       <change beforePath="$PROJECT_DIR$/app/(tabs)/networks/[Network].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/networks/[Network].jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/networks/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/networks/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/Entries/Network.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Entries/Network.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -313,7 +312,7 @@
       <workItem from="1749066910954" duration="2402000" />
       <workItem from="1749069406681" duration="570000" />
       <workItem from="1749132280343" duration="16336000" />
-      <workItem from="1749152482504" duration="5048000" />
+      <workItem from="1749152482504" duration="5641000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />

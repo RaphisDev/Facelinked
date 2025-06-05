@@ -743,7 +743,7 @@ export default function Network() {
     };
 
     const renderMemberItem = ({ item }) => (
-        <View style={styles.memberItem}>
+        <Pressable style={styles.memberItem}>
             <TouchableOpacity 
                 onPress={() => {
                     setModalVisible(false);
@@ -792,7 +792,7 @@ export default function Network() {
                     <Ionicons name="trash" size={16} color="white" />
                 </TouchableOpacity>
             )}
-        </View>
+        </Pressable>
     );
 
     const renderHeader = () => (
@@ -1957,7 +1957,6 @@ const FriendsSelectionModal = ({ visible, onClose, onSubmit, username, token, me
                                     />
                                 ) : (
                                     <View style={styles.emptyFriendsContainer}>
-                                        <Ionicons name="people" size={50} color="#CBD5E1" />
                                         <Text style={styles.emptyFriendsText}>No friends found</Text>
                                         <Text style={styles.emptyFriendsSubtext}>Add friends to invite them to your network</Text>
                                     </View>
