@@ -104,10 +104,10 @@ class WebsocketController{
                         return loadedChats;
                     }
 
-                    const saveChats = async (senderId, loadedChats, oldMessage, message) => {
+                    const saveChats = async (senderId, loadedChats, oldMessage, message, receiverId) => {
                         if (senderId === username) {
                             await asyncStorage.setItem("chats", JSON.stringify(loadedChats.map((chat) => {
-                                if (chat.username === senderId) {
+                                if (chat.username === receiverId) {
                                     return {
                                         ...chat,
                                         lastMessage: "You: " + message
@@ -166,14 +166,14 @@ class WebsocketController{
                     const processMessage = async (parsedMessage) => {
                         const loadedChats = await getChats();
 
-                        await saveChats(parsedMessage.senderId, loadedChats, false, parsedMessage.content);
+                        await saveChats(parsedMessage.senderId, loadedChats, false, parsedMessage.content, parsedMessage.receiverId);
                         await saveMessages(parsedMessage);
                         await asyncStorage.setItem("lastMessageId", parsedMessage.millis.toString());
                     }
                     const processOldMessages = async (parsedMessage) => {
                         const loadedChats = await getChats();
 
-                        await saveChats(parsedMessage.senderId, loadedChats, true, parsedMessage.content);
+                        await saveChats(parsedMessage.senderId, loadedChats, true, parsedMessage.content, parsedMessage.receiverId);
 
                         const messageUserName = parsedMessage.senderId === username ? parsedMessage.receiverId : parsedMessage.senderId;
 
@@ -262,6 +262,7 @@ class WebsocketController{
 
                         if (messages.ok) {
                             const parsedMessages = await messages.json();
+                            console.log(parsedMessages);
 
                             for (const message of parsedMessages) {
                                 await processOldMessages(message);
@@ -293,7 +294,7 @@ class WebsocketController{
 
                         const loadedChats = await getChats();
 
-                        await saveChats(parsedMessage.senderId, loadedChats, false, parsedMessage.content);
+                        await saveChats(parsedMessage.senderId, loadedChats, false, parsedMessage.content, parsedMessage.receiverId);
                         await asyncStorage.setItem("lastMessageId", parsedMessage.millis.toString());
                     });
                     receiveNetworkMessages();

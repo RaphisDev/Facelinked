@@ -128,7 +128,7 @@ export default function ChatRoom() {
                 });
                 if (profile.ok) {
                     const profileJson = await profile.json();
-                    setUserData({ name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath.split(",")[0] });
+                    setUserData({ name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath });
                 }
             }
         }
@@ -566,7 +566,7 @@ export default function ChatRoom() {
                         activeOpacity={0.8}
                     >
                         <Image
-                            source={{ uri: userData.image.split(",")[0] }}
+                            source={{ uri: userData.image?.split(",")[0] }}
                             style={styles.profileImage}
                             className="bg-gray-200"
                             cachePolicy="memory"

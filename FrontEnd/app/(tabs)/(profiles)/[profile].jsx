@@ -463,8 +463,9 @@
                         setPosts([{
                             title: postInputText,
                             content: selectedPostImages,
-                            likes: 0,
-                            millis: Date.now()
+                            likes: [],
+                            millis: Date.now(),
+                            comments: [],
                         }, ...cachedPosts.current]);
 
                         const title = postInputText;
@@ -565,6 +566,30 @@
                                 ],
                             });
                             setPosts(prevState => prevState.slice(1));
+                        }
+                    }
+
+                    async function DeletePost(millis) {
+                        const response = await fetch(`${ip}/profile/posts/${millis}`, {
+                            method: 'DELETE',
+                            headers: {
+                                "Authorization": `Bearer ${token.current}`
+                            }
+                        });
+                        if (response.ok) {
+                            setPosts(prevState => prevState.filter(post => post.id.millis !== millis));
+                            setShowPostModal(false);
+                        } else {
+                            showAlert({
+                                title: 'Error',
+                                message: 'An error occurred while deleting your post. Please try again later.',
+                                buttons: [
+                                    {
+                                        text: 'OK',
+                                        onPress: () => {}
+                                    },
+                                ],
+                            });
                         }
                     }
 
@@ -1507,7 +1532,7 @@
                                                               activeOpacity={0.8}
                                                           >
                                                               <View className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                                                                  <Post {...items.item} username={profileName.current} onLikePress={() => LikePost(items.item)} onCommentPress={() => openPostDetails(items.item)} onImagePress={(image) => {if(items.item.content.length > 1) {setShowPostImageGallery(true); setCurrentPostImage(image); setPostImageGallery(items.item.content)} else {openPostDetails(items.item)}}} />
+                                                                  <Post {...items.item} onDeletePost={() => DeletePost(items.item.id.millis)} username={profileName.current} onLikePress={() => LikePost(items.item)} onCommentPress={() => openPostDetails(items.item)} onImagePress={(image) => {if(items.item.content.length > 1) {setShowPostImageGallery(true); setCurrentPostImage(image); setPostImageGallery(items.item.content)} else {openPostDetails(items.item)}}} />
                                                               </View>
                                                           </TouchableOpacity>
                                                       )

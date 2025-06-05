@@ -21,9 +21,9 @@ public class ChatService {
         return result.getMillis();
     }
 
-    public List<ChatMessage> findByIdAfter(Long id, String senderId) {
-        var afterIdChats = new ArrayList<>(chatRepository.findByMillisGreaterThanAndReceiverId(id, senderId));
-        afterIdChats.addAll(chatRepository.findByMillisGreaterThanAndSenderId(id, senderId));
+    public List<ChatMessage> findByIdAfter(Long id, String receiver) {
+        var afterIdChats = new ArrayList<>(chatRepository.findByMillisGreaterThanAndReceiverId(id, receiver));
+        afterIdChats.addAll(chatRepository.findByMillisGreaterThanAndSenderId(id, receiver));
         afterIdChats.sort(Comparator.comparing(ChatMessage::getMillis));
         return afterIdChats;
     }

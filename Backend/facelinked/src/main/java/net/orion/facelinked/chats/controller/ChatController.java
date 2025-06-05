@@ -156,30 +156,18 @@ public class ChatController {
     @GetMapping("/afterId")
     public ResponseEntity<List<ChatMessage>> getChat(@AuthenticationPrincipal UserDetails userDetails, @RequestParam Long id) {
 
-        if (userDetails == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-        }
         String sender = userDetails.getUsername();
         var senderId = userService.findByEmail(sender).getUserName();
 
-        if (senderId == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
         return ResponseEntity.ok(chatService.findByIdAfter(id, senderId));
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<ChatMessage>> getAllChat(@AuthenticationPrincipal UserDetails userDetails) {
 
-        if (userDetails == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-        }
         String sender = userDetails.getUsername();
         var senderId = userService.findByEmail(sender).getUserName();
 
-        if (senderId == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
         return ResponseEntity.ok(chatService.findBySenderOrReceiverId(senderId));
     }
 }

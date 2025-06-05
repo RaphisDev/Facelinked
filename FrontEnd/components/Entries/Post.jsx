@@ -1,5 +1,5 @@
 import "../../global.css";
-import {FlatList, Platform, Pressable, Share, Text, TouchableOpacity, View} from "react-native";
+import {FlatList, Modal, Platform, Pressable, Share, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {Image} from "expo-image";
 import * as SecureStore from "expo-secure-store";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -9,6 +9,9 @@ export default function Post(props) {
     // Check if we're in desktop mode
     const isDesktop = props.isDesktop || false;
     const username = useRef(Platform.OS === "web" ? localStorage.getItem("username") : SecureStore.getItem("username"));
+    const [optionsVisible, setOptionsVisible] = useState(false);
+
+    const isWeb = Platform.OS === 'web';
 
     const renderImages = () => {
         if (!props.content || props.content.length === 0) return null;
@@ -87,10 +90,16 @@ export default function Post(props) {
                             {props.title}
                         </Text>
                     </View>
+                    {props.username === username.current && (
+                        <TouchableOpacity onPress={() => setOptionsVisible(prev => !prev)}>
+                            <Ionicons name="ellipsis-horizontal" size={isDesktop ? 24 : 20} color="#6B7280" />
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 {/* Post Images */}
                 {renderImages()}
+                <Text className="font-extralight text-right text-sm mb-1.5">{new Date(props.id.millis).toLocaleString()}</Text>
 
                 {/* Post Actions */}
                 <View className={`flex-row justify-between pt-2 border-t border-gray-100 ${isDesktop ? "mt-1" : ""}`}>
@@ -133,6 +142,117 @@ export default function Post(props) {
                     </TouchableOpacity>
                 </View>
             </View>
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={optionsVisible}
+                onRequestClose={() => setOptionsVisible(false)}
+            >
+                <Pressable
+                    style={styles.optionsModalOverlay}
+                    onPress={(event) => {
+                        if (event.target === event.currentTarget) {
+                            setOptionsVisible(false);
+                        }
+                    }}
+                >
+                    <View style={[
+                        styles.optionsContainer,
+                        isWeb && styles.optionsContainerWeb
+                    ]}>
+                        <View style={styles.optionsHeader}>
+                            <View style={styles.optionsHandleBar} />
+                            <Text style={styles.optionsTitle}>Post Options</Text>
+                        </View>
+
+                        <TouchableOpacity
+                            style={styles.optionButton}
+                            onPress={async () => {
+                                if (props.onDeletePost()) {
+                                    props.onDeletePost();
+                                }
+                                setOptionsVisible(false);
+                            }}
+                        >
+                            <Ionicons name="trash" size={22} color="#EF4444" />
+                            <Text style={[styles.optionText]}>Delete Post</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={[styles.optionButton, styles.cancelButton]}
+                            onPress={() => setOptionsVisible(false)}
+                        >
+                            <Ionicons name="close-outline" size={22} color="#EF4444" />
+                            <Text style={[styles.optionText, styles.cancelText]}>Cancel</Text>
+                        </TouchableOpacity>
+                    </View>
+                </Pressable>
+            </Modal>
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    optionsModalOverlay: {
+        flex: 1,
+        justifyContent: 'flex-end',
+    },
+    optionsContainer: {
+        backgroundColor: 'white',
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+        padding: 20,
+        paddingTop: 8,
+        width: '100%',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 10,
+    },
+    optionsContainerWeb: {
+        width: '400px',
+        alignSelf: 'center',
+        marginBottom: 40,
+        borderRadius: 24,
+    },
+    optionsHeader: {
+        alignItems: 'center',
+        marginBottom: 12,
+        paddingVertical: 8,
+    },
+    optionsHandleBar: {
+        width: 40,
+        height: 5,
+        backgroundColor: '#CBD5E1',
+        borderRadius: 3,
+        marginBottom: 12,
+    },
+    optionsTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#334155',
+    },
+    optionButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 16,
+        borderRadius: 12,
+        marginVertical: 4,
+        backgroundColor: 'rgba(59, 130, 246, 0.05)',
+    },
+    optionText: {
+        marginLeft: 15,
+        fontSize: 16,
+        color: '#334155',
+        fontWeight: '500',
+    },
+    cancelButton: {
+        backgroundColor: 'rgba(239, 68, 68, 0.05)',
+        marginTop: 8,
+    },
+    cancelText: {
+        color: '#EF4444',
+    }
+})

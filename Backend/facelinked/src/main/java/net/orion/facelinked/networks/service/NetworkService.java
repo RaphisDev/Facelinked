@@ -1,8 +1,6 @@
 package net.orion.facelinked.networks.service;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import net.orion.facelinked.chats.ChatMessage;
 import net.orion.facelinked.networks.Network;
 import net.orion.facelinked.networks.NetworkMember;
 import net.orion.facelinked.networks.NetworkMessage;
@@ -11,8 +9,6 @@ import net.orion.facelinked.networks.repository.NetworkRepository;
 import net.orion.facelinked.networks.controller.NetworkUpdateRequest;
 import net.orion.facelinked.profile.Profile;
 import net.orion.facelinked.profile.service.ProfileService;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
