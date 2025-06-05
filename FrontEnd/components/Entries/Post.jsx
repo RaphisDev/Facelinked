@@ -4,6 +4,7 @@ import {Image} from "expo-image";
 import * as SecureStore from "expo-secure-store";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {useRef, useState} from "react";
+import * as Haptics from "expo-haptics";
 
 export default function Post(props) {
     // Check if we're in desktop mode
@@ -106,7 +107,12 @@ export default function Post(props) {
                     <TouchableOpacity 
                         className={`flex-row items-center ${isDesktop ? "py-3 px-4" : "py-2 px-3"} rounded-full ${isDesktop ? "hover:bg-gray-100 transition-colors duration-200" : ""}`}
                         activeOpacity={0.7}
-                        onPress={props.onLikePress}
+                        onPress={async () => {
+                            props.onLikePress();
+                            if (!props.likes.some(user => user === username.current)) {
+                                await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                            }
+                        }}
                     >
                         <Ionicons name={props.likes.some((item) => item === username.current) ? "heart" : "heart-outline"} size={isDesktop ? 22 : 20} color={props.likes.some((item) => item === username.current) ? "#f81212" : "#6B7280"} />
                         <Text className={`ml-2 text-gray-600 font-medium ${isDesktop ? "text-base" : ""}`}>
@@ -117,7 +123,10 @@ export default function Post(props) {
                     <TouchableOpacity 
                         className={`flex-row items-center ${isDesktop ? "py-3 px-4" : "py-2 px-3"} rounded-full ${isDesktop ? "hover:bg-gray-100 transition-colors duration-200" : ""}`}
                         activeOpacity={0.7}
-                        onPress={props.onCommentPress}
+                        onPress={async () => {
+                            props.onCommentPress();
+                            await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                        }}
                     >
                         <Ionicons name="chatbubble-outline" size={isDesktop ? 22 : 20} color="#6B7280" />
                         <Text className={`ml-2 text-gray-600 font-medium ${isDesktop ? "text-base" : ""}`}>
