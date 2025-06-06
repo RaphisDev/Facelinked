@@ -3,10 +3,13 @@ import { useRouter } from "expo-router";
 import "../../global.css"
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
+import {useTranslation} from "react-i18next";
 
 export default function Network(props) {
     const router = useRouter();
     const isDesktop = props.isDesktop;
+
+    const {t} = useTranslation();
 
     return (
         <TouchableOpacity 
@@ -62,7 +65,7 @@ export default function Network(props) {
                                 <Text style={[
                                     styles.creatorText,
                                     isDesktop && styles.desktopFooterText
-                                ]}>Created by {props.creator}</Text>
+                                ]}>{t("created.by")} {props.creator}</Text>
                             </View>
                         ) : (
                             <View style={styles.statsContainer}>
@@ -76,7 +79,7 @@ export default function Network(props) {
                                 <Text style={[
                                     styles.statsText,
                                     isDesktop && styles.desktopFooterText
-                                ]}>{props.member.length} Members</Text></>)}
+                                ]}>{props.member.length} {t("members")}</Text></>)}
                             </View>
                         )}
                         <Ionicons name="chevron-forward" size={isDesktop ? 20 : 16} color="#94A3B8" />

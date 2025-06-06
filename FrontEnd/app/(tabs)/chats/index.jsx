@@ -13,6 +13,7 @@ import ip from "../../../components/AppManager";
 import * as SecureStore from "expo-secure-store";
 import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {useTranslation} from "react-i18next";
 
 const MOBILE_WIDTH_THRESHOLD = 768;
 
@@ -30,6 +31,8 @@ export default function Chats() {
     
     const stateManager = new StateManager();
     const ws = new WebSocketProvider();
+
+    const {t} = useTranslation();
 
     useEffect(() => {
         const handleResize = () => {
@@ -182,7 +185,7 @@ export default function Chats() {
                 {!isSearching ? (
                     <>
                         <Text className="text-2xl ml-3 font-bold text-text dark:text-dark-text">
-                            Messages
+                            {t("messages")}
                         </Text>
                         <TouchableOpacity 
                             onPress={toggleSearch}
@@ -199,7 +202,7 @@ export default function Chats() {
                         <TextInput
                             ref={searchInputRef}
                             className="flex-1 py-2 px-2 text-gray-700 outline-none"
-                            placeholder="Search conversations..."
+                            placeholder={t("search.conversations")}
                             placeholderTextColor="#9CA3AF"
                             value={searchQuery}
                             onChangeText={setSearchQuery}
@@ -218,16 +221,16 @@ export default function Chats() {
             <View className="w-32 h-32 mb-4 items-center justify-center bg-blue-100/70 rounded-full">
                 <Ionicons name="chatbubbles-outline" size={60} color="#3B82F6" />
             </View>
-            <Text className="text-xl font-bold text-gray-800 mb-2 text-center">No conversations yet</Text>
+            <Text className="text-xl font-bold text-gray-800 mb-2 text-center">{t("no.conversations.yet")}</Text>
             <Text className="text-center text-gray-500 mb-6 max-w-xs">
-                Connect with friends to start messaging and build meaningful relationships
+                {t("connect.with.friends.to.meaningful.chats")}
             </Text>
             <TouchableOpacity 
                 onPress={() => router.push('/networks')}
                 className="px-5 py-3 rounded-full bg-gradient-to-r bg-blue-600 from-blue-500 to-blue-700 shadow-md flex-row items-center"
             >
                 <Ionicons name="people" size={20} color="white" className="mr-2" />
-                <Text className="text-white font-medium">Find Friends</Text>
+                <Text className="text-white font-medium">{t("find.friends")}</Text>
             </TouchableOpacity>
         </View>
     );
@@ -262,7 +265,7 @@ export default function Chats() {
                                 showsVerticalScrollIndicator={false}
                                 ListEmptyComponent={searchQuery ? (
                                     <View className="flex-1 items-center justify-center py-10">
-                                        <Text className="text-gray-500">No matching conversations found</Text>
+                                        <Text className="text-gray-500">{t("no.matching.conversations.found")}</Text>
                                     </View>
                                 ) : null}
                             />
@@ -289,10 +292,10 @@ export default function Chats() {
                                 <Ionicons name="chatbubbles" size={80} color="#3B82F6" />
                             </View>
                             <Text className="text-2xl font-bold text-gray-800 mb-4 text-center">
-                                Select a conversation
+                                {t("select.conversation")}
                             </Text>
                             <Text className="text-center text-gray-500 max-w-md mb-8">
-                                Choose a chat from the left sidebar to start messaging or continue a conversation.
+                                {t("choose.conversation.to.start.chatting")}
                             </Text>
                         </View>
                     )}
@@ -307,7 +310,7 @@ export default function Chats() {
             className="flex-1 bg-blue-50/50 dark:bg-dark-primary"
             style={{
                 paddingTop: Platform.OS !== 'web' ? insets.top : 0,
-                paddingBottom: 80, // Add padding for mobile tab bar
+                paddingBottom: 100
             }}
         >
             {renderHeader()}
@@ -339,7 +342,7 @@ export default function Chats() {
                         ItemSeparatorComponent={() => <View className="h-3" />}
                         ListEmptyComponent={searchQuery ? (
                             <View className="flex-1 items-center justify-center py-10">
-                                <Text className="text-gray-500">No matching conversations found</Text>
+                                <Text className="text-gray-500">{t("no.matching.conversations.found")}</Text>
                             </View>
                         ) : null}
                     />

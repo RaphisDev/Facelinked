@@ -8,11 +8,14 @@ import {useEffect, useState} from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {showAlert} from "../../../../components/PopUpModalView";
 import WebSocketProvider from "../../../../components/WebSocketProvider";
+import {useTranslation} from "react-i18next";
 
 export default function Index() {
     const router = useRouter();
     const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
     const [isDesktop, setIsDesktop] = useState(windowWidth > 768);
+
+    const {t} = useTranslation();
 
     // Handle window resize for responsive layout
     useEffect(() => {
@@ -128,7 +131,7 @@ export default function Index() {
                 <View className={`${isDesktop ? "max-w-2xl mx-auto" : ""} w-full mt-4`}>
                     {/* Settings Section */}
                     <View className="mb-6">
-                        <Text className="text-lg font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1">Account Settings</Text>
+                        <Text className="text-lg font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1">{t("account.settings")}</Text>
                         {settingsOptions.map(renderSettingItem)}
                     </View>
 
@@ -141,7 +144,7 @@ export default function Index() {
                         <View className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900 items-center justify-center">
                             <Ionicons name="log-out-outline" size={22} color="#EF4444" />
                         </View>
-                        <Text className="ml-3 text-lg font-semibold text-red-600 dark:text-red-400">Logout</Text>
+                        <Text className="ml-3 text-lg font-semibold text-red-600 dark:text-red-400">{t("log.out")}</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>

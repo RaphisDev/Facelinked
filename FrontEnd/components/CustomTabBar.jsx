@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { usePathname, useRouter } from 'expo-router';
 import { useEmbeddedState } from "./EmbeddedStateManager";
+import {useTranslation} from "react-i18next";
 
 const MOBILE_WIDTH_THRESHOLD = 768;
 const SIDEBAR_WIDTH = 220;
@@ -17,12 +18,14 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
     const router = useRouter();
     const embedded = useEmbeddedState();
 
+    const {t} = useTranslation();
+
     // Define tab routes and their icons
     const tabRoutes = [
-        { name: 'home', label: 'Home', iconFocused: 'home-sharp', iconUnfocused: 'home-outline' },
-        { name: 'networks', label: 'Networks', iconFocused: 'git-merge-sharp', iconUnfocused: 'git-merge-outline' },
-        { name: 'chats', label: 'Chats', iconFocused: 'chatbubbles-sharp', iconUnfocused: 'chatbubbles-outline' },
-        { name: 'profile', label: 'Profile', iconFocused: 'person-sharp', iconUnfocused: 'person-outline' }
+        { name: 'home', label: t("home"), iconFocused: 'home-sharp', iconUnfocused: 'home-outline' },
+        { name: 'networks', label: t("networks"), iconFocused: 'git-merge-sharp', iconUnfocused: 'git-merge-outline' },
+        { name: 'chats', label: t("chats"), iconFocused: 'chatbubbles-sharp', iconUnfocused: 'chatbubbles-outline' },
+        { name: 'profile', label: t("profile"), iconFocused: 'person-sharp', iconUnfocused: 'person-outline' }
     ];
 
     const renderTab = (route, index) => {

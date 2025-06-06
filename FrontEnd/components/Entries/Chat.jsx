@@ -7,9 +7,11 @@ import {useEffect} from "react";
 import "../../global.css";
 import asyncStorage from "@react-native-async-storage/async-storage/src/AsyncStorage";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import {useTranslation} from "react-i18next";
 
 export default function Chat(props) {
     const router = useRouter();
+    const {t} = useTranslation();
     
     // Format the latest message timestamp
     const formatTime = (timestamp) => {
@@ -52,7 +54,7 @@ export default function Chat(props) {
                         numberOfLines={1} 
                         className={`text-sm ${props.unread ? 'font-medium text-gray-800' : 'text-gray-500'} flex-1 mr-1`}
                     >
-                        {props.lastMessage || "Start a conversation"}
+                        {props.lastMessage || t("start.conversation")}
                     </Text>
                     
                     {props.unread && (

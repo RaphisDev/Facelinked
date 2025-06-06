@@ -24,10 +24,12 @@
                 import {SafeAreaProvider, SafeAreaView, useSafeAreaInsets} from "react-native-safe-area-context";
                 import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
                 import {useSearchParams} from "expo-router/build/hooks";
+                import {useTranslation} from "react-i18next";
 
                 export default function Profile() {
 
-                    let {profile, post} = useLocalSearchParams();
+                    let {profile, post} = useLocalSearchParams();0
+                    const {t} = useTranslation();
                     const router = useRouter();
                     const insets = useSafeAreaInsets();
                     const segments = useSegments();
@@ -88,9 +90,9 @@
                     const [editRelationship, setEditRelationship] = useState(false);
 
                     const [profileInfos, setProfileInfos] = useState({
-                        name: "Loading...",
-                        location: "Loading...",
-                        hobbies: "Loading...",
+                        name: t("loading"),
+                        location: t("loading"),
+                        hobbies: t("loading"),
                         inRelationship: false,
                         profilePicturePath: "",
                         dateOfBirth: new Date()
@@ -312,7 +314,7 @@
                                 newProfileImages.push(url.split("?")[0]);
                             } else {
                                 showAlert({
-                                    title: 'Error',
+                                    title: t("error"),
                                     message: 'An error occurred while uploading your image. Please try again later.',
                                     buttons: [
                                         {
@@ -529,7 +531,7 @@
 
                             if (!data.ok) {
                                 showAlert({
-                                    title: 'Error',
+                                    title:  t("error"),
                                     message: 'An error occurred while sending your post. Please try again later.',
                                     buttons: [
                                         {
@@ -556,7 +558,7 @@
                         } catch (error) {
                             console.error('Error sending post:', error);
                             showAlert({
-                                title: 'Error',
+                                title: t("error"),
                                 message: 'An error occurred while sending your post. Please try again later.',
                                 buttons: [
                                     {
@@ -581,7 +583,7 @@
                             setShowPostModal(false);
                         } else {
                             showAlert({
-                                title: 'Error',
+                                title: t("error"),
                                 message: 'An error occurred while deleting your post. Please try again later.',
                                 buttons: [
                                     {
@@ -719,7 +721,7 @@
                             setComments(prevState => prevState.slice(0, -1));
 
                             showAlert({
-                                title: 'Error',
+                                title: t("error"),
                                 message: 'An error occurred while sending your comment. Please try again later.',
                                 buttons: [
                                     {
@@ -816,13 +818,13 @@
                                 }
 
                                 showAlert({
-                                    title: 'Success',
-                                    message: 'Your profile has been updated.',
+                                    title: t("success"),
+                                    message: t("profile.updated"),
                                     buttons: [{ text: 'OK', onPress: () => {} }],
                                 });
                             } else {
                                 showAlert({
-                                    title: 'Error',
+                                    title: t("error"),
                                     message: 'Failed to update profile. Please try again.',
                                     buttons: [{ text: 'OK', onPress: () => {} }],
                                 });
@@ -830,7 +832,7 @@
                         } catch (error) {
                             console.error('Error updating profile:', error);
                             showAlert({
-                                title: 'Error',
+                                title: t("error"),
                                 message: 'An error occurred while updating your profile.',
                                 buttons: [{ text: 'OK', onPress: () => {} }],
                             });
@@ -1004,7 +1006,7 @@
                                                         setSearchResults([]);
                                                     }
                                                 }}
-                                                placeholder="Search for users..."
+                                                placeholder={t("search.placeholder")}
                                                 placeholderTextColor="#94A3B8"
                                                 autoCapitalize="none"
                                                 className="flex-1 ml-2 text-gray-700 outline-none py-2"
@@ -1028,8 +1030,8 @@
                                                 <View className="w-20 h-20 mb-4 items-center justify-center bg-blue-100/70 rounded-full">
                                                     <Ionicons name="search" size={30} color="#3B82F6" />
                                                 </View>
-                                                <Text className="text-center text-xl font-semibold text-gray-800">No results</Text>
-                                                <Text className="text-center text-gray-500 mt-2">Try a different search term</Text>
+                                                <Text className="text-center text-xl font-semibold text-gray-800">{t("no.results")}</Text>
+                                                <Text className="text-center text-gray-500 mt-2">{t("no.results.subline")}</Text>
                                             </View>
                                         )}
                                         renderItem={(item) =>
@@ -1100,7 +1102,7 @@
                                                 <View className="w-8 h-8 rounded-full bg-blue-100 items-center justify-center mr-2">
                                                     <Ionicons name="arrow-back" size={18} color="#3B82F6" />
                                                 </View>
-                                                <Text className="text-blue-600 font-medium">Back</Text>
+                                                <Text className="text-blue-600 font-medium">{t("back")}</Text>
                                             </TouchableOpacity>
                                         </View>
                                     )}
@@ -1151,7 +1153,7 @@
                                                                 >
                                                                     <View className="flex-row items-center justify-center">
                                                                         <Ionicons name="chatbubble" color="white" size={18} />
-                                                                        <Text className="text-white font-medium ml-2">Message</Text>
+                                                                        <Text className="text-white font-medium ml-2">{t("meesage")}</Text>
                                                                     </View>
                                                                 </TouchableOpacity>
 
@@ -1163,7 +1165,7 @@
                                                                 >
                                                                     <View className="flex-row items-center justify-center">
                                                                         <Ionicons name="people" color="#3B82F6" size={18} />
-                                                                        <Text className="text-gray-700 font-medium ml-2">Friends</Text>
+                                                                        <Text className="text-gray-700 font-medium ml-2">{t("friends")}</Text>
                                                                     </View>
                                                                     {hasFriendRequests && profileName.current === username.current && (
                                                                         <View
@@ -1191,7 +1193,7 @@
                                                                 >
                                                                     <View className="flex-row items-center justify-center">
                                                                         <Ionicons name="pencil" color="white" size={18} />
-                                                                        <Text className="text-white font-medium ml-2">Edit Profile</Text>
+                                                                        <Text className="text-white font-medium ml-2">{t("edit.profile")}</Text>
                                                                     </View>
                                                                 </TouchableOpacity>
 
@@ -1203,7 +1205,7 @@
                                                                 >
                                                                     <View className="flex-row items-center justify-center">
                                                                         <Ionicons name="people" color="#3B82F6" size={18} />
-                                                                        <Text className="text-gray-700 font-medium ml-2">Friends</Text>
+                                                                        <Text className="text-gray-700 font-medium ml-2">{t("friends")}</Text>
                                                                     </View>
                                                                     {hasFriendRequests && profileName.current === username.current && (
                                                                         <View
@@ -1241,7 +1243,7 @@
                                                                 <Ionicons name="calendar" size={16} color="#3B82F6" />
                                                             </View>
                                                             <Text className="text-base font-medium text-gray-700 dark:text-dark-text">
-                                                                {calculateAge(new Date(profileInfos?.dateOfBirth))} years old
+                                                                {calculateAge(new Date(profileInfos?.dateOfBirth))} {t("years.old")}
                                                             </Text>
                                                         </View>
 
@@ -1268,7 +1270,7 @@
                                                                 <Ionicons name="heart" size={16} color="#3B82F6" />
                                                             </View>
                                                             <Text className="text-base font-medium text-gray-700 dark:text-dark-text">
-                                                                {profileInfos.inRelationship ? "In a relationship" : "Single"}
+                                                                {profileInfos.inRelationship ? t("in.relationship") : t("single")}
                                                             </Text>
                                                         </View>
                                                     </View>
@@ -1347,7 +1349,7 @@
                                                         >
                                                             <View className="flex-row items-center justify-center">
                                                                 <Ionicons name="chatbubble" color="white" size={18} />
-                                                                <Text className="text-white font-medium ml-2">Message</Text>
+                                                                <Text className="text-white font-medium ml-2">{t("message")}</Text>
                                                             </View>
                                                         </TouchableOpacity>
 
@@ -1359,7 +1361,7 @@
                                                         >
                                                             <View className="flex-row items-center justify-center">
                                                                 <Ionicons name="people" color="#3B82F6" size={18} />
-                                                                <Text className="text-gray-700 font-medium ml-2">Friends</Text>
+                                                                <Text className="text-gray-700 font-medium ml-2">{t("friends")}</Text>
                                                             </View>
                                                             {hasFriendRequests && profileName.current === username.current && (
                                                                 <View
@@ -1387,7 +1389,7 @@
                                                         >
                                                             <View className="flex-row items-center justify-center">
                                                                 <Ionicons name="pencil" color="white" size={18} />
-                                                                <Text className="text-white font-medium ml-2">Edit Profile</Text>
+                                                                <Text className="text-white font-medium ml-2">{t("edit.profile")}</Text>
                                                             </View>
                                                         </TouchableOpacity>
 
@@ -1399,7 +1401,7 @@
                                                         >
                                                             <View className="flex-row items-center justify-center">
                                                                 <Ionicons name="people" color="#3B82F6" size={18} />
-                                                                <Text className="text-gray-700 font-medium ml-2">Friends</Text>
+                                                                <Text className="text-gray-700 font-medium ml-2">{t("edit.profile")}</Text>
                                                             </View>
                                                             {hasFriendRequests && profileName.current === username.current && (
                                                                 <View
@@ -1424,7 +1426,7 @@
                                     )}
                                     <View className={`bg-white rounded-xl ${isDesktop ? 'mx-auto max-w-4xl' : 'mx-4'} mt-6 shadow-sm overflow-hidden`}>
                                         <View className={`flex-row justify-between ${isDesktop ? "space-x-20" : ""} items-center px-5 py-4 border-b border-gray-100`}>
-                                            <Text className="text-gray-800 dark:text-dark-text font-bold text-xl">Posts</Text>
+                                            <Text className="text-gray-800 dark:text-dark-text font-bold text-xl">{t("posts")}</Text>
                                             {profileName.current === username.current &&
                                                 <TouchableOpacity
                                                     onPress={createPost}
@@ -1444,8 +1446,8 @@
                                                 <View className="w-16 h-16 mb-4 items-center justify-center bg-blue-100/70 rounded-full">
                                                     <Ionicons name="document-text-outline" size={28} color="#3B82F6" />
                                                 </View>
-                                                <Text className="text-gray-800 dark:text-dark-text text-center font-semibold text-lg">No posts yet</Text>
-                                                <Text className="text-gray-500 text-center mt-1">Posts will appear here</Text>
+                                                <Text className="text-gray-800 dark:text-dark-text text-center font-semibold text-lg">{t("no.posts.yet")}</Text>
+                                                <Text className="text-gray-500 text-center mt-1">{t("posts.appear.here")}</Text>
                                             </View>
                                         }
                                         data={posts}
@@ -1493,7 +1495,7 @@
                                                                           //onEndEditing={() => setPosts(cachedPosts.current)}
                                                                           multiline={true}
                                                                           placeholderTextColor="#9CA3AF"
-                                                                          placeholder="What's on your mind?"
+                                                                          placeholder={t("whats.on.your.mind")}
                                                                           className="flex-1 text-gray-800 outline-none p-2"
                                                                       />
 
@@ -1545,7 +1547,7 @@
                                     {/* Header */}
                                     <View className="flex-row justify-between items-center px-6 pt-6 pb-4 border-b border-gray-100">
                                         <View className="flex-row items-center">
-                                            <Text className="text-2xl text-gray-800 dark:text-dark-text font-bold">Friends</Text>
+                                            <Text className="text-2xl text-gray-800 dark:text-dark-text font-bold">{t("friends")}</Text>
                                             <View className="ml-2 px-2 py-1 bg-blue-100 rounded-full">
                                                 <Text className="text-blue-600 font-medium text-sm">{profileInfos.friends?.length || 0}</Text>
                                             </View>
@@ -1601,7 +1603,7 @@
                                                     }
                                                 }}
                                                 className="flex-1 ml-2 text-gray-700 outline-none"
-                                                placeholder="Search friends..."
+                                                placeholder={t("search.friends")}
                                                 placeholderTextColor="#94A3B8"
                                                 autoCapitalize="none"
                                             />
@@ -1617,11 +1619,11 @@
                                                 <View className="w-20 h-20 mb-4 items-center justify-center bg-blue-100/70 rounded-full">
                                                     <Ionicons name="people" size={30} color="#3B82F6" />
                                                 </View>
-                                                <Text className="text-center text-xl font-semibold text-gray-800">No friends found</Text>
+                                                <Text className="text-center text-xl font-semibold text-gray-800">{t("no.friends.found")}</Text>
                                                 <Text className="text-center text-gray-500 mt-2 max-w-xs">
                                                     {profileName.current === username.current
-                                                        ? "Connect with others to build your network"
-                                                        : `${profileInfos.name} hasn't added any friends yet`}
+                                                        ? t("connect.to.build.network")
+                                                        : `${profileInfos.name} ${t("no.friends.added")}`}
                                                 </Text>
                                             </View>
                                         )}
@@ -1660,8 +1662,8 @@
                                                                 onPress={async() => {
                                                                     setShowModal(false)
                                                                     showAlert({
-                                                                        title: `Remove Friend`,
-                                                                        message: `Are you sure you want to remove ${item.item.memberName} from your friends?`,
+                                                                        title: t("remove.friend"),
+                                                                        message: `${t('sure.to.remove')} ${item.item.memberName} ${t('from.friends')}`,
                                                                         buttons: [
                                                                             {
                                                                                 text: 'Cancel',
@@ -1728,7 +1730,7 @@
                                             >
                                                 <Ionicons name="arrow-back" size={24} color="#3B82F6" />
                                             </TouchableOpacity>
-                                            <Text className="text-lg font-bold text-gray-800">Post</Text>
+                                            <Text className="text-lg font-bold text-gray-800">{t("posts")}</Text>
                                             <View style={{ width: 40 }} />
                                         </View>
 
@@ -1785,18 +1787,18 @@
                                                                             <Ionicons name={selectedPost.likes.some(like => like === username.current) ? "heart" : "heart-outline"} size={18} color={selectedPost.likes.some(like => like === username.current) ? "#f81212" : "#6B7280"} />
                                                                             <Text className="text-gray-500 ml-1">{selectedPost.likes.length || 0}</Text>
                                                                         </View>
-                                                                        <Text className="text-gray-500 text-sm">{comments.length} {comments.length === 1 ? "comment" : "comments"}</Text>
+                                                                        <Text className="text-gray-500 text-sm">{comments.length} {comments.length === 1 ? t("comment") : t("comments")}</Text>
                                                                     </View>
                                                                 </View>
                                                             </View>
 
-                                                            <Text className="text-lg font-bold text-gray-800 mb-4">Comments</Text>
+                                                            <Text className="text-lg font-bold text-gray-800 mb-4">{t("comments")}</Text>
 
                                                             {comments.length === 0 && (
                                                                 <View className="items-center py-8 bg-gray-50 rounded-lg mb-4">
                                                                     <Ionicons name="chatbubble-outline" size={40} color="#CBD5E1" />
-                                                                    <Text className="text-gray-500 mt-2">No comments yet</Text>
-                                                                    <Text className="text-gray-400 text-sm">Be the first to comment</Text>
+                                                                    <Text className="text-gray-500 mt-2">{t("no.comments.yet")}</Text>
+                                                                    <Text className="text-gray-400 text-sm">{t("comment.first")}</Text>
                                                                 </View>
                                                             )}
                                                         </View>
@@ -1821,7 +1823,7 @@
                                                     <View className="flex-row items-center bg-gray-100 rounded-full px-4 py-2">
                                                         <TextInput
                                                             className="flex-1 text-gray-700 outline-none py-2"
-                                                            placeholder="Add a comment..."
+                                                            placeholder={t("add.comment")}
                                                             value={commentText}
                                                             onChangeText={setCommentText}
                                                             multiline
@@ -1978,7 +1980,7 @@
                                             <Ionicons name="arrow-back" size={22} color="#3B82F6" />
                                         </TouchableOpacity>
 
-                                        <Text className="text-gray-800 text-xl font-bold">Photo Gallery</Text>
+                                        <Text className="text-gray-800 text-xl font-bold">{t("photo.gallery")}</Text>
 
                                         {profileName.current === username.current && (
                                             <TouchableOpacity
@@ -2015,7 +2017,7 @@
 
                                             {profileName.current === username.current && (
                                                 <View className="absolute bottom-4 left-4 bg-blue-500 px-3 py-1 rounded-full shadow-sm">
-                                                    <Text className="text-white font-medium">Profile Picture</Text>
+                                                    <Text className="text-white font-medium">{t("profile.picture")}</Text>
                                                 </View>
                                             )}
                                         </View>
@@ -2080,7 +2082,7 @@
                                                     onPress={() => addProfilePicture()}
                                                 >
                                                     <Ionicons name="add" size={40} color="#3B82F6" />
-                                                    <Text className="text-gray-600 mt-2">Add Photo</Text>
+                                                    <Text className="text-gray-600 mt-2">{t("add.photo")}</Text>
                                                 </TouchableOpacity>
                                             )}
                                         </ScrollView>
@@ -2249,7 +2251,7 @@
                                 <View className="bg-white dark:bg-dark-primary h-full w-full" style={isDesktop ? {maxWidth: 800, marginHorizontal: 'auto'} : {}}>
                                     {Platform.OS === "web" && <TouchableOpacity className="p-3 bg-gray-100 rounded-full self-end mr-4 mt-4" onPress={() => setShowFriendRequests(false)}><Ionicons size={20} color="#3B82F6" name="close"/></TouchableOpacity>}
 
-                                    <Text className="text-2xl text-gray-800 dark:text-dark-text text-center mt-6 font-bold">Friend Requests</Text>
+                                    <Text className="text-2xl text-gray-800 dark:text-dark-text text-center mt-6 font-bold">{t("friend.requests")}</Text>
 
                                     <FlatList
                                         data={friendRequests}
@@ -2264,7 +2266,7 @@
                                                     />
                                                     <View className="ml-3 flex-1">
                                                         <Text className="font-bold text-gray-800">{item.memberName}</Text>
-                                                        <Text className="text-gray-500">Wants to be your friend</Text>
+                                                        <Text className="text-gray-500">{t("wants.to.be.your.friend")}</Text>
                                                     </View>
                                                 </TouchableOpacity>
 
@@ -2273,14 +2275,14 @@
                                                         onPress={() => handleFriendRequest(item.memberId, false)}
                                                         className="bg-gray-200 rounded-full px-4 py-2 mr-3"
                                                     >
-                                                        <Text className="text-gray-800 font-medium">Decline</Text>
+                                                        <Text className="text-gray-800 font-medium">{t("decline")}</Text>
                                                     </TouchableOpacity>
 
                                                     <TouchableOpacity
                                                         onPress={() => handleFriendRequest(item.memberId, true)}
                                                         className="bg-blue-500 rounded-full px-4 py-2"
                                                     >
-                                                        <Text className="text-white font-medium">Accept</Text>
+                                                        <Text className="text-white font-medium">{t("accept")}</Text>
                                                     </TouchableOpacity>
                                                 </View>
                                             </View>
@@ -2290,8 +2292,8 @@
                                                 <View className="w-16 h-16 mb-4 items-center justify-center bg-blue-100/70 rounded-full">
                                                     <Ionicons name="person-outline" size={28} color="#3B82F6" />
                                                 </View>
-                                                <Text className="text-gray-800 text-center font-semibold text-lg">No friend requests</Text>
-                                                <Text className="text-gray-500 text-center mt-1">You'll see requests here</Text>
+                                                <Text className="text-gray-800 text-center font-semibold text-lg">{t("no.requests.yet")}</Text>
+                                                <Text className="text-gray-500 text-center mt-1">{t("friend.requests.here")}</Text>
                                             </View>
                                         }
                                     />
@@ -2303,7 +2305,7 @@
                                 <View className="bg-white dark:bg-dark-primary h-full w-full" style={isDesktop ? {maxWidth: 800, marginHorizontal: 'auto'} : {}}>
                                     {Platform.OS === "web" && <TouchableOpacity className="p-3 bg-gray-100 rounded-full self-end mr-4 mt-4" onPress={() => setShowEditProfile(false)}><Ionicons size={20} color="#3B82F6" name="close"/></TouchableOpacity>}
 
-                                    <Text className="text-2xl text-gray-800 dark:text-dark-text text-center mt-6 font-bold">Edit Profile</Text>
+                                    <Text className="text-2xl text-gray-800 dark:text-dark-text text-center mt-6 font-bold">{t("edit.profile")}</Text>
 
                                     <ScrollView className="flex-1 px-6 mt-6">
                                         <View className="mb-6">
@@ -2312,27 +2314,27 @@
                                                 value={editName}
                                                 onChangeText={setEditName}
                                                 className="bg-gray-50 p-3 rounded-lg border border-gray-200 text-gray-800"
-                                                placeholder="Your name"
+                                                placeholder={t("your.name")}
                                             />
                                         </View>
 
                                         <View className="mb-6">
-                                            <Text className="text-gray-700 font-medium mb-2">Location</Text>
+                                            <Text className="text-gray-700 font-medium mb-2">{t("location")}</Text>
                                             <TextInput
                                                 value={editLocation}
                                                 onChangeText={setEditLocation}
                                                 className="bg-gray-50 p-3 rounded-lg border border-gray-200 text-gray-800"
-                                                placeholder="Your location"
+                                                placeholder={t("your.location")}
                                             />
                                         </View>
 
                                         <View className="mb-6">
-                                            <Text className="text-gray-700 font-medium mb-2">Hobbies</Text>
+                                            <Text className="text-gray-700 font-medium mb-2">{t("hobbies")}</Text>
                                             <TextInput
                                                 value={editHobbies}
                                                 onChangeText={setEditHobbies}
                                                 className="bg-gray-50 p-3 rounded-lg border border-gray-200 text-gray-800"
-                                                placeholder="Your hobbies"
+                                                placeholder={t("your.hobbies")}
                                                 multiline
                                                 numberOfLines={3}
                                                 style={{ textAlignVertical: 'top' }}
@@ -2340,7 +2342,7 @@
                                         </View>
 
                                         <View className="mb-6 flex-row items-center">
-                                            <Text className="text-gray-700 font-medium mr-4">In a relationship</Text>
+                                            <Text className="text-gray-700 font-medium mr-4">{t("in.relationship")}</Text>
                                             <TouchableOpacity
                                                 onPress={() => setEditRelationship(!editRelationship)}
                                                 className={`w-6 h-6 rounded-md border ${editRelationship ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-300'} justify-center items-center`}
@@ -2354,14 +2356,14 @@
                                                 onPress={() => setShowEditProfile(false)}
                                                 className="bg-gray-200 rounded-full px-6 py-3 mr-4"
                                             >
-                                                <Text className="text-gray-800 font-medium">Cancel</Text>
+                                                <Text className="text-gray-800 font-medium">{t("cancel")}</Text>
                                             </TouchableOpacity>
 
                                             <TouchableOpacity
                                                 onPress={saveProfile}
                                                 className="bg-blue-500 rounded-full px-6 py-3"
                                             >
-                                                <Text className="text-white font-medium">Save</Text>
+                                                <Text className="text-white font-medium">{t("save")}</Text>
                                             </TouchableOpacity>
                                         </View>
                                     </ScrollView>

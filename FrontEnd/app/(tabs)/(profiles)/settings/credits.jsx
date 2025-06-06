@@ -6,11 +6,14 @@ import {useEffect, useState} from "react";
 import * as SecureStore from "expo-secure-store";
 import {SafeAreaView} from "react-native-safe-area-context";
 import {Image} from "expo-image";
+import {useTranslation} from "react-i18next";
 
 export default function Credits() {
     const router = useRouter();
     const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
     const [isDesktop, setIsDesktop] = useState(windowWidth > 768);
+
+    const { t } = useTranslation();
 
     // Handle window resize for responsive layout
     useEffect(() => {
@@ -68,13 +71,13 @@ export default function Credits() {
                 <View className={`${isDesktop ? "max-w-2xl mx-auto" : ""} w-full mt-4`}>
                     {/* Developer Section */}
                     <View className="mb-6">
-                        <Text className="text-lg font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1">Developer</Text>
+                        <Text className="text-lg font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1">{t("developer")}</Text>
                         <View className="bg-white dark:bg-dark-primary p-5 rounded-xl shadow-sm flex-row items-center">
                             <View className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900 items-center justify-center mr-4">
                                 <Ionicons name="code-slash-outline" size={32} color="#3B82F6" />
                             </View>
                             <View>
-                                <Text className="text-gray-500 dark:text-gray-400">Developed by</Text>
+                                <Text className="text-gray-500 dark:text-gray-400">{t("developed.by")}</Text>
                                 <Text className="text-xl font-bold text-gray-800 dark:text-dark-text">Raphael Templer</Text>
                             </View>
                         </View>
@@ -82,9 +85,9 @@ export default function Credits() {
 
                     {/* Technologies Section */}
                     <View className="mb-6">
-                        <Text className="text-lg font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1">Technologies</Text>
+                        <Text className="text-lg font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1">{t("technologien")}</Text>
                         <View className="bg-white dark:bg-dark-primary p-5 rounded-xl shadow-sm">
-                            <Text className="text-xl font-bold text-gray-800 dark:text-dark-text mb-4">Special Thanks To</Text>
+                            <Text className="text-xl font-bold text-gray-800 dark:text-dark-text mb-4">{t("special.thanks")}</Text>
 
                             <View className="gap-3">
                                 {technologies.map((tech, index) => (
@@ -122,7 +125,7 @@ export default function Credits() {
                             <Text className="text-center text-blue-600 dark:text-blue-400 text-2xl font-bold mb-2">FaceLinked</Text>
                             <Text className="text-center text-gray-500 dark:text-gray-400 mb-4">Version 1.0.0</Text>
                             <Text className="text-center text-gray-600 dark:text-gray-300 text-sm">
-                                © 2023 FaceLinked. All rights reserved.
+                                © 2025 FaceLinked. All rights reserved.
                             </Text>
                         </View>
                     </View>

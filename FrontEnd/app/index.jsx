@@ -1900,7 +1900,7 @@ const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, se
                 </View>
 
                 <View className="mb-3">
-                    <Text className="block text-sm font-medium text-gray-700 mb-1">Password</Text>
+                    <Text className="block text-sm font-medium text-gray-700 mb-1">{t("password")}</Text>
                     <View className="relative">
                         <View className="absolute inset-y-0 left-0 pl-3 flex flex-row items-center pointer-events-none">
                             <Lock size={18} color="#9CA3AF" />
@@ -2102,7 +2102,7 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
                     >
                         {step > 1 ? <ArrowLeft size={20} color="#000000" /> : <X size={20} color="#000000" />}
                     </TouchableOpacity>
-                    <Text className="text-xl font-semibold flex-1 text-center">Create Your Account</Text>
+                    <Text className="text-xl font-semibold flex-1 text-center">{t("create.account")}</Text>
                     <View style={{ width: 32 }}></View>
                 </View>
 
@@ -2181,25 +2181,25 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
                 <View className="mb-8">
                     {step === 1 && (
                         <View className="space-y-6">
-                            <Text className="text-2xl font-semibold text-gray-800 mb-6">Let's get started</Text>
+                            <Text className="text-2xl font-semibold text-gray-800 mb-6">{t("get.started")}</Text>
                             <View className="space-y-4">
                                 <View className="mb-4">
-                                    <Text className="block text-sm font-medium text-gray-700 mb-1">Your Name</Text>
+                                    <Text className="block text-sm font-medium text-gray-700 mb-1">{t("your.name")}</Text>
                                     <TextInput
                                         value={formData.name}
                                         onChangeText={(value) => updateFormData('name', value)}
                                         className="w-full p-3 border border-gray-300 rounded-lg"
-                                        placeholder="Enter your name"
+                                        placeholder={t("enter.name")}
                                         placeholderTextColor="#9CA3AF"
                                     />
                                 </View>
                                 <View className="mb-4">
-                                    <Text className="block text-sm font-medium text-gray-700 mb-1">Choose a Username</Text>
+                                    <Text className="block text-sm font-medium text-gray-700 mb-1">{t("choose.usernames")}</Text>
                                     <TextInput
                                         value={formData.username}
                                         onChangeText={(value) => updateFormData('username', value)}
                                         className="w-full p-3 border border-gray-300 rounded-lg"
-                                        placeholder="Enter username"
+                                        placeholder={t("enter.username")}
                                         placeholderTextColor="#9CA3AF"
                                     />
                                 </View>
@@ -2209,7 +2209,7 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
 
                     {step === 2 && (
                         <View className="space-y-6">
-                            <Text className="text-2xl font-semibold text-gray-800 mb-6">Your account details</Text>
+                            <Text className="text-2xl font-semibold text-gray-800 mb-6">{t("your.account.details")}</Text>
                             <View className="space-y-4">
                                 <View className="mb-4">
                                     <Text className="block text-sm font-medium text-gray-700 mb-1">Email</Text>
@@ -2221,13 +2221,13 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
                                             value={formData.email}
                                             onChangeText={(value) => updateFormData('email', value)}
                                             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg"
-                                            placeholder="Enter your email"
+                                            placeholder={t("enter.email")}
                                             placeholderTextColor="#9CA3AF"
                                         />
                                     </View>
                                 </View>
                                 <View className="mb-4">
-                                    <Text className="block text-sm font-medium text-gray-700 mb-1">Password</Text>
+                                    <Text className="block text-sm font-medium text-gray-700 mb-1">{t("password")}</Text>
                                     <View className="relative">
                                         <View className="absolute inset-y-0 left-0 flex flex-row items-center pl-3 pointer-events-none">
                                             <Lock size={18} color="#9CA3AF" />
@@ -2237,7 +2237,7 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
                                             value={formData.password}
                                             onChangeText={(value) => updateFormData('password', value)}
                                             className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg"
-                                            placeholder="Enter your password"
+                                            placeholder={t("enter.password")}
                                             placeholderTextColor="#9CA3AF"
                                         />
                                         <TouchableOpacity
@@ -2251,7 +2251,7 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
                                 <View className="mt-6">
                                     <View className="flex flex-row items-center">
                                         <View className="flex-1 h-px bg-gray-300" />
-                                        <Text className="mx-2 text-gray-500 text-sm">Or continue with</Text>
+                                        <Text className="mx-2 text-gray-500 text-sm">{t("continue.alternatives")}</Text>
                                         <View className="flex-1 h-px bg-gray-300" />
                                     </View>
 
@@ -2278,10 +2278,10 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
 
                     {step === 3 && (
                         <View className="space-y-6">
-                            <Text className="text-2xl font-semibold text-gray-800 mb-6">Tell us about yourself</Text>
+                            <Text className="text-2xl font-semibold text-gray-800 mb-6">{t("tell.about")}</Text>
                             <View className="space-y-6">
                                 <View className="mb-4">
-                                    <Text className="text-lg font-medium text-gray-700 mb-3">Are you in a relationship?</Text>
+                                    <Text className="text-lg font-medium text-gray-700 mb-3">{t("are.u.relationship")}</Text>
                                     <View className="flex flex-row gap-3">
                                         <Pressable
                                             onPress={() => updateFormData('relationship', true)}
@@ -2292,7 +2292,7 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
                                             }`}
                                         >
                                             <Heart size={18} color={formData.relationship === true ? "#3B82F6" : "#6B7280"} className="mr-2" />
-                                            <Text className={formData.relationship === true ? "text-blue-700" : "text-gray-700"}>Yes</Text>
+                                            <Text className={formData.relationship === true ? "text-blue-700" : "text-gray-700"}>{t("yes")}</Text>
                                         </Pressable>
                                         <Pressable
                                             onPress={() => updateFormData('relationship', false)}
@@ -2302,12 +2302,12 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
                                                     : 'border-gray-300'
                                             }`}
                                         >
-                                            <Text className={formData.relationship === false ? "text-blue-700" : "text-gray-700"}>No</Text>
+                                            <Text className={formData.relationship === false ? "text-blue-700" : "text-gray-700"}>{t("no")}</Text>
                                         </Pressable>
                                     </View>
                                 </View>
                                 <View className="mb-4">
-                                    <Text className="text-lg font-medium text-gray-700 mb-3">When were you born?</Text>
+                                    <Text className="text-lg font-medium text-gray-700 mb-3">{t("when.born")}</Text>
                                     {Platform.OS === 'web' ? renderWebDatePicker() : renderMobileDatePicker()}
                                 </View>
                             </View>
@@ -2316,10 +2316,10 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
 
                     {step === 4 && (
                         <View className="space-y-6">
-                            <Text className="text-2xl font-semibold text-gray-800 mb-6">Your profile details</Text>
+                            <Text className="text-2xl font-semibold text-gray-800 mb-6">{t("profile.details")}</Text>
                             <View className="space-y-4">
                                 <View className="mb-4">
-                                    <Text className="block text-sm font-medium text-gray-700 mb-1">Where are you from?</Text>
+                                    <Text className="block text-sm font-medium text-gray-700 mb-1">{t("where.are.u.from")}</Text>
                                     <View className="relative">
                                         <View className="absolute inset-y-0 left-0 flex flex-row items-center pl-3 pointer-events-none">
                                             <MapPin size={18} color="#9CA3AF" />
@@ -2328,17 +2328,17 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
                                             value={formData.location}
                                             onChangeText={(value) => updateFormData('location', value)}
                                             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg"
-                                            placeholder="You live in"
+                                            placeholder={t("u.live.in")}
                                             placeholderTextColor="#9CA3AF"
                                         />
                                     </View>
                                 </View>
                                 <View>
-                                    <Text className="block text-sm font-medium mb-1 text-gray-700">What are your hobbies or interests?</Text>
+                                    <Text className="block text-sm font-medium mb-1 text-gray-700">{t("what.hobbiess.or.interests")}</Text>
                                     <TextInput
                                         multiline={true}
                                         numberOfLines={4}
-                                        placeholder="football, reading, hiking, cooking..."
+                                        placeholder={t("hobbies.placeholder")}
                                         placeholderTextColor="#9CA3AF"
                                         onChangeText={(value) => updateFormData('interests', value)}
                                         className="w-full p-3 border border-gray-300 rounded-lg h-24"
@@ -2346,7 +2346,7 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
                                         value={formData.interests}
                                     />
                                     <Text className="mt-2 text-xs text-gray-500">
-                                        Add multiple interests separated by commas
+                                        {t("separate.with.comma")}
                                     </Text>
                                 </View>
                             </View>
@@ -2355,7 +2355,7 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
 
                     {step === 5 && (
                         <View className="space-y-6">
-                            <Text className="text-2xl font-semibold text-gray-800 mb-6">Profile Picture</Text>
+                            <Text className="text-2xl font-semibold text-gray-800 mb-6">{t("profile.picture")}</Text>
                             <View className="flex flex-col items-center">
                                 <TouchableOpacity
                                     activeOpacity={0.7}
@@ -2381,7 +2381,7 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
                                         </View>
                                     )}
                                 </TouchableOpacity>
-                                <Text className="text-sm text-gray-500">JPG, PNG or GIF. Max size 5MB.</Text>
+                                <Text className="text-sm text-gray-500">{t("profile.picture.subline")}</Text>
                             </View>
                             <View className="mt-6 pt-6 border-t border-gray-300">
                                 <View className="flex flex-row items-center">
@@ -2394,13 +2394,13 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
                                         )}
                                     </Pressable>
                                     <Text className="ml-2 text-sm text-gray-700">
-                                        You are 14 or older and accept the{' '}
+                                        {t("fourteen.older.and.accept")}{' '}
                                         <Text onPress={() => navigateTo('privacy')} className="text-blue-600 font-medium">
-                                            Privacy Policy
+                                            {t("privacy.policy")}
                                         </Text>{' '}
                                         &{' '}
                                         <Text onPress={() => navigateTo('terms')} className="text-blue-600 font-medium">
-                                            Terms and Conditions
+                                            {t("terms.conditions")}
                                         </Text>
                                     </Text>
                                 </View>
@@ -2418,7 +2418,7 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
                             className="px-4 py-2 border border-gray-300 rounded-lg flex flex-row items-center"
                         >
                             <ArrowLeft size={16} color="#6B7280" className="mr-2" />
-                            <Text className="text-gray-600">Back</Text>
+                            <Text className="text-gray-600">{t("back")}</Text>
                         </TouchableOpacity>
                     ) : (
                         <View></View>
@@ -2435,11 +2435,11 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
                     >
                         {step < totalSteps ? (
                             <>
-                                <Text className="text-white">Continue</Text>
+                                <Text className="text-white">{t("continue")}</Text>
                                 <ArrowRight size={16} color="#FFFFFF" className="ml-2" />
                             </>
                         ) : (
-                            <Text className="text-white">Create Account</Text>
+                            <Text className="text-white">{t("createaccount")}</Text>
                         )}
                     </TouchableOpacity>
                 </View>

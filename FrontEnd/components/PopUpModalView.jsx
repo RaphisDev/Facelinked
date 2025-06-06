@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput, Dimensions, Platform } from 'react-native';
+import {useTranslation} from "react-i18next";
 
 const CustomAlert = {
     show: null,
@@ -47,6 +48,7 @@ const AlertModal = () => {
     });
 
     const [windowDimensions, setWindowDimensions] = useState(Dimensions.get('window'));
+    const { t } = useTranslation();
 
     useEffect(() => {
         const updateDimensions = () => {
@@ -155,7 +157,7 @@ const AlertModal = () => {
                     {state.hasInput && (
                         <TextInput
                             style={[styles.input, isDesktop && styles.desktopInput]}
-                            placeholder={state.inputConfig?.placeholder || 'Enter text'}
+                            placeholder={state.inputConfig?.placeholder || t("enter.text")}
                             value={state.inputValue}
                             onChangeText={(text) => setState(prev => ({...prev, inputValue: text}))}
                             {...state.inputConfig}

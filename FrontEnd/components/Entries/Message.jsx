@@ -5,6 +5,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system';
 import "../../global.css";
+import {useTranslation} from "react-i18next";
 
 export default function MessageEntry({ message }) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -15,6 +16,8 @@ export default function MessageEntry({ message }) {
   // Animation for new message appearance
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
+
+  const {t} = useTranslation();
 
   useEffect(() => {
     Animated.parallel([
@@ -281,7 +284,7 @@ export default function MessageEntry({ message }) {
           ]}>
             <View style={styles.optionsHeader}>
               <View style={styles.optionsHandleBar} />
-              <Text style={styles.optionsTitle}>Image Options</Text>
+              <Text style={styles.optionsTitle}>{t("image.options")}</Text>
             </View>
 
             <TouchableOpacity
@@ -289,7 +292,7 @@ export default function MessageEntry({ message }) {
               onPress={handleSaveImage}
             >
               <Ionicons name="download-outline" size={22} color="#3B82F6" />
-              <Text style={styles.optionText}>Save to Device</Text>
+              <Text style={styles.optionText}>{t("save.to.device")}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -307,7 +310,7 @@ export default function MessageEntry({ message }) {
               }}
             >
               <Ionicons name={isWeb ? "copy-outline" : "share-outline"} size={22} color="#3B82F6" />
-              <Text style={styles.optionText}>{isWeb ? "Copy Link" : "Share"}</Text>
+              <Text style={styles.optionText}>{isWeb ? "Copy Link" : t("share")}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -315,7 +318,7 @@ export default function MessageEntry({ message }) {
               onPress={() => setOptionsVisible(false)}
             >
               <Ionicons name="close-outline" size={22} color="#EF4444" />
-              <Text style={[styles.optionText, styles.cancelText]}>Cancel</Text>
+              <Text style={[styles.optionText, styles.cancelText]}>{t("cancel")}</Text>
             </TouchableOpacity>
           </View>
         </Pressable>

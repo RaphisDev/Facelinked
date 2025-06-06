@@ -8,11 +8,14 @@ import {showAlert} from "../../../../components/PopUpModalView";
 import ip from "../../../../components/AppManager";
 import {SafeAreaView} from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import {useTranslation} from "react-i18next";
 
 export default function AccountSettings() {
     const router = useRouter();
     const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
     const [isDesktop, setIsDesktop] = useState(windowWidth > 768);
+
+    const {t} = useTranslation();
 
     // Handle window resize for responsive layout
     useEffect(() => {
@@ -43,12 +46,12 @@ export default function AccountSettings() {
 
     const handleLogout = async () => {
         showAlert({
-            title: "Are you sure?",
-            message: "Do you want to log out?",
+            title: t("are.u.sure"),
+            message: t("logout.confirmation"),
             buttons: [
-                {text: "Cancel", onPress: () => {}},
+                {text: t("cancel"), onPress: () => {}},
                 {
-                    text: "Continue", onPress: async () => {
+                    text: t("continue"), onPress: async () => {
                         await asyncStorage.clear();
                         if (Platform.OS === "web") {
                             localStorage.clear();
@@ -68,8 +71,8 @@ export default function AccountSettings() {
 
     const handleDeleteAccount = () => {
         showAlert({
-            title: "Are you sure you want to delete your account?",
-            message: "This action cannot be undone.",
+            title: t("are.u.sure.to.delete.account"),
+            message: t("action.not.undone"),
             buttons: [
                 {text: "Cancel", onPress: () => {}},
                 {text: "Continue", onPress: async () => {
@@ -99,15 +102,15 @@ export default function AccountSettings() {
                             new WebSocketProvider().reset();
 
                             showAlert({
-                                title: "Account deleted",
-                                message: "Your account has been deleted successfully.",
+                                title: t("success"),
+                                message: t("account.deleted.successfully"),
                                 buttons: [
                                     {text: "Okay", onPress: () => router.replace("/")}
                                 ]
                             })
                         } else {
                             showAlert({
-                                title: "Error. Try again later.",
+                                title: t("error"),
                                 message: "An error occurred while deleting your account.",
                                 buttons: [
                                     {text: "Okay", onPress: () => {}}
@@ -139,7 +142,7 @@ export default function AccountSettings() {
                 <View className={`${isDesktop ? "max-w-2xl mx-auto" : ""} w-full mt-4`}>
                     {/* Account Section */}
                     <View className="mb-6">
-                        <Text className="text-lg font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1">Account Management</Text>
+                        <Text className="text-lg font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1">{t("account.management")}</Text>
 
                         {/* Logout Button */}
                         <TouchableOpacity 
@@ -157,13 +160,13 @@ export default function AccountSettings() {
                             <View className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 items-center justify-center">
                                 <Ionicons name="log-out-outline" size={22} color="#3B82F6" />
                             </View>
-                            <Text className="ml-3 text-lg font-semibold dark:text-dark-text text-gray-800">Log out</Text>
+                            <Text className="ml-3 text-lg font-semibold dark:text-dark-text text-gray-800">{t("log.out")}</Text>
                         </TouchableOpacity>
                     </View>
 
                     {/* Danger Zone */}
                     <View className="mb-6">
-                        <Text className="text-lg font-semibold text-red-500 dark:text-red-400 mb-3 px-1">Danger Zone</Text>
+                        <Text className="text-lg font-semibold text-red-500 dark:text-red-400 mb-3 px-1">{t("danger.zone")}</Text>
 
                         {/* Delete Account Button */}
                         <TouchableOpacity 
@@ -174,10 +177,10 @@ export default function AccountSettings() {
                             <View className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900 items-center justify-center">
                                 <Ionicons name="trash-outline" size={22} color="#EF4444" />
                             </View>
-                            <Text className="ml-3 text-lg font-semibold text-red-600 dark:text-red-400">Delete Account</Text>
+                            <Text className="ml-3 text-lg font-semibold text-red-600 dark:text-red-400">{t("delete.account")}</Text>
                         </TouchableOpacity>
                         <Text className="text-sm text-red-400 dark:text-red-500 px-1">
-                            Warning: This action cannot be undone. All your data will be permanently deleted.
+                            {t("account.deletion.warning")}
                         </Text>
                     </View>
                 </View>

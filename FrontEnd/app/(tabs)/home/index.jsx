@@ -28,6 +28,7 @@ import {LinearGradient} from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
 import {showAlert} from "../../../components/PopUpModalView";
 import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
+import {useTranslation} from "react-i18next";
 
 export default function Index() {
     const [posts, setPosts] = useState([]);
@@ -59,6 +60,7 @@ export default function Index() {
     const username = useRef("");
 
     const fadeAnim = useRef(new Animated.Value(0)).current;
+    const {t} = useTranslation();
 
     useEffect(() => {
         if (showCommentInput) {
@@ -272,7 +274,7 @@ export default function Index() {
             setComments(prevState => prevState.slice(0, -1));
 
             showAlert({
-                title: 'Error',
+                title: t("error"),
                 message: 'An error occurred while sending your comment. Please try again later.',
                 buttons: [
                     {
@@ -318,8 +320,8 @@ export default function Index() {
     const createPost = async () => {
         if (postText.trim() === "" && selectedImages.length === 0) {
             showAlert({
-                title: 'Empty Post',
-                message: 'Please add some text or images to your post',
+                title: t("empty.post"),
+                message: t("add.text.image"),
                 buttons: [
                     {
                         text: "Okay",
@@ -384,7 +386,7 @@ export default function Index() {
                 setShowPostCreation(false);
 
                 showAlert({
-                    title: 'Error',
+                    title: t("error"),
                     message: 'An error occurred while sending your post. Please try again later.',
                     buttons: [
                         {
@@ -399,8 +401,8 @@ export default function Index() {
                 setSelectedImages([]);
 
                 showAlert({
-                    title: 'Success',
-                    message: 'Your post has been created!',
+                    title: t("success"),
+                    message: t("post.created"),
                     buttons: [
                         {
                             text: "Okay",
@@ -412,7 +414,7 @@ export default function Index() {
         } catch (error) {
             console.error('Error sending post:', error);
             showAlert({
-                title: 'Error',
+                title: t("error"),
                 message: 'An error occurred while sending your post. Please try again later.',
                 buttons: [
                     {
@@ -470,9 +472,9 @@ export default function Index() {
             <View className="w-20 h-20 bg-blue-100 rounded-full items-center justify-center mb-4">
                 <Ionicons name="newspaper-outline" size={32} color="#3B82F6" />
             </View>
-            <Text className="text-xl font-semibold text-gray-800 mb-2">No posts yet</Text>
+            <Text className="text-xl font-semibold text-gray-800 mb-2">{t("no.posts.yet")}</Text>
             <Text className="text-gray-500 text-center px-10">
-                When your friends post updates, they'll appear here.
+                {t("start.follow.friends")}
             </Text>
         </View>
     );
@@ -522,28 +524,6 @@ export default function Index() {
                     </TouchableOpacity>
             </View>
 
-            {/* Search Bar */}
-            {showSearch && (
-                <View className={`px-4 pt-2 pb-2 ${isDesktop ? "max-w-7xl mx-auto" : ""}`}>
-                    <View className="flex-row items-center bg-white/90 rounded-full px-4 py-2 border border-gray-200 shadow-sm">
-                        <Ionicons name="search" size={18} color="#64748B" />
-                        <TextInput
-                            ref={searchInput}
-                            value={searchText}
-                            onChangeText={setSearchText}
-                            placeholder="Search for people or posts..."
-                            placeholderTextColor="#94A3B8"
-                            className="flex-1 ml-2 text-gray-700 outline-none py-2"
-                        />
-                        {searchText.length > 0 && (
-                            <TouchableOpacity onPress={() => setSearchText("")}>
-                                <Ionicons name="close" size={18} color="#64748B" />
-                            </TouchableOpacity>
-                        )}
-                    </View>
-                </View>
-            )}
-
             {/* Desktop Layout */}
             {isDesktop ? (
                 <View className="flex-row w-3/4 mx-auto" style={{ height: '100%', overflow: 'auto' }}
@@ -553,7 +533,7 @@ export default function Index() {
                         {loading ? (
                             <View className="flex-1 items-center justify-center py-20">
                                 <ActivityIndicator size="large" color="#3B82F6" />
-                                <Text className="text-gray-500 mt-4">Loading posts...</Text>
+                                <Text className="text-gray-500 mt-4">{t("loading.posts")}</Text>
                             </View>
                         ) : (
                             renderFriendsPosts()
@@ -566,7 +546,7 @@ export default function Index() {
                     {loading ? (
                         <View className="flex-1 items-center justify-center">
                             <ActivityIndicator size="large" color="#3B82F6" />
-                            <Text className="text-gray-500 mt-4">Loading posts...</Text>
+                            <Text className="text-gray-500 mt-4">{t("loading.posts")}</Text>
                         </View>
                     ) : (
                         renderFriendsPosts()
@@ -715,7 +695,7 @@ export default function Index() {
                                     >
                                         <Ionicons name="close" size={24} color="#3B82F6" />
                                     </TouchableOpacity>
-                                    <Text className="text-lg font-bold text-gray-800">Add Comment</Text>
+                                    <Text className="text-lg font-bold text-gray-800">{t("add.comment.text")}</Text>
                                     <View style={{ width: 40 }} />
                                 </View>
 
@@ -764,8 +744,8 @@ export default function Index() {
                                 ) : (
                                     <View className="items-center py-8 bg-gray-50 mx-4 my-4 rounded-lg">
                                         <Ionicons name="chatbubble-outline" size={40} color="#CBD5E1" />
-                                        <Text className="text-gray-500 mt-2">No comments yet</Text>
-                                        <Text className="text-gray-400 text-sm">Be the first to comment</Text>
+                                        <Text className="text-gray-500 mt-2">{t("no.comments.yet")}</Text>
+                                        <Text className="text-gray-400 text-sm">{t("comment.first")}</Text>
                                     </View>
                                 )}
 
@@ -774,7 +754,7 @@ export default function Index() {
                                     <View className="flex-row items-center bg-gray-100 rounded-full px-4 py-2">
                                         <TextInput
                                             className="flex-1 text-gray-700 outline-none py-2"
-                                            placeholder="Add a comment..."
+                                            placeholder={t("add.comment")}
                                             value={commentText}
                                             onChangeText={setCommentText}
                                             onSubmitEditing={() => {
@@ -846,13 +826,13 @@ export default function Index() {
                                 >
                                     <Ionicons name="close" size={24} color="#3B82F6" />
                                 </TouchableOpacity>
-                                <Text className="text-lg font-bold text-gray-800">Create Post</Text>
+                                <Text className="text-lg font-bold text-gray-800">{t("create.post")}</Text>
                                 <TouchableOpacity
                                     onPress={createPost}
                                     disabled={postText.trim() === "" && selectedImages.length === 0}
                                     className={`p-2 ${postText.trim() === "" && selectedImages.length === 0 ? "opacity-50" : ""}`}
                                 >
-                                    <Text className="text-blue-500 font-bold">Post</Text>
+                                    <Text className="text-blue-500 font-bold">{t("to.post")}</Text>
                                 </TouchableOpacity>
                             </View>
 
@@ -860,7 +840,7 @@ export default function Index() {
                             <View className="p-4">
                                 <TextInput
                                     className="text-gray-800 min-h-[100px] text-base outline-none"
-                                    placeholder="What's on your mind?"
+                                    placeholder={t("whats.on.your.mind")}
                                     placeholderTextColor="#94A3B8"
                                     value={postText}
                                     onChangeText={setPostText}
@@ -901,7 +881,7 @@ export default function Index() {
                                 >
                                     <Ionicons name="image" size={22} color={selectedImages.length >= 5 ? "#94A3B8" : "#3B82F6"} />
                                     <Text className={`ml-2 ${selectedImages.length >= 5 ? "text-gray-400" : "text-blue-500"}`}>
-                                        {selectedImages.length >= 5 ? "Max 5 images" : "Add Photos"}
+                                        {selectedImages.length >= 5 ? t("max.5.images") : t("add.photos")}
                                     </Text>
                                 </TouchableOpacity>
                             </View>

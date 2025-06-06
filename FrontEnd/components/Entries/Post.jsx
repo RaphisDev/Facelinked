@@ -5,6 +5,7 @@ import * as SecureStore from "expo-secure-store";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {useRef, useState} from "react";
 import * as Haptics from "expo-haptics";
+import {useTranslation} from "react-i18next";
 
 export default function Post(props) {
     // Check if we're in desktop mode
@@ -13,6 +14,7 @@ export default function Post(props) {
     const [optionsVisible, setOptionsVisible] = useState(false);
 
     const isWeb = Platform.OS === 'web';
+    const {t} = useTranslation();
 
     const renderImages = () => {
         if (!props.content || props.content.length === 0) return null;
@@ -116,7 +118,7 @@ export default function Post(props) {
                     >
                         <Ionicons name={props.likes.some((item) => item === username.current) ? "heart" : "heart-outline"} size={isDesktop ? 22 : 20} color={props.likes.some((item) => item === username.current) ? "#f81212" : "#6B7280"} />
                         <Text className={`ml-2 text-gray-600 font-medium ${isDesktop ? "text-base" : ""}`}>
-                            {props.likes.length > 0 ? props.likes.length : "Like"}
+                            {props.likes.length > 0 ? props.likes.length : t("like")}
                         </Text>
                     </TouchableOpacity>
 
@@ -130,7 +132,7 @@ export default function Post(props) {
                     >
                         <Ionicons name="chatbubble-outline" size={isDesktop ? 22 : 20} color="#6B7280" />
                         <Text className={`ml-2 text-gray-600 font-medium ${isDesktop ? "text-base" : ""}`}>
-                            {props.comments.length > 0 ? props.comments.length : "Comment"}
+                            {props.comments.length > 0 ? props.comments.length : t("to.comment")}
                         </Text>
                     </TouchableOpacity>
 
@@ -146,7 +148,7 @@ export default function Post(props) {
                     >
                         <Ionicons name="share-outline" size={isDesktop ? 22 : 20} color="#6B7280" />
                         <Text className={`ml-2 text-gray-600 font-medium ${isDesktop ? "text-base" : ""}`}>
-                            Share
+                            {t("share")}
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -172,7 +174,7 @@ export default function Post(props) {
                     ]}>
                         <View style={styles.optionsHeader}>
                             <View style={styles.optionsHandleBar} />
-                            <Text style={styles.optionsTitle}>Post Options</Text>
+                            <Text style={styles.optionsTitle}>{t("post.options")}</Text>
                         </View>
 
                         <TouchableOpacity
@@ -185,7 +187,7 @@ export default function Post(props) {
                             }}
                         >
                             <Ionicons name="trash" size={22} color="#EF4444" />
-                            <Text style={[styles.optionText]}>Delete Post</Text>
+                            <Text style={[styles.optionText]}>{t("delete.post")}</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
@@ -193,7 +195,7 @@ export default function Post(props) {
                             onPress={() => setOptionsVisible(false)}
                         >
                             <Ionicons name="close-outline" size={22} color="#EF4444" />
-                            <Text style={[styles.optionText, styles.cancelText]}>Cancel</Text>
+                            <Text style={[styles.optionText, styles.cancelText]}>{t("cancel")}</Text>
                         </TouchableOpacity>
                     </View>
                 </Pressable>

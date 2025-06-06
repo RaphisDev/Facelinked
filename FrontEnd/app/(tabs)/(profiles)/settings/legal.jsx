@@ -4,11 +4,14 @@ import {useRouter} from "expo-router";
 import {useEffect, useState} from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import {useTranslation} from "react-i18next";
 
 export default function LegalSettings() {
     const router = useRouter();
     const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
     const [isDesktop, setIsDesktop] = useState(windowWidth > 768);
+
+    const { t } = useTranslation();
 
     // Handle window resize for responsive layout
     useEffect(() => {
@@ -84,7 +87,7 @@ export default function LegalSettings() {
                 <View className={`${isDesktop ? "max-w-2xl mx-auto" : ""} w-full mt-4`}>
                     {/* Legal Documents Section */}
                     <View className="mb-6">
-                        <Text className="text-lg font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1">Legal Documents</Text>
+                        <Text className="text-lg font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1">{t("legal.documents")}</Text>
                         {legalOptions.map(renderLegalItem)}
                     </View>
 
@@ -92,7 +95,7 @@ export default function LegalSettings() {
                     <View className="mb-6">
                         <Text className="text-lg font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1">Impressum</Text>
                         <View className="bg-white dark:bg-dark-primary p-5 rounded-xl shadow-sm">
-                            <Text className="text-xl font-bold text-gray-800 dark:text-dark-text mb-4">Contact Information</Text>
+                            <Text className="text-xl font-bold text-gray-800 dark:text-dark-text mb-4">{t("contact.information")}</Text>
 
                             <View className="mb-4">
                                 <Text className="text-gray-700 dark:text-gray-300 font-medium">Monika Schneider</Text>
@@ -102,10 +105,10 @@ export default function LegalSettings() {
                             </View>
 
                             <View>
-                                <Text className="text-gray-700 dark:text-gray-300 font-medium mb-1">Contact</Text>
+                                <Text className="text-gray-700 dark:text-gray-300 font-medium mb-1">{t("contact")}</Text>
                                 <View className="flex-row items-center mb-1">
                                     <Ionicons name="mail-outline" size={16} color="#3B82F6" />
-                                    <Text className="text-gray-600 dark:text-gray-400 ml-2">bretter.schlaue83@icloud.com</Text>
+                                    <Text className="text-gray-600 dark:text-gray-400 ml-2">info@facelinked.com</Text>
                                 </View>
                                 <View className="flex-row items-center">
                                     <Ionicons name="globe-outline" size={16} color="#3B82F6" />

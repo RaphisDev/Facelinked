@@ -33,6 +33,7 @@ import StateManager from "../../../components/StateManager";
 import { showAlert } from "../../../components/PopUpModalView";
 import {SafeAreaProvider, useSafeAreaInsets} from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
+import {useTranslation} from "react-i18next";
 
 const MOBILE_WIDTH_THRESHOLD = 768;
 
@@ -67,6 +68,8 @@ export default function Network() {
     const oldestMessageTimestamp = useRef(null);
     const isInitialLoad = useRef(true);
     const inputBarAnimation = useRef(new Animated.Value(0)).current;
+
+    const {t} = useTranslation();
 
     useEffect(() => {
         const handleResize = () => {
@@ -273,8 +276,8 @@ export default function Network() {
                 }
             } else {
                 showAlert({
-                    title: 'Not Found',
-                    message: 'Network not found/You have no access',
+                    title: t("not.found"),
+                    message: t("network.not.found.no.access"),
                     buttons: [
                         {
                             text: 'OK',
@@ -288,7 +291,7 @@ export default function Network() {
         } catch (error) {
             console.error("Error loading network:", error);
             showAlert({
-                title: 'Error',
+                title: t("error"),
                 message: 'Failed to load network information',
                 buttons: [{ text: 'OK', onPress: () => {} }],
             });
@@ -507,7 +510,7 @@ export default function Network() {
         } catch (error) {
             console.error("Error setting favorite:", error);
             showAlert({
-                title: 'Error',
+                title: t("error"),
                 message: 'Failed to update favorite status',
                 buttons: [{ text: 'OK', onPress: () => {} }],
             });
@@ -528,13 +531,13 @@ export default function Network() {
             if (response.ok) {
                 setMember(member.filter((m) => m.memberId !== user));
                 showAlert({
-                    title: 'User removed',
+                    title: t("user.removed"),
                     message: '',
                     buttons: [{ text: 'OK', onPress: () => {} }],
                 });
             } else {
                 showAlert({
-                    title: 'Failed to remove user',
+                    title: t("error"),
                     message: '',
                     buttons: [{ text: 'Cancel', onPress: () => {} }],
                 });
@@ -542,7 +545,7 @@ export default function Network() {
         } catch (error) {
             console.error("Error removing user:", error);
             showAlert({
-                title: 'Error',
+                title: t("error"),
                 message: 'Failed to remove user',
                 buttons: [{ text: 'OK', onPress: () => {} }],
             });
@@ -552,28 +555,28 @@ export default function Network() {
     const updateNetwork = () => {
         setModalVisible(false);
         showAlert({
-            title: 'Update Network',
-            message: 'Enter a new name for the network\nLeave empty for no change',
+            title: t("update.network"),
+            message: t("new.name.network"),
             hasInput: true,
             inputConfig: {
-                placeholder: 'New network name',
+                placeholder: t("new.network.name.placeholder"),
                 defaultValue: currentNetwork.current.name
             },
             buttons: [
                 {
-                    text: 'Cancel',
+                    text: t("cancel"),
                     onPress: () => {}
                 },
                 {
-                    text: 'Update',
+                    text: t("update"),
                     onPress: (text) => {
                         if (text.trim().length === 0) {
                             text = currentNetwork.current.name;
                         } else if (text.length <= 3) {
                             setTimeout(() => {
                                 showAlert({
-                                    title: 'Error',
-                                    message: 'Name too short',
+                                    title: t("error"),
+                                    message: t("name.too.short"),
                                     buttons: [{ text: 'OK', onPress: () => {} }]
                                 });
                             }, 300)
@@ -583,27 +586,27 @@ export default function Network() {
                         // Use setTimeout to ensure the next alert shows properly
                         setTimeout(() => {
                             showAlert({
-                                title: 'Update Network',
-                                message: 'Enter a new description\nLeave empty for no change',
+                                title: t("update.network"),
+                                message: t("new.description.network"),
                                 hasInput: true,
                                 inputConfig: {
-                                    placeholder: 'New description',
+                                    placeholder: t("new.network.description.placeholder"),
                                     defaultValue: currentNetwork.current.description
                                 },
                                 buttons: [
                                     {
-                                        text: 'Cancel',
+                                        text: t("cancel"),
                                         onPress: () => {}
                                     },
                                     {
-                                        text: 'Update',
+                                        text: t("update"),
                                         onPress: async (description) => {
                                             if (description.trim().length === 0) {
                                                 if (text === currentNetwork.current.name) {
                                                     setTimeout(() => {
                                                         showAlert({
-                                                            title: 'No Change',
-                                                            message: 'No change applied',
+                                                            title: t("no.change"),
+                                                            message: t("no.change.made"),
                                                             buttons: [{
                                                                 text: 'OK', onPress: () => {}
                                                             }]
@@ -615,8 +618,8 @@ export default function Network() {
                                             } else if (description.length <= 3) {
                                                 setTimeout(() => {
                                                     showAlert({
-                                                        title: 'Error',
-                                                        message: 'Description too short',
+                                                        title: t("error"),
+                                                        message: t("description.too.shorttoo.short"),
                                                         buttons: [{
                                                             text: 'OK', onPress: () => {}
                                                         }]
@@ -664,7 +667,7 @@ export default function Network() {
 
                                                     setTimeout(() => {
                                                         showAlert({
-                                                            title: 'Success',
+                                                            title: t("success"),
                                                             message: 'Change approved!',
                                                             buttons: [{ text: 'OK', onPress: () => {} }]
                                                         });
@@ -673,7 +676,7 @@ export default function Network() {
                                             } catch (error) {
                                                 console.error("Error updating network:", error);
                                                 showAlert({
-                                                    title: 'Error',
+                                                    title: t("error"),
                                                     message: 'Failed to update network',
                                                     buttons: [{ text: 'OK', onPress: () => {} }]
                                                 });
@@ -720,13 +723,13 @@ export default function Network() {
                 setMember(data.members);
 
                 showAlert({
-                    title: 'Success',
-                    message: `${selectedFriendIds.length} ${selectedFriendIds.length === 1 ? 'friend' : 'friends'} added to network`,
+                    title: t("success"),
+                    message: `${selectedFriendIds.length} ${selectedFriendIds.length === 1 ? t("friend") : t("friends")} ${t("added.to.network")}`,
                     buttons: [{ text: 'OK', onPress: () => {} }]
                 });
             } else {
                 showAlert({
-                    title: 'Error',
+                    title: t("error"),
                     message: 'Failed to add selected friends',
                     buttons: [{ text: 'OK', onPress: () => {} }]
                 });
@@ -734,7 +737,7 @@ export default function Network() {
         } catch (error) {
             console.error("Error adding users:", error);
             showAlert({
-                title: 'Error',
+                title: t("error"),
                 message: 'Failed to add friends to network',
                 buttons: [{ text: 'OK', onPress: () => {} }]
             });
@@ -771,15 +774,15 @@ export default function Network() {
                     onPress={() => {
                         setModalVisible(false);
                         showAlert({
-                            title: `Remove User`,
+                            title: t("remove.user"),
                             message: `Are you sure you want to remove ${item.memberId}? This action cannot be undone.`,
                             buttons: [
                                 {
-                                    text: 'Cancel',
+                                    text: t("cancel"),
                                     onPress: () => {}
                                 },
                                 {
-                                    text: 'Remove',
+                                    text: t("remove"),
                                     onPress: async () => {
                                         await removeUser(item.memberId);
                                     }
@@ -806,7 +809,7 @@ export default function Network() {
 
             <View style={styles.headerContent}>
                 <Text style={styles.headerTitle} numberOfLines={1}>
-                    {currentNetwork.current?.name || 'Network'}
+                    {currentNetwork.current?.name || t("network.loading")}
                 </Text>
                 {currentNetwork.current?.private && (
                     <Ionicons name="lock-closed" size={16} color="#64748B" style={styles.lockIcon} />
@@ -840,7 +843,7 @@ export default function Network() {
                         styles.input,
                         { height: Math.min(Math.max(40, inputHeight), 120) }
                     ]}
-                    placeholder="Type a message..."
+                    placeholder={t("type.message")}
                     placeholderTextColor="#9CA3AF"
                     value={inputText}
                     onChangeText={setInputText}
@@ -975,7 +978,7 @@ export default function Network() {
         isLoadingMore && (
             <View style={styles.loadingMoreContainer}>
                 <ActivityIndicator size="small" color="#3B82F6" />
-                <Text style={styles.loadingMoreText}>Loading more messages...</Text>
+                <Text style={styles.loadingMoreText}>{t("loading.more.messages")}</Text>
             </View>
         )
     );
@@ -983,8 +986,8 @@ export default function Network() {
     const renderEmptyComponent = () => (
         <View style={styles.emptyContainer}>
             <Ionicons name="chatbubbles-outline" size={60} color="#CBD5E1" />
-            <Text style={styles.emptyText}>No messages yet</Text>
-            <Text style={styles.emptySubtext}>Be the first to start the conversation!</Text>
+            <Text style={styles.emptyText}>{t("no.messages.yet")}</Text>
+            <Text style={styles.emptySubtext}>{t('first.to.conversation')}</Text>
         </View>
     );
 
@@ -1009,7 +1012,7 @@ export default function Network() {
             <SafeAreaView style={styles.loadingContainer}>
                 <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
                 <ActivityIndicator size="large" color="#3B82F6" />
-                <Text style={styles.loadingText}>Loading network...</Text>
+                <Text style={styles.loadingText}>{t("network.loading")}</Text>
             </SafeAreaView>
         );
     }
@@ -1033,7 +1036,7 @@ export default function Network() {
 
                             <View style={styles.headerContent}>
                                 <Text style={styles.headerTitle} numberOfLines={1}>
-                                    {currentNetwork.current?.name || 'Network'}
+                                    {currentNetwork.current?.name || t("network.loading")}
                                 </Text>
                                 {currentNetwork.current?.private && (
                                     <Ionicons name="lock-closed" size={16} color="#64748B" style={styles.lockIcon} />
@@ -1062,12 +1065,12 @@ export default function Network() {
                             <View style={styles.desktopNetworkStats}>
                                 <View style={styles.statItem}>
                                     <Ionicons name="people" size={16} color="#64748B" />
-                                    <Text style={styles.statText}>{currentNetwork.current?.favoriteMembers.length} members</Text>
+                                    <Text style={styles.statText}>{currentNetwork.current?.favoriteMembers.length} {t("members")}</Text>
                                 </View>
 
                                 <View style={styles.statItem}>
                                     <Ionicons name="person" size={16} color="#64748B" />
-                                    <Text style={styles.statText}>Created by {currentNetwork.current?.creatorId}</Text>
+                                    <Text style={styles.statText}>{t("created.by")} {currentNetwork.current?.creatorId}</Text>
                                 </View>
                             </View>
 
@@ -1087,7 +1090,7 @@ export default function Network() {
                                         color={isFavorite ? "#F43F5E" : "#64748B"} 
                                     />
                                     <Text style={styles.desktopActionButtonText}>
-                                        {isFavorite ? "Favorited" : "Favorite"}
+                                        {isFavorite ? t("favorited") : t("favorite")}
                                     </Text>
                                 </TouchableOpacity>
 
@@ -1096,7 +1099,7 @@ export default function Network() {
                                     onPress={() => setModalVisible(true)}
                                 >
                                     <Ionicons name="information-circle-outline" size={22} color="#64748B" />
-                                    <Text style={styles.desktopActionButtonText}>Network Info</Text>
+                                    <Text style={styles.desktopActionButtonText}>{t("network.info")}</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -1212,7 +1215,7 @@ export default function Network() {
                             onTouchEnd={(e) => e.stopPropagation()}
                         >
                             <View style={styles.modalHeader}>
-                                <Text style={styles.modalTitle}>Network Details</Text>
+                                <Text style={styles.modalTitle}>{t("network.details")}</Text>
                                 <TouchableOpacity 
                                     onPress={() => setModalVisible(false)}
                                     style={styles.closeButton}
@@ -1253,12 +1256,12 @@ export default function Network() {
                                     <View style={styles.networkStats}>
                                         <View style={styles.statItem}>
                                             <Ionicons name="heart" size={16} color="#64748B" />
-                                            <Text style={styles.statText}>{currentNetwork.current?.favoriteMembers.length} favorites</Text>
+                                            <Text style={styles.statText}>{currentNetwork.current?.favoriteMembers.length} {t("favorites")}</Text>
                                         </View>
 
                                         <View style={styles.statItem}>
                                             <Ionicons name="person" size={16} color="#64748B" />
-                                            <Text style={styles.statText}>Created by {currentNetwork.current?.creatorId}</Text>
+                                            <Text style={styles.statText}>{t("created.by")} {currentNetwork.current?.creatorId}</Text>
                                         </View>
                                     </View>
                                 </View>
@@ -1280,7 +1283,7 @@ export default function Network() {
                                         color={isFavorite ? "#F43F5E" : "#64748B"} 
                                     />
                                     <Text style={styles.actionButtonText}>
-                                        {isFavorite ? "Favorited" : "Favorite"}
+                                        {isFavorite ? t("favorited") : t("favorite")}
                                     </Text>
                                 </TouchableOpacity>
 
@@ -1297,14 +1300,14 @@ export default function Network() {
                                     }}
                                 >
                                     <Ionicons name="share-outline" size={22} color="#64748B" />
-                                    <Text style={styles.actionButtonText}>Share</Text>
+                                    <Text style={styles.actionButtonText}>{t("share")}</Text>
                                 </TouchableOpacity>
                             </View>
 
                             {currentNetwork.current?.private && (
                             <View style={styles.membersSection}>
                                 <View style={styles.membersSectionHeader}>
-                                    <Text style={styles.sectionTitle}>Members ({member?.length})</Text>
+                                    <Text style={styles.sectionTitle}>{t("members")} ({member?.length})</Text>
 
                                     {(currentNetwork.current?.private && currentNetwork.current?.creatorId === username.current) && (
                                         <TouchableOpacity 
@@ -1312,7 +1315,7 @@ export default function Network() {
                                             onPress={addUser}
                                         >
                                             <Ionicons name="person-add" size={18} color="#3B82F6" />
-                                            <Text style={styles.addMemberText}>Add</Text>
+                                            <Text style={styles.addMemberText}>{t("add")}</Text>
                                         </TouchableOpacity>
                                     )}
                                 </View>
@@ -1329,7 +1332,7 @@ export default function Network() {
                                 />
                                 ) : (
                                     <View style={styles.emptyMembersContainer}>
-                                        <Text style={styles.emptyMembersText}>No members found</Text>
+                                        <Text style={styles.emptyMembersText}>{t("no.members.found")}</Text>
                             </View>
                                 )}
                             </View>)}
@@ -1829,6 +1832,8 @@ const FriendsSelectionModal = ({ visible, onClose, onSubmit, username, token, me
     const [isLoadingFriends, setIsLoadingFriends] = useState(true);
     const [selectedFriends, setSelectedFriends] = useState([]);
 
+    const {t} = useTranslation();
+
     useEffect(() => {
         const loadFriends = async () => {
             setIsLoadingFriends(true);
@@ -1871,8 +1876,8 @@ const FriendsSelectionModal = ({ visible, onClose, onSubmit, username, token, me
     const handleSubmit = async () => {
         if (selectedFriends.length === 0) {
             showAlert({
-                title: 'No Selection',
-                message: 'Please select at least one friend',
+                title: t("no.selection"),
+                message: t("select.at.least.one.friend"),
                 buttons: [{ text: 'OK', onPress: () => {} }]
             });
             return;
@@ -1932,7 +1937,7 @@ const FriendsSelectionModal = ({ visible, onClose, onSubmit, username, token, me
                                 onTouchEnd={(e) => e.stopPropagation()}
                             >
                                 <View style={styles.modalHeader}>
-                                    <Text style={styles.modalTitle}>Add Friends to Network</Text>
+                                    <Text style={styles.modalTitle}>{t("add.friends.to.network")}</Text>
                                     <TouchableOpacity
                                         onPress={onClose}
                                         style={styles.closeButton}
@@ -1944,7 +1949,7 @@ const FriendsSelectionModal = ({ visible, onClose, onSubmit, username, token, me
                                 {isLoadingFriends ? (
                                     <View style={styles.friendsLoadingContainer}>
                                         <ActivityIndicator size="large" color="#3B82F6" />
-                                        <Text style={styles.loadingText}>Loading friends...</Text>
+                                        <Text style={styles.loadingText}>{t("friends.loading")}</Text>
                                     </View>
                                 ) : friendsList.length > 0 ? (
                                     <FlatList
@@ -1957,8 +1962,8 @@ const FriendsSelectionModal = ({ visible, onClose, onSubmit, username, token, me
                                     />
                                 ) : (
                                     <View style={styles.emptyFriendsContainer}>
-                                        <Text style={styles.emptyFriendsText}>No friends found</Text>
-                                        <Text style={styles.emptyFriendsSubtext}>Add friends to invite them to your network</Text>
+                                        <Text style={styles.emptyFriendsText}>{t("no.friends.found")}</Text>
+                                        <Text style={styles.emptyFriendsSubtext}>{t("add.friends.to.invite")}</Text>
                                     </View>
                                 )}
 
@@ -1967,7 +1972,7 @@ const FriendsSelectionModal = ({ visible, onClose, onSubmit, username, token, me
                                         style={styles.cancelButton}
                                         onPress={onClose}
                                     >
-                                        <Text style={styles.cancelButtonText}>Cancel</Text>
+                                        <Text style={styles.cancelButtonText}>{t("cancel")}</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         style={[
@@ -1978,7 +1983,7 @@ const FriendsSelectionModal = ({ visible, onClose, onSubmit, username, token, me
                                         disabled={selectedFriends.length === 0}
                                     >
                                         <Text style={styles.addButtonText}>
-                                            Add {selectedFriends.length > 0 ? `(${selectedFriends.length})` : ''}
+                                            {t("add")} {selectedFriends.length > 0 ? `(${selectedFriends.length})` : ''}
                                         </Text>
                                     </TouchableOpacity>
                                 </View>

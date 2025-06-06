@@ -24,6 +24,7 @@ import MessageEntry from "../../../components/Entries/Message.jsx";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
 import { setEmbeddedState } from "../../../components/EmbeddedStateManager";
+import {useTranslation} from "react-i18next";
 
 const MOBILE_WIDTH_THRESHOLD = 768;
 
@@ -34,6 +35,7 @@ export default function ChatRoom() {
     const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
     const [isDesktop, setIsDesktop] = useState(windowWidth > MOBILE_WIDTH_THRESHOLD);
     const [isEmbedded, setIsEmbedded] = useState(false);
+    const {t} = useTranslation();
 
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
@@ -522,7 +524,7 @@ export default function ChatRoom() {
         return (
             <View style={styles.loadingContainer}>
                 <View style={styles.loadingIndicator}>
-                    <Text style={styles.loadingText}>Loading conversation...</Text>
+                    <Text style={styles.loadingText}>{t("loading.converstation")}</Text>
                 </View>
             </View>
         );
@@ -575,9 +577,9 @@ export default function ChatRoom() {
                         <View style={styles.profileInfo}>
                             <Text style={styles.profileName}>{userData.name}</Text>
                             {isTyping ? (
-                                <Text style={styles.typingIndicator}>typing...</Text>
+                                <Text style={styles.typingIndicator}>{t("typing")}</Text>
                             ) : (
-                                <Text style={styles.profileSubtext}>Tap to view profile</Text>
+                                <Text style={styles.profileSubtext}>{t("tap.view.profile")}</Text>
                             )}
                         </View>
                     </TouchableOpacity>
@@ -622,8 +624,8 @@ export default function ChatRoom() {
                     }}
                     ListEmptyComponent={
                         <View style={styles.emptyChat}>
-                            <Text style={styles.emptyChatText}>No messages yet.</Text>
-                            <Text style={styles.emptyChatSubtext}>Start the conversation!</Text>
+                            <Text style={styles.emptyChatText}>{t("no.messages.yet")}</Text>
+                            <Text style={styles.emptyChatSubtext}>{t("start.conversation")}</Text>
                         </View>
                     }
                 />
@@ -662,7 +664,7 @@ export default function ChatRoom() {
                         <TextInput
                             ref={inputRef}
                             style={[styles.textInput, {maxHeight: 120}]}
-                            placeholder="Type a message..."
+                            placeholder={t("type.message")}
                             placeholderTextColor="#9CA3AF"
                             value={input}
                             className="outline-none"
