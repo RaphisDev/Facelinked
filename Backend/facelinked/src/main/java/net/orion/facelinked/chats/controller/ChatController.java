@@ -61,18 +61,11 @@ public class ChatController {
         }
         var senderProfilePicturePath = senderProfile.getProfilePicturePath();
         String senderName = senderProfile.getName();
-        if (message.getContent() == null && message.getImages() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Message content or images must be provided.");
-        } else if (message.getContent() == null) {
-            message.setContent("");
-        } else if (message.getImages() == null) {
-            message.setImages(new ArrayList<>());
-        }
 
-        var id = chatService.saveToDatabase(new ChatMessage(sender, message.getReceiver(), message.getContent(), new AutoPrimaryKey(null, System.currentTimeMillis()), message.getImages() == null ? new ArrayList<>() : message.getImages()));
+        var id = chatService.saveToDatabase(new ChatMessage(sender, message.getReceiver(), message.getContent() == null ? "" : message.getContent(), new AutoPrimaryKey(null, System.currentTimeMillis()), message.getImages() == null ? new ArrayList<>() : message.getImages()));
 
         template.convertAndSendToUser(message.getReceiver(), "/queue/messages",
-               new ChatMessage(sender, message.getReceiver(), message.getContent(), new AutoPrimaryKey(null, id), message.getImages() == null ? new ArrayList<>() : message.getImages()));
+               new ChatMessage(sender, message.getReceiver(), message.getContent() == null ? "" : message.getContent(), new AutoPrimaryKey(null, id), message.getImages() == null ? new ArrayList<>() : message.getImages()));
 
         sendPushNotification(message.getReceiver(), message.getContent(), senderName, senderProfilePicturePath);
     }

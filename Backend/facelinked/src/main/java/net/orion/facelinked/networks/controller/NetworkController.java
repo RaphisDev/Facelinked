@@ -68,13 +68,13 @@ public class NetworkController {
     }
 
     private List<NetworkMember> getNetworkMembers(NetworkRequest network) {
-        var members = network.getMembers().stream().distinct().toList();
-        members.forEach(member -> {
+        var membersList = network.getMembers().stream().distinct().collect(java.util.stream.Collectors.toList());
+        membersList.forEach(member -> {
             var user = profileService.findByUsername(member.getMemberId());
             member.setMemberProfilePicturePath(user.getProfilePicturePath());
             member.setMemberName(user.getName());
         });
-        return members;
+        return membersList;
     }
 
     @GetMapping("/meetnewpeople")

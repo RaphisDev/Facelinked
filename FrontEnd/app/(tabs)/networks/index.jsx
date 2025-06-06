@@ -34,6 +34,8 @@ import { BlurView } from "expo-blur";
 import * as ImagePicker from "expo-image-picker";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import asyncStorage from "@react-native-async-storage/async-storage";
+import {showAlert} from "../../../components/PopUpModalView";
+import {useTranslation} from "react-i18next";
 
 const MOBILE_WIDTH_THRESHOLD = 768;
 
@@ -50,6 +52,8 @@ export default function Networks() {
     const tabSlideAnimation = useRef(new Animated.Value(0)).current;
 
     const stateManager = new StateManager();
+
+    const {t} = useTranslation();
 
     const [isSearching, setIsSearching] = useState(false);
     const [searchResults, setSearchResults] = useState([]);
@@ -72,6 +76,10 @@ export default function Networks() {
     const [friendsList, setFriendsList] = useState([]);
     const [selectedFriends, setSelectedFriends] = useState([]);
     const [loadingFriends, setLoadingFriends] = useState(false);
+
+    const [showFriends, setShowFriends] = useState(false);
+    const [friends, setSelectedFriendsMeetNewPeople] = useState([]);
+    const [friendsSearchResults, setFriendsSearchResults] = useState([]);
 
     const router = useRouter();
     const token = useRef(null);
@@ -123,10 +131,6 @@ export default function Networks() {
     }, [segments, selected]);
 
     useEffect(() => {
-        loadPeople()
-    }, []);
-
-    useEffect(() => {
         if (Platform.OS === "web") {
             token.current = localStorage.getItem("token");
             username.current = localStorage.getItem("username");
@@ -139,6 +143,7 @@ export default function Networks() {
                 router.replace("/")
             }
         })
+        loadPeople()
 
         stateManager.setNetworkState(true);
     }, []);
@@ -189,7 +194,7 @@ export default function Networks() {
             const response = await fetch(`${ip}/networks/meetnewpeople`, {
                 method: "GET",
                 headers: {
-                    "Authorization": `Bearer ${token.current}`}
+                    "Authorization": `Bearer ${token.current}`},
             });
             if (response.ok) {
                 const data = await response.json();
@@ -354,7 +359,10 @@ export default function Networks() {
                 }
             });
             if (response.ok) {
-                const data = await response.json();
+                let data = await response.json();
+                data.forEach(network => {
+                    network.networkId = network.id;
+                })
                 setNetworks(data);
                 await asyncStorage.setItem("networks", JSON.stringify(data));
             } else {
@@ -830,7 +838,7 @@ export default function Networks() {
                                             tintColor="#3B82F6"
                                         />
                                     }
-                                    keyExtractor={(item) => item.networkId.toString()}
+                                    keyExtractor={(item) => item.networkId?.toString()}
                                     renderItem={(items) => (
                                         <Network 
                                             id={items.item.networkId} 
@@ -965,7 +973,7 @@ export default function Networks() {
                                     ]}>
                                         <View style={styles.personImageContainer}>
                                             <Image 
-                                                source={{uri: item.profilePicture}} 
+                                                source={{uri: item.profilePicturePath}}
                                                 style={styles.personImage}
                                                 contentFit="cover"
                                                 transition={200}
@@ -990,12 +998,12 @@ export default function Networks() {
                                         </View>
 
                                         <View style={styles.personActions}>
-                                            <TouchableOpacity activeOpacity={0.7} onPress={() => router.navigate(`/chats/${item.username}`)} style={styles.messageButton}>
-                                                <Ionicons name="chatbubble" size={20} color="white" style={styles.actionButtonIcon} />
-                                                <Text style={styles.actionButtonText}>Message</Text>
+                                            <TouchableOpacity activeOpacity={0.7} onPress={() => {setShowFriends(true); setSelectedFriendsMeetNewPeople(item.friends)}} style={styles.messageButton}>
+                                                <Ionicons name="people" size={20} color="white" style={styles.actionButtonIcon} />
+                                                <Text style={styles.actionButtonText}>Friends</Text>
                                             </TouchableOpacity>
 
-                                            <TouchableOpacity activeOpacity={0.55} onPress={() => AddFriend(item.username)} style={[styles.addFriendButton, {backgroundColor: item.isFriend ? "#10B981" : '#059669'}]}>
+                                            <TouchableOpacity activeOpacity={0.55} disabled={item.isFriend} onPress={() => {if(!item.isFriend) {AddFriend(item.username)}}} style={[styles.addFriendButton, {backgroundColor: item.isFriend ? "#10B981" : '#059669'}]}>
                                                 <Ionicons name={item.isFriend ? "checkmark" : "person-add"} size={20} color="white" style={styles.actionButtonIcon} />
                                                 <Text style={styles.actionButtonText}>{item.isFriend ? "Sent request" : "Add Friend"}</Text>
                                             </TouchableOpacity>
@@ -1335,6 +1343,81 @@ export default function Networks() {
             </GestureHandlerRootView>
 
             {renderCreateNetworkModal()}
+
+            <Modal animationType="slide" visible={showFriends} presentationStyle={isDesktop ? "formSheet" : "pageSheet"} onRequestClose={() => {setShowFriends(false);}}>
+                <View className="bg-white dark:bg-dark-primary h-full w-full" style={isDesktop ? {maxWidth: 800, marginHorizontal: 'auto'} : {}}>
+                    {/* Header */}
+                    <View className="flex-row justify-between items-center px-6 pt-6 pb-4 border-b border-gray-100">
+                        <View className="flex-row items-center">
+                            <Text className="text-2xl text-gray-800 dark:text-dark-text font-bold">{t("friends")}</Text>
+                            <View className="ml-2 px-2 py-1 bg-blue-100 rounded-full">
+                                <Text className="text-blue-600 font-medium text-sm">{friends?.length || 0}</Text>
+                            </View>
+                        </View>
+                    </View>
+
+                    {/* Search Bar */}
+                    <View className="px-6 pt-4 pb-4">
+                        <View className="flex-row items-center bg-gray-100 rounded-full px-4 py-2">
+                            <Ionicons name="search" size={18} color="#64748B" />
+                            <TextInput
+                                onChangeText={(text) => {
+                                    if (text.length >= 1) {
+                                        setFriendsSearchResults(friends?.filter((friend) =>
+                                            friend.memberName.toLowerCase().includes(text.toLowerCase()) ||
+                                            friend.memberId.toLowerCase().includes(text.toLowerCase())
+                                        ));
+                                    } else if (text.length === 0) {
+                                        setFriendsSearchResults(friends);
+                                    }
+                                }}
+                                className="flex-1 ml-2 text-gray-700 outline-none"
+                                placeholder={t("search.friends")}
+                                placeholderTextColor="#94A3B8"
+                                autoCapitalize="none"
+                            />
+                        </View>
+                    </View>
+
+                    {/* Friends List */}
+                    <FlatList
+                        className="px-4"
+                        data={friendsSearchResults}
+                        ListEmptyComponent={() => (
+                            <View className="flex-1 items-center justify-center py-16">
+                                <View className="w-20 h-20 mb-4 items-center justify-center bg-blue-100/70 rounded-full">
+                                    <Ionicons name="people" size={30} color="#3B82F6" />
+                                </View>
+                                <Text className="text-center text-xl font-semibold text-gray-800">{t("no.friends.found")}</Text>
+                            </View>
+                        )}
+                        renderItem={(item) => (
+                            <View className="mb-2">
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        setShowFriends(false);
+                                        router.navigate(`/${item.item.memberId}`);
+                                    }}
+                                    activeOpacity={0.7}
+                                    className="flex-row justify-between items-center p-3 bg-white rounded-xl border border-gray-100 shadow-sm"
+                                >
+                                    <View className="flex-row items-center">
+                                        <Image
+                                            source={{uri: item.item.memberProfilePicturePath.split(",")[0]}}
+                                            style={{width: 50, height: 50, borderRadius: 25}}
+                                            className="bg-gray-200"
+                                        />
+                                        <View className="flex-col ml-3">
+                                            <Text className="text-gray-800 dark:text-dark-text font-bold text-lg">{item.item.memberName}</Text>
+                                            <Text className="text-gray-500 dark:text-dark-text text-sm">@{item.item.memberId}</Text>
+                                        </View>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                        )}
+                    />
+                </View>
+            </Modal>
         </SafeAreaView>
     );
 }

@@ -1401,7 +1401,7 @@
                                                         >
                                                             <View className="flex-row items-center justify-center">
                                                                 <Ionicons name="people" color="#3B82F6" size={18} />
-                                                                <Text className="text-gray-700 font-medium ml-2">{t("edit.profile")}</Text>
+                                                                <Text className="text-gray-700 font-medium ml-2">{t("friends")}</Text>
                                                             </View>
                                                             {hasFriendRequests && profileName.current === username.current && (
                                                                 <View

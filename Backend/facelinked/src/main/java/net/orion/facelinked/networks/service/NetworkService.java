@@ -1,5 +1,8 @@
 package net.orion.facelinked.networks.service;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
+import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import lombok.AllArgsConstructor;
 import net.orion.facelinked.networks.Network;
 import net.orion.facelinked.networks.NetworkMember;
@@ -36,7 +39,14 @@ public class NetworkService {
     }
 
     public List<Network> getFavoriteNetworks(String username) {
-        return networkRepository.findByFavoriteMembersContaining(username);
+        var networks = new ArrayList<Network>();
+        var networkList = networkRepository.findAll();
+        for (var network : networkList) {
+            if (network.getFavoriteMembers().contains(username)) {
+                networks.add(network);
+            }
+        }
+        return networks;
     }
 
     public Network getNetwork(String networkId) {
@@ -116,7 +126,13 @@ public class NetworkService {
                     continue;
                 if (friends.stream().anyMatch(f -> f.getMemberId().equals(friendOfFriend.getMemberId())))
                     continue;
-                friendsArray.add(profileService.findByUsername(friendOfFriend.getMemberId()));
+                if (friendsArray.stream().anyMatch(f -> f.getUsername().equals(friendOfFriend.getMemberId())))
+                    continue;
+                var person = profileService.findByUsername(friendOfFriend.getMemberId());
+                if (person.getFriendRequests().stream().anyMatch(f -> f.getMemberId().equals(profile.getUsername()))) {
+                    continue;
+                }
+                friendsArray.add(person);
             }
         }
         return friendsArray;
