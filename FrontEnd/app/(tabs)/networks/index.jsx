@@ -998,7 +998,7 @@ export default function Networks() {
                                         </View>
 
                                         <View style={styles.personActions}>
-                                            <TouchableOpacity activeOpacity={0.7} onPress={() => {setShowFriends(true); setSelectedFriendsMeetNewPeople(item.friends)}} style={styles.messageButton}>
+                                            <TouchableOpacity activeOpacity={0.7} onPress={() => {setShowFriends(true); setSelectedFriendsMeetNewPeople(item.friends); setFriendsSearchResults(item.friends)}} style={styles.messageButton}>
                                                 <Ionicons name="people" size={20} color="white" style={styles.actionButtonIcon} />
                                                 <Text style={styles.actionButtonText}>Friends</Text>
                                             </TouchableOpacity>
