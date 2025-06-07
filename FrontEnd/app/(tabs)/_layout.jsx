@@ -8,6 +8,7 @@ import {SafeAreaProvider, useSafeAreaInsets} from "react-native-safe-area-contex
 import {useEffect, useRef, useState} from "react";
 import WebSocketProvider from "../../components/WebSocketProvider";
 import { useEmbeddedState } from "../../components/EmbeddedStateManager";
+import {MotiView} from "moti";
 
 const MOBILE_WIDTH_THRESHOLD = 768;
 const SIDEBAR_WIDTH = 220;
@@ -59,7 +60,7 @@ export default function TabsLayout() {
         <>
             <SafeAreaProvider>
                 <LayoutWrapper>
-            <Tabs screenOptions={{tabBarShowLabel: false, tabBarStyle: {display: "none"}, headerStyle: isDesktop ? {
+            <Tabs screenOptions={{tabBarShowLabel: false, animation:"shift", tabBarStyle: {display: "none"}, headerStyle: isDesktop ? {
                     marginLeft: SIDEBAR_WIDTH,
                 } : {},
                 contentStyle: isDesktop ? {
