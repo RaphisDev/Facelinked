@@ -2,7 +2,7 @@ import "../../../../global.css"
 import {Alert, Platform, ScrollView, Text, TouchableOpacity, View, Dimensions} from "react-native";
 import asyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
-import {useRouter} from "expo-router";
+import {useNavigation, useRouter} from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {useEffect, useState} from "react";
 import {SafeAreaView} from "react-native-safe-area-context";
@@ -69,12 +69,12 @@ export default function Index() {
             key={index}
             activeOpacity={0.7} 
             onPress={() => router.push(item.route)}
-            style={{
+            style={[{
                 shadowColor: '#000',
                 shadowOpacity: 0.2,
                 shadowRadius: 1.5,
                 elevation: 2,
-            }}
+            }, Platform.OS === "android" ? {} : {shadowOffset: { width: 0, height: 1 }}]}
             className={`flex-row items-center p-4 bg-white dark:bg-dark-primary rounded-xl mb-3 hover:shadow-md transition-shadow duration-200`}
         >
             <View className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 items-center justify-center">
@@ -117,6 +117,17 @@ export default function Index() {
 
     return (
         <SafeAreaView className="flex-1 bg-blue-50/50 dark:bg-black">
+            <TouchableOpacity
+                onPress={router.back}
+                className="flex-row items-center ml-7"
+                style={Platform.OS !== "ios" && {display: 'none'}}
+                activeOpacity={0.7}
+            >
+                <View className="w-8 h-8 rounded-full bg-blue-100 items-center justify-center mr-2">
+                    <Ionicons name="arrow-back" size={18} color="#3B82F6" />
+                </View>
+                <Text className="text-blue-600 font-medium">{t("back")}</Text>
+            </TouchableOpacity>
             {/* Content */}
             <ScrollView 
                 className="flex-1 px-4"

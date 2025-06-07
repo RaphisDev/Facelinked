@@ -146,12 +146,12 @@ export default function AccountSettings() {
                         <Text className="text-lg font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1">{t("account.management")}</Text>
                         {/* Language Selection */}
                         <View
-                            style={{
+                            style={[{
                                 shadowColor: '#000',
                                 shadowOpacity: 0.2,
                                 shadowRadius: 1.5,
                                 elevation: 2,
-                            }}
+                            }, Platform.OS === "android" ? {} : {shadowOffset: { width: 0, height: 1 }}]}
                             className="flex-row items-center justify-between p-4 bg-white dark:bg-dark-primary rounded-xl mb-3"
                         >
                             <View className="flex-row items-center">
@@ -185,13 +185,12 @@ export default function AccountSettings() {
                         <TouchableOpacity 
                             activeOpacity={0.7}
                             onPress={handleLogout}
-                            style={{
+                            style={[{
                                 shadowColor: '#000',
                                 shadowOpacity: 0.2,
                                 shadowRadius: 1.5,
                                 elevation: 2,
-                            }}
-
+                            }, Platform.OS === "android" ? {} : {shadowOffset: { width: 0, height: 1 }}]}
                             className="flex-row items-center p-4 bg-white dark:bg-dark-primary rounded-xl mb-3 hover:shadow-md transition-shadow duration-200"
                         >
                             <View className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 items-center justify-center">

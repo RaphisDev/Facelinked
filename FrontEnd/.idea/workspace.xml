@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/_layout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/_layout.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/CustomTabBar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/CustomTabBar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/account.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/account.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/legal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/settings/legal.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
