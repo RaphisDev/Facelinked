@@ -56,7 +56,7 @@ const Index = () => {
         }
         const token = await SecureStore.getItemAsync("token");
 
-        if (Notification.PermissionStatus.GRANTED && Platform.OS === 'ios' && token != null && Device.isDevice && await asyncStorage.getItem("deviceToken") !== "true") {
+        if (Notification.PermissionStatus.GRANTED && token != null && Device.isDevice && await asyncStorage.getItem("deviceToken") !== "true") {
             const deviceToken = await Notification.getDevicePushTokenAsync();
             const status = await fetch(`${ip}/messages/setDeviceToken`, {
                 method: "POST",
@@ -835,7 +835,7 @@ const LoginPage = ({navigateTo, showPassword, setShowPassword, previousPage}) =>
                             }
                         }
 
-                        if (Notification.PermissionStatus.UNDETERMINED && Platform.OS === "ios" && Device.isDevice && await asyncStorage.getItem("deviceToken") === null) {
+                        if (Notification.PermissionStatus.UNDETERMINED && Device.isDevice && await asyncStorage.getItem("deviceToken") === null) {
                             const deviceToken = await requestPermission();
                             if (!deviceToken) {
                                 await asyncStorage.setItem("deviceToken", "false");
@@ -1257,7 +1257,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                     }
                 }
 
-                if (Notification.PermissionStatus.UNDETERMINED && Platform.OS === "ios" && Device.isDevice && await asyncStorage.getItem("deviceToken") === null) {
+                if (Notification.PermissionStatus.UNDETERMINED && Device.isDevice && await asyncStorage.getItem("deviceToken") === null) {
                     const deviceToken = await requestPermission();
                     if (!deviceToken) {
                         await asyncStorage.setItem("deviceToken", "false");

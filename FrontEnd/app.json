@@ -23,7 +23,8 @@
         "image": "./assets/images/icon.png",
         "resizeMode": "contain",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
