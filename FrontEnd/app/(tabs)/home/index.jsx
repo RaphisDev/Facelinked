@@ -127,7 +127,7 @@ export default function Index() {
         });
         stateManager.homePressed.addListener("homePressed", () => {
             flatList.current?.scrollToOffset({animated: true, offset: 0});
-            onRefresh()
+            onRefresh();
         })
         return () => {
             stateManager.homePressed.removeAllListeners("homePressed");

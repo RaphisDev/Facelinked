@@ -37,10 +37,13 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 
         const onPress = () => {
             if (route.name === 'home') {
-                new StateManager().setHomePressed();
+                if (pathname === '/home') {
+                    new StateManager().setHomePressed();
+                }
             } else if (route.name === 'chats') {
                 new StateManager().setChatState(true);
             }
+
             router.push(`/${route.name}`);
         };
 
