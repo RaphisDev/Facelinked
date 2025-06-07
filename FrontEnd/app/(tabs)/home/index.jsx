@@ -41,6 +41,9 @@ export default function Index() {
     const stateManager = useRef(new StateManager()).current;
     const flatList = useRef(null);
 
+    const [showLikes, setShowLikes] = useState(false);
+    const [selectedLikes, setSelectedLikes] = useState([]);
+
     const [allPostsFetched, setAllPostsFetched] = useState(false);
 
     // State for image viewing
@@ -484,6 +487,12 @@ export default function Index() {
                         onCommentPress={() => handleCommentPress(item)}
                         onImagePress={(image) => handleImagePress(item, image)}
                         isDesktop={isDesktop}
+                        onLongPressLikes={() => {
+                            if (item.likes?.length > 0) {
+                                setSelectedLikes(item.likes);
+                                setShowLikes(true);
+                            }
+                        }}
                     />
                 </TouchableOpacity>
             </View>
@@ -578,6 +587,58 @@ export default function Index() {
                     )}
                 </>
             )}
+
+            <Modal animationType="slide" visible={showLikes} presentationStyle={isDesktop ? "formSheet" : "pageSheet"} onRequestClose={() => setShowLikes(false)}>
+                <SafeAreaView className="bg-white dark:bg-dark-primary flex-1" style={isDesktop ? {maxWidth: 800, marginHorizontal: 'auto'} : {}}>
+                    {/* Header */}
+                    <View className="flex-row justify-between items-center px-6 pt-4 pb-4 border-b border-gray-200">
+                        <View className="flex-row items-center">
+                            <Text className="text-2xl text-gray-800 dark:text-dark-text font-bold">{t("likes.show")}</Text>
+                            <View className="ml-2 px-3 py-1 bg-blue-100 rounded-full">
+                                <Text className="text-blue-600 font-medium text-sm">{selectedLikes?.length || 0}</Text>
+                            </View>
+                        </View>
+                        <TouchableOpacity
+                            onPress={() => setShowLikes(false)}
+                            className="w-8 h-8 rounded-full bg-gray-100 items-center justify-center"
+                        >
+                            <Ionicons name="close" size={20} color="#64748B" />
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Users List */}
+                    <FlatList
+                        data={selectedLikes}
+                        renderItem={({item}) => (
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setShowLikes(false);
+                                    router.navigate(`/${item}`);
+                                }}
+                                activeOpacity={0.7}
+                                className="flex-row items-center px-6 py-4 border-b border-gray-100 hover:bg-gray-50"
+                            >
+                                <View className="w-12 h-12 rounded-full bg-blue-100 items-center justify-center mr-4 overflow-hidden">
+                                    <Text className="font-bold text-xl text-sky-800">{item.charAt(0).toUpperCase()}</Text>
+                                </View>
+                                <View className="flex-1">
+                                    <Text className="text-gray-800 dark:text-dark-text font-medium text-base">{item}</Text>
+                                </View>
+                                <Ionicons name="chevron-forward" size={20} color="#94A3B8" />
+                            </TouchableOpacity>
+                        )}
+                        keyExtractor={(item, index) => index.toString()}
+                        ListEmptyComponent={() => (
+                            <View className="items-center justify-center py-12">
+                                <View className="w-16 h-16 rounded-full bg-blue-50 items-center justify-center mb-4">
+                                    <Ionicons name="heart-outline" size={32} color="#3B82F6" />
+                                </View>
+                                <Text className="text-center text-gray-500 dark:text-dark-text">{t("no.likes.yet")}</Text>
+                            </View>
+                        )}
+                    />
+                </SafeAreaView>
+            </Modal>
 
             {/* Image Viewing Modal */}
             <Modal

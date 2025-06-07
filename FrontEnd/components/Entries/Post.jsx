@@ -115,6 +115,7 @@ export default function Post(props) {
                                 await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                             }
                         }}
+                        onLongPress={props.onLongPressLikes}
                     >
                         <Ionicons name={props.likes.some((item) => item === username.current) ? "heart" : "heart-outline"} size={isDesktop ? 22 : 20} color={props.likes.some((item) => item === username.current) ? "#f81212" : "#6B7280"} />
                         <Text className={`ml-2 text-gray-600 font-medium ${isDesktop ? "text-base" : ""}`}>

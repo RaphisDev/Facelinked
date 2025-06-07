@@ -53,6 +53,9 @@
                     const [postInputText, setPostInputText] = useState("");
                     const cachedPosts = useRef([]);
 
+                    const [showLikes, setShowLikes] = useState(false);
+                    const [selectedLikes, setSelectedLikes] = useState([]);
+
                     const token = useRef("");
                     const username = useRef("");
                     const profileName = useRef("");
@@ -1536,7 +1539,7 @@
                                                               activeOpacity={0.8}
                                                           >
                                                               <View className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                                                                  <Post {...items.item} onDeletePost={() => DeletePost(items.item.id.millis)} username={profileName.current} onLikePress={() => LikePost(items.item)} onCommentPress={() => openPostDetails(items.item)} onImagePress={(image) => {if(items.item.content.length > 1) {setShowPostImageGallery(true); setCurrentPostImage(image); setPostImageGallery(items.item.content)} else {openPostDetails(items.item)}}} />
+                                                                  <Post {...items.item} onDeletePost={() => DeletePost(items.item.id.millis)} onLongPressLikes={() => {if (items.item.likes.length > 0) {setShowLikes(true); setSelectedLikes(items.item.likes)}}} username={profileName.current} onLikePress={() => LikePost(items.item)} onCommentPress={() => openPostDetails(items.item)} onImagePress={(image) => {if(items.item.content.length > 1) {setShowPostImageGallery(true); setCurrentPostImage(image); setPostImageGallery(items.item.content)} else {openPostDetails(items.item)}}} />
                                                               </View>
                                                           </TouchableOpacity>
                                                       )
@@ -1544,6 +1547,57 @@
                                               }}/>
                                 </ScrollView>
                             </SafeAreaView>
+                            <Modal animationType="slide" visible={showLikes} presentationStyle={isDesktop ? "formSheet" : "pageSheet"} onRequestClose={() => setShowLikes(false)}>
+                                <SafeAreaView className="bg-white dark:bg-dark-primary flex-1" style={isDesktop ? {maxWidth: 800, marginHorizontal: 'auto'} : {}}>
+                                    {/* Header */}
+                                    <View className="flex-row justify-between items-center px-6 pt-4 pb-4 border-b border-gray-200">
+                                        <View className="flex-row items-center">
+                                            <Text className="text-2xl text-gray-800 dark:text-dark-text font-bold">{t("likes.show")}</Text>
+                                            <View className="ml-2 px-3 py-1 bg-blue-100 rounded-full">
+                                                <Text className="text-blue-600 font-medium text-sm">{selectedLikes?.length || 0}</Text>
+                                            </View>
+                                        </View>
+                                        <TouchableOpacity
+                                            onPress={() => setShowLikes(false)}
+                                            className="w-8 h-8 rounded-full bg-gray-100 items-center justify-center"
+                                        >
+                                            <Ionicons name="close" size={20} color="#64748B" />
+                                        </TouchableOpacity>
+                                    </View>
+
+                                    {/* Users List */}
+                                    <FlatList
+                                        data={selectedLikes}
+                                        renderItem={({item}) => (
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    setShowLikes(false);
+                                                    router.navigate(`/${item}`);
+                                                }}
+                                                activeOpacity={0.7}
+                                                className="flex-row items-center px-6 py-4 border-b border-gray-100 hover:bg-gray-50"
+                                            >
+                                                <View className="w-12 h-12 rounded-full bg-blue-100 items-center justify-center mr-4 overflow-hidden">
+                                                    <Text className="font-bold text-xl text-sky-800">{item.charAt(0).toUpperCase()}</Text>
+                                                </View>
+                                                <View className="flex-1">
+                                                    <Text className="text-gray-800 dark:text-dark-text font-medium text-base">{item}</Text>
+                                </View>
+                                                <Ionicons name="chevron-forward" size={20} color="#94A3B8" />
+                                            </TouchableOpacity>
+                                        )}
+                                        keyExtractor={(item, index) => index.toString()}
+                                        ListEmptyComponent={() => (
+                                            <View className="items-center justify-center py-12">
+                                                <View className="w-16 h-16 rounded-full bg-blue-50 items-center justify-center mb-4">
+                                                    <Ionicons name="heart-outline" size={32} color="#3B82F6" />
+                                                </View>
+                                                <Text className="text-center text-gray-500 dark:text-dark-text">{t("no.likes.yet")}</Text>
+                                            </View>
+                                        )}
+                                    />
+                                </SafeAreaView>
+                            </Modal>
                             <Modal animationType="slide" visible={showModal} presentationStyle={isDesktop ? "formSheet" : "pageSheet"} onRequestClose={() => {setShowModal(false);}}>
                                 <View className="bg-white dark:bg-dark-primary h-full w-full" style={isDesktop ? {maxWidth: 800, marginHorizontal: 'auto'} : {}}>
                                     {/* Header */}
@@ -2251,9 +2305,20 @@
                             {/* Friend Requests Modal */}
                             <Modal animationType="slide" visible={showFriendRequests} presentationStyle={isDesktop ? "formSheet" : "pageSheet"} onRequestClose={() => {setShowFriendRequests(false);}}>
                                 <View className="bg-white dark:bg-dark-primary h-full w-full" style={isDesktop ? {maxWidth: 800, marginHorizontal: 'auto'} : {}}>
-                                    {Platform.OS === "web" && <TouchableOpacity className="p-3 bg-gray-100 rounded-full self-end mr-4 mt-4" onPress={() => setShowFriendRequests(false)}><Ionicons size={20} color="#3B82F6" name="close"/></TouchableOpacity>}
-
-                                    <Text className="text-2xl text-gray-800 dark:text-dark-text text-center mt-6 font-bold">{t("friend.requests")}</Text>
+                                    <View className="flex-row justify-between items-center px-6 pt-4 pb-4 border-b border-gray-200">
+                                        <View className="flex-row items-center">
+                                            <Text className="text-2xl text-gray-800 dark:text-dark-text font-bold">{t("friend.requests")}</Text>
+                                            <View className="ml-2 px-3 py-1 bg-blue-100 rounded-full">
+                                                <Text className="text-blue-600 font-medium text-sm">{friendRequests?.length || 0}</Text>
+                                            </View>
+                                        </View>
+                                        <TouchableOpacity
+                                            onPress={() => setShowFriendRequests(false)}
+                                            className="w-8 h-8 rounded-full bg-gray-100 items-center justify-center"
+                                        >
+                                            <Ionicons name="close" size={20} color="#64748B" />
+                                        </TouchableOpacity>
+                                    </View>
 
                                     <FlatList
                                         data={friendRequests}
