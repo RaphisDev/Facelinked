@@ -717,7 +717,7 @@ export default function ChatRoom() {
 
                         <TouchableOpacity
                             onPress={sendMessage}
-                            disabled={(input.trim() === '' && selectedImages.length === 0) || userData.friends?.some(item => item.memberId === ownUsername.current)}
+                            disabled={(input.trim() === '' && selectedImages.length === 0) || (!userData.friends?.some(item => item.memberId === ownUsername.current) && userData.friends)}
                             style={[
                                 styles.sendButton,
                                 { backgroundColor: input.trim() === '' && selectedImages.length === 0 ? '#CBD5E1' : '#3B82F6' }
