@@ -1446,10 +1446,10 @@
                                         ListEmptyComponent={
                                             <View className={`items-center justify-center mt-4 py-16 ${isDesktop ? 'mx-auto w-3/4 mt-7' : 'mx-4'} bg-white rounded-xl shadow-sm`}>
                                                 <View className="w-16 h-16 mb-4 items-center justify-center bg-blue-100/70 rounded-full">
-                                                    <Ionicons name={profileInfos.friends?.some(item => item.memberId === username.current) ? "document-text-outline" : "lock-closed"} size={28} color="#3B82F6" />
+                                                    <Ionicons name={profileInfos.friends?.some(item => item.memberId === username.current) || profileName.current === username.current ? "document-text-outline" : "lock-closed"} size={28} color="#3B82F6" />
                                                 </View>
-                                                <Text className="text-gray-800 dark:text-dark-text text-center font-semibold text-lg">{profileInfos.friends?.some(item => item.memberId === username.current) ? t("no.posts.yet") : t("no.friend.no.allowed")}</Text>
-                                                <Text className="text-gray-500 text-center mt-1">{profileInfos.friends?.some(item => item.memberId === username.current) ? t("posts.appear.here") : t("no.friend.no.allowed.subline")}</Text>
+                                                <Text className="text-gray-800 dark:text-dark-text text-center font-semibold text-lg">{profileInfos.friends?.some(item => item.memberId === username.current) || profileName.current === username.current ? t("no.posts.yet") : t("no.friend.no.allowed")}</Text>
+                                                <Text className="text-gray-500 text-center mt-1">{profileInfos.friends?.some(item => item.memberId === username.current) || profileName.current === username.current ? t("posts.appear.here") : t("no.friend.no.allowed.subline")}</Text>
                                             </View>
                                         }
                                         data={posts}
