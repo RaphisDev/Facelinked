@@ -20,8 +20,21 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
         var principalName = accessor.getUser() != null ? accessor.getUser().getName() : null;
         var destination = accessor.getDestination();
 
+        if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+            return message;
+        }
+
+        if (StompCommand.SUBSCRIBE.equals(accessor.getCommand()) &&
+                accessor.getDestination() != null &&
+                accessor.getDestination().startsWith("/auth")) {
+            return message;
+        }
+
         if (destination == null) {
-            throw new IllegalArgumentException("User not authenticated");
+            if (principalName == null && !StompCommand.DISCONNECT.equals(accessor.getCommand())) {
+                throw new IllegalArgumentException("User not authenticated");
+            }
+            return message;
         }
 
         if (destination.startsWith("/networks")) {

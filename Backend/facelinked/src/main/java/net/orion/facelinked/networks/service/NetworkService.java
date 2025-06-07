@@ -156,12 +156,8 @@ public class NetworkService {
                 if (friendNetwork.getFavoriteMembers().contains(profile.getUsername())) {
                     continue;
                 }
-                var networkMember = new NetworkMember();
-                networkMember.setMemberName(profile.getName());
-                networkMember.setMemberProfilePicturePath(profile.getProfilePicturePath());
-                networkMember.setMemberId(profile.getUsername());
 
-                if (!networks.contains(friendNetwork) && !friendNetwork.getMembers().contains(networkMember)) {
+                if (!networks.contains(friendNetwork)) {
                     networks.add(friendNetwork);
                 }
             }

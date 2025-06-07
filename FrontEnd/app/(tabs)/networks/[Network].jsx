@@ -1,6 +1,6 @@
 import "../../../global.css"
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
     Animated,
     Dimensions,
@@ -34,6 +34,8 @@ import { showAlert } from "../../../components/PopUpModalView";
 import {SafeAreaProvider, useSafeAreaInsets} from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
 import {useTranslation} from "react-i18next";
+import * as ImagePicker from "expo-image-picker";
+import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
 
 const MOBILE_WIDTH_THRESHOLD = 768;
 
@@ -58,6 +60,7 @@ export default function Network() {
     const [isLoading, setIsLoading] = useState(true);
     const [inputHeight, setInputHeight] = useState(40);
     const [keyboardVisible, setKeyboardVisible] = useState(false);
+    const [selectedImages, setSelectedImages] = useState([]);
 
     const flatListRefDesk = useRef(null);
     const flatListRef = useRef(null);
@@ -327,7 +330,8 @@ export default function Network() {
                     senderProfilePicturePath: message.senderId.memberProfilePicturePath.split(",")[0],
                     sender: message.senderId.memberId,
                     content: message.content,
-                    millis: message.millis
+                    millis: message.millis,
+                    images: message.images || []
                 }));
 
                 if (formattedMessages.length > 0) {
@@ -385,11 +389,13 @@ export default function Network() {
                 }
 
                 setHasMoreMessages(data.length >= 20);
+                setIsLoadingMore(false);
             }
         } catch (error) {
             console.error("Error loading more messages:", error);
-        } finally {
-            setIsLoadingMore(false);
+            setTimeout(() => {
+                setIsLoadingMore(false);
+            }, 5000);
         }
     };
 
@@ -405,13 +411,106 @@ export default function Network() {
         await asyncStorage.setItem(`networks/${Network}`, JSON.stringify(updatedMessages));
     };
 
+    const renderSelectedImages = () => {
+        if (!selectedImages || selectedImages.length === 0) return null;
+
+        return (
+            <View style={styles.selectedImagesContainer}>
+                <FlatList
+                    horizontal
+                    data={selectedImages}
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={({ item, index }) => (
+                        <View style={styles.selectedImageWrapper}>
+                            <Image
+                                source={{ uri: item }}
+                                style={styles.selectedImage}
+                                contentFit="cover"
+                                transition={200}
+                            />
+                            <TouchableOpacity
+                                style={styles.removeImageButton}
+                                onPress={() => {
+                                    const newImages = [...selectedImages];
+                                    newImages.splice(index, 1);
+                                    setSelectedImages(newImages);
+                                }}
+                            >
+                                <Ionicons name="close" size={16} color="white" />
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                    showsHorizontalScrollIndicator={false}
+                />
+            </View>
+        );
+    };
+
+    const pickImage = async () => {
+        try {
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: "images",
+                allowsMultipleSelection: true,
+                quality: 0.8,
+            });
+
+            if (!result.canceled) {
+                setSelectedImages(prevState => [...prevState, ...result.assets.map(asset => asset.uri)]);
+            }
+        } catch (error) {
+            console.error('Error picking image:', error);
+        }
+    };
+
     const sendMessage = async () => {
         if (inputText.trim() === "") return;
 
         const messageText = inputText.trim();
         setInputText("");
+        setSelectedImages([])
         inputRef.current?.clear();
         Keyboard.dismiss();
+
+        let imageURls = [];
+        if (selectedImages.length > 0) {
+            let token = '';
+            if (Platform.OS === "web") {
+                token = localStorage.getItem("token");
+            } else {
+                token = await SecureStore.getItemAsync("token");
+            }
+
+            for (const image of selectedImages) {
+                let tempImage;
+                const manipResult = await ImageManipulator.manipulate(
+                    image).resize({width: 500});
+                const renderedImage = await manipResult.renderAsync();
+                const savedImage = await renderedImage.saveAsync({format: SaveFormat.JPEG, compress: 0.7});
+                tempImage = savedImage.uri;
+
+                const bucketResponse = await fetch(`${ip}/profile/upload`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                    }
+                });
+                if (bucketResponse.ok) {
+                    const url = await bucketResponse.text();
+
+                    const response = await fetch(tempImage);
+                    const blob = await response.blob();
+
+                    await fetch(url, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": blob.type
+                        },
+                        body: blob,
+                    });
+                    imageURls.push(url.split("?")[0]);
+                }
+            }
+        }
 
         try {
             // Add optimistic message
@@ -422,7 +521,8 @@ export default function Network() {
                     : SecureStore.getItem("profilePicture")?.split(",")[0],
                 content: messageText,
                 millis: Date.now(),
-                isOptimistic: true
+                isOptimistic: true,
+                images: imageURls
             };
 
             setMessages(prevMessages => [...prevMessages, optimisticMessage]);
@@ -433,6 +533,7 @@ export default function Network() {
                 body: JSON.stringify({
                     receiver: Network,
                     content: messageText,
+                    images: imageURls,
                 })
             });
 
@@ -446,7 +547,8 @@ export default function Network() {
                 const updatedMessages = [...loadedMessages, {
                     sender: username.current,
                     content: messageText,
-                    millis: Date.now()
+                    millis: Date.now(),
+                    images: imageURls
                 }];
 
                 await asyncStorage.setItem(`networks/${Network}`, JSON.stringify(updatedMessages));
@@ -827,16 +929,25 @@ export default function Network() {
 
     const renderFooter = () => (
         <KeyboardAvoidingView>
-        <Animated.View 
+        <Animated.View
             style={[
                 styles.inputContainer,
-                { 
+                {
                     transform: [{ translateY: inputBarAnimation }],
                     paddingBottom: keyboardVisible ? 10 : 0,
                 }
             ]}
         >
+            {renderSelectedImages()}
+
             <View style={styles.inputWrapper}>
+                <TouchableOpacity
+                    onPress={pickImage}
+                    style={styles.attachButton}
+                    activeOpacity={0.7}
+                >
+                    <Ionicons name="image-outline" size={24} color="#64748B" />
+                </TouchableOpacity>
                 <TextInput
                     ref={inputRef}
                     style={[
@@ -861,7 +972,7 @@ export default function Network() {
                     }}
                 />
 
-                <TouchableOpacity 
+                <TouchableOpacity
                     style={[
                         styles.sendButton,
                         { backgroundColor: inputText.trim() === '' ? '#CBD5E1' : '#3B82F6' }
@@ -1002,6 +1113,7 @@ export default function Network() {
                     senderProfilePicturePath={item.senderProfilePicturePath} 
                     timestamp={item.millis}
                     isDesktop={isDesktop}
+                    images={item.images}
                 />
             );
         }
@@ -1361,6 +1473,44 @@ const styles = StyleSheet.create({
         height: 1,
         backgroundColor: '#E2E8F0',
         marginLeft: 68,
+    },
+    selectedImagesContainer: {
+        padding: 10,
+        backgroundColor: '#F8FAFC',
+        borderTopWidth: 1,
+        borderTopColor: '#E2E8F0',
+        marginBottom: 8,
+        borderRadius: 12,
+    },
+    selectedImageWrapper: {
+        marginRight: 10,
+        position: 'relative',
+    },
+    selectedImage: {
+        width: 70,
+        height: 70,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: 'rgba(203, 213, 225, 0.5)',
+    },
+    removeImageButton: {
+        position: 'absolute',
+        top: -6,
+        right: -6,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        borderRadius: 12,
+        width: 24,
+        height: 24,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1.5,
+        borderColor: 'white',
+    },
+    attachButton: {
+        paddingVertical: 10,
+        paddingHorizontal: 4,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     emptyMembersContainer: {
         padding: 20,
