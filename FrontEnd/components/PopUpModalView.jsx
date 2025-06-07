@@ -35,7 +35,7 @@ const CustomAlert = {
     }
 };
 
-const AlertModal = () => {
+const AlertModal = (t) => {
     const [state, setState] = useState({
         visible: false,
         title: '',
@@ -48,7 +48,6 @@ const AlertModal = () => {
     });
 
     const [windowDimensions, setWindowDimensions] = useState(Dimensions.get('window'));
-    const { t } = useTranslation();
 
     useEffect(() => {
         const updateDimensions = () => {
@@ -295,7 +294,8 @@ const styles = StyleSheet.create({
 
 
 export default function CustomAlertProvider() {
-    return <AlertModal />;
+    const {t} = useTranslation();
+    return <AlertModal t={t} />;
 }
 
 

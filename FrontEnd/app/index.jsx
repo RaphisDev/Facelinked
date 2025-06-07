@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import "../global.css";
 import {router, useRouter} from "expo-router";
-import '../i18n';
 import * as SecureStore from "expo-secure-store";
 import WebSocketProvider from "../components/WebSocketProvider";
 import {Image} from "expo-image";
@@ -56,7 +55,7 @@ const Index = () => {
         }
         const token = await SecureStore.getItemAsync("token");
 
-        if (Notification.PermissionStatus.GRANTED && token != null && Device.isDevice && await asyncStorage.getItem("deviceToken") !== "true") {
+        if (Notification.PermissionStatus.GRANTED && Platform.OS !== "web" && token != null && Device.isDevice && await asyncStorage.getItem("deviceToken") !== "true") {
             const deviceToken = await Notification.getDevicePushTokenAsync();
             const status = await fetch(`${ip}/messages/setDeviceToken`, {
                 method: "POST",
@@ -835,7 +834,7 @@ const LoginPage = ({navigateTo, showPassword, setShowPassword, previousPage}) =>
                             }
                         }
 
-                        if (Notification.PermissionStatus.UNDETERMINED && Device.isDevice && await asyncStorage.getItem("deviceToken") === null) {
+                        if (Notification.PermissionStatus.UNDETERMINED && Platform.OS !== "web" && Device.isDevice && await asyncStorage.getItem("deviceToken") === null) {
                             const deviceToken = await requestPermission();
                             if (!deviceToken) {
                                 await asyncStorage.setItem("deviceToken", "false");
@@ -1257,7 +1256,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                     }
                 }
 
-                if (Notification.PermissionStatus.UNDETERMINED && Device.isDevice && await asyncStorage.getItem("deviceToken") === null) {
+                if (Notification.PermissionStatus.UNDETERMINED && Platform.OS !== "web" && Device.isDevice && await asyncStorage.getItem("deviceToken") === null) {
                     const deviceToken = await requestPermission();
                     if (!deviceToken) {
                         await asyncStorage.setItem("deviceToken", "false");

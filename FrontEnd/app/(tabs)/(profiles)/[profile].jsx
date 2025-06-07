@@ -2333,7 +2333,7 @@
                                                     />
                                                     <View className="ml-3 flex-1">
                                                         <Text className="font-bold text-gray-800">{item.memberName}</Text>
-                                                        <Text className="text-gray-500">{t("wants.to.be.your.friend")}</Text>
+                                                        <Text className="text-gray-500">{t("wants.to.be.friend")}</Text>
                                                     </View>
                                                 </TouchableOpacity>
 

@@ -1,5 +1,6 @@
 import {Stack} from "expo-router";
 import CustomAlertProvider from "../components/PopUpModalView";
+import '../i18n';
 
 export default function RootLayout() {
 

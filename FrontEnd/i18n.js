@@ -5,10 +5,13 @@ import { initReactI18next } from 'react-i18next';
 import en from './assets/locales/en.json';
 import de from './assets/locales/de.json';
 
+const locales = Localization.getLocales();
+const languageCode = locales?.length > 0 ? locales[0].languageCode : 'en';
+
 i18n
     .use(initReactI18next)
     .init({
-        lng: Localization.getLocales()[0].languageCode,
+        lng: languageCode,
         fallbackLng: 'en',
         resources: {
             en: { translation: en },
@@ -18,5 +21,6 @@ i18n
             escapeValue: false,
         },
     });
+
 
 export default i18n;
