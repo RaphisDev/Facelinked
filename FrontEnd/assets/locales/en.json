@@ -168,7 +168,7 @@
   "first.to.conversation": "Be the first to start the conversation!",
   "favorited": "Favorited",
   "favorite": "Favorite",
-  "favorites": "favorites",
+  "favorites": "Favorites",
   "network.info": "Network Information",
   "network.details": "Network Details",
   "add": "Add",
@@ -209,5 +209,9 @@
   "selected.members": "Selected Members",
   "network.image": "Network Image",
   "upload.image": "Upload Image",
-  "language": "Language"
+  "language": "Language",
+    "no.friend.no.allowed": "You are not friends",
+  "no.friend.no.allowed.subline": "You have to be friends to see posts",
+  "friend.required": "Friend Required",
+  "friend.required.message": "You need to be friends to chat",
 }

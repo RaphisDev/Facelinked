@@ -53,6 +53,9 @@ export default function Networks() {
 
     const stateManager = new StateManager();
 
+    const [allFriendNetworksFetched, setAllFriendNetworksFetched] = useState(false);
+    const [allMeetNewPeopleFetched, setAllMeetNewPeopleFetched] = useState(false);
+
     const {t} = useTranslation();
 
     const [isSearching, setIsSearching] = useState(false);
@@ -190,6 +193,10 @@ export default function Networks() {
     };
 
     const loadPeople = async () => {
+        if (allMeetNewPeopleFetched) {
+            return;
+        }
+
         try {
             const response = await fetch(`${ip}/networks/meetnewpeople`, {
                 method: "GET",
@@ -198,7 +205,13 @@ export default function Networks() {
             });
             if (response.ok) {
                 const data = await response.json();
-                setPeople(data.map(person => {
+                setPeople(prevState => {
+                    const existingPeople = new Set(prevState.map(people => people.username));
+                    const uniquePeople = data.filter(people => !existingPeople.has(people.username));
+                    if (uniquePeople.length === 0) {
+                        setAllMeetNewPeopleFetched(true);
+                    }
+                    return prevState.concat(uniquePeople.map(person => {
                         return {
                             ...person,
                             profilePicturePath: person.profilePicturePath.split(",")[0] ,
@@ -206,8 +219,8 @@ export default function Networks() {
                             relationshipStatus: person.inRelationship ? "in relationship" : "Single",
                             isFriend: false,
                         }
-                    }
-                ));
+                    }));
+                });
             }
         } catch (error) {
             console.error("Error fetching people:", error);
@@ -347,6 +360,7 @@ export default function Networks() {
 
     const onRefreshFriends = () => {
         setRefreshingFriend(true);
+        setAllFriendNetworksFetched(false);
         fetchFriendNetworks();
     }
 
@@ -394,6 +408,12 @@ export default function Networks() {
     };
 
     const fetchFriendNetworks = async () => {
+        if (allFriendNetworksFetched) {
+            setLoadingFriends(false);
+            setRefreshingFriend(false);
+            return;
+        }
+
         try {
             const response = await fetch(`${ip}/networks/friendsNetworks`, {
                 method: "GET",
@@ -404,7 +424,14 @@ export default function Networks() {
             });
             if (response.ok) {
                 const data = await response.json();
-                setFriendNetworks(data);
+                setFriendNetworks(prevState => {
+                    const existingNetworkIds = new Set(prevState.map(network => network.networkId));
+                    const uniqueNewNetworks = data.filter(network => !existingNetworkIds.has(network.networkId));
+                    if (uniqueNewNetworks.length === 0) {
+                        setAllFriendNetworksFetched(true);
+                    }
+                    return prevState.concat(uniqueNewNetworks);
+                });
             }
         } catch (error) {
             console.error("Error fetching friends networks:", error);
@@ -881,6 +908,7 @@ export default function Networks() {
                                             isDesktop={isDesktop}
                                         />
                                     )}
+                                    onEndReached={() => fetchFriendNetworks()}
                                     refreshControl={
                                         <RefreshControl
                                             refreshing={refreshingFriends}
@@ -951,6 +979,9 @@ export default function Networks() {
                                 data={people}
                                 horizontal
                                 pagingEnabled
+                                onEndReached={() => {
+                                    loadPeople()
+                                }}
                                 showsHorizontalScrollIndicator={false}
                                 keyExtractor={(item) => item.username.toString()}
                                 onMomentumScrollEnd={(e) => {

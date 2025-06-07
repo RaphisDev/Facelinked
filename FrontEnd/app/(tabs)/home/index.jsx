@@ -40,6 +40,8 @@ export default function Index() {
     const [showSearch, setShowSearch] = useState(false);
     const searchInput = useRef(null);
 
+    const [allPostsFetched, setAllPostsFetched] = useState(false);
+
     // State for image viewing
     const [showImageModal, setShowImageModal] = useState(false);
     const [currentImage, setCurrentImage] = useState(null);
@@ -125,7 +127,12 @@ export default function Index() {
     }, []);
 
     const fetchPosts = async () => {
-        setLoading(true);
+
+        if (allPostsFetched) {
+            setLoading(false);
+            setRefreshing(false);
+            return;
+        }
 
         try {
             const response = await fetch(`${ip}/profile/homefeed`, {
@@ -153,7 +160,14 @@ export default function Index() {
                         post.name = profile.name;
                     }
                 }
-                setPosts(data);
+                setPosts(prevState => {
+                  const existingPostIds = new Set(prevState.map(post => post.id.millis));
+                  const uniqueNewPosts = data.filter(post => !existingPostIds.has(post.id.millis));
+                  if (uniqueNewPosts.length === 0) {
+                      setAllPostsFetched(true);
+                  }
+                  return prevState.concat(uniqueNewPosts);
+                });
             } else {
                 console.error('Failed to fetch posts');
             }
@@ -167,6 +181,7 @@ export default function Index() {
 
     const onRefresh = () => {
         setRefreshing(true);
+        setAllPostsFetched(false);
         fetchPosts();
     };
 
@@ -493,6 +508,7 @@ export default function Index() {
                     width: '100%'
                 }}
                 ListEmptyComponent={!loading && renderEmptyList()}
+                onEndReached={() => fetchPosts()}
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}

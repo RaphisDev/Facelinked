@@ -1037,9 +1037,11 @@
                                         renderItem={(item) =>
                                         <View>
                                             <TouchableOpacity onPress={() => {
-                                                router.navigate(`/${item.item.username}`);
-                                                input.current.clear();
                                                 handleAddBar();
+                                                input.current.clear();
+                                                setTimeout(() => {
+                                                    router.navigate(`/${item.item.username}`);
+                                                }, 10)
                                             }} activeOpacity={0.6} className="flex-row justify-between items-center p-4 hover:bg-blue-50">
                                                 <View className="flex-row items-center">
                                                     <Image source={{uri: item.item.profilePicturePath.split(",")[0]}} style={{width: 48, height: 48, borderRadius: 24}} className="bg-gray-200"></Image>
@@ -1444,10 +1446,10 @@
                                         ListEmptyComponent={
                                             <View className={`items-center justify-center mt-4 py-16 ${isDesktop ? 'mx-auto w-3/4 mt-7' : 'mx-4'} bg-white rounded-xl shadow-sm`}>
                                                 <View className="w-16 h-16 mb-4 items-center justify-center bg-blue-100/70 rounded-full">
-                                                    <Ionicons name="document-text-outline" size={28} color="#3B82F6" />
+                                                    <Ionicons name={profileInfos.friends?.some(item => item.memberId === username.current) ? "document-text-outline" : "lock-closed"} size={28} color="#3B82F6" />
                                                 </View>
-                                                <Text className="text-gray-800 dark:text-dark-text text-center font-semibold text-lg">{t("no.posts.yet")}</Text>
-                                                <Text className="text-gray-500 text-center mt-1">{t("posts.appear.here")}</Text>
+                                                <Text className="text-gray-800 dark:text-dark-text text-center font-semibold text-lg">{profileInfos.friends?.some(item => item.memberId === username.current) ? t("no.posts.yet") : t("no.friend.no.allowed")}</Text>
+                                                <Text className="text-gray-500 text-center mt-1">{profileInfos.friends?.some(item => item.memberId === username.current) ? t("posts.appear.here") : t("no.friend.no.allowed.subline")}</Text>
                                             </View>
                                         }
                                         data={posts}

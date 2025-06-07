@@ -102,7 +102,7 @@ export default function Post(props) {
 
                 {/* Post Images */}
                 {renderImages()}
-                <Text className="font-extralight text-right text-sm mb-1.5">{new Date(props.id.millis).toLocaleString()}</Text>
+                <Text className="font-extralight text-right text-sm mb-1.5">{new Date(props.id.millis).toLocaleString(undefined, {hour12: true, hour: '2-digit', minute: '2-digit', year: 'numeric', month: 'short', day: 'numeric'})}</Text>
 
                 {/* Post Actions */}
                 <View className={`flex-row justify-between pt-2 border-t border-gray-100 ${isDesktop ? "mt-1" : ""}`}>

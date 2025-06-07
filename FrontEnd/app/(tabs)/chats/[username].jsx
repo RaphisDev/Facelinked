@@ -36,6 +36,7 @@ export default function ChatRoom() {
     const [isDesktop, setIsDesktop] = useState(windowWidth > MOBILE_WIDTH_THRESHOLD);
     const [isEmbedded, setIsEmbedded] = useState(false);
     const {t} = useTranslation();
+    const ownUsername = useRef("")
 
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
@@ -98,6 +99,7 @@ export default function ChatRoom() {
             } else {
                 if (SecureStore.getItem("token") === null) {router.replace("/")}}
         });
+        ownUsername.current = Platform.OS === 'web' ? localStorage.getItem("username") : SecureStore.getItem("username");
 
         const loadMessages = async () => {
             const loadedMessages = await asyncStorage.getItem(`messages/${username}`);
@@ -130,7 +132,7 @@ export default function ChatRoom() {
                 });
                 if (profile.ok) {
                     const profileJson = await profile.json();
-                    setUserData({ name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath });
+                    setUserData({ name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath, friends: profileJson.friends });
                 }
             }
         }
@@ -579,7 +581,7 @@ export default function ChatRoom() {
                             {isTyping ? (
                                 <Text style={styles.typingIndicator}>{t("typing")}</Text>
                             ) : (
-                                <Text style={styles.profileSubtext}>{t("tap.view.profile")}</Text>
+                                <Text style={styles.profileSubtext}>{t("tab.view.profile")}</Text>
                             )}
                         </View>
                     </TouchableOpacity>
@@ -592,6 +594,24 @@ export default function ChatRoom() {
                     </TouchableOpacity>
                 </View>
 
+                {(!userData.friends?.some(item => item.memberId === ownUsername.current) && userData.friends) && (
+                    <View style={styles.friendRequiredContainer}>
+                <View style={styles.friendRequiredContent}>
+                    <Ionicons name="lock-closed" size={48} color={"#3B82F6"} style={styles.lockIcon} />
+                    <Text style={styles.friendRequiredTitle}>{t("friend.required")}</Text>
+                    <Text style={styles.friendRequiredText}>
+                        {t("friend.required.message")}
+                    </Text>
+                    <TouchableOpacity
+                        style={styles.friendButton}
+                        onPress={() => router.navigate(`/${username}`)}
+                        activeOpacity={0.8}
+                    >
+                        <Ionicons name="person-add" size={20} color="white" style={styles.friendIcon} />
+                        <Text style={styles.friendText}>{t("view.profile")}</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>)}
                 <FlatList
                     ref={flatListRef}
                     data={groupMessagesByDate(messages)}
@@ -684,7 +704,7 @@ export default function ChatRoom() {
 
                         <TouchableOpacity
                             onPress={sendMessage}
-                            disabled={input.trim() === '' && selectedImages.length === 0}
+                            disabled={(input.trim() === '' && selectedImages.length === 0) || userData.friends?.some(item => item.memberId === ownUsername.current)}
                             style={[
                                 styles.sendButton,
                                 { backgroundColor: input.trim() === '' && selectedImages.length === 0 ? '#CBD5E1' : '#3B82F6' }
@@ -745,7 +765,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.05,
         shadowRadius: 2,
         elevation: 2,
-        zIndex: 10,
+        zIndex: 102,
     },
     backButton: {
         width: 38,
@@ -904,5 +924,76 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 1.5,
         borderColor: 'white',
+    },
+
+    friendRequiredContainer: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+        zIndex: 101,
+        backgroundColor: 'rgba(248, 250, 252, 0.75)',
+    },
+
+    friendRequiredContent: {
+        backgroundColor: 'white',
+        borderRadius: 16,
+        padding: 24,
+        alignItems: 'center',
+        maxWidth: 340,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+        elevation: 3,
+    },
+
+    lockIcon: {
+        marginBottom: 16,
+        padding: 16,
+        backgroundColor: "rgba(219, 234, 254, 0.7)",
+        borderRadius: 40,
+    },
+
+    friendRequiredTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#1E293B',
+        marginBottom: 8,
+        textAlign: 'center',
+    },
+
+    friendRequiredText: {
+        fontSize: 15,
+        color: '#64748B',
+        textAlign: 'center',
+        marginBottom: 24,
+        lineHeight: 22,
+    },
+
+    friendButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#3B82F6',
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 12,
+    },
+
+    friendIcon: {
+        marginRight: 8,
+    },
+
+    friendText: {
+        color: 'white',
+        fontWeight: '600',
+        fontSize: 16,
     },
 });

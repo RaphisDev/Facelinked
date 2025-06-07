@@ -209,5 +209,9 @@
   "selected.members": "Ausgewählte Mitglieder",
   "network.image": "Netzwerkbild",
    "upload.image": "Bild hochladen",
-  "language": "Sprache"
+  "language": "Sprache",
+  "no.friend.no.allowed": "Ihr seid nicht befreundet",
+  "no.friend.no.allowed.subline": "Du musst befreundet sein, um Beiträge zu sehen",
+  "friend.required": "Freund erforderlich",
+  "friend.required.message": "Du musst befreundet sein, um zu chatten",
 }
