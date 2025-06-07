@@ -29,6 +29,7 @@ import * as ImagePicker from "expo-image-picker";
 import {showAlert} from "../../../components/PopUpModalView";
 import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
 import {useTranslation} from "react-i18next";
+import StateManager from "../../../components/StateManager";
 
 export default function Index() {
     const [posts, setPosts] = useState([]);
@@ -36,9 +37,9 @@ export default function Index() {
     const [refreshing, setRefreshing] = useState(false);
     const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
     const [isDesktop, setIsDesktop] = useState(windowWidth > 768);
-    const [searchText, setSearchText] = useState("");
-    const [showSearch, setShowSearch] = useState(false);
-    const searchInput = useRef(null);
+
+    const stateManager = useRef(new StateManager()).current;
+    const flatList = useRef(null);
 
     const [allPostsFetched, setAllPostsFetched] = useState(false);
 
@@ -124,6 +125,13 @@ export default function Index() {
                 fetchPosts();
             }
         });
+        stateManager.homePressed.addListener("homePressed", () => {
+            flatList.current?.scrollToOffset({animated: true, offset: 0});
+            onRefresh()
+        })
+        return () => {
+            stateManager.homePressed.removeAllListeners("homePressed");
+        }
     }, []);
 
     const fetchPosts = async () => {
@@ -498,6 +506,7 @@ export default function Index() {
     const renderFriendsPosts = () => {
         return (
             <FlatList
+                ref={flatList}
                 data={posts}
                 renderItem={renderPostItem}
                 keyExtractor={item => item.id.millis}

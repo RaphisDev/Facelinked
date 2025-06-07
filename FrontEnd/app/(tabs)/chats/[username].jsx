@@ -25,6 +25,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
 import { setEmbeddedState } from "../../../components/EmbeddedStateManager";
 import {useTranslation} from "react-i18next";
+import StateManager from "../../../components/StateManager";
 
 const MOBILE_WIDTH_THRESHOLD = 768;
 
@@ -175,7 +176,13 @@ export default function ChatRoom() {
         if (Platform.OS === 'android') {
             const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
                 if (!isDesktop) {
-                    router.back();
+                    const stateManager = new StateManager();
+                    if (stateManager.chatOpened) {
+                        router.back()
+                    } else {
+                        router.push('/chats');
+                        stateManager.setChatState(true);
+                    }
                     return true;
                 }
                 return false;
@@ -208,7 +215,13 @@ export default function ChatRoom() {
             window.history.pushState({}, '', newUrl);
             router.back();
         } else {
-            router.back()
+            const stateManager = new StateManager();
+            if (stateManager.chatOpened) {
+                router.back()
+            } else {
+                router.push('/chats');
+                stateManager.setChatState(true);
+            }
         }
     };
 

@@ -1,8 +1,11 @@
+import {EventEmitter} from "expo";
+
 let stateManagerInstance = null;
 
 class StateManager {
     chatOpened = false;
     networkOpened = false;
+    homePressed = new EventEmitter();
 
     constructor() {
         if (!stateManagerInstance) {
@@ -16,6 +19,9 @@ class StateManager {
     }
     setNetworkState(newState) {
         this.networkOpened = newState;
+    }
+    setHomePressed() {
+        this.homePressed.emit("homePressed");
     }
 }
 

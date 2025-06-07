@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { usePathname, useRouter } from 'expo-router';
 import { useEmbeddedState } from "./EmbeddedStateManager";
 import {useTranslation} from "react-i18next";
+import StateManager from "./StateManager";
 
 const MOBILE_WIDTH_THRESHOLD = 768;
 const SIDEBAR_WIDTH = 220;
@@ -35,6 +36,11 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
         }
 
         const onPress = () => {
+            if (route.name === 'home') {
+                new StateManager().setHomePressed();
+            } else if (route.name === 'chats') {
+                new StateManager().setChatState(true);
+            }
             router.push(`/${route.name}`);
         };
 
