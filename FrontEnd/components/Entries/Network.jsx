@@ -74,12 +74,12 @@ export default function Network(props) {
                                     styles.statsText,
                                     isDesktop && styles.desktopFooterText
                                 ]}>{props.favoriteMembers?.length}</Text>
-                                {(props.member && props.member.length > 0) && ( <>
+                                {(props.members && props.members.length > 0) && ( <>
                                 <Ionicons name="people" size={isDesktop ? 16 : 14} color="#64748B" style={styles.peopleIcon} />
                                 <Text style={[
                                     styles.statsText,
                                     isDesktop && styles.desktopFooterText
-                                ]}>{props.member.length} {t("members")}</Text></>)}
+                                ]}>{props.members.length} {t("members")}</Text></>)}
                             </View>
                         )}
                         <Ionicons name="chevron-forward" size={isDesktop ? 20 : 16} color="#94A3B8" />

@@ -269,7 +269,7 @@ export default function Network() {
                                 description: data.description,
                                 creatorId: data.creatorId,
                                 private: data.private,
-                                members: member,
+                                members: data.members,
                                 favoriteMembers: data.favoriteMembers,
                                 networkPicturePath: data.networkPicturePath
                             };
@@ -1439,7 +1439,7 @@ export default function Network() {
                                     renderItem={renderMemberItem}
                                     ItemSeparatorComponent={() => <View style={styles.memberSeparator} />}
                                     style={styles.membersList}
-                                        contentContainerStyle={{ paddingBottom: 20 }}
+                                    contentContainerStyle={{ paddingBottom: 20}}
                                     showsVerticalScrollIndicator={false}
                                 />
                                 ) : (
@@ -1801,9 +1801,9 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     modalContent: {
-        width: '95%', // Wider to fill more of the screen
-        maxWidth: 600, // Larger maximum width
-        maxHeight: '95%', // Taller to fill more of the screen
+        width: '95%',
+        maxWidth: 600,
+        maxHeight: '70%',
         backgroundColor: 'white',
         borderRadius: 16,
         overflow: 'hidden',
@@ -1905,7 +1905,6 @@ const styles = StyleSheet.create({
         marginLeft: 6,
     },
     membersSection: {
-        maxHeight: "50%"
     },
     membersSectionHeader: {
         flexDirection: 'row',
@@ -1936,6 +1935,7 @@ const styles = StyleSheet.create({
         marginLeft: 4,
     },
     membersList: {
+        maxHeight: "70%"
     },
     memberItem: {
         flexDirection: 'row',

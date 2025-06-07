@@ -872,7 +872,7 @@ export default function Networks() {
                                             network={items.item.name} 
                                             networkPicturePath={items.item.networkPicturePath} 
                                             description={items.item.description}
-                                            member={items.item.members}
+                                            members={items.item.members}
                                             favoriteMembers={items.item.favoriteMembers}
                                             isPrivate={items.item.private}
                                             isDesktop={isDesktop}
