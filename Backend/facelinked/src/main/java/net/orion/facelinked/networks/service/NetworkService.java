@@ -153,6 +153,9 @@ public class NetworkService {
                         continue;
                     }
                 }
+                if (friendNetwork.getFavoriteMembers().contains(profile.getUsername())) {
+                    continue;
+                }
                 var networkMember = new NetworkMember();
                 networkMember.setMemberName(profile.getName());
                 networkMember.setMemberProfilePicturePath(profile.getProfilePicturePath());
