@@ -48,17 +48,17 @@ export default function Index() {
 
     const settingsOptions = [
         {
-            title: "Profile",
+            title: t("profile"),
             icon: "person-outline",
             route: "/settings/account"
         },
         {
-            title: "Legal",
+            title: t("legal"),
             icon: "document-text-outline",
             route: "/settings/legal"
         },
         {
-            title: "Credits",
+            title: t("credits"),
             icon: "information-circle-outline",
             route: "/settings/credits"
         }

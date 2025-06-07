@@ -611,7 +611,7 @@ export default function Networks() {
             <View style={styles.contentContainer}>
                 {/* Page Header */}
                 <View style={styles.pageHeader}>
-                    <Text style={styles.pageTitle}>Networks</Text>
+                    <Text style={styles.pageTitle}>{t("networks")}</Text>
                     <View style={styles.headerActions}>
                         <TouchableOpacity 
                             style={styles.headerActionButton}
@@ -630,7 +630,7 @@ export default function Networks() {
                                 onPress={navigateToMeetPeople}
                             >
                                 <Ionicons name="people-outline" size={24} color="#3B82F6" />
-                                <Text style={styles.desktopActionButtonText}>Meet People</Text>
+                                <Text style={styles.desktopActionButtonText}>{t("meet.people")}</Text>
                             </TouchableOpacity>
                         ) : (
                             <TouchableOpacity 
@@ -654,7 +654,7 @@ export default function Networks() {
                             styles.searchInput,
                             isDesktop && styles.desktopSearchInput
                         ]}
-                        placeholder="Search networks..."
+                        placeholder={t("search.networks")}
                         placeholderTextColor="#9CA3AF"
                         value={searchText}
                         onChangeText={handleSearch}
@@ -687,11 +687,11 @@ export default function Networks() {
                                     <Text style={[
                                         styles.emptySearchText,
                                         isDesktop && styles.desktopEmptySearchText
-                                    ]}>No results found</Text>
+                                    ]}>{t("no.results")}</Text>
                                     <Text style={[
                                         styles.emptySearchSubtext,
                                         isDesktop && styles.desktopEmptySearchSubtext
-                                    ]}>Try a different search term</Text>
+                                    ]}>{t("no.results.subline")}</Text>
                                 </View>
                             )}
                             renderItem={({item}) => (
@@ -778,7 +778,7 @@ export default function Networks() {
                                         color={selected === 0 ? "#3B82F6" : "#64748B"} 
                                         style={styles.tabIcon}
                                     />
-                                    <Text style={[styles.tabText, selected === 0 && styles.activeTabText]}>Favorites</Text>
+                                    <Text style={[styles.tabText, selected === 0 && styles.activeTabText]}>{t("favorites")}</Text>
                                 </Animated.View>
                             </TouchableOpacity>
 
@@ -808,7 +808,7 @@ export default function Networks() {
                                         color={selected === 1 ? "#3B82F6" : "#64748B"} 
                                         style={styles.tabIcon} 
                                     />
-                                    <Text style={[styles.tabText, selected === 1 && styles.activeTabText]}>Friends</Text>
+                                    <Text style={[styles.tabText, selected === 1 && styles.activeTabText]}>{t("friends")}</Text>
                                 </Animated.View>
                             </TouchableOpacity>
                         </Animated.View>
@@ -854,8 +854,8 @@ export default function Networks() {
                                     ListEmptyComponent={() => (
                                         <View style={styles.emptyContainer}>
                                             <Ionicons name="heart-outline" size={60} color="#CBD5E1" style={styles.emptyIcon} />
-                                            <Text style={styles.emptyText}>No favorite networks</Text>
-                                            <Text style={styles.emptySubtext}>Networks you favorite will appear here</Text>
+                                            <Text style={styles.emptyText}>{t("no.favorite.networks")}</Text>
+                                            <Text style={styles.emptySubtext}>{t("no.favorite.networks.subline")}</Text>
                                         </View>
                                     )}
                                     contentContainerStyle={styles.networksList}
@@ -891,8 +891,8 @@ export default function Networks() {
                                     }                                    ListEmptyComponent={() => (
                                         <View style={styles.emptyContainer}>
                                             <Ionicons name="people-outline" size={60} color="#CBD5E1" style={styles.emptyIcon} />
-                                            <Text style={styles.emptyText}>No friend networks</Text>
-                                            <Text style={styles.emptySubtext}>Networks created by your friends will appear here</Text>
+                                            <Text style={styles.emptyText}>{t("no.networks.friends")}</Text>
+                                            <Text style={styles.emptySubtext}>{t("no.networks.friends.subline")}</Text>
                                         </View>
                                     )}
                                     contentContainerStyle={styles.networksList}
@@ -938,7 +938,7 @@ export default function Networks() {
                         onPress={navigateToNetworks}
                     >
                         <Ionicons name="arrow-back" size={24} color="#3B82F6" />
-                        {isDesktop && <Text style={styles.desktopBackButtonText}>Back to Networks</Text>}
+                        {isDesktop && <Text style={styles.desktopBackButtonText}>{t("back.networks")}</Text>}
                     </TouchableOpacity>
                     <Text style={styles.meetPeopleTitle}>Meet New People</Text>
                 </View>
@@ -962,8 +962,8 @@ export default function Networks() {
                                     <View style={{width: isDesktop ? Math.min(windowWidth, 1024) : windowWidth}}
                                           className="flex flex-col items-center justify-center h-full px-4">
                                         <Ionicons name="people-outline" size={70} color="#CBD5E1" className="mb-4" />
-                                        <Text className="text-xl font-semibold text-gray-500 mb-2">No people found</Text>
-                                        <Text className="text-gray-400 text-center">Try refreshing or check back later</Text>
+                                        <Text className="text-xl font-semibold text-gray-500 mb-2">{t("no.people")}</Text>
+                                        <Text className="text-gray-400 text-center">{t("try.later.network")}</Text>
                                     </View>
                                 )}
                                 renderItem={({item}) => (
@@ -985,7 +985,7 @@ export default function Networks() {
                                         <View style={styles.personInfoBox}>
                                             <View style={styles.personInfoRow}>
                                                 <Ionicons name="calendar" size={16} color="#64748B" style={styles.infoIcon} />
-                                                <Text style={styles.personInfoText}>{item.age} years old</Text>
+                                                <Text style={styles.personInfoText}>{item.age} {t("years.old")}</Text>
                                             </View>
                                             <View style={styles.personInfoRow}>
                                                 <Ionicons name="heart" size={16} color="#64748B" style={styles.infoIcon} />
@@ -1000,12 +1000,12 @@ export default function Networks() {
                                         <View style={styles.personActions}>
                                             <TouchableOpacity activeOpacity={0.7} onPress={() => {setShowFriends(true); setSelectedFriendsMeetNewPeople(item.friends); setFriendsSearchResults(item.friends)}} style={styles.messageButton}>
                                                 <Ionicons name="people" size={20} color="white" style={styles.actionButtonIcon} />
-                                                <Text style={styles.actionButtonText}>Friends</Text>
+                                                <Text style={styles.actionButtonText}>{t("friends")}</Text>
                                             </TouchableOpacity>
 
                                             <TouchableOpacity activeOpacity={0.55} disabled={item.isFriend} onPress={() => {if(!item.isFriend) {AddFriend(item.username)}}} style={[styles.addFriendButton, {backgroundColor: item.isFriend ? "#10B981" : '#059669'}]}>
                                                 <Ionicons name={item.isFriend ? "checkmark" : "person-add"} size={20} color="white" style={styles.actionButtonIcon} />
-                                                <Text style={styles.actionButtonText}>{item.isFriend ? "Sent request" : "Add Friend"}</Text>
+                                                <Text style={styles.actionButtonText}>{item.isFriend ? t("request.sent") : t("add.friend")}</Text>
                                             </TouchableOpacity>
                                         </View>
 
@@ -1014,7 +1014,7 @@ export default function Networks() {
                                             activeOpacity={0.7}
                                             onPress={() => router.navigate(`/${item.username}`)}
                                         >
-                                            <Text style={styles.viewProfileText}>View Profile</Text>
+                                            <Text style={styles.viewProfileText}>{t("view.profile")}</Text>
                                         </TouchableOpacity>
                                     </View>
                                 )}
@@ -1026,7 +1026,7 @@ export default function Networks() {
 
                 <View style={styles.swipeHintContainer}>
                     <Ionicons name="swap-horizontal" size={20} color="#94A3B8" />
-                    <Text style={styles.swipeHintText}>Swipe to see more people</Text>
+                    <Text style={styles.swipeHintText}>{t("swipe.to.more")}</Text>
                 </View>
 
                 {isDesktop && <View style={styles.navigationButtonsContainer}>
@@ -1042,7 +1042,7 @@ export default function Networks() {
                         <Text style={[
                             styles.navigationButtonText,
                             currentPersonIndex === 0 && styles.disabledButtonText
-                        ]}>Previous</Text>
+                        ]}>{t("previous")}</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity 
@@ -1056,7 +1056,7 @@ export default function Networks() {
                         <Text style={[
                             styles.navigationButtonText,
                             currentPersonIndex === people.length - 1 && styles.disabledButtonText
-                        ]}>Next</Text>
+                        ]}>{t("next")}</Text>
                         <Ionicons name="chevron-forward" size={24} color={currentPersonIndex === people.length - 1 ? "#CBD5E1" : "#3B82F6"} />
                     </TouchableOpacity>
                 </View>}
@@ -1082,7 +1082,7 @@ export default function Networks() {
                         onTouchEnd={(e) => e.stopPropagation()}
                     >
                         <View style={styles.modalHeader}>
-                            <Text style={styles.modalTitle}>Create Network</Text>
+                            <Text style={styles.modalTitle}>{t("create.network")}</Text>
                             <TouchableOpacity 
                                 onPress={() => setCreateModalVisible(false)}
                                 style={styles.closeButton}
@@ -1100,10 +1100,10 @@ export default function Networks() {
                             ) : null}
 
                             <View style={styles.formGroup}>
-                                <Text style={styles.formLabel}>Network Name</Text>
+                                <Text style={styles.formLabel}>{t("network.name")}</Text>
                                 <TextInput
                                     style={styles.formInput}
-                                    placeholder="Enter network name"
+                                    placeholder={t("network.name.placeholder")}
                                     placeholderTextColor="#9CA3AF"
                                     value={networkName}
                                     onChangeText={setNetworkName}
@@ -1113,10 +1113,10 @@ export default function Networks() {
                             </View>
 
                             <View style={styles.formGroup}>
-                                <Text style={styles.formLabel}>Description</Text>
+                                <Text style={styles.formLabel}>{t("description")}</Text>
                                 <TextInput
                                     style={[styles.formInput, styles.textArea]}
-                                    placeholder="Enter network description"
+                                    placeholder={t("network.description.placeholder")}
                                     placeholderTextColor="#9CA3AF"
                                     value={networkDescription}
                                     onChangeText={setNetworkDescription}
@@ -1128,7 +1128,7 @@ export default function Networks() {
 
                             <View style={styles.formGroup}>
                                 <View style={styles.switchContainer}>
-                                    <Text style={styles.formLabel}>Private Network</Text>
+                                    <Text style={styles.formLabel}>{t("private.network")}</Text>
                                     <Switch
                                         trackColor={{false: '#CBD5E1', true: '#93C5FD'}}
                                         thumbColor={isPrivate ? '#3B82F6' : '#f4f3f4'}
@@ -1139,14 +1139,14 @@ export default function Networks() {
                                 </View>
                                 <Text style={styles.helperText}>
                                     {isPrivate 
-                                        ? "Only invited members can join this network" 
-                                        : "Anyone can find and join this network"}
+                                        ? t("network.private.description")
+                                        : t("network.public.description")}
                                 </Text>
                             </View>
 
                             {isPrivate && (
                                 <View style={styles.formGroup}>
-                                    <Text style={styles.formLabel}>Add Members</Text>
+                                    <Text style={styles.formLabel}>{t("add.memebers")}</Text>
 
                                     {/* Friends List Selection */}
                                     <View style={styles.friendsSelectionContainer}>
@@ -1167,7 +1167,7 @@ export default function Networks() {
                                             }}
                                         >
                                             <Text style={styles.selectAllButtonText}>
-                                                {selectedFriends.length === friendsList.length ? "Deselect All" : "Select All Friends"}
+                                                {selectedFriends.length === friendsList.length ? t("deselect.all") : t("select.all.friends")}
                                             </Text>
                                         </TouchableOpacity>
 
@@ -1175,7 +1175,7 @@ export default function Networks() {
                                         <View style={styles.addMemberContainer}>
                                             <TextInput
                                                 style={styles.memberInput}
-                                                placeholder="Search for friends"
+                                                placeholder={t("network.add.member.placeholder")}
                                                 placeholderTextColor="#9CA3AF"
                                                 value={friendsSearch}
                                                 onChangeText={(text) => setFriendsSearch(text)}
@@ -1188,7 +1188,7 @@ export default function Networks() {
                                         {loadingFriends ? (
                                             <View style={styles.loadingContainer}>
                                                 <ActivityIndicator size="small" color="#3B82F6" />
-                                                <Text style={styles.loadingText}>Loading friends...</Text>
+                                                <Text style={styles.loadingText}>{t("friends.loading")}</Text>
                                             </View>
                                         ) : friendsList.length > 0 ? (
                                             <ScrollView style={styles.friendsListScrollView}>
@@ -1238,8 +1238,8 @@ export default function Networks() {
                                             </ScrollView>
                                         ) : (
                                             <View style={styles.emptyFriendsContainer}>
-                                                <Text style={styles.emptyFriendsText}>You don't have any friends yet</Text>
-                                                <Text style={styles.emptyFriendsSubtext}>Add friends to invite them to your network</Text>
+                                                <Text style={styles.emptyFriendsText}>{t("no.friends.yet")}</Text>
+                                                <Text style={styles.emptyFriendsSubtext}>{t("no.friends.yet.subline")}</Text>
                                             </View>
                                         )}
                                     </View>
@@ -1247,14 +1247,14 @@ export default function Networks() {
                                     {/* Selected Members List */}
                                     {members.length > 0 && (
                                         <View style={styles.membersListContainer}>
-                                            <Text style={styles.membersListTitle}>Selected members: {members.length}</Text>
+                                            <Text style={styles.membersListTitle}>{t("selected.members")}: {members.length}</Text>
                                         </View>
                                     )}
                                 </View>
                             )}
 
                             <View style={styles.formGroup}>
-                                <Text style={styles.formLabel}>Network Image</Text>
+                                <Text style={styles.formLabel}>{t("network.image")}</Text>
                                 <TouchableOpacity 
                                     style={styles.imagePickerButton}
                                     onPress={pickImage}
@@ -1270,7 +1270,7 @@ export default function Networks() {
                                     ) : (
                                         <View style={styles.imagePickerPlaceholder}>
                                             <Ionicons name="image-outline" size={40} color="#94A3B8" />
-                                            <Text style={styles.imagePickerText}>Upload Image</Text>
+                                            <Text style={styles.imagePickerText}>{t("upload.image")}</Text>
                                         </View>
                                     )}
                                 </TouchableOpacity>
@@ -1283,7 +1283,7 @@ export default function Networks() {
                                 style={styles.cancelButton}
                                 onPress={() => setCreateModalVisible(false)}
                             >
-                                <Text style={styles.cancelButtonText}>Cancel</Text>
+                                <Text style={styles.cancelButtonText}>{t("cancel")}</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity 
@@ -1297,7 +1297,7 @@ export default function Networks() {
                                 {isCreating ? (
                                     <ActivityIndicator size="small" color="white" />
                                 ) : (
-                                    <Text style={styles.createButtonText}>Create Network</Text>
+                                    <Text style={styles.createButtonText}>{t("create.network")}</Text>
                                 )}
                             </TouchableOpacity>
                         </View>

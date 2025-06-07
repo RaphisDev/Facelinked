@@ -40,6 +40,7 @@ import {MotiScrollView, MotiView} from "moti";
 import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
 import {useDerivedValue} from "react-native-reanimated";
 import {useTranslation} from "react-i18next";
+import i18n from "i18next";
 
 global.TextEncoder = TextEncoder;
 
@@ -82,6 +83,11 @@ const Index = () => {
 
         setTimeout(async () => {
             if (await signedIn()) {
+                const lang = Platform.OS === "web" ? localStorage.getItem("userLanguage") : await asyncStorage.getItem("userLanguage");
+                if (lang != null) {
+                    await i18n.changeLanguage(lang);
+                }
+
                 new WebSocketProvider();
                 router.replace("/home");
             } else {

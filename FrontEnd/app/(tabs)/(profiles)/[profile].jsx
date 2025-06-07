@@ -1705,7 +1705,7 @@
                                                         color="white"
                                                     />
                                                     <Animated.Text style={[{opacity: fadeAnim}, {color: 'white', fontWeight: '600', marginLeft: 8}]}>
-                                                        {isAdded ? "Friend Added" : isFriendRequestSent ? "Request sent" : isFriendRequestReceived ? "Accept Request" : "Add Friend"}
+                                                        {isAdded ? t("friend.added") : isFriendRequestSent ? t("request.sent") : isFriendRequestReceived ? t("accept.request") : t("add.friend")}
                                                     </Animated.Text>
                                                 </View>
                                             </TouchableOpacity>

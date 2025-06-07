@@ -9,6 +9,7 @@ import ip from "../../../../components/AppManager";
 import {SafeAreaView} from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {useTranslation} from "react-i18next";
+import i18n from "i18next";
 
 export default function AccountSettings() {
     const router = useRouter();
@@ -143,6 +144,42 @@ export default function AccountSettings() {
                     {/* Account Section */}
                     <View className="mb-6">
                         <Text className="text-lg font-semibold text-gray-500 dark:text-gray-400 mb-3 px-1">{t("account.management")}</Text>
+                        {/* Language Selection */}
+                        <View
+                            style={{
+                                shadowColor: '#000',
+                                shadowOpacity: 0.2,
+                                shadowRadius: 1.5,
+                                elevation: 2,
+                            }}
+                            className="flex-row items-center justify-between p-4 bg-white dark:bg-dark-primary rounded-xl mb-3"
+                        >
+                            <View className="flex-row items-center">
+                                <View className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 items-center justify-center">
+                                    <Ionicons name="language-outline" size={22} color="#10B981" />
+                                </View>
+                                <Text className="ml-3 text-lg font-semibold dark:text-dark-text text-gray-800">{t("language")}</Text>
+                            </View>
+                            <View>
+                                <TouchableOpacity
+                                    onPress={async () => {
+                                        const currentLang = i18n.language;
+                                        const newLang = currentLang === 'en' ? 'de' : 'en';
+                                        await i18n.changeLanguage(newLang);
+                                        if (Platform.OS === "web") {
+                                            localStorage.setItem('userLanguage', newLang);
+                                        } else (
+                                            await asyncStorage.setItem('userLanguage', newLang)
+                                        )
+                                    }}
+                                    className="px-3 py-2 bg-green-100 dark:bg-green-900 rounded-lg"
+                                >
+                                    <Text className="text-green-700 dark:text-green-300 font-medium">
+                                        {i18n.language === 'en' ? 'English → Deutsch' : 'Deutsch → English'}
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
 
                         {/* Logout Button */}
                         <TouchableOpacity 

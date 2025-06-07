@@ -34,12 +34,12 @@ export default function LegalSettings() {
 
     const legalOptions = [
         {
-            title: "Privacy Policy",
+            title: t("privacy.policy"),
             icon: "shield-checkmark-outline",
             route: "/settings/privacy"
         },
         {
-            title: "Terms and Conditions",
+            title: t("terms.and.conditions"),
             icon: "document-text-outline",
             route: "/settings/terms"
         }
