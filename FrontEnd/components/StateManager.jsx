@@ -1,4 +1,6 @@
 import {EventEmitter} from "expo";
+import {Platform} from "react-native";
+import * as SecureStore from "expo-secure-store";
 
 let stateManagerInstance = null;
 
@@ -6,12 +8,28 @@ class StateManager {
     chatOpened = false;
     networkOpened = false;
     homePressed = new EventEmitter();
+    currentUsername = "profile";
+    username = "";
 
     constructor() {
         if (!stateManagerInstance) {
             stateManagerInstance = this;
         }
         return stateManagerInstance;
+    }
+
+    getActualUsername() {
+        if(this.username === "") {
+            this.username = Platform.OS === 'web' ? localStorage.getItem('username') : SecureStore.getItem('username');
+        }
+        return this.username;
+    }
+    getCurrentUsername() {
+        return this.currentUsername;
+    }
+
+    setCurrentUsername(username) {
+        this.currentUsername = username;
     }
 
     setChatState(newState) {

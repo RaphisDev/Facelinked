@@ -25,6 +25,7 @@
                 import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
                 import {useSearchParams} from "expo-router/build/hooks";
                 import {useTranslation} from "react-i18next";
+                import StateManager from "../../../components/StateManager";
 
                 export default function Profile() {
 
@@ -447,6 +448,7 @@
                         setTimeout(() => {
                             if (token.current === null) {router.replace("/")}
                         })
+                        new StateManager().setCurrentUsername(profile);
 
                         fetchData();
                     }, [profile]);
