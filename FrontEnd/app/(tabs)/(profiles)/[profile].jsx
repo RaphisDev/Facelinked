@@ -1158,7 +1158,7 @@
                                                                 >
                                                                     <View className="flex-row items-center justify-center">
                                                                         <Ionicons name="chatbubble" color="white" size={18} />
-                                                                        <Text className="text-white font-medium ml-2">{t("meesage")}</Text>
+                                                                        <Text className="text-white font-medium ml-2">{t("message")}</Text>
                                                                     </View>
                                                                 </TouchableOpacity>
 
@@ -2333,7 +2333,7 @@
                                                     />
                                                     <View className="ml-3 flex-1">
                                                         <Text className="font-bold text-gray-800">{item.memberName}</Text>
-                                                        <Text className="text-gray-500">{t("wants.to.be.friend")}</Text>
+                                                        <Text className="text-gray-500">{t("wants.to.be.friends")}</Text>
                                                     </View>
                                                 </TouchableOpacity>
 

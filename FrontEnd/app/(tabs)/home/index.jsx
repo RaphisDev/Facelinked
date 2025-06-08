@@ -425,17 +425,6 @@ export default function Index() {
                 setShowPostCreation(false);
                 setPostText("");
                 setSelectedImages([]);
-
-                showAlert({
-                    title: t("success"),
-                    message: t("post.created"),
-                    buttons: [
-                        {
-                            text: "Okay",
-                            onPress: () => {}
-                        }
-                    ]}
-                );
             }
         } catch (error) {
             console.error('Error sending post:', error);

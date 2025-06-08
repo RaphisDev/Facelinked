@@ -539,7 +539,7 @@ export default function ChatRoom() {
         return (
             <View style={styles.loadingContainer}>
                 <View style={styles.loadingIndicator}>
-                    <Text style={styles.loadingText}>{t("loading.converstation")}</Text>
+                    <Text style={styles.loadingText}>{t("loading.conversation")}</Text>
                 </View>
             </View>
         );

@@ -46,6 +46,12 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
             if(pathname === "/profile" && route.name === "profile") {
                 return;
             }
+            if (pathname === "/chats" && route.name === "chats") {
+                return;
+            }
+            if (pathname === "/networks" && route.name === "networks") {
+                return;
+            }
             router.push(`/${route.name}`);
         };
 
