@@ -116,14 +116,16 @@ export default function ChatRoom() {
 
             if (loadedChats.filter((chat) => chat.username === username).length === 1) {
                 setUserData(loadedChats.filter((chat) => chat.username === username)[0])
-            } else {
-                let token;
-                if (Platform.OS === "web") {
-                    token = localStorage.getItem("token");
-                }
-                else {
-                    token = SecureStore.getItem("token");
-                }
+            }
+
+            let token;
+            if (Platform.OS === "web") {
+                token = localStorage.getItem("token");
+            }
+            else {
+                token = SecureStore.getItem("token");
+            }
+            try {
                 const profile = await fetch(`${ip}/profile/${username}`, {
                     method: "GET",
                     headers: {
@@ -134,7 +136,22 @@ export default function ChatRoom() {
                 if (profile.ok) {
                     const profileJson = await profile.json();
                     setUserData({ name: profileJson.name, username: profileJson.username, image: profileJson.profilePicturePath, friends: profileJson.friends });
+                    await asyncStorage.setItem("chats", JSON.stringify([...loadedChats.map((chat) => {
+                        if (chat.username === username) {
+                            return {
+                                name: profileJson.name,
+                                username: profileJson.username,
+                                image: profileJson.profilePicturePath.split(",")[0],
+                                friends: profileJson.friends,
+                                lastMessage: chat.lastMessage,
+                                unread: chat.unread
+                            };
+                        }
+                        return chat;
+                    })]));
                 }
+            }
+            catch (e) {
             }
         }
         loadMessages();
