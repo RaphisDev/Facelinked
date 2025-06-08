@@ -703,9 +703,7 @@
                         };
 
                         setComments(prevState => [...prevState, newComment]);
-                        commentText.current = "";
-                        setOverOneChar(false)
-                        commentRef.current?.clear();
+                        
                         setPosts(prevState => {
                             return prevState.map(item => {
                                 if (item.id.millis === selectedPost.id.millis) {
@@ -725,6 +723,9 @@
                                 comment: commentText.current,
                             })
                         });
+                        commentText.current = "";
+                        setOverOneChar(false)
+                        commentRef.current?.clear();
 
                         if (!status.ok) {
                             setComments(prevState => prevState.slice(0, -1));
