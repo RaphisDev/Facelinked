@@ -106,6 +106,8 @@ public class ProfileService {
             toAdd.setFriends(newFriendsOfToAdd);
             profileRepository.save(toAdd);
 
+            sendFriendAcceptedPushNotification(toAdd.getUsername(), user.getName(), user.getProfilePicturePath());
+
             if (user.getFriends().size() >= 5 && user.getFaceSmashId() == null) {
                 faceSmashService.smashPerson(user);
             }
@@ -127,10 +129,19 @@ public class ProfileService {
 
         profileRepository.save(toAdd);
 
-        sendPushNotification(toAdd.getUsername(), user.getName(), user.getProfilePicturePath());
+        sendFriendRequestPushNotification(toAdd.getUsername(), user.getName(), user.getProfilePicturePath());
     }
 
-    public void sendPushNotification(String receiver, String sender, String profilePictureUrl) {
+    public void sendFriendAcceptedPushNotification(String receiver, String sender, String profilePictureUrl) {
+        var receiverAccount = userService.findByUsername(receiver);
+        if (receiverAccount.getDeviceTokens() == null || receiverAccount.getDeviceTokens().isEmpty()) {
+            return;
+        }
+
+        pushNotificationService.sendPushNotification(receiverAccount.getDeviceTokens(), sender, "Friend request accepted!", profilePictureUrl, null, receiverAccount);
+    }
+
+    public void sendFriendRequestPushNotification(String receiver, String sender, String profilePictureUrl) {
         var receiverAccount = userService.findByUsername(receiver);
         if (receiverAccount.getDeviceTokens() == null || receiverAccount.getDeviceTokens().isEmpty()) {
             return;
