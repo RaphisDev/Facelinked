@@ -85,7 +85,7 @@ public class PushNotificationService {
 
                 Message message = Message.builder()
                         .setNotification(notification)
-                        .setToken(token)
+                        .setToken(data)
                         .build();
 
                 try {

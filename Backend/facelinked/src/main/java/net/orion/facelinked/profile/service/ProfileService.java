@@ -132,7 +132,7 @@ public class ProfileService {
 
     public void sendPushNotification(String receiver, String sender, String profilePictureUrl) {
         var receiverAccount = userService.findByUsername(receiver);
-        if (receiverAccount.getDeviceTokens() == null) {
+        if (receiverAccount.getDeviceTokens() == null || receiverAccount.getDeviceTokens().isEmpty()) {
             return;
         }
 

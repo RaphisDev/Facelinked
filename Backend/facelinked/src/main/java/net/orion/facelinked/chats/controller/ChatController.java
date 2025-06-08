@@ -67,12 +67,12 @@ public class ChatController {
         template.convertAndSendToUser(message.getReceiver(), "/queue/messages",
                new ChatMessage(sender, message.getReceiver(), message.getContent() == null ? "" : message.getContent(), new AutoPrimaryKey(null, id), message.getImages() == null ? new ArrayList<>() : message.getImages()));
 
-        sendPushNotification(message.getReceiver(), message.getContent(), senderName, senderProfilePicturePath, message.getImages() == null ? null : message.getImages().getFirst());
+        sendPushNotification(message.getReceiver(), message.getContent(), senderName, senderProfilePicturePath, message.getImages().isEmpty() ? null : message.getImages().getFirst());
     }
 
     public void sendPushNotification(String receiver, String message, String sender, String profilePictureUrl, String image) {
         var receiverAccount = userService.findByUsername(receiver);
-        if (receiverAccount.getDeviceTokens() == null) {
+        if (receiverAccount.getDeviceTokens() == null || receiverAccount.getDeviceTokens().isEmpty()) {
             return;
         }
         pushNotificationService.sendPushNotification(receiverAccount.getDeviceTokens(), sender, message, profilePictureUrl, image, receiverAccount);

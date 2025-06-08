@@ -129,6 +129,9 @@ public class NetworkService {
                 if (friendsArray.stream().anyMatch(f -> f.getUsername().equals(friendOfFriend.getMemberId())))
                     continue;
                 var person = profileService.findByUsername(friendOfFriend.getMemberId());
+                if (person == null) {
+                    continue;
+                }
                 if (person.getFriendRequests().stream().anyMatch(f -> f.getMemberId().equals(profile.getUsername()))) {
                     continue;
                 }
