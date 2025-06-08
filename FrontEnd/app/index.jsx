@@ -2008,14 +2008,14 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
     ];
 
     const handleDateChange = (event, selectedDate) => {
-        setShowDatePicker(true);
+        setShowDatePicker(Platform.OS === "ios");
         if (selectedDate) {
             updateFormData('birthDate', {
                 day: selectedDate.getDate(),
                 month: monthNames[selectedDate.getMonth()],
                 year: selectedDate.getFullYear()
             });
-            }
+        }
     };
 
     const renderWebDatePicker = () => (
@@ -2199,7 +2199,7 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
                                     />
                                 </View>
                                 <View className="mb-4">
-                                    <Text className="block text-sm font-medium text-gray-700 mb-1">{t("choose.usernames")}</Text>
+                                    <Text className="block text-sm font-medium text-gray-700 mb-1">{t("choose.username")}</Text>
                                     <TextInput
                                         value={formData.username}
                                         onChangeText={(value) => updateFormData('username', value)}
@@ -2339,7 +2339,7 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
                                     </View>
                                 </View>
                                 <View>
-                                    <Text className="block text-sm font-medium mb-1 text-gray-700">{t("what.hobbiess.or.interests")}</Text>
+                                    <Text className="block text-sm font-medium mb-1 text-gray-700">{t("what.hobbies.or.interests")}</Text>
                                     <TextInput
                                         multiline={true}
                                         numberOfLines={4}
@@ -2351,7 +2351,7 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
                                         value={formData.interests}
                                     />
                                     <Text className="mt-2 text-xs text-gray-500">
-                                        {t("separate.with.comma")}
+                                        {t("separate.with.commas")}
                                     </Text>
                                 </View>
                             </View>
@@ -2405,7 +2405,7 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
                                         </Text>{' '}
                                         &{' '}
                                         <Text onPress={() => navigateTo('terms')} className="text-blue-600 font-medium">
-                                            {t("terms.conditions")}
+                                            {t("terms.and.conditions")}
                                         </Text>
                                     </Text>
                                 </View>
