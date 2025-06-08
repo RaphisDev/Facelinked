@@ -76,7 +76,9 @@
                     const [postImageGallery, setPostImageGallery] = useState([]);
                     const [cachedPost, setCachedPost] = useState(null);
                     const [comments, setComments] = useState([]);
-                    const [commentText, setCommentText] = useState("");
+                    const commentText = useRef("");
+                    const commentRef = useRef(null);
+                    const [overOneChar, setOverOneChar] = useState(false);
                     const [showImageGallery, setShowImageGallery] = useState(false);
                     const [profileImages, setProfileImages] = useState([]);
                     const [selectedImage, setSelectedImage] = useState(null);
@@ -684,7 +686,7 @@
 
                     // Function to add a comment
                     const addComment = async () => {
-                        if (commentText.trim() === "") return;
+                        if (commentText.current.trim() === "") return;
 
                         let profilePath;
                         if (Platform.OS === "web") {
@@ -696,12 +698,14 @@
                         const newComment = {
                             id: comments.length,
                             author: username.current,
-                            text: commentText,
+                            text: commentText.current,
                             profilePicturePath: profilePath.split(',')[0],
                         };
 
                         setComments(prevState => [...prevState, newComment]);
-                        setCommentText("");
+                        commentText.current = "";
+                        setOverOneChar(false)
+                        commentRef.current?.clear();
                         setPosts(prevState => {
                             return prevState.map(item => {
                                 if (item.id.millis === selectedPost.id.millis) {
@@ -718,7 +722,7 @@
                                 "Content-Type": "application/json"
                             },
                             body: JSON.stringify({
-                                comment: commentText,
+                                comment: commentText.current,
                             })
                         });
 
@@ -1880,17 +1884,17 @@
                                                 <View className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3">
                                                     <View className="flex-row items-center bg-gray-100 rounded-full px-4 py-2">
                                                         <TextInput
+                                                            ref={commentRef}
                                                             className="flex-1 text-gray-700 outline-none py-2"
                                                             placeholder={t("add.comment")}
-                                                            value={commentText}
-                                                            onChangeText={setCommentText}
+                                                            onChangeText={text => {commentText.current = text; setOverOneChar(text.trim().length > 0)}}
                                                             multiline
                                                             maxLength={500}
                                                         />
                                                         <TouchableOpacity
                                                             onPress={addComment}
-                                                            disabled={commentText.trim() === ''}
-                                                            className={`ml-2 p-2 rounded-full ${commentText.trim() === '' ? 'bg-gray-300' : 'bg-blue-500'}`}
+                                                            disabled={!overOneChar}
+                                                            className={`ml-2 p-2 rounded-full ${!overOneChar ? 'bg-gray-300' : 'bg-blue-500'}`}
                                                         >
                                                             <Ionicons name="send" size={18} color="white" />
                                                         </TouchableOpacity>
