@@ -51,6 +51,7 @@ public class PushNotificationService {
                         + "\"aps\":{"
                         + "\"alert\":{\"title\":\"" + escapedTitle + "\",\"body\":\"" + escapedBody + "\"},"
                         + "\"sound\":\"default\","
+                        + "\"badge\": 0,"
                         + "\"mutable-content\":1"
                         + "},"
                         + "\"profile_picture\":\"" + escapedProfilePictureUrl + "\""
