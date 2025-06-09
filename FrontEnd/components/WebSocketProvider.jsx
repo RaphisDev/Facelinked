@@ -120,11 +120,18 @@ class WebsocketController{
                         }
 
                         if (!loadedChats.some((chat) => chat.username === senderId)) {
+                            let apiToken;
+                            if (Platform.OS === "web") {
+                                apiToken = localStorage.getItem("token");
+                            }
+                            else {
+                                apiToken = SecureStore.getItem("token");
+                            }
 
                             const profile = await fetch(`${ip}/profile/${senderId}`, {
                                 method: "GET",
                                 headers: {
-                                    "Authorization": `Bearer ${token}`
+                                    "Authorization": `Bearer ${apiToken}`
                                 }
                             });
                             if (profile.ok) {
@@ -213,13 +220,21 @@ class WebsocketController{
                         const maxRetries = 4;
                         let retries = 0;
 
+                        let apiToken;
+                        if (Platform.OS === "web") {
+                            apiToken = localStorage.getItem("token");
+                        }
+                        else {
+                            apiToken = SecureStore.getItem("token");
+                        }
+
                         while (retries < maxRetries) {
                             try {
                                 const response = await fetch(url, {
                                     method: "GET",
                                     headers: {
                                         "Application-Type": "application/json",
-                                        "Authorization": `Bearer ${token}`
+                                        "Authorization": `Bearer ${apiToken}`
                                     }
                                 });
 

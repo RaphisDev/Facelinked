@@ -116,7 +116,11 @@ public class NetworkService {
             if (friendsArray.size() >= 5) {
                 break;
             }
-            var friendsOfFriends = new ArrayList<>(profileService.findByUsername(friend.getMemberId()).getFriends());
+            var friendProfile = profileService.findByUsername(friend.getMemberId());
+            if (friendProfile == null) {
+                continue;
+            }
+            var friendsOfFriends = new ArrayList<>(friendProfile.getFriends());
             Collections.shuffle(friendsOfFriends);
             for (var friendOfFriend : friendsOfFriends) {
                 if (friendsArray.size() >= 5) {
