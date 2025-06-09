@@ -1177,7 +1177,7 @@ export default function Networks() {
 
                             {isPrivate && (
                                 <View style={styles.formGroup}>
-                                    <Text style={styles.formLabel}>{t("add.memebers")}</Text>
+                                    <Text style={styles.formLabel}>{t("add.members")}</Text>
 
                                     {/* Friends List Selection */}
                                     <View style={styles.friendsSelectionContainer}>

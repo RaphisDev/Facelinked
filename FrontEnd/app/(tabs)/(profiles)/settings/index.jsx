@@ -9,6 +9,7 @@ import {SafeAreaView} from "react-native-safe-area-context";
 import {showAlert} from "../../../../components/PopUpModalView";
 import WebSocketProvider from "../../../../components/WebSocketProvider";
 import {useTranslation} from "react-i18next";
+import {GoogleSignin} from "@react-native-google-signin/google-signin";
 
 export default function Index() {
     const router = useRouter();
@@ -106,6 +107,11 @@ export default function Index() {
                             await SecureStore.deleteItemAsync("username");
                             await SecureStore.deleteItemAsync("profilePicture");
                             await SecureStore.deleteItemAsync("profile");
+                        }
+                        try {
+                            await GoogleSignin.signOut();
+                        } catch (error) {
+                            console.error(error);
                         }
                         new WebSocketProvider().reset();
                         router.replace("/");

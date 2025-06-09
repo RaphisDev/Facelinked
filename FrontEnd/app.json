@@ -48,7 +48,13 @@
           "iosNSEFilePath": "./assets/NotificationService.m"
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.770069358586-doqfol8erj0q0aki2qg5rcn56440c2t4"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

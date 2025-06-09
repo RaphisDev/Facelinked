@@ -1,45 +1,49 @@
-import {
-    Appearance,
-    Platform,
-    Pressable,
-    Text,
-    TouchableOpacity,
-    View,
-    Share,
-    ScrollView,
-    TextInput,
-    SafeAreaView, StyleSheet, Linking
-} from "react-native";
+import {Appearance, Platform, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
 import "../global.css";
-import {router, useRouter} from "expo-router";
+import {Link, router, useRouter} from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import WebSocketProvider from "../components/WebSocketProvider";
 import {Image} from "expo-image";
 import * as Device from "expo-device";
 import * as Notification from "expo-notifications";
 import ip from "../components/AppManager";
-import React, { useState, useEffect, useRef } from 'react';
-import {ChevronRight, User, Users, Heart, MessageCircle, MapPin, Menu, X, Share2, ArrowRight,
-    Mail,
-    Lock,
+import React, {useEffect, useRef, useState} from 'react';
+import {
+    ArrowLeft,
+    ArrowRight,
+    Camera,
+    Check,
+    ChevronRight,
     Eye,
     EyeOff,
-    Check,
-    ArrowLeft,
-    Volleyball,
-    Camera,} from 'lucide-react-native';
-import {Link} from "expo-router";
+    Heart,
+    Lock,
+    Mail,
+    MapPin,
+    Menu,
+    MessageCircle,
+    Share2,
+    Users,
+    X,
+} from 'lucide-react-native';
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
 import {TextEncoder} from "text-encoding";
 import asyncStorage from "@react-native-async-storage/async-storage";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import CustomAlertProvider, {showAlert} from "../components/PopUpModalView";
+import {showAlert} from "../components/PopUpModalView";
 import {MotiScrollView, MotiView} from "moti";
 import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
-import {useDerivedValue} from "react-native-reanimated";
 import {useTranslation} from "react-i18next";
 import i18n from "i18next";
+import {GoogleSignin, GoogleSigninButton,} from '@react-native-google-signin/google-signin';
+
+GoogleSignin.configure({
+    webClientId: process.env.EXPO_PUBLIC_WEB_ID,
+    scopes: ['profile', 'email'],
+    offlineAccess: true,
+    forceCodeForRefreshToken: false,
+    iosClientId: process.env.EXPO_PUBLIC_IOS_ID,
+});
 
 global.TextEncoder = TextEncoder;
 
@@ -1867,6 +1871,25 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
 const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, setShowPassword, rememberMe, setRememberMe, formData, updateFormData}) => {
     const { t } = useTranslation();
 
+    const GoogleLogin = async () => {
+        await GoogleSignin.hasPlayServices();
+
+        return await GoogleSignin.signIn();
+    };
+
+    const googleSignIn = async () => {
+        try {
+            const response = await GoogleLogin();
+
+            const { idToken, user } = response.data ?? {};
+            if (idToken) {
+                console.log(idToken, user);
+            }
+        } catch (error) {
+            console.log('Error', error);
+        }
+    };
+
     return (
         <View style={{marginBottom: 110, justifyContent: "center", width: "100%", flexGrow: 1}}>
         <View className="backdrop-blur-sm mt-7 bg-white rounded-3xl border border-white/50 p-6 md:p-8 w-full max-w-[93%] mx-auto">
@@ -1963,13 +1986,10 @@ const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, se
                     </View>
 
                     <View className="mt-6 flex flex-row gap-3">
-                        <TouchableOpacity
-                            activeOpacity={0.9}
+                        <GoogleSigninButton
                             className="flex-1 py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center"
-                        >
-                            <View className="w-5 h-5 bg-blue-500 rounded-full mr-2"></View>
-                            <Text className="text-gray-700">Google</Text>
-                        </TouchableOpacity>
+                            onPress={googleSignIn}
+                        />
                         <TouchableOpacity
                             activeOpacity={0.9}
                             className="flex-1 py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center"

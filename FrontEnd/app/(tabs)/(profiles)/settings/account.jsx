@@ -10,6 +10,7 @@ import {SafeAreaView} from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {useTranslation} from "react-i18next";
 import i18n from "i18next";
+import {GoogleSignin} from "@react-native-google-signin/google-signin";
 
 export default function AccountSettings() {
     const router = useRouter();
@@ -62,6 +63,11 @@ export default function AccountSettings() {
                             await SecureStore.deleteItemAsync("profilePicture");
                             await SecureStore.deleteItemAsync("profile");
                         }
+                        try {
+                            await GoogleSignin.signOut();
+                        } catch (error) {
+                            console.error(error);
+                        }
                         new WebSocketProvider().reset();
                         router.replace("/");
                     }
@@ -99,6 +105,11 @@ export default function AccountSettings() {
                                 await SecureStore.deleteItemAsync("username");
                                 await SecureStore.deleteItemAsync("profilePicture");
                                 await SecureStore.deleteItemAsync("profile");
+                            }
+                            try {
+                                await GoogleSignin.signOut();
+                            } catch (error) {
+                                console.error(error);
                             }
                             new WebSocketProvider().reset();
 
