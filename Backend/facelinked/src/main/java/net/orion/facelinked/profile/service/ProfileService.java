@@ -149,10 +149,20 @@ public class ProfileService {
 
         pushNotificationService.sendPushNotification(receiverAccount.getDeviceTokens(), sender, "New friend request!", profilePictureUrl, null, receiverAccount);
     }
-    
+
+    public void sendCommentPushNotification(String receiver, String message, String sender, String profilePictureUrl, String image) {
+        var receiverAccount = userService.findByUsername(receiver);
+        if (receiverAccount.getDeviceTokens() == null || receiverAccount.getDeviceTokens().isEmpty()) {
+            return;
+        }
+        pushNotificationService.sendPushNotification(receiverAccount.getDeviceTokens(), "New comment!", sender + ": " + message, profilePictureUrl, image, receiverAccount);
+    }
+
     public void addComment(Long millis, Profile sender, String comment, Profile user) {
 
         comment = sender.getUsername() + "Ð" + sender.getProfilePicturePath() + "Ð" + comment;
+
+        sendCommentPushNotification(user.getUsername(), comment, sender.getName(), sender.getProfilePicturePath(), null);
 
         var post = postRepository.findById(new PrimaryKey(user.getUsername(), millis)).orElseThrow();
         var currentComment = new ArrayList<>(post.getComments());
