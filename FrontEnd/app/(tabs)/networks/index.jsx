@@ -830,12 +830,12 @@ export default function Networks() {
                                     })
                                 }}>
                                     <Ionicons 
-                                        name="people" 
+                                        name="compass"
                                         size={20} 
                                         color={selected === 1 ? "#3B82F6" : "#64748B"} 
                                         style={styles.tabIcon} 
                                     />
-                                    <Text style={[styles.tabText, selected === 1 && styles.activeTabText]}>{t("friends")}</Text>
+                                    <Text style={[styles.tabText, selected === 1 && styles.activeTabText]}>{t("explore")}</Text>
                                 </Animated.View>
                             </TouchableOpacity>
                         </Animated.View>
