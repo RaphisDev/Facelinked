@@ -1415,6 +1415,7 @@ export default function Networks() {
                     <FlatList
                         className="px-4"
                         data={friendsSearchResults}
+                        contentContainerStyle={{paddingBottom: 100}}
                         ListEmptyComponent={() => (
                             <View className="flex-1 items-center justify-center py-16">
                                 <View className="w-20 h-20 mb-4 items-center justify-center bg-blue-100/70 rounded-full">
