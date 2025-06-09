@@ -61,7 +61,6 @@ export default function AccountSettings() {
                             await SecureStore.deleteItemAsync("token");
                             await SecureStore.deleteItemAsync("username");
                             await SecureStore.deleteItemAsync("profilePicture");
-                            await SecureStore.deleteItemAsync("profile");
                         }
                         try {
                             await GoogleSignin.signOut();
@@ -104,7 +103,6 @@ export default function AccountSettings() {
                                 await SecureStore.deleteItemAsync("token");
                                 await SecureStore.deleteItemAsync("username");
                                 await SecureStore.deleteItemAsync("profilePicture");
-                                await SecureStore.deleteItemAsync("profile");
                             }
                             try {
                                 await GoogleSignin.signOut();

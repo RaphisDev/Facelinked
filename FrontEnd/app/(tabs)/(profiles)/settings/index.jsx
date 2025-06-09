@@ -106,7 +106,6 @@ export default function Index() {
                             await SecureStore.deleteItemAsync("token");
                             await SecureStore.deleteItemAsync("username");
                             await SecureStore.deleteItemAsync("profilePicture");
-                            await SecureStore.deleteItemAsync("profile");
                         }
                         try {
                             await GoogleSignin.signOut();

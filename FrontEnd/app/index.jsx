@@ -36,6 +36,7 @@ import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
 import {useTranslation} from "react-i18next";
 import i18n from "i18next";
 import {GoogleSignin, GoogleSigninButton,} from '@react-native-google-signin/google-signin';
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 GoogleSignin.configure({
     webClientId: process.env.EXPO_PUBLIC_WEB_ID,
@@ -56,6 +57,12 @@ const Index = () => {
     async function signedIn() {
         if (Platform.OS === "web") {
             return localStorage.getItem("token") != null;
+        }
+        if (await asyncStorage.getItem("profile") === null) {
+            const profile = await SecureStore.getItemAsync("profile");
+            if (profile != null) {
+                await asyncStorage.setItem("profile", profile);
+            }
         }
         const token = await SecureStore.getItemAsync("token");
 
@@ -802,7 +809,7 @@ const LoginPage = ({navigateTo, showPassword, setShowPassword, previousPage}) =>
                                 await SecureStore.setItemAsync("token", token);
                                 await SecureStore.setItemAsync("username", data.username);
                                 await SecureStore.setItemAsync("profilePicture", profileJson.profilePicturePath);
-                                await SecureStore.setItemAsync("profile", JSON.stringify(profileJson));
+                                await asyncStorage.setItem("profile", JSON.stringify(profileJson));
                             }
                         }
                         async function requestPermission() {
@@ -900,6 +907,136 @@ const LoginPage = ({navigateTo, showPassword, setShowPassword, previousPage}) =>
             }
         }
     }
+
+    const GoogleLogin = async () => {
+        await GoogleSignin.hasPlayServices();
+
+        return await GoogleSignin.signIn();
+    };
+
+    const googleSignIn = async () => {
+        try {
+            const response = await GoogleLogin();
+
+            const { idToken, user } = response.data ?? {};
+            if (idToken) {
+                const response = await fetch(`${ip}/auth/authenticate/google`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        googleToken: idToken,
+                        email: user.email,
+                    }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const token = data.token;
+
+                    const profile = await fetch(`${ip}/profile/${data.username}`, {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
+                    });
+                    if (profile.ok) {
+                        const profileJson = await profile.json();
+
+                        if (rememberMe) {
+                            if (Platform.OS === "web") {
+                                localStorage.setItem("token", token);
+                                localStorage.setItem("username", data.username);
+                                localStorage.setItem("profilePicture", profileJson.profilePicturePath);
+                                localStorage.setItem("profile", JSON.stringify(profileJson));
+                            }
+                            else {
+                                await SecureStore.setItemAsync("token", token);
+                                await SecureStore.setItemAsync("username", data.username);
+                                await SecureStore.setItemAsync("profilePicture", profileJson.profilePicturePath);
+                                await asyncStorage.setItem("profile", JSON.stringify(profileJson));
+                            }
+                        }
+                        async function requestPermission() {
+                            if (Device.isDevice) {
+                                const { status: existingStatus } = await Notification.getPermissionsAsync();
+                                let finalStatus = existingStatus;
+
+                                if (existingStatus !== 'granted') {
+                                    const { status } = await Notification.requestPermissionsAsync();
+                                    finalStatus = status;
+                                }
+
+                                if (finalStatus !== 'granted') {
+                                    if (Platform.OS !== "android") {
+                                        showAlert({
+                                            title: "Permission denied",
+                                            message: "Notifications are disabled. Enable them in your settings.",
+                                            buttons: [{
+                                                text: 'OK',
+                                                onPress: () => {
+
+                                                }
+                                            },],
+                                        })
+                                    } else {
+                                        alert("Notifications are disabled. Enable them in your settings.");
+                                    }
+                                    return null;
+                                }
+                                await Notification.getDevicePushTokenAsync().then((token) => {
+                                    return token;
+                                });
+                            }
+                        }
+
+                        if (Notification.PermissionStatus.UNDETERMINED && Platform.OS !== "web" && Device.isDevice && await asyncStorage.getItem("deviceToken") === null) {
+                            const deviceToken = await requestPermission();
+                            if (!deviceToken) {
+                                await asyncStorage.setItem("deviceToken", "false");
+                            }
+                            else {
+                                const status = await fetch(`${ip}/messages/setDeviceToken`, {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                        "Authorization": `Bearer ${token}`
+                                    },
+                                    body: JSON.stringify({
+                                        token: deviceToken
+                                    })
+                                });
+
+                                if (status.ok) {
+                                    await asyncStorage.setItem("deviceToken", "true");
+                                }
+                            }
+                        }
+
+                        router.replace("/");
+                    }
+                } else {
+                    if (Platform.OS !== "android") {
+                        showAlert({
+                            title: "Error",
+                            message: "Invalid email or password. Please try again.",
+                            buttons: [{
+                                text: 'OK',
+                                onPress: () => {
+
+                                }
+                            }],
+                        })
+                    } else {
+                        alert("Invalid email or password. Please try again.");
+                    }
+                }
+            }
+        } catch (error) {
+            console.log('Error', error);
+        }
+    };
 
     const updateFormData = (name, value) => {
         setFormData({
@@ -1012,18 +1149,20 @@ const LoginPage = ({navigateTo, showPassword, setShowPassword, previousPage}) =>
                             <View className="flex-1 h-px bg-gray-300"/>
                         </View>
 
-                        <View className="mt-6 grid grid-cols-2 gap-3">
-                            <TouchableOpacity activeOpacity={0.9}
-                                              className="py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center text-gray-700 bg-white hover:bg-gray-50"
+                        <View className="mt-6 items-center">
+                            <TouchableOpacity
+                                activeOpacity={0.7}
+                                onPress={() => showAlert({
+                                    title: "Google Sign-In",
+                                    message: "Google Sign-In is not yet implemented on this platform.",
+                                    buttons: [{
+                                        text: 'OK',
+                                        onPress: () => {}
+                                    }],
+                                })}
+                                style={{width: "100%", maxWidth: 240}}
                             >
-                                <View className="w-5 h-5 bg-blue-500 rounded-full mr-2"></View>
-                                Google
-                            </TouchableOpacity>
-                            <TouchableOpacity activeOpacity={0.9}
-                                              className="py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center text-gray-700 bg-white hover:bg-gray-50"
-                            >
-                                <View className="w-5 h-5 bg-black rounded-full mr-2"></View>
-                                Apple
+                                <Image style={{height: 50}} source={require("../assets/images/google-signin.png")} alt="Google" />
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -1041,7 +1180,7 @@ const LoginPage = ({navigateTo, showPassword, setShowPassword, previousPage}) =>
             </View>
         );
     } else {
-        return <MobileLoginFlow previousPage={previousPage} loginEmail={loginEmail} navigateTo={navigateTo} showPassword={showPassword} setShowPassword={setShowPassword}
+        return <MobileLoginFlow googleSignIn={googleSignIn} previousPage={previousPage} loginEmail={loginEmail} navigateTo={navigateTo} showPassword={showPassword} setShowPassword={setShowPassword}
                                 rememberMe={rememberMe} setRememberMe={setRememberMe} formData={formData} updateFormData={updateFormData} />
     }
 };
@@ -1054,6 +1193,27 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
     const [registered, setRegistered] = useState(false);
 
     const token = useRef("");
+    const googleToken = useRef("");
+
+    const GoogleLogin = async () => {
+        await GoogleSignin.hasPlayServices();
+
+        return await GoogleSignin.signIn();
+    };
+
+    const RegisterWithGoogle = async () => {
+        try {
+            const response = await GoogleLogin();
+
+            const {idToken, user} = response.data ?? {};
+            if (idToken) {
+                updateFormData("email", user.email);
+                googleToken.current = idToken;
+            }
+        } catch (error) {
+            console.log('Error', error);
+        }
+    }
 
     async function Register() {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -1072,7 +1232,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
             age--;
         }
 
-        if (emailRegex.test(formData.email.trim()) && formData.password.trim().length > 3 && formData.username.trim().length >= 3 && formData.name.length > 3 && !formData.username.includes("/") && !bannedUsernames.includes(formData.username.trim())) {
+        if (((emailRegex.test(formData.email.trim()) && formData.password.trim().length > 3) || googleToken.current !== "") && formData.username.trim().length >= 3 && formData.name.length > 3 && !formData.username.includes("/") && !bannedUsernames.includes(formData.username.trim())) {
             if(age <= 13 || formData.interests.length < 3 || formData.location.length <= 3 || !formData.profilePicture) {
                 if (Platform.OS !== "android") {
                     showAlert({
@@ -1093,18 +1253,34 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
             }
             setRegistered(true)
             try {
-                const response = await fetch(`${ip}/auth/register`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        email: formData.email.trim(),
-                        password: formData.password.trim(),
-                        username: formData.username.trim(),
-                        name: formData.name,
-                    }),
-                });
+                let response;
+                if (googleToken.current !== "") {
+                    response = await fetch(`${ip}/auth/register/google`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            email: formData.email.trim(),
+                            googleToken: googleToken.current,
+                            username: formData.username.trim(),
+                            name: formData.name,
+                        }),
+                    });
+                } else {
+                    response = await fetch(`${ip}/auth/register`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            email: formData.email.trim(),
+                            password: formData.password.trim(),
+                            username: formData.username.trim(),
+                            name: formData.name,
+                        }),
+                    });
+                }
 
                 if (response.ok) {
                     const data = await response.json();
@@ -1323,7 +1499,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                         await SecureStore.setItemAsync("token", token.current);
                         await SecureStore.setItemAsync("username", formData.username.trim());
                         await SecureStore.setItemAsync("profilePicture", imageUrl.current);
-                        await SecureStore.setItemAsync("profile", JSON.stringify({
+                        await asyncStorage.setItem("profile", JSON.stringify({
                             name: formData.name,
                             location: formData.location,
                             score: 0,
@@ -1606,18 +1782,20 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                                         <View className="flex-1 h-px bg-gray-300"/>
                                     </View>
 
-                                    <View className="mt-6 grid grid-cols-2 gap-3">
-                                        <TouchableOpacity activeOpacity={0.8}
-                                                          className="py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center text-gray-700 bg-white hover:bg-gray-50"
+                                    <View className="mt-6 items-center">
+                                        <TouchableOpacity
+                                            activeOpacity={0.7}
+                                            onPress={() => showAlert({
+                                                title: "Google Sign-In",
+                                                message: "Google Sign-In is not yet implemented on this platform.",
+                                                buttons: [{
+                                                text: 'OK',
+                                                onPress: () => {}
+                                            }],
+                                            })}
+                                            style={{width: "100%", maxWidth: 240}}
                                         >
-                                            <View className="w-5 h-5 bg-blue-500 rounded-full mr-2"></View>
-                                            Google
-                                        </TouchableOpacity>
-                                        <TouchableOpacity activeOpacity={0.8}
-                                                          className="py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center text-gray-700 bg-white hover:bg-gray-50"
-                                        >
-                                            <View className="w-5 h-5 bg-black rounded-full mr-2"></View>
-                                            Apple
+                                            <Image style={{height: 50}} source={require("../assets/images/google-signin.png")} alt="Google" />
                                         </TouchableOpacity>
                                     </View>
                                 </View>
@@ -1862,33 +2040,14 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
             </View>
         );
     } else {
-        return <MobileRegistrationFlow navigateTo={navigateTo} showPassword={showPassword} setShowPassword={setShowPassword} formData={formData}
+        return <MobileRegistrationFlow RegisterWithGoogle={RegisterWithGoogle} navigateTo={navigateTo} showPassword={showPassword} setShowPassword={setShowPassword} formData={formData}
                                        previousPage={previousPage} step={step} activeStep={activeStep} jumpToStep={jumpToStep}
                                        acceptLegals={acceptLegals} setAcceptLegals={setAcceptLegals} prevStep={prevStep} nextStep={nextStep} registered={registered} updateFormData={updateFormData} />
     }
 };
 
-const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, setShowPassword, rememberMe, setRememberMe, formData, updateFormData}) => {
+const MobileLoginFlow = ({googleSignIn, navigateTo, previousPage, loginEmail, showPassword, setShowPassword, rememberMe, setRememberMe, formData, updateFormData}) => {
     const { t } = useTranslation();
-
-    const GoogleLogin = async () => {
-        await GoogleSignin.hasPlayServices();
-
-        return await GoogleSignin.signIn();
-    };
-
-    const googleSignIn = async () => {
-        try {
-            const response = await GoogleLogin();
-
-            const { idToken, user } = response.data ?? {};
-            if (idToken) {
-                console.log(idToken, user);
-            }
-        } catch (error) {
-            console.log('Error', error);
-        }
-    };
 
     return (
         <View style={{marginBottom: 110, justifyContent: "center", width: "100%", flexGrow: 1}}>
@@ -1985,17 +2144,13 @@ const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, se
                         <View className="flex-1 h-px bg-gray-300" />
                     </View>
 
-                    <View className="mt-6 flex flex-row gap-3">
-                        <GoogleSigninButton
-                            className="flex-1 py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center"
-                            onPress={googleSignIn}
-                        />
+                    <View className="mt-6 items-center">
                         <TouchableOpacity
-                            activeOpacity={0.9}
-                            className="flex-1 py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center"
+                            activeOpacity={0.7}
+                            onPress={googleSignIn}
+                            style={{width: "100%", maxWidth: 240}}
                         >
-                            <View className="w-5 h-5 bg-black rounded-full mr-2"></View>
-                            <Text className="text-gray-700">Apple</Text>
+                           <Image style={{height: 50}} source={require("../assets/images/google-signin.png")} alt="Google" />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -2017,7 +2172,7 @@ const MobileLoginFlow = ({navigateTo, previousPage, loginEmail, showPassword, se
     );
 }
 
-const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousPage, step, activeStep, acceptLegals, setAcceptLegals, prevStep, nextStep, registered, jumpToStep, updateFormData, formData }) => {
+const MobileRegistrationFlow = ({ RegisterWithGoogle, navigateTo, showPassword, setShowPassword, previousPage, step, activeStep, acceptLegals, setAcceptLegals, prevStep, nextStep, registered, jumpToStep, updateFormData, formData }) => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const totalSteps = 5;
     const { t } = useTranslation();
@@ -2280,20 +2435,13 @@ const MobileRegistrationFlow = ({ navigateTo, showPassword, setShowPassword, pre
                                         <View className="flex-1 h-px bg-gray-300" />
                                     </View>
 
-                                    <View className="mt-6 flex flex-row gap-3">
+                                    <View className="mt-6 items-center">
                                         <TouchableOpacity
-                                            activeOpacity={0.8}
-                                            className="flex-1 py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center"
+                                            activeOpacity={0.7}
+                                            onPress={RegisterWithGoogle}
+                                            style={{width: "100%", maxWidth: 240}}
                                         >
-                                            <View className="w-5 h-5 bg-blue-500 rounded-full mr-2"></View>
-                                            <Text className="text-gray-700">Google</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity
-                                            activeOpacity={0.8}
-                                            className="flex-1 py-3 px-4 border border-gray-300 rounded-lg flex flex-row items-center justify-center"
-                                        >
-                                            <View className="w-5 h-5 bg-black rounded-full mr-2"></View>
-                                            <Text className="text-gray-700">Apple</Text>
+                                            <Image style={{height: 50}} source={require("../assets/images/google-signin.png")} alt="Google" />
                                         </TouchableOpacity>
                                     </View>
                                 </View>

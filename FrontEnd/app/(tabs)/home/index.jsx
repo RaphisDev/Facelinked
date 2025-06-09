@@ -30,6 +30,7 @@ import {showAlert} from "../../../components/PopUpModalView";
 import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
 import {useTranslation} from "react-i18next";
 import StateManager from "../../../components/StateManager";
+import asyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Index() {
     const [posts, setPosts] = useState([]);
@@ -264,7 +265,7 @@ export default function Index() {
         if (Platform.OS === "web") {
             profilePath = JSON.parse(localStorage.getItem('profile')).profilePicturePath;
         } else {
-            profilePath = JSON.parse(SecureStore.getItem('profile')).profilePicturePath;
+            profilePath = JSON.parse(await asyncStorage.getItem('profile')).profilePicturePath;
         }
 
         const newComment = {

@@ -449,7 +449,7 @@ export default function Networks() {
                 profile = JSON.parse(localStorage.getItem("profile"));
             }
             else {
-                profile = JSON.parse(SecureStore.getItem("profile"));
+                profile = JSON.parse(await asyncStorage.getItem("profile"));
             }
             setFriendsList(profile.friends);
         } catch (error) {
@@ -950,6 +950,7 @@ export default function Networks() {
                         isFriend: true
                     };
                 }
+                return person;
             }));
         }
     }

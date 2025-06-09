@@ -26,6 +26,7 @@
                 import {useSearchParams} from "expo-router/build/hooks";
                 import {useTranslation} from "react-i18next";
                 import StateManager from "../../../components/StateManager";
+                import asyncStorage from "@react-native-async-storage/async-storage";
 
                 export default function Profile() {
 
@@ -112,7 +113,7 @@
                                     profile = JSON.parse(localStorage.getItem('profile'));
                                 }
                                 else {
-                                    profile = JSON.parse(SecureStore.getItem('profile'));
+                                    profile = JSON.parse(await asyncStorage.getItem('profile'));
                                 }
                                 setProfileInfos(profile);
                             }
@@ -148,7 +149,7 @@
                                         setIsFriendRequestReceived(profile.friendRequests.some((friend) => friend.memberId === profileName.current));
                                     }
                                 } else {
-                                    const profile = JSON.parse(SecureStore.getItem('profile'));
+                                    const profile = JSON.parse(await asyncStorage.getItem('friends'));
                                     if (!profile.friends) {
                                         setIsAdded(false);
                                     } else {
@@ -164,7 +165,7 @@
                                     if (Platform.OS === "web") {
                                         localStorage.setItem('profile', JSON.stringify(profileInfos));
                                     } else {
-                                        SecureStore.setItem('profile', JSON.stringify(profileInfos));
+                                        await asyncStorage.setItem('profile', JSON.stringify(profileInfos));
                                     }
                                 }
 
@@ -692,7 +693,7 @@
                         if (Platform.OS === "web") {
                             profilePath = JSON.parse(localStorage.getItem('profile')).profilePicturePath;
                         } else {
-                            profilePath = JSON.parse(SecureStore.getItem('profile')).profilePicturePath;
+                            profilePath = JSON.parse(await asyncStorage.getItem('profile')).profilePicturePath;
                         }
 
                         const newComment = {
@@ -824,7 +825,7 @@
                                 if (Platform.OS === "web") {
                                     localStorage.setItem('profile', JSON.stringify({...profileInfos, ...updatedProfile}));
                                 } else {
-                                    SecureStore.setItem('profile', JSON.stringify({...profileInfos, ...updatedProfile}));
+                                    await asyncStorage.setItem('profile', JSON.stringify({...profileInfos, ...updatedProfile}));
                                 }
 
                                 showAlert({
@@ -1677,6 +1678,7 @@
                                     <FlatList
                                         className="px-4"
                                         data={friendsSearchResults}
+                                        contentContainerStyle={{paddingBottom: 80}}
                                         ListEmptyComponent={() => (
                                             <View className="flex-1 items-center justify-center py-16">
                                                 <View className="w-20 h-20 mb-4 items-center justify-center bg-blue-100/70 rounded-full">
@@ -1755,10 +1757,10 @@
 
                                     {/* Add Friend Button */}
                                     {profileName.current !== username.current && (
-                                        <View className="px-6 bottom-safe border-t border-gray-100">
+                                        <View className="px-6 mb-3.5 bottom-safe border-t border-gray-100">
                                             <TouchableOpacity
                                                 onPress={() => isFriendRequestReceived ? handleFriendRequest(profileName.current, true) : isFriendRequestSent ? null : AddFriend()}
-                                                className="bg-blue-500 rounded-lg py-3 shadow-sm"
+                                                className="bg-blue-500 rounded-lg py-3.5 shadow-sm"
                                                 activeOpacity={0.8}
                                             >
                                                 <View className="flex-row items-center justify-center">
