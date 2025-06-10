@@ -215,5 +215,7 @@
   "friend.required": "Freund erforderlich",
   "friend.required.message": "Du musst befreundet sein, um zu chatten",
   "likes.show": "Gefällt mir",
-  "explore": "Entdecken"
+  "explore": "Entdecken",
+  "permission.required": "Berechtigung erforderlich",
+  "camera.permission": "Kamera-Berechtigung erforderlich",
 }

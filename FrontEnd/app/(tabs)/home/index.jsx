@@ -31,6 +31,8 @@ import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
 import {useTranslation} from "react-i18next";
 import StateManager from "../../../components/StateManager";
 import asyncStorage from "@react-native-async-storage/async-storage";
+import {CameraView, useCameraPermissions} from "expo-camera";
+import {CameraType} from "expo-image-picker";
 
 export default function Index() {
     const [posts, setPosts] = useState([]);
@@ -62,6 +64,12 @@ export default function Index() {
     const [showPostCreation, setShowPostCreation] = useState(false);
     const [postText, setPostText] = useState("");
     const [selectedImages, setSelectedImages] = useState([]);
+
+    const [cameraActive, setCameraActive] = useState(false);
+    const [cameraReady, setCameraReady] = useState(false);
+    const cameraRef = useRef(null);
+    const [facing, setFacing] = useState<CameraType>('back');
+    const [permission, requestPermission] = useCameraPermissions();
 
     const token = useRef("");
     const username = useRef("");
@@ -312,6 +320,53 @@ export default function Index() {
             })
         }
     };
+
+    const onPictureSaved = (photo) => {
+        if (photo && photo.uri) {
+            console.log(photo.uri)
+            setSelectedImages(prevImages => {
+                const updatedImages = [...prevImages, photo.uri];
+                return updatedImages.slice(0, 5);
+            });
+        }
+    }
+
+    function toggleCameraFacing() {
+        setFacing(current => (current === 'back' ? 'front' : 'back'));
+    }
+
+    const takeImage = async () => {
+        if (cameraActive && cameraReady) {
+            await cameraRef.current?.takePictureAsync({
+                quality: 0.7,
+                onPictureSaved: onPictureSaved
+            })
+        }
+    }
+
+    const openCamera = async () => {
+        if (permission.granted) {
+            setCameraActive(true);
+            setCameraReady(false)
+        } else {
+            const { status } = await requestPermission();
+            if (status === 'granted') {
+                setCameraActive(true);
+                setCameraReady(false)
+            } else {
+                showAlert({
+                    title: t("permission.required"),
+                    message: t("camera.permission"),
+                    buttons: [
+                        {
+                            text: "Okay",
+                            onPress: () => {}
+                        }
+                    ]
+                })
+            }
+        }
+    }
 
     // Function to pick images from gallery
     const pickImages = async () => {
@@ -629,6 +684,18 @@ export default function Index() {
                     />
                 </SafeAreaView>
             </Modal>
+
+            <CameraView ref={cameraRef} onCameraReady={() => setCameraReady(true)}
+                        style={{display: cameraActive ? "flex" : "none"}} facing={facing}>
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
+                        <Text style={styles.text}>Flip Camera</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.takePictureButton} disabled={!cameraReady} onPress={takeImage}>
+                        <Text style={styles.text}>Take Photo</Text>
+                    </TouchableOpacity>
+                </View>
+            </CameraView>
 
             {/* Image Viewing Modal */}
             <Modal
@@ -951,6 +1018,13 @@ export default function Index() {
                             {/* Action Buttons */}
                             <View className="flex-row px-4 py-3 border-t border-gray-200">
                                 <TouchableOpacity
+                                    onPress={openCamera}
+                                    className="flex-row items-center p-2 rounded-lg bg-gray-100"
+                                    disabled={selectedImages.length >= 5}
+                                >
+                                    <Ionicons name="camera" size={22} color={selectedImages.length >= 5 ? "#94A3B8" : "#3B82F6"} />
+                                </TouchableOpacity>
+                                <TouchableOpacity
                                     onPress={pickImages}
                                     className="flex-row items-center p-2 rounded-lg bg-gray-100"
                                     disabled={selectedImages.length >= 5}
@@ -972,3 +1046,34 @@ export default function Index() {
         </SafeAreaProvider>
     );
 }
+
+const styles = StyleSheet.create({
+    camera: {
+        flex: 1,
+    },
+    buttonContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        backgroundColor: 'transparent',
+        margin: 64,
+    },
+    button: {
+        flex: 1,
+        alignSelf: 'flex-end',
+        alignItems: 'center',
+    },
+    takePictureButton: {
+        flex: 1,
+        alignSelf: 'flex-end',
+        alignItems: 'center',
+        backgroundColor: '#3B82F6',
+        borderRadius: 50,
+        padding: 16,
+        marginLeft: 20,
+    },
+    text: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: 'white',
+    },
+});
