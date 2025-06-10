@@ -1303,7 +1303,7 @@
                                                                 {id: "relationshipStatus", icon: "heart", value: profileInfos.inRelationship ? "In a relationship" : "Single"},
                                                             ]}
                                                             renderItem={({item}) => (
-                                                                <View className="flex-row items-center mb-3">
+                                                                <View className="flex-row items-center mb-3 mr-10">
                                                                     <View className="w-8 h-8 rounded-full bg-blue-100 items-center justify-center mr-3">
                                                                         <Ionicons className={item.id === "hobbies" ? "mt-0.5" : ''} name={item.icon} size={16} color="#3B82F6" />
                                                                     </View>

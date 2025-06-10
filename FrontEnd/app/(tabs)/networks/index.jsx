@@ -216,7 +216,7 @@ export default function Networks() {
                             ...person,
                             profilePicturePath: person.profilePicturePath.split(",")[0] ,
                             age: calculateAge(new Date(person.dateOfBirth)),
-                            relationshipStatus: person.inRelationship ? "in relationship" : "Single",
+                            relationshipStatus: person.inRelationship ? t("in.relationship") : t("single"),
                             isFriend: false,
                         }
                     }));
