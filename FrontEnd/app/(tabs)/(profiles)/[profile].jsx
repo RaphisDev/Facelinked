@@ -474,7 +474,10 @@
                             title: postInputText,
                             content: selectedPostImages,
                             likes: [],
-                            millis: Date.now(),
+                            id: {
+                                millis: Date.now(),
+                                userId: profileName.current,
+                            },
                             comments: [],
                         }, ...cachedPosts.current]);
 
@@ -551,8 +554,7 @@
                                 setPosts(prevState => prevState.slice(1));
                             }
                             else {
-                                // Refresh posts
-                                const postData = await fetch(`${ip}/profile/posts/all/${profileName.current}`, {
+                                const postData = await fetch(`${ip}/profile/posts/last5/${profileName.current}`, {
                                     method: 'GET',
                                     headers: {
                                         "Authorization": `Bearer ${token.current}`
@@ -590,16 +592,7 @@
                             setPosts(prevState => prevState.filter(post => post.id.millis !== millis));
                             setShowPostModal(false);
                         } else {
-                            showAlert({
-                                title: t("error"),
-                                message: 'An error occurred while deleting your post. Please try again later.',
-                                buttons: [
-                                    {
-                                        text: 'OK',
-                                        onPress: () => {}
-                                    },
-                                ],
-                            });
+                            console.error('Error deleting post:');
                         }
                     }
 
@@ -1474,10 +1467,11 @@
                                         renderItem={(items) => {
                                                   if(items.item.new) {
                                                       return (
+                                                          <View className="mx-4 mt-4">
                                                           <KeyboardAvoidingView
                                                               behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                                                               keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
-                                                              className="w-full mx-4 mt-4"
+                                                              className="w-full"
                                                           >
                                                               <View className="bg-white border border-gray-200 min-h-20 p-4 rounded-xl shadow-sm">
                                                                   {renderSelectedPostImages()}
@@ -1538,7 +1532,8 @@
 
                                                               {/* Invisible view to ensure proper scrolling with keyboard */}
                                                               <View style={{ height: 200 }} />
-                                                          </KeyboardAvoidingView>)
+                                                          </KeyboardAvoidingView>
+                                                          </View>)
                                                   } else {
                                                       return (
                                                           <TouchableOpacity

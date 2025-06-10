@@ -181,9 +181,7 @@ export default function Post(props) {
                         <TouchableOpacity
                             style={styles.optionButton}
                             onPress={async () => {
-                                if (props.onDeletePost()) {
-                                    props.onDeletePost();
-                                }
+                                props.onDeletePost();
                                 setOptionsVisible(false);
                             }}
                         >
