@@ -1077,7 +1077,7 @@ const LoginPage = ({navigateTo, showPassword, setShowPassword, previousPage}) =>
                     if (Platform.OS !== "android") {
                         showAlert({
                             title: "Error",
-                            message: "Invalid email or password. Please try again.",
+                            message: "There is no account associated with that account",
                             buttons: [{
                                 text: 'OK',
                                 onPress: () => {
@@ -1086,7 +1086,7 @@ const LoginPage = ({navigateTo, showPassword, setShowPassword, previousPage}) =>
                             }],
                         })
                     } else {
-                        alert("Invalid email or password. Please try again.");
+                        alert("There is no account associated with that account");
                     }
                     try {
                         await GoogleSignin.signOut();
@@ -1276,6 +1276,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
             if (idToken) {
                 updateFormData("email", user.email);
                 googleToken.current = idToken;
+                nextStep()
             }
         } catch (error) {
             console.log('Error', error);
@@ -1376,6 +1377,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                     }
                     jumpToStep(1);
                     setRegistered(false);
+                    return;
                 }
             }
             catch (error) {
@@ -1400,6 +1402,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                 }
                 jumpToStep(1);
                 setRegistered(false);
+                return;
             }
             await CompleteProfile();
         }

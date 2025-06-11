@@ -35,7 +35,7 @@ public class AuthenticationController
         try {
             return ResponseEntity.ok(authService.registerGoogle(request));
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+            throw new RuntimeException(e);
         }
     }
 
