@@ -507,6 +507,7 @@ export default function ChatRoom() {
                 mediaTypes: "images",
                 allowsMultipleSelection: true,
                 quality: 0.8,
+                selectionLimit: 7 - selectedImages.length,
             });
 
             if (!result.canceled) {

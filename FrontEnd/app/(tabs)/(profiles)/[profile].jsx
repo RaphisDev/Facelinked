@@ -663,6 +663,7 @@
                             allowsMultipleSelection: true,
                             quality: 0.8,
                             aspect: [4, 3],
+                            selectionLimit: 7 - selectedImages.length,
                         });
 
                         if (!result.canceled && result.assets) {
