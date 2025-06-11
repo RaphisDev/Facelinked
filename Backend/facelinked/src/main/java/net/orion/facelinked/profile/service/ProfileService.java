@@ -88,9 +88,9 @@ public class ProfileService {
         if(user.getFriends().stream().anyMatch(friend -> friend.getMemberId().equals(memberToAdd.getMemberId()))) {
             return;
         }
-        if (user.getFriendRequests().contains(memberToAdd)) {
+        if (user.getFriendRequests().stream().anyMatch(friend -> friend.getMemberId().equals(memberToAdd.getMemberId()))) {
             var friendRequests = new ArrayList<>(user.getFriendRequests());
-            friendRequests.remove(memberToAdd);
+            friendRequests.removeIf(friend -> friend.getMemberId().equals(memberToAdd.getMemberId()));
             user.setFriendRequests(friendRequests);
             var newFriends = new ArrayList<>(user.getFriends());
             newFriends.add(memberToAdd);
@@ -98,10 +98,12 @@ public class ProfileService {
             profileRepository.save(user);
 
             var newFriendsOfToAdd = new ArrayList<>(toAdd.getFriends());
+
             var userMember = new NetworkMember();
             userMember.setMemberId(user.getUsername());
             userMember.setMemberName(user.getName());
             userMember.setMemberProfilePicturePath(user.getProfilePicturePath());
+
             newFriendsOfToAdd.add(userMember);
             toAdd.setFriends(newFriendsOfToAdd);
             profileRepository.save(toAdd);
