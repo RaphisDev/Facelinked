@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
+      <change beforePath="$PROJECT_DIR$/../Backend/facelinked/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Backend/facelinked/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/index.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -335,6 +336,7 @@
       <workItem from="1749654662252" duration="43000" />
       <workItem from="1749654718487" duration="32000" />
       <workItem from="1749654969137" duration="237000" />
+      <workItem from="1749655617207" duration="189000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />

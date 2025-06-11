@@ -28,10 +28,31 @@ public class AuthenticationController
         return ResponseEntity.ok(authService.register(request));
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/register/google")
+    private ResponseEntity<AuthenticationResponse> RegisterGoogle(@Valid @RequestBody GoogleRegisterRequest request)
+    {
+        try {
+            return ResponseEntity.ok(authService.registerGoogle(request));
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+    }
+
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> Authenticate(@RequestBody AuthenticationRequest request) {
         try {
             return ResponseEntity.ok(authService.authenticate(request));
+        } catch (Exception e)
+        {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("/authenticate/google")
+    public ResponseEntity<AuthenticationResponse> Authenticate(@RequestBody GoogleAuthenticationRequest request) {
+        try {
+            return ResponseEntity.ok(authService.authenticateGoogle(request));
         } catch (Exception e)
         {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);

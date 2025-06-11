@@ -984,6 +984,7 @@ const LoginPage = ({navigateTo, showPassword, setShowPassword, previousPage}) =>
                     body: JSON.stringify({
                         googleToken: idToken,
                         email: user.email,
+                        android: Platform.OS === "android",
                     }),
                 });
 
@@ -1087,10 +1088,20 @@ const LoginPage = ({navigateTo, showPassword, setShowPassword, previousPage}) =>
                     } else {
                         alert("Invalid email or password. Please try again.");
                     }
+                    try {
+                        await GoogleSignin.signOut();
+                    } catch (error) {
+                        console.error("Error signing out from Google:", error);
+                    }
                 }
             }
         } catch (error) {
             console.log('Error', error);
+            try {
+                await GoogleSignin.signOut();
+            } catch (error) {
+                console.error("Error signing out from Google:", error);
+            }
         }
     };
 
@@ -1321,6 +1332,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                             googleToken: googleToken.current,
                             username: formData.username.trim(),
                             name: formData.name,
+                            android: Platform.OS === "android",
                         }),
                     });
                 } else {
@@ -1357,6 +1369,11 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                     } else {
                         alert("There is already an account with that email or username.");
                     }
+                    try {
+                        await GoogleSignin.signOut();
+                    } catch (error) {
+                        console.error("Error signing out from Google:", error);
+                    }
                     jumpToStep(1);
                     setRegistered(false);
                 }
@@ -1375,6 +1392,11 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                     })
                 } else {
                     alert("Network Error. Please try again.");
+                }
+                try {
+                    await GoogleSignin.signOut();
+                } catch (error) {
+                    console.error("Error signing out from Google:", error);
                 }
                 jumpToStep(1);
                 setRegistered(false);
