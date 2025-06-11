@@ -33,6 +33,8 @@ import StateManager from "../../../components/StateManager";
 import asyncStorage from "@react-native-async-storage/async-storage";
 import {CameraView, useCameraPermissions} from "expo-camera";
 import {CameraType} from "expo-image-picker";
+import {CameraTypeToFacingMode} from "expo-camera/build/web/WebConstants";
+import CustomTabBar from "../../../components/CustomTabBar";
 
 export default function Index() {
     const [posts, setPosts] = useState([]);
@@ -68,7 +70,7 @@ export default function Index() {
     const [cameraActive, setCameraActive] = useState(false);
     const [cameraReady, setCameraReady] = useState(false);
     const cameraRef = useRef(null);
-    const [facing, setFacing] = useState<CameraType>('back');
+    const [facing, setFacing] = useState('back');
     const [permission, requestPermission] = useCameraPermissions();
 
     const token = useRef("");
@@ -323,11 +325,11 @@ export default function Index() {
 
     const onPictureSaved = (photo) => {
         if (photo && photo.uri) {
-            console.log(photo.uri)
             setSelectedImages(prevImages => {
                 const updatedImages = [...prevImages, photo.uri];
                 return updatedImages.slice(0, 5);
             });
+            closeCamera()
         }
     }
 
@@ -339,20 +341,29 @@ export default function Index() {
         if (cameraActive && cameraReady) {
             await cameraRef.current?.takePictureAsync({
                 quality: 0.7,
-                onPictureSaved: onPictureSaved
+                onPictureSaved: onPictureSaved,
+                exif: false
             })
         }
+    }
+
+    function closeCamera() {
+        setCameraActive(false);
+        setShowPostCreation(true);
+        stateManager.setTabBarVisible(true);
     }
 
     const openCamera = async () => {
         if (permission.granted) {
             setCameraActive(true);
-            setCameraReady(false)
+            setShowPostCreation(false)
+            stateManager.setTabBarVisible(false);
         } else {
             const { status } = await requestPermission();
             if (status === 'granted') {
                 setCameraActive(true);
-                setCameraReady(false)
+                setShowPostCreation(false)
+                stateManager.setTabBarVisible(false);
             } else {
                 showAlert({
                     title: t("permission.required"),
@@ -685,17 +696,88 @@ export default function Index() {
                 </SafeAreaView>
             </Modal>
 
-            <CameraView ref={cameraRef} onCameraReady={() => setCameraReady(true)}
-                        style={{display: cameraActive ? "flex" : "none"}} facing={facing}>
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-                        <Text style={styles.text}>Flip Camera</Text>
+            <View style={{
+              position: cameraActive ? 'absolute' : 'relative',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 10,
+                display: cameraActive ? "flex" : "none"
+            }}>
+              <CameraView
+                ref={cameraRef}
+                onCameraReady={() => setCameraReady(true)}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                }}
+                facing={Platform.OS === 'web' ? facing : facing === 'front' ? CameraType.front : CameraType.back}
+                video={false}
+                enableZoomGesture
+              />
+
+              {cameraActive && (
+                <SafeAreaProvider style={{position: 'absolute', top: 0, left: 0, right: 0, bottom: 0}}>
+                <SafeAreaView style={{flex: 1}}>
+                    <LinearGradient
+                      colors={['rgba(0,0,0,0.7)', 'rgba(0,0,0,0)']}
+                      style={{position: 'absolute', top: 0, left: 0, right: 0, height: 100, zIndex: 10}}
+                    />
+                  <View style={{position: 'absolute', top: 16, right: 16, zIndex: 20}}>
+                    <TouchableOpacity
+                        style={{
+                          padding: 12,
+                          backgroundColor: 'rgba(0,0,0,0.6)',
+                          borderRadius: 30,
+                          shadowColor: '#000',
+                          shadowOffset: { width: 0, height: 2 },
+                          shadowOpacity: 0.3,
+                          shadowRadius: 3
+                        }}
+                      onPress={closeCamera}>
+                      <Ionicons name="close" size={24} color="#ffffff" />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.takePictureButton} disabled={!cameraReady} onPress={takeImage}>
-                        <Text style={styles.text}>Take Photo</Text>
+                  </View>
+                    <View style={{...styles.buttonContainer}}>
+                    <TouchableOpacity
+                        style={{
+                          ...styles.button,
+                          backgroundColor: 'rgba(0,0,0,0.6)',
+                          padding: 14,
+                          borderRadius: 40,
+                          shadowColor: '#000',
+                          shadowOffset: { width: 0, height: 2 },
+                          shadowOpacity: 0.3,
+                            zIndex: 20,
+                          shadowRadius: 3
+                        }}
+                      onPress={toggleCameraFacing}>
+                        <Ionicons name="camera-reverse-outline" size={26} color="#ffffff" />
                     </TouchableOpacity>
+                    <TouchableOpacity
+                        style={{
+                          ...styles.takePictureButton,
+                          shadowColor: '#000',
+                          shadowOffset: { width: 0, height: 3 },
+                          shadowOpacity: 0.4,
+                            zIndex: 20,
+                          shadowRadius: 5,
+                        }}
+                      disabled={!cameraReady}
+                      onPress={takeImage}>
+                        <Ionicons name="camera" size={32} color="#ffffff" />
+                    </TouchableOpacity>
+                    <View style={{flex: 1}} />
                 </View>
-            </CameraView>
+                    <LinearGradient
+                      colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.7)']}
+                      style={{position: 'absolute', bottom: 0, left: 0, right: 0, height: 120, zIndex: 5}}
+                    />
+                </SafeAreaView>
+                </SafeAreaProvider>
+              )}
+            </View>
 
             {/* Image Viewing Modal */}
             <Modal
@@ -797,6 +879,20 @@ export default function Index() {
                 </SafeAreaProvider>
             </Modal>
 
+            {showCommentInput && <Animated.View
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: fadeAnim.interpolate({
+                        inputRange: [0, 0.5],
+                        outputRange: ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.5)']
+                    })
+                }}
+            >
+
             {/* Comment Input Modal */}
             <Modal
                 visible={showCommentInput}
@@ -804,19 +900,7 @@ export default function Index() {
                 onRequestClose={() => setShowCommentInput(false)}
                 animationType={isDesktop ? "fade" : "slide"}
             >
-                    <Animated.View
-                        style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            backgroundColor: fadeAnim.interpolate({
-                                inputRange: [0, 0.5],
-                                outputRange: ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.5)']
-                            })
-                        }}
-                    >
+
                         <SafeAreaProvider>
                             <SafeAreaView style={{ flex: 1 }}>
                                 <KeyboardAvoidingView
@@ -920,10 +1004,22 @@ export default function Index() {
                                 </KeyboardAvoidingView>
                             </SafeAreaView>
                         </SafeAreaProvider>
-                    </Animated.View>
-
         </Modal>
+            </Animated.View>}
 
+            {showPostCreation && <Animated.View
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: fadeAnim.interpolate({
+                        inputRange: [0, 0.5],
+                        outputRange: ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.5)']
+                    })
+                }}
+            >
             {/* Post Creation Modal */}
             <Modal
                 visible={showPostCreation}
@@ -931,19 +1027,6 @@ export default function Index() {
                 onRequestClose={() => setShowPostCreation(false)}
                 animationType={isDesktop ? "fade" : "slide"}
             >
-                <Animated.View
-                    style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: fadeAnim.interpolate({
-                            inputRange: [0, 0.5],
-                            outputRange: ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 0.5)']
-                        })
-                    }}
-                >
                     <SafeAreaProvider>
                         <SafeAreaView style={{ flex: 1 }}>
                             <KeyboardAvoidingView
@@ -1019,7 +1102,7 @@ export default function Index() {
                             <View className="flex-row px-4 py-3 border-t border-gray-200">
                                 <TouchableOpacity
                                     onPress={openCamera}
-                                    className="flex-row items-center p-2 rounded-lg bg-gray-100"
+                                    className="flex-row mr-3 items-center p-2 rounded-lg bg-gray-100"
                                     disabled={selectedImages.length >= 5}
                                 >
                                     <Ionicons name="camera" size={22} color={selectedImages.length >= 5 ? "#94A3B8" : "#3B82F6"} />
@@ -1040,8 +1123,8 @@ export default function Index() {
                 </KeyboardAvoidingView>
                 </SafeAreaView>
                 </SafeAreaProvider>
-                </Animated.View>
             </Modal>
+            </Animated.View>}
         </SafeAreaView>
         </SafeAreaProvider>
     );
@@ -1061,15 +1144,18 @@ const styles = StyleSheet.create({
         flex: 1,
         alignSelf: 'flex-end',
         alignItems: 'center',
+        maxWidth: 85,
+        marginBottom: 15
     },
     takePictureButton: {
-        flex: 1,
         alignSelf: 'flex-end',
         alignItems: 'center',
+        justifyContent: 'center',
         backgroundColor: '#3B82F6',
         borderRadius: 50,
-        padding: 16,
-        marginLeft: 20,
+        width: 90,
+        height: 90,
+        marginLeft: 25
     },
     text: {
         fontSize: 24,

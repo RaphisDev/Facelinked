@@ -10,12 +10,19 @@ class StateManager {
     homePressed = new EventEmitter();
     currentUsername = "profile";
     username = "";
+    tabBarVisible = true;
+    tabBarChanged = new EventEmitter();
 
     constructor() {
         if (!stateManagerInstance) {
             stateManagerInstance = this;
         }
         return stateManagerInstance;
+    }
+
+    setTabBarVisible(visible) {
+        this.tabBarVisible = visible;
+        this.tabBarChanged.emit("tabBarChanged", visible);
     }
 
     getActualUsername() {

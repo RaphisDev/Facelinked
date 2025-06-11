@@ -1,5 +1,5 @@
 // components/CustomTabBar.js
-import React from 'react';
+import React, {useRef, useState} from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,7 +18,10 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
     const pathname = usePathname();
     const router = useRouter();
     const embedded = useEmbeddedState();
-
+    const [visible, setCurrentVisible] = useState(true);
+    new StateManager().tabBarChanged.addListener("tabBarChanged", (newState) => {
+        setCurrentVisible(newState);
+    })
     const {t} = useTranslation();
 
     // Define tab routes and their icons
@@ -105,6 +108,9 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 
     if (tabRoutes.some(route => pathname.startsWith("/" + route.name + "/"))) {
         return null
+    }
+    if (!visible) {
+        return null;
     }
 
     // Render bottom tab bar for mobile

@@ -128,7 +128,7 @@ export default function Post(props) {
                         activeOpacity={0.7}
                         onPress={async () => {
                             props.onCommentPress();
-                            await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                            await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
                         }}
                     >
                         <Ionicons name="chatbubble-outline" size={isDesktop ? 22 : 20} color="#6B7280" />
