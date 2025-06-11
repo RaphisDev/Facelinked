@@ -29,7 +29,7 @@ public class AuthService
     public AuthenticationResponse register(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Invalid credentials");
+            throw new IllegalArgumentException("Authentication failed");
         }
 
         var user = User.builder()
@@ -51,7 +51,7 @@ public class AuthService
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) throws Exception {
         if (request.getPassword() == null || request.getPassword().isEmpty()) {
-            throw new IllegalArgumentException("Invalid credentials");
+            throw new IllegalArgumentException("Authentication failed");
         }
 
         try {
@@ -59,10 +59,10 @@ public class AuthService
                     new UsernamePasswordAuthenticationToken(request.getEmail().toLowerCase(), request.getPassword())
             );
             var user = userRepository.findByEmail(request.getEmail().toLowerCase())
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
+                    .orElseThrow(() -> new IllegalArgumentException("Authentication failed"));
 
             if (user.getPassword() == null || user.getPassword().isEmpty()) {
-                throw new IllegalArgumentException("Invalid credentials");
+                throw new IllegalArgumentException("Authentication failed");
             }
 
             var jwtToken = jwtService.generateToken(user);
@@ -72,26 +72,26 @@ public class AuthService
                     .username(user.getUserName())
                     .build();
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid credentials");
+            throw new IllegalArgumentException("Authentication failed");
         }
     }
 
     public AuthenticationResponse registerGoogle(@Valid GoogleRegisterRequest request) throws Exception {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Invalid credentials");
+            throw new IllegalArgumentException("Authentication failed");
         }
 
         var payload = googleTokenVerifier.verifyToken(request.getGoogleToken(), request.isAndroid());
         if (!payload.getEmail().equals(request.getEmail())) {
-            throw new IllegalArgumentException("Invalid credentials");
+            throw new IllegalArgumentException("Authentication failed");
         }
 
         String googleId = payload.getSubject();
         if (googleId.isEmpty()) {
-            throw new IllegalArgumentException("Invalid credentials");
+            throw new IllegalArgumentException("Authentication failed");
         }
         if (userRepository.existsByGoogleId(googleId)) {
-            throw new IllegalArgumentException("Invalid credentials");
+            throw new IllegalArgumentException("Authentication failed");
         }
 
         var user = User.builder()
@@ -115,18 +115,18 @@ public class AuthService
     public AuthenticationResponse authenticateGoogle(GoogleAuthenticationRequest request) throws Exception {
         try {
             var user = userRepository.findByEmail(request.getEmail().toLowerCase())
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
+                    .orElseThrow(() -> new IllegalArgumentException("Authentication failed"));
 
             if (user.getGoogleId() == null || user.getGoogleId().isEmpty()) {
-                throw new IllegalArgumentException("Invalid credentials");
+                throw new IllegalArgumentException("Authentication failed");
             }
 
             var payload = googleTokenVerifier.verifyToken(request.getGoogleToken(), request.isAndroid());
             if (!payload.getSubject().equals(user.getGoogleId())) {
-                throw new IllegalArgumentException("Invalid credentials");
+                throw new IllegalArgumentException("Authentication failed");
             }
             if (!payload.getEmail().equals(user.getEmail())) {
-                throw new IllegalArgumentException("Invalid credentials");
+                throw new IllegalArgumentException("Authentication failed");
             }
 
             var jwtToken = jwtService.generateToken(user);
@@ -136,7 +136,7 @@ public class AuthService
                     .username(user.getUserName())
                     .build();
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid credentials");
+            throw new IllegalArgumentException("Authentication failed");
         }
     }
 }
