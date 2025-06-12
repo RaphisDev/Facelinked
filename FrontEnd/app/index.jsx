@@ -39,7 +39,7 @@ import {GoogleSignin, GoogleSigninButton,} from '@react-native-google-signin/goo
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 GoogleSignin.configure({
-    webClientId: process.env.EXPO_PUBLIC_WEB_ID,
+    webClientId: Platform.OS === "android" ? process.env.EXPO_PUBLIC_ANDROID_ID : Platform.OS === "ios" ? process.env.EXPO_PUBLIC_IOS_ID : process.env.EXPO_PUBLIC_WEB_ID,
     scopes: ['profile', 'email'],
     offlineAccess: true,
     forceCodeForRefreshToken: false,
@@ -1461,7 +1461,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                     if (Platform.OS !== "android") {
                         showAlert({
                             title: "Error",
-                            message: "Try again later",
+                            message: "An account with that email already exists",
                             buttons: [{
                                 text: 'OK',
                                 onPress: () => {
@@ -1470,7 +1470,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                             },],
                         })
                     } else {
-                        alert("Try again later");
+                        alert("An account with that email already exists");
                     }
                     await fetch(`${ip}/profile/delete?onlyUser=true`, {
                         method: "DELETE",

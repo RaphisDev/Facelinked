@@ -77,7 +77,7 @@ export default function AccountSettings() {
 
     const handleDeleteAccount = () => {
         showAlert({
-            title: t("are.u.sure.to.delete.account"),
+            title: t("are.u.sure.delete.account"),
             message: t("action.not.undone"),
             buttons: [
                 {text: "Cancel", onPress: () => {}},

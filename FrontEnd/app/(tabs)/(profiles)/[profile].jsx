@@ -1440,7 +1440,7 @@
                                         </View>
                                     </View>
                                     <FlatList
-                                        keyExtractor={(items) => items.millis}
+                                        keyExtractor={(items) => items.id.millis}
                                         scrollEnabled={false}
                                         ListEmptyComponent={
                                             <View className={`items-center justify-center mt-4 py-16 ${isDesktop ? 'mx-auto w-3/4 mt-7' : 'mx-4'} bg-white rounded-xl shadow-sm`}>

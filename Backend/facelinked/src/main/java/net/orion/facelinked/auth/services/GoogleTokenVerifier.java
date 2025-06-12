@@ -21,6 +21,7 @@ public class GoogleTokenVerifier {
     public GoogleIdToken.Payload verifyToken(String idTokenString, boolean isAndroid) throws Exception {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
                 .setAudience(Collections.singletonList(isAndroid ? ANDROID_CLIENT_ID : IOS_CLIENT_ID))
+                .setIssuer("https://accounts.google.com")
                 .build();
 
         GoogleIdToken idToken = verifier.verify(idTokenString);
