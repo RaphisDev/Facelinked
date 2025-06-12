@@ -39,11 +39,11 @@ import {GoogleSignin, GoogleSigninButton,} from '@react-native-google-signin/goo
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 GoogleSignin.configure({
-    webClientId: Platform.OS === "android" ? process.env.EXPO_PUBLIC_ANDROID_ID : Platform.OS === "ios" ? process.env.EXPO_PUBLIC_IOS_ID : process.env.EXPO_PUBLIC_WEB_ID,
+    webClientId: Platform.OS === "android" ? "770069358586-18qqjdqn508p6vfjus72e846jd194b7c.apps.googleusercontent.com" : Platform.OS === "ios" ? "770069358586-doqfol8erj0q0aki2qg5rcn56440c2t4.apps.googleusercontent.com" : "770069358586-ocnflboghb2psdbsdo9jniv584b69n62.apps.googleusercontent.com",
     scopes: ['profile', 'email'],
     offlineAccess: true,
     forceCodeForRefreshToken: false,
-    iosClientId: process.env.EXPO_PUBLIC_IOS_ID,
+    iosClientId: "770069358586-doqfol8erj0q0aki2qg5rcn56440c2t4.apps.googleusercontent.com",
 });
 
 global.TextEncoder = TextEncoder;
