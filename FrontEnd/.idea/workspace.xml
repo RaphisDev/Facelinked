@@ -5,8 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile].jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/home/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/home/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/locales/de.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/locales/de.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/locales/en.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/locales/en.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -334,7 +336,9 @@
       <workItem from="1749578426046" duration="3813000" />
       <workItem from="1749663718051" duration="1022000" />
       <workItem from="1749732318003" duration="9863000" />
-      <workItem from="1749745859502" duration="398000" />
+      <workItem from="1749745859502" duration="511000" />
+      <workItem from="1749746756095" duration="38000" />
+      <workItem from="1749748333630" duration="1305000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />

@@ -1,5 +1,6 @@
                 import {
-    Alert, Animated, Dimensions,
+                    ActivityIndicator,
+                    Alert, Animated, Dimensions,
     FlatList,
     Keyboard, KeyboardAvoidingView, Modal,
     Platform,
@@ -1962,6 +1963,14 @@
                                 zIndex: 10,
                                 display: cameraActive ? "flex" : "none"
                             }}>
+                                {!cameraReady && cameraActive && (
+                                    <View className="bg-black w-full h-full">
+                                        <View className="absolute inset-0 flex items-center justify-center">
+                                            <ActivityIndicator size="large" color="#ffffff" />
+                                            <Text className="text-white mt-4">{t("loading.camera")}</Text>
+                                        </View>
+                                    </View>
+                                )}
                                 <CameraView
                                     ref={cameraRef}
                                     onCameraReady={() => setCameraReady(true)}
@@ -1981,7 +1990,7 @@
                                                 colors={['rgba(0,0,0,0.7)', 'rgba(0,0,0,0)']}
                                                 style={{position: 'absolute', top: 0, left: 0, right: 0, height: 100, zIndex: 10}}
                                             />
-                                            <View style={{position: 'absolute', top: 16, right: 16, zIndex: 20}}>
+                                            <View style={{position: 'absolute', top: Platform.OS === "ios" ? 54 : 16, right: 16, zIndex: 20}}>
                                                 <TouchableOpacity
                                                     style={{
                                                         padding: 12,

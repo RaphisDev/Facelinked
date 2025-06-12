@@ -218,4 +218,5 @@
   "explore": "Explore",
   "permission.required": "Permission Required",
   "camera.permission": "Camera permission is required to take photos.",
+  "loading.camera": "Loading camera..."
 }
