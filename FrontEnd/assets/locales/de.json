@@ -220,5 +220,7 @@
   "camera.permission": "Kamera-Berechtigung erforderlich",
   "loading.camera": "Kamera wird geladen...",
   "delete.network": "Netzwerk löschen",
-  "confirm.delete.network": "Bist du sicher, dass du dieses Netzwerk löschen möchtest?"
+  "confirm.delete.network": "Bist du sicher, dass du dieses Netzwerk löschen möchtest?",
+  "discover.app": "Entdecke die App",
+  "view.website": "Website anzeigen"
 }

@@ -1,6 +1,9 @@
 import "../global.css"
+import {useTranslation} from "react-i18next";
 
 export default function Apps() {
+
+    const {t} = useTranslation();
     return (
         <div className="qr-landing-page">
             <div className="background-elements">
@@ -15,7 +18,7 @@ export default function Apps() {
             
             <main className="main-content">
                 <div className="hero-section">
-                    <h2>Discover the app</h2>
+                    <h2>{t("discover.app")}</h2>
                 </div>
                 
                 <section className="download-section">                    
@@ -44,7 +47,7 @@ export default function Apps() {
                 </section>
                 
                 <section className="website-section">
-                    <a href="/" className="website-button">View website</a>
+                    <a href="/" className="website-button">{t("view.website")}</a>
                 </section>
             </main>
             
