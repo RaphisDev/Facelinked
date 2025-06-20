@@ -15,7 +15,7 @@ export default function Apps() {
             
             <main className="main-content">
                 <div className="hero-section">
-                    <h2>Discover Facelinked</h2>
+                    <h2>Discover the app</h2>
                 </div>
                 
                 <section className="download-section">                    
@@ -44,7 +44,7 @@ export default function Apps() {
                 </section>
                 
                 <section className="website-section">
-                    <a href="/" className="website-button">Website besuchen</a>
+                    <a href="/" className="website-button">View website</a>
                 </section>
             </main>
             
