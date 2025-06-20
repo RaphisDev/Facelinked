@@ -1,5 +1,5 @@
 {
-  "landingPage.description": "Eine Plattform entwickelt für nahe Communities, echte Freundschaften, and bedeutsame Interatkionen.",
+  "landingPage.description": "Eine Plattform entwickelt für lokale Communities, echte Freundschaften, und bedeutsame Interaktionen.",
   "join.now": "Trete bei",
   "login": "Anmelden",
   "welcome.back": "Willkommen zurück",
@@ -218,5 +218,7 @@
   "explore": "Entdecken",
   "permission.required": "Berechtigung erforderlich",
   "camera.permission": "Kamera-Berechtigung erforderlich",
-  "loading.camera": "Kamera wird geladen..."
+  "loading.camera": "Kamera wird geladen...",
+  "delete.network": "Netzwerk löschen",
+  "confirm.delete.network": "Bist du sicher, dass du dieses Netzwerk löschen möchtest?"
 }

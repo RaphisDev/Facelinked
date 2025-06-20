@@ -80,6 +80,7 @@
                     const [isFriendRequestSent, setIsFriendRequestSent] = useState(false);
                     const [isFriendRequestReceived, setIsFriendRequestReceived] = useState(false);
                     const [friendsSearchResults, setFriendsSearchResults] = useState([]);
+                    const fadeAnimText = useRef(new Animated.Value(1)).current;
                     const fadeAnim = useRef(new Animated.Value(1)).current;
 
                     // New states for additional features
@@ -749,12 +750,12 @@
                         });
 
                         Animated.sequence([
-                            Animated.timing(fadeAnim, {
+                            Animated.timing(fadeAnimText, {
                                 toValue: 0,
                                 duration: 0,
                                 useNativeDriver: true
                             }),
-                            Animated.timing(fadeAnim, {
+                            Animated.timing(fadeAnimText, {
                                 toValue: 1,
                                 duration: 200,
                                 useNativeDriver: true
@@ -1690,7 +1691,7 @@
                                                         size={20}
                                                         color="white"
                                                     />
-                                                    <Animated.Text style={[{opacity: fadeAnim}, {color: 'white', fontWeight: '600', marginLeft: 8}]}>
+                                                    <Animated.Text style={[{opacity: fadeAnimText}, {color: 'white', fontWeight: '600', marginLeft: 8}]}>
                                                         {isAdded ? t("friend.added") : isFriendRequestSent ? t("request.sent") : isFriendRequestReceived ? t("accept.request") : t("add.friend")}
                                                     </Animated.Text>
                                                 </View>

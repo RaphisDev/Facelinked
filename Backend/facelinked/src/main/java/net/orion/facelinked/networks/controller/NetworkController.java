@@ -77,6 +77,21 @@ public class NetworkController {
         return membersList;
     }
 
+    @DeleteMapping("/{networkId}")
+    public void deleteNetwork(@PathVariable String networkId, @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            throw new IllegalArgumentException("User not authenticated");
+        }
+        var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
+        networkService.deleteNetwork(networkId, sender);
+    }
+
+    @PutMapping("/{networkId}/updatePicture")
+    public void updateNetworkImage(@PathVariable String networkId, @AuthenticationPrincipal UserDetails userDetails, @RequestBody String image) {
+        var sender = userService.findByEmail(userDetails.getUsername()).getUserName();
+        networkService.updateNetworkImage(networkId, image, sender);
+    }
+
     @GetMapping("/meetnewpeople")
     public ResponseEntity<List<Profile>> getMeetNewPeople(@AuthenticationPrincipal UserDetails userDetails) {
         var sender = userService.findByEmail(userDetails.getUsername()).getUserName();

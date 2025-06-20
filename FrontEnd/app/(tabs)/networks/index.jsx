@@ -374,11 +374,23 @@ export default function Networks() {
             });
             if (response.ok) {
                 let data = await response.json();
-                data.forEach(network => {
+                let previousNetworks = await AsyncStorage.getItem("networks") || [];
+                if (previousNetworks.length !== 0) {
+                    previousNetworks = JSON.parse(previousNetworks);
+                }
+                const uniqueNetworks = data.filter(network => !previousNetworks.some(previousNetwork => previousNetwork.networkId === network.id));
+                const updatedPreviousNetwork = previousNetworks.map(network => {
+                    if(data.some(newNetwork => newNetwork.id === network.networkId)) {
+                        return data.find(newNetwork => newNetwork.id === network.networkId);
+                    }
+                    return null;
+                }).filter(network => network !== null);
+                uniqueNetworks.forEach(network => {
                     network.networkId = network.id;
                 })
-                setNetworks(data);
-                await asyncStorage.setItem("networks", JSON.stringify(data));
+                const newNetworks = [...updatedPreviousNetwork, ...uniqueNetworks];
+                setNetworks(newNetworks);
+                await asyncStorage.setItem("networks", JSON.stringify(newNetworks));
             } else {
                 let networks = await AsyncStorage.getItem("networks") || [];
                 if (networks.length !== 0) {
@@ -444,14 +456,19 @@ export default function Networks() {
     // Fetch user's friends list
     const fetchFriendsList = async () => {
         try {
-            let profile;
-            if (Platform.OS === "web") {
-                profile = JSON.parse(localStorage.getItem("profile"));
+            const username = Platform.OS === "web" ? localStorage.getItem("username") : SecureStore.getItem("username");
+            const response = await fetch(`${ip}/profile/${username}`, {
+                method: 'GET',
+                headers: {
+                    "Authorization": `Bearer ${token.current}`,
+                    "Content-Type": "application/json"
+                }
+            });
+            if (!response.ok) {
+                console.error("Failed to fetch profile");
             }
-            else {
-                profile = JSON.parse(await asyncStorage.getItem("profile"));
-            }
-            setFriendsList(profile.friends);
+            const data = await response.json();
+            setFriendsList(data.friends);
         } catch (error) {
             console.error("Error fetching friends list:", error);
             setFriendsList([]);

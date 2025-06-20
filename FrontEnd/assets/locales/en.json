@@ -218,5 +218,7 @@
   "explore": "Explore",
   "permission.required": "Permission Required",
   "camera.permission": "Camera permission is required to take photos.",
-  "loading.camera": "Loading camera..."
+  "loading.camera": "Loading camera...",
+  "delete.network": "Delete Network",
+    "confirm.delete.network": "Are you sure you want to delete this network?"
 }

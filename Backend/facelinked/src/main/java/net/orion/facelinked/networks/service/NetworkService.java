@@ -34,6 +34,16 @@ public class NetworkService {
         networkRepository.save(network);
     }
 
+    public void deleteNetwork(String networkId, String username) {
+        var network = networkRepository.findById(networkId).orElseThrow(() -> new IllegalArgumentException("Network not found"));
+        if(network.getCreatorId().equals(username)) {
+            networkRepository.deleteById(networkId);
+        }
+        else {
+            throw new IllegalArgumentException("You are not allowed to delete this network");
+        }
+    }
+
     public List<Network> searchForNetwork(String searchName) {
         return networkRepository.searchTop5BySearchNameContains(searchName);
     }
@@ -170,5 +180,15 @@ public class NetworkService {
             }
         }
         return networks;
+    }
+
+    public void updateNetworkImage(String networkId, String image, String sender) {
+        var network = networkRepository.findById(networkId).orElseThrow(() -> new IllegalArgumentException("Network not found"));
+        if (network.getCreatorId().equals(sender)) {
+            network.setNetworkPicturePath(image);
+            networkRepository.save(network);
+        } else {
+            throw new IllegalArgumentException("You are not allowed to update this network");
+        }
     }
 }

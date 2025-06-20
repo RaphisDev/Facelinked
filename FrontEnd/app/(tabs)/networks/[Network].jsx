@@ -1130,6 +1130,98 @@ export default function Network() {
         );
     }
 
+    async function deleteNetwork() {
+        try {
+            const response = await fetch(`${ip}/networks/${Network}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token.current}`
+                }
+            });
+            if (response.ok) {
+                await asyncStorage.removeItem(`networks/${Network}`);
+            }
+        } catch (error) {
+            console.error("Error deleting network:", error);
+            showAlert({
+                title: t("error"),
+                message: 'Failed to delete network',
+                buttons: [{
+                    text: 'OK', onPress: () => {
+                    }
+                }],
+            });
+        }
+    }
+
+    async function handleNewImage() {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: "images",
+            allowsMultipleSelection: false,
+            quality: 0.8,
+        });
+
+        if (!result.canceled) {
+            let imageUri = result.assets[0].uri;
+
+            let tempImage;
+            const manipResult = await ImageManipulator.manipulate(
+                imageUri).resize({width: 500});
+            const renderedImage = await manipResult.renderAsync();
+            const savedImage = await renderedImage.saveAsync({format: SaveFormat.JPEG, compress: 0.7});
+            tempImage = savedImage.uri;
+
+            const uploadResponse = await fetch(`${ip}/profile/upload`, {
+                method: 'GET',
+                headers: {
+                    "Authorization": `Bearer ${token.current}`
+                }
+            });
+
+            if (uploadResponse.ok) {
+                const uploadUrl = await uploadResponse.text();
+
+                const response = await fetch(tempImage);
+                const blob = await response.blob();
+
+                await fetch(uploadUrl, {
+                    method: 'PUT',
+                    headers: {
+                        "Content-Type": blob.type
+                    },
+                    body: blob
+                });
+
+                imageUri = uploadUrl.split("?")[0];
+            } else {
+                return;
+            }
+
+            const response = await fetch(`${ip}/networks/${Network}/updatePicture`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token.current}`
+                },
+                body: JSON.stringify({ image: imageUri })
+            });
+
+            if (response.ok) {
+                currentNetwork.current.networkPicturePath = imageUri;
+
+                await asyncStorage.setItem("networks", JSON.stringify(JSON.parse(await asyncStorage.getItem("networks")).map((network) => {
+                    if (network.networkId === Network) {
+                        return {
+                            ...network,
+                            networkPicturePath: imageUri
+                        };
+                    }
+                    return network;
+                })));
+            }
+        }
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
@@ -1339,12 +1431,14 @@ export default function Network() {
 
                             <View style={styles.networkInfoSection}>
                                 {currentNetwork.current?.networkPicturePath ? (
-                                    <Image 
-                                        source={{uri: currentNetwork.current.networkPicturePath}} 
-                                        style={styles.networkImage}
-                                        contentFit="cover"
-                                        transition={150}
-                                    />
+                                    <TouchableOpacity activeOpacity={0.7} onPress={handleNewImage}>
+                                        <Image
+                                            source={{uri: currentNetwork.current.networkPicturePath}}
+                                            style={styles.networkImage}
+                                            contentFit="cover"
+                                            transition={150}
+                                        />
+                                    </TouchableOpacity>
                                 ) : (
                                     <View style={styles.networkImagePlaceholder}>
                                         <Ionicons name="people" size={40} color="#94A3B8" />
@@ -1355,12 +1449,38 @@ export default function Network() {
                                     <View style={styles.networkNameContainer}>
                                         <Text style={styles.networkName}>{currentNetwork.current?.name}</Text>
                                         {currentNetwork.current?.creatorId === username.current && (
-                                            <TouchableOpacity 
-                                                onPress={updateNetwork}
-                                                style={styles.editButton}
-                                            >
-                                                <Ionicons name="create-outline" size={20} color="#3B82F6" />
-                                            </TouchableOpacity>
+                                            <View className="flex-row items-center">
+                                                <TouchableOpacity
+                                                    onPress={updateNetwork}
+                                                    style={styles.editButton}
+                                                >
+                                                    <Ionicons name="trash" size={20} color="#E53E3E" />
+                                                </TouchableOpacity>
+                                                <TouchableOpacity
+                                                    onPress={() => {
+                                                        showAlert({
+                                                            title: t("delete.network"),
+                                                            message: t("confirm.delete.network"),
+                                                            buttons: [
+                                                                {
+                                                                    text: t("cancel"),
+                                                                    onPress: () => {}
+                                                                },
+                                                                {
+                                                                    text: t("delete"),
+                                                                    onPress: async () => {
+                                                                        await deleteNetwork();
+                                                                        router.back();
+                                                                    }
+                                                                }
+                                                            ]
+                                                        });
+                                                    }}
+                                                    style={styles.editButton}
+                                                >
+                                                    <Ionicons name="create-outline" size={20} color="#3B82F6" />
+                                                </TouchableOpacity>
+                                            </View>
                                         )}
                                     </View>
 
