@@ -1285,7 +1285,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
 
     async function Register() {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        const bannedUsernames = ["chats", "(profiles)", "home", "networks", "profile", "undefined", "privacy", "terms", "about", "index", "_layout", "+not_found", "(tabs)"];
+        const bannedUsernames = ["chats", "(profiles)", "home", "networks", "profile", "undefined", "privacy", "terms", "about", "index", "_layout", "+not_found", "(tabs)", "apps"];
 
         const birthDateObj = formData.birthDate;
         const monthIndex = typeof birthDateObj.month === 'string'
