@@ -18,7 +18,7 @@ export default function Apps() {
             
             <main className="main-content">
                 <div className="hero-section">
-                    <h2>{t("discover.app")}</h2>
+                    <h2>{t("available.soon")}</h2>
                 </div>
                 
                 <section className="download-section">                    
@@ -32,7 +32,7 @@ export default function Apps() {
                         </a>
                         
                         {/* Google Play Badge Placeholder */}
-                        <a href="#" className="badge play-store-badge">
+                        <a href="https://play.google.com/store/apps/details?id=com.orion.facelinked" className="badge play-store-badge">
                             <div className="placeholder-badge">
                                 <svg viewBox="0 0 24 24" className="store-icon">
                                     <path fill="#4285F4" d="M12.954 11.616l2.957-2.957L6.36 3.291c-.633-.342-1.226-.39-1.746-.016l8.34 8.341z"/>
