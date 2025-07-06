@@ -223,5 +223,6 @@
     "confirm.delete.network": "Are you sure you want to delete this network?",
   "discover.app": "Discover the App",
   "view.website": "View Website",
-  "available.soon": "Available soon"
+  "available.soon": "Available soon",
+  "download.now": "Download Now"
 }
