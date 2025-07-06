@@ -39,4 +39,16 @@ public class StorageService {
             return presignedRequest.url().toString();
         }
     }
+
+    public String updatePicture(String filePath) {
+        try (S3Presigner presigner = S3Presigner.create()) {
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(filePath)
+                    .build();
+
+            PresignedPutObjectRequest presignedRequest = presigner.presignPutObject(r -> r.putObjectRequest(putObjectRequest).signatureDuration(Duration.ofMinutes(1)));
+            return presignedRequest.url().toString();
+        }
+    }
 }

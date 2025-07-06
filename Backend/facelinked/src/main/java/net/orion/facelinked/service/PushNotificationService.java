@@ -28,7 +28,8 @@ public class PushNotificationService {
 
     public void sendPushNotification(List<String> tokens, String title, String body, String profileImageUrl, String imageUrl, User user) {
 
-        for (String token : tokens) {
+        var uniqueTokens = tokens.stream().distinct().toList();
+        for (String token : uniqueTokens) {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = null;
             try {

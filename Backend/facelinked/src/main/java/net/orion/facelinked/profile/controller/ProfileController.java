@@ -243,4 +243,15 @@ public class ProfileController {
     {
         return ResponseEntity.ok(storageService.generatePresignedUrl());
     }
+
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @PutMapping("/update/picture")
+    public ResponseEntity<String> UpdateProfilePicture(@AuthenticationPrincipal UserDetails userDetails, @RequestBody String picturePath) {
+        var username = userService.findByEmail(userDetails.getUsername()).getUserName();
+        var profile = profileService.findByUsername(username);
+        if (Arrays.stream(profile.getProfilePicturePath().split(",")).noneMatch(path -> path.equals(picturePath))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+        return ResponseEntity.ok(storageService.updatePicture(picturePath.substring(picturePath.lastIndexOf("/") + 1)));
+    }
 }

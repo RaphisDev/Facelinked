@@ -36,6 +36,7 @@ import { BlurView } from "expo-blur";
 import {useTranslation} from "react-i18next";
 import * as ImagePicker from "expo-image-picker";
 import {ImageManipulator, SaveFormat} from "expo-image-manipulator";
+import {reload} from "expo-router/build/global-state/routing";
 
 const MOBILE_WIDTH_THRESHOLD = 768;
 
@@ -1203,7 +1204,7 @@ export default function Network() {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token.current}`
                 },
-                body: JSON.stringify({ image: imageUri })
+                body: imageUri
             });
 
             if (response.ok) {
@@ -1218,7 +1219,52 @@ export default function Network() {
                     }
                     return network;
                 })));
+                setModalVisible(false);
             }
+        }
+    }
+
+    async function handleUpdateImage() {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: "images",
+            allowsMultipleSelection: false,
+            quality: 0.8,
+        });
+
+        if (!result.canceled) {
+            let imageUri = result.assets[0].uri;
+
+            let tempImage;
+            const manipResult = await ImageManipulator.manipulate(
+                imageUri).resize({width: 500});
+            const renderedImage = await manipResult.renderAsync();
+            const savedImage = await renderedImage.saveAsync({format: SaveFormat.JPEG, compress: 0.7});
+            tempImage = savedImage.uri;
+
+            const uploadResponse = await fetch(`${ip}/networks/update/picture/${encodeURIComponent(currentNetwork.current.networkId)}`, {
+                method: 'GET',
+                headers: {
+                    "Authorization": `Bearer ${token.current}`
+                }
+            });
+
+            if (uploadResponse.ok) {
+                const uploadUrl = await uploadResponse.text();
+
+                const response = await fetch(tempImage);
+                const blob = await response.blob();
+
+                await fetch(uploadUrl, {
+                    method: 'PUT',
+                    headers: {
+                        "Content-Type": blob.type
+                    },
+                    body: blob
+                });
+            } else {
+                return;
+            }
+            setModalVisible(false);
         }
     }
 
@@ -1252,16 +1298,20 @@ export default function Network() {
                         {/* Network info */}
                         <View style={styles.desktopNetworkInfo}>
                             {currentNetwork.current?.networkPicturePath ? (
+                                <TouchableOpacity activeOpacity={0.7} onPress={handleUpdateImage}>
                                 <Image 
                                     source={{uri: currentNetwork.current.networkPicturePath}} 
                                     style={styles.desktopNetworkImage}
                                     contentFit="cover"
                                     transition={150}
                                 />
+                                </TouchableOpacity>
                             ) : (
+                                <TouchableOpacity activeOpacity={0.7} onPress={handleNewImage}>
                                 <View style={styles.desktopNetworkImagePlaceholder}>
                                     <Ionicons name="people" size={40} color="#94A3B8" />
                                 </View>
+                                </TouchableOpacity>
                             )}
 
                             <Text style={styles.desktopNetworkName}>{currentNetwork.current?.name}</Text>
@@ -1431,7 +1481,7 @@ export default function Network() {
 
                             <View style={styles.networkInfoSection}>
                                 {currentNetwork.current?.networkPicturePath ? (
-                                    <TouchableOpacity activeOpacity={0.7} onPress={handleNewImage}>
+                                    <TouchableOpacity activeOpacity={0.7} onPress={handleUpdateImage}>
                                         <Image
                                             source={{uri: currentNetwork.current.networkPicturePath}}
                                             style={styles.networkImage}
@@ -1440,9 +1490,11 @@ export default function Network() {
                                         />
                                     </TouchableOpacity>
                                 ) : (
+                                    <TouchableOpacity activeOpacity={0.7} onPress={handleNewImage}>
                                     <View style={styles.networkImagePlaceholder}>
                                         <Ionicons name="people" size={40} color="#94A3B8" />
                                     </View>
+                                    </TouchableOpacity>
                                 )}
 
                                 <View style={styles.networkDetails}>
@@ -1454,10 +1506,11 @@ export default function Network() {
                                                     onPress={updateNetwork}
                                                     style={styles.editButton}
                                                 >
-                                                    <Ionicons name="trash" size={20} color="#E53E3E" />
+                                                    <Ionicons name="create-outline" size={20} color="#3B82F6" />
                                                 </TouchableOpacity>
                                                 <TouchableOpacity
                                                     onPress={() => {
+                                                        setModalVisible(false);
                                                         showAlert({
                                                             title: t("delete.network"),
                                                             message: t("confirm.delete.network"),
@@ -1478,7 +1531,7 @@ export default function Network() {
                                                     }}
                                                     style={styles.editButton}
                                                 >
-                                                    <Ionicons name="create-outline" size={20} color="#3B82F6" />
+                                                    <Ionicons name="trash" size={20} color="#E53E3E" />
                                                 </TouchableOpacity>
                                             </View>
                                         )}

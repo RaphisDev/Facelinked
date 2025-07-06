@@ -326,7 +326,7 @@ export default function Networks() {
                     private: isPrivate,
                     favoriteMembers: [username.current],
                     members: data.members,
-                    networkPicturePath: imageUrl ? imageUrl.split('?')[0] : ""
+                    networkPicturePath: imageUrl ? imageUrl : ""
                 }
             ]));
 
@@ -378,6 +378,7 @@ export default function Networks() {
                 if (previousNetworks.length !== 0) {
                     previousNetworks = JSON.parse(previousNetworks);
                 }
+
                 const uniqueNetworks = data.filter(network => !previousNetworks.some(previousNetwork => previousNetwork.networkId === network.id));
                 const updatedPreviousNetwork = previousNetworks.map(network => {
                     if(data.some(newNetwork => newNetwork.id === network.networkId)) {
@@ -385,10 +386,20 @@ export default function Networks() {
                     }
                     return null;
                 }).filter(network => network !== null);
-                uniqueNetworks.forEach(network => {
-                    network.networkId = network.id;
-                })
+
                 const newNetworks = [...updatedPreviousNetwork, ...uniqueNetworks];
+                newNetworks.forEach(network => {
+                    if (network.id) {
+                        network.networkId = network.id;
+                    } else {
+                        network.id = network.networkId;
+                    }
+                    if (network.creatorId) {
+                        network.creator = network.creatorId;
+                    } else {
+                        network.creatorId = network.creator;
+                    }
+                })
                 setNetworks(newNetworks);
                 await asyncStorage.setItem("networks", JSON.stringify(newNetworks));
             } else {
@@ -882,7 +893,7 @@ export default function Networks() {
                                             tintColor="#3B82F6"
                                         />
                                     }
-                                    keyExtractor={(item) => item.networkId?.toString()}
+                                    keyExtractor={(item) => item.networkId?.toString() || item.id?.toString()}
                                     renderItem={(items) => (
                                         <Network 
                                             id={items.item.networkId} 

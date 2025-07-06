@@ -21,9 +21,11 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -280,5 +282,16 @@ public class NetworkController {
     private ResponseEntity<String> BucketUrl()
     {
         return ResponseEntity.ok(storageService.generatePresignedUrl());
+    }
+
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @GetMapping("/update/picture/{networkId}")
+    public ResponseEntity<String> UpdateNetworkPicture(@AuthenticationPrincipal UserDetails userDetails, @PathVariable String networkId) {
+        var username = userService.findByEmail(userDetails.getUsername()).getUserName();
+        var network = networkService.getNetwork(networkId);
+        if (!network.getCreatorId().equals(username)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to update this network's picture");
+        }
+        return ResponseEntity.ok(storageService.updatePicture(network.getNetworkPicturePath().substring(network.getNetworkPicturePath().lastIndexOf("/") + 1)));
     }
 }

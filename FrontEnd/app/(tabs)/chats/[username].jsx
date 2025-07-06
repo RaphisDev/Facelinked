@@ -446,7 +446,7 @@ export default function ChatRoom() {
                 return message;
             }))
             ws.messageReceived.emit("newMessageReceived")
-            await asyncStorage.setItem("lastMessageId", Date.now().toString());
+            await asyncStorage.setItem("lastMessageId", (Date.now() + 1000).toString());
         }
         catch (e) {
             //setMessages(prevState => prevState.filter((chat) => !chat.isOptimistic)); letting the message just vanish isnt a good approach to network failure either
