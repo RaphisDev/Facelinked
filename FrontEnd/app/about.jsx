@@ -10,7 +10,7 @@ export default function About() {
             <Text className="mt-2 dark:text-dark-text">Eichstaett, Bavaria 85072</Text>
             <Text className="mt-2 dark:text-dark-text">Germany</Text>
             <Text className="mt-4 font-bold dark:text-dark-text">Contact</Text>
-            <Text className="mt-2 dark:text-dark-text">Email: bretter.schlaue83@icloud.com</Text>
+            <Text className="mt-2 dark:text-dark-text">Email: info@facelinked.com</Text>
             <Text className="mt-2 dark:text-dark-text">Internet: www.facelinked.com</Text>
         </View>
     )
