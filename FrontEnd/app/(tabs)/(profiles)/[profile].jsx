@@ -854,6 +854,8 @@
 
                             if (status.ok) {
                                 setFriendRequests(friendRequests.filter(request => request.memberId !== id));
+                                setIsFriendRequestReceived(false);
+                                setIsAdded(true)
                                 setHasFriendRequests(friendRequests.length > 1);
                                 let newFriends = profileInfos.friends;
                                 const friend = await fetch(`${ip}/profile/${id}`, {
