@@ -895,10 +895,10 @@ export default function Networks() {
                                     }
                                     keyExtractor={(item) => item.networkId?.toString() || item.id?.toString()}
                                     renderItem={(items) => (
-                                        <Network 
-                                            id={items.item.networkId} 
-                                            network={items.item.name} 
-                                            networkPicturePath={items.item.networkPicturePath} 
+                                        <Network
+                                            id={items.item.networkId}
+                                            network={items.item.name}
+                                            networkPicturePath={items.item.networkPicturePath}
                                             description={items.item.description}
                                             members={items.item.members}
                                             favoriteMembers={items.item.favoriteMembers}
@@ -920,15 +920,15 @@ export default function Networks() {
 
                             {/* Friends Tab Content */}
                             <View style={{ width: windowWidth }}>
-                                <FlatList 
+                                <FlatList
                                     data={friendNetworks}
                                     keyExtractor={(item) => item.id.toString()}
                                     renderItem={(items) => (
-                                        <Network 
+                                        <Network
                                             id={items.item.id}
-                                            network={items.item.name} 
-                                            networkPicturePath={items.item.networkPicturePath} 
-                                            description={items.item.description} 
+                                            network={items.item.name}
+                                            networkPicturePath={items.item.networkPicturePath}
+                                            description={items.item.description}
                                             creator={items.item.creatorId}
                                             member={items.item.members}
                                             favoriteMembers={items.item.favoriteMembers}
@@ -944,7 +944,8 @@ export default function Networks() {
                                             colors={["#3B82F6"]}
                                             tintColor="#3B82F6"
                                         />
-                                    }                                    ListEmptyComponent={() => (
+                                    }
+                                    ListEmptyComponent={() => (
                                         <View style={styles.emptyContainer}>
                                             <Ionicons name="people-outline" size={60} color="#CBD5E1" style={styles.emptyIcon} />
                                             <Text style={styles.emptyText}>{t("no.networks.friends")}</Text>
@@ -1504,6 +1505,7 @@ const styles = StyleSheet.create({
         maxWidth: 1024, // Similar to max-w-7xl in Tailwind
         backgroundColor: '#f1f4f9',
         paddingHorizontal: 20,
+        flex: 1
     },
     contentContainer: {
         flex: 1,

@@ -97,7 +97,15 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
         return (
             <View style={[
                 styles.sidebarContainer,
-                { paddingTop: insets.top, paddingBottom: insets.bottom }
+                {
+                    paddingTop: insets.top,
+                    paddingBottom: insets.bottom,
+                    position: 'absolute',
+                    left: -SIDEBAR_WIDTH,
+                    top: 0,
+                    bottom: 0,
+                    width: SIDEBAR_WIDTH
+                }
             ]}>
                 <View style={styles.sidebarContent}>
                     {tabRoutes.map((route, index) => renderTab(route, index))}
@@ -168,11 +176,6 @@ const styles = StyleSheet.create({
 
     // Desktop sidebar styles
     sidebarContainer: {
-        position: 'fixed', // Use fixed instead of absolute for web
-        left: 0,
-        top: 0,
-        bottom: 0,
-        width: SIDEBAR_WIDTH,
         backgroundColor: 'white',
         shadowColor: '#000',
         shadowOffset: { width: 4, height: 0 },

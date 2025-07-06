@@ -1150,11 +1150,11 @@
                                                     {/* Action Buttons */}
                                                     <View className="py-3">
                                                         {profileName.current !== username.current ? (
-                                                            <View className="space-y-2">
+                                                            <View className={`space-y-2 ${Platform.OS === "ios" ? "gap-y-2" : ""}`}>
                                                                 <TouchableOpacity
                                                                     onPress={() => router.navigate(`/chats/${profile}`)}
                                                                     activeOpacity={0.7}
-                                                                    className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg py-3 px-4 shadow-sm"
+                                                                    className={`bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg py-3 px-4 shadow-sm ${Platform.OS === "ios" ? "bg-blue-700" : ""}`}
                                                                 >
                                                                     <View className="flex-row items-center justify-center">
                                                                         <Ionicons name="chatbubble" color="white" size={18} />
@@ -1190,11 +1190,11 @@
                                                                 </TouchableOpacity>
                                                             </View>
                                                         ) : (
-                                                            <View className="space-y-2">
+                                                            <View className={`space-y-2 ${Platform.OS === "ios" ? "gap-y-2" : ""}`}>
                                                                 <TouchableOpacity
                                                                     onPress={initEditProfile}
                                                                     activeOpacity={0.7}
-                                                                    className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg py-3 px-4 shadow-sm"
+                                                                    className={`bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg py-3 px-4 shadow-sm ${Platform.OS === "ios" ? "bg-blue-700" : ""}`}
                                                                 >
                                                                     <View className="flex-row items-center justify-center">
                                                                         <Ionicons name="pencil" color="white" size={18} />
@@ -1430,7 +1430,7 @@
                                         </View>
                                     )}
                                     <View className={`bg-white rounded-xl ${isDesktop ? 'mx-auto max-w-4xl' : 'mx-4'} mt-6 shadow-sm overflow-hidden`}>
-                                        <View className={`flex-row justify-between ${isDesktop ? "space-x-20" : ""} items-center px-5 py-4 border-b border-gray-100`}>
+                                        <View className={`flex-row justify-between ${isDesktop ? Platform.OS === "ios" ? "gap-x-20" : "space-x-20" : ""} items-center px-5 py-4 border-b border-gray-100`}>
                                             <Text className="text-gray-800 dark:text-dark-text font-bold text-xl">{t("posts")}</Text>
                                             {profileName.current === username.current &&
                                                 <TouchableOpacity
