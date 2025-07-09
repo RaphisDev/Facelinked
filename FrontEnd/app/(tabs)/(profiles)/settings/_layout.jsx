@@ -19,6 +19,10 @@ export default function SettingsLayout() {
                 <Stack.Screen name="terms" options={{headerTitle: t("terms.and.conditions"), headerBackTitle: t("legal")}}/>
                 <Stack.Screen name="credits" options={{headerTitle: t("credits"), headerBackTitle: t("settings")}}/>
                 <Stack.Screen name="index" options={{headerTitle: t("settings"), headerBackTitle: t("back")}}/>
+                <Stack.Screen name="eula" options={{
+                    headerTitle: "Eula",
+                    headerBackTitle: t("legal"),
+                }}/>
             </Stack>
         </>
     );

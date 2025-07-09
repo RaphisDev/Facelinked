@@ -2080,6 +2080,10 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                                         <Link target="_blank" href="/terms" className="text-blue-600 font-medium">
                                             Terms and Conditions
                                         </Link>
+                                        &{' '}
+                                        <Link target="_blank" href="/eula" className="text-blue-600 font-medium">
+                                            EULA
+                                        </Link>
                                     </Text>
                                 </View>
                             </View>
@@ -2649,13 +2653,17 @@ const MobileRegistrationFlow = ({ RegisterWithGoogle, navigateTo, showPassword, 
                                     </Pressable>
                                     <Text className="ml-2 text-sm text-gray-700">
                                         {t("fourteen.older.and.accept")}{' '}
-                                        <Text onPress={() => navigateTo('privacy')} className="text-blue-600 font-medium">
+                                        <Link target="_blank" href="/privacy" className="text-blue-600 font-medium">
                                             {t("privacy.policy")}
-                                        </Text>{' '}
+                                        </Link>{' '}
                                         &{' '}
-                                        <Text onPress={() => navigateTo('terms')} className="text-blue-600 font-medium">
+                                        <Link target="_blank" href="/terms" className="text-blue-600 font-medium">
                                             {t("terms.and.conditions")}
-                                        </Text>
+                                        </Link>{' '}
+                                        &{' '}
+                                        <Link target="_blank" href="/eula" className="text-blue-600 font-medium">
+                                            EULA
+                                        </Link>
                                     </Text>
                                 </View>
                             </View>

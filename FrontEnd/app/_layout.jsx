@@ -14,6 +14,7 @@ export default function RootLayout() {
               <Stack.Screen name="terms" options={{ headerShown: false }}/>
               <Stack.Screen name="about" options={{ headerShown: false }}/>
               <Stack.Screen name="apps" options={{ headerShown: false }}/>
+              <Stack.Screen name="eula" options={{ headerShown: false }}/>
           </Stack>
       </>
   );
