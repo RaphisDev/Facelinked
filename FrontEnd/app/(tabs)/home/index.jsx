@@ -358,7 +358,7 @@ export default function Index() {
             setCameraActive(true);
             setShowPostCreation(false)
             stateManager.setTabBarVisible(false);
-        } else {
+        } else if (permission.canAskAgain) {
             const { status } = await requestPermission();
             if (status === 'granted') {
                 setCameraActive(true);

@@ -39,7 +39,7 @@ import {GoogleSignin, GoogleSigninButton,} from '@react-native-google-signin/goo
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 GoogleSignin.configure({
-    webClientId: Platform.OS === "android" ? "770069358586-18qqjdqn508p6vfjus72e846jd194b7c.apps.googleusercontent.com" : Platform.OS === "ios" ? "770069358586-doqfol8erj0q0aki2qg5rcn56440c2t4.apps.googleusercontent.com" : "770069358586-ocnflboghb2psdbsdo9jniv584b69n62.apps.googleusercontent.com",
+    webClientId: "770069358586-ocnflboghb2psdbsdo9jniv584b69n62.apps.googleusercontent.com",
     scopes: ['profile', 'email'],
     offlineAccess: true,
     forceCodeForRefreshToken: false,
@@ -1372,6 +1372,7 @@ const RegistrationFlow = ({ navigateTo, showPassword, setShowPassword, previousP
                     }
                     try {
                         await GoogleSignin.signOut();
+                        updateFormData("email", "");
                     } catch (error) {
                         console.error("Error signing out from Google:", error);
                     }
@@ -2221,7 +2222,7 @@ const MobileLoginFlow = ({googleSignIn, navigateTo, previousPage, loginEmail, sh
                 >
                     <Text className="text-white text-center font-medium">{t("sign.in")}</Text>
                 </TouchableOpacity>
-
+                {Platform.OS === "android" && (
                 <View className="mt-6">
                     <View className="flex-row items-center">
                         <View className="flex-1 h-px bg-gray-300" />
@@ -2238,7 +2239,7 @@ const MobileLoginFlow = ({googleSignIn, navigateTo, previousPage, loginEmail, sh
                            <Image style={{height: 50}} source={require("../assets/images/google-signin.png")} alt="Google" />
                         </TouchableOpacity>
                     </View>
-                </View>
+                </View>)}
             </View>
 
             <View className="mt-8">
@@ -2513,6 +2514,7 @@ const MobileRegistrationFlow = ({ RegisterWithGoogle, navigateTo, showPassword, 
                                         </TouchableOpacity>
                                     </View>
                                 </View>
+                                {Platform.OS === 'android' && (
                                 <View className="mt-6">
                                     <View className="flex flex-row items-center">
                                         <View className="flex-1 h-px bg-gray-300" />
@@ -2529,7 +2531,7 @@ const MobileRegistrationFlow = ({ RegisterWithGoogle, navigateTo, showPassword, 
                                             <Image style={{height: 50}} source={require("../assets/images/google-signin.png")} alt="Google" />
                                         </TouchableOpacity>
                                     </View>
-                                </View>
+                                </View>)}
                             </View>
                         </View>
                     )}
