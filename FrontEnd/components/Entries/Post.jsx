@@ -1,5 +1,16 @@
 import "../../global.css";
-import {FlatList, Modal, Platform, Pressable, Share, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {
+    FlatList,
+    Linking,
+    Modal,
+    Platform,
+    Pressable,
+    Share,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
+} from "react-native";
 import {Image} from "expo-image";
 import * as SecureStore from "expo-secure-store";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -93,11 +104,10 @@ export default function Post(props) {
                             {props.title}
                         </Text>
                     </View>
-                    {props.username === username.current && (
+
                         <TouchableOpacity onPress={() => setOptionsVisible(prev => !prev)}>
                             <Ionicons name="ellipsis-horizontal" size={isDesktop ? 24 : 20} color="#6B7280" />
                         </TouchableOpacity>
-                    )}
                 </View>
 
                 {/* Post Images */}
@@ -178,6 +188,7 @@ export default function Post(props) {
                             <Text style={styles.optionsTitle}>{t("post.options")}</Text>
                         </View>
 
+                        {props.username === username.current && (
                         <TouchableOpacity
                             style={styles.optionButton}
                             onPress={async () => {
@@ -187,6 +198,18 @@ export default function Post(props) {
                         >
                             <Ionicons name="trash" size={22} color="#EF4444" />
                             <Text style={[styles.optionText]}>{t("delete.post")}</Text>
+                        </TouchableOpacity>)}
+
+                        <TouchableOpacity
+                            style={styles.optionButton}
+                            onPress={async () => {
+                                const mailUrl = `mailto:support@facelinked.com?subject=${encodeURIComponent("Report Post")}&body=${encodeURIComponent(`I would like to report the post with the id ${props.id.millis} because it violates...`)}`
+                                await Linking.openURL(mailUrl);
+                                setOptionsVisible(false);
+                            }}
+                        >
+                            <Ionicons name="mail" size={22} color="#EF4444" />
+                            <Text style={[styles.optionText]}>{t("report.post")}</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity

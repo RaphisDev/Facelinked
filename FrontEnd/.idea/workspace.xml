@@ -5,8 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/home/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/home/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/app.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile].jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/locales/de.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/locales/de.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/locales/en.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/locales/en.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/Entries/Post.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Entries/Post.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -350,6 +353,11 @@
       <workItem from="1752074711893" duration="1476000" />
       <workItem from="1752269945212" duration="569000" />
       <workItem from="1752955465413" duration="2243000" />
+      <workItem from="1752957827876" duration="106000" />
+      <workItem from="1753044626738" duration="1013000" />
+      <workItem from="1753117696891" duration="391000" />
+      <workItem from="1753118117748" duration="1875000" />
+      <workItem from="1753120272458" duration="35000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />

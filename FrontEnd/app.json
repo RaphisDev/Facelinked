@@ -51,9 +51,15 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow Facelinked to access your camera",
-          "microphonePermission": "Allow Facelinked to access your microphone",
+          "cameraPermission": "The app needs access to your camera to let you share photos directly from the app with your friends in posts and messages.",
+          "microphonePermission": "Needs microphone access to record audio for future video posts",
           "recordAudioAndroid": true
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app needs access to your photos to let you share them with your friends in posts and messages."
         }
       ],
       "expo-localization",

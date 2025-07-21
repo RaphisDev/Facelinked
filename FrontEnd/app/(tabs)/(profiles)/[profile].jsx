@@ -1710,8 +1710,8 @@
                                     style={{ flex: 1 }}
                                     keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
                                 >
-                                    <SafeAreaView>
-                                    <View className="bg-white dark:bg-dark-primary h-full w-full" style={isDesktop ? {maxWidth: 800, marginHorizontal: 'auto'} : {}}>
+                                    <SafeAreaView style={{ flex: 1 }}>
+                                    <View className="bg-white dark:bg-dark-primary" style={[{ flex: 1 }, isDesktop ? {maxWidth: 800, marginHorizontal: 'auto'} : {}]}>
                                         <View className="flex-row justify-between items-center px-4 py-3 border-b border-gray-200">
                                             <TouchableOpacity
                                                 onPress={() => setShowPostModal(false)}
@@ -1726,6 +1726,7 @@
                                         {selectedPost && (
                                             <>
                                                 <FlatList
+                                                    style={{ flex: 1 }}
                                                     data={comments}
                                                     keyExtractor={(item, index) => index.toString()}
                                                     ListHeaderComponent={() => (
@@ -1808,7 +1809,7 @@
                                                     contentContainerStyle={{ paddingBottom: 100 }}
                                                 />
 
-                                                <View className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3">
+                                                <View className="bg-white border-t border-gray-200 px-4 py-3">
                                                     <View className="flex-row items-center bg-gray-100 rounded-full px-4 py-2">
                                                         <TextInput
                                                             ref={commentRef}
