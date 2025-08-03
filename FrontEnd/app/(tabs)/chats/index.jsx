@@ -1,5 +1,15 @@
 import "../../../global.css"
-import {FlatList, Keyboard, Platform, TextInput, TouchableOpacity, View, Text, Dimensions} from "react-native";
+import {
+    FlatList,
+    Keyboard,
+    Platform,
+    TextInput,
+    TouchableOpacity,
+    View,
+    Text,
+    Dimensions,
+    BackHandler
+} from "react-native";
 import {useEffect, useLayoutEffect, useRef, useState} from "react";
 import * as SecureStorage from "expo-secure-store";
 import {TextEncoder} from 'text-encoding';
@@ -47,10 +57,18 @@ export default function Chats() {
 
         handleResize();
 
+        const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            () => {
+                return true;
+            }
+        );
+
         return () => {
             if (Platform.OS === 'web') {
                 window.removeEventListener('resize', handleResize);
             }
+            backHandler.remove();
         };
     }, []);
 

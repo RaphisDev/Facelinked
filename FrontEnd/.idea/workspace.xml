@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d68d624-f78e-4d45-958a-3625fada31ed" name="Changes" comment="Initialize">
-      <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/app.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile].jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/(profiles)/[profile].jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/locales/de.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/locales/de.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/locales/en.json" beforeDir="false" afterPath="$PROJECT_DIR$/assets/locales/en.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/Entries/Post.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Entries/Post.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/chats/_layout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chats/_layout.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(tabs)/chats/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/chats/index.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -358,6 +355,9 @@
       <workItem from="1753117696891" duration="391000" />
       <workItem from="1753118117748" duration="1875000" />
       <workItem from="1753120272458" duration="35000" />
+      <workItem from="1753630223659" duration="17000" />
+      <workItem from="1753632713898" duration="401000" />
+      <workItem from="1754252202457" duration="196000" />
     </task>
     <task id="LOCAL-00001" summary="Initialize">
       <option name="closed" value="true" />
