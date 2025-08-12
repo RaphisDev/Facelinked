@@ -13,7 +13,7 @@ export default function Apps() {
             </div>
             
             <header className="header">
-                <h1>FaceLinked</h1>
+                <h1>Facelinked</h1>
             </header>
             
             <main className="main-content">
@@ -52,7 +52,7 @@ export default function Apps() {
             </main>
             
             <footer className="footer">
-                <p>© 2025 FaceLinked</p>
+                <p>© 2025 Facelinked</p>
             </footer>
             
             <style jsx>{`
