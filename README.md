@@ -211,11 +211,6 @@ sudo docker run \
 cd ../Frontend/components/
 ```
 
-**Windows**
-```sh
-
-```
-
 <!-- Markdown link & img dfn's -->
 [stars-image]: https://img.shields.io/github/stars/raphisdev/facelinked?style=social
 [stars-url]: https://github.com/raphisdev/facelinked/stargazers
