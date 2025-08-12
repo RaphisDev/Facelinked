@@ -12,6 +12,7 @@ web-build/
 ios
 android
 google-services.json
+AppManager.jsx
 
 # macOS
 .DS_Store

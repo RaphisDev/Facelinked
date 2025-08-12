@@ -30,3 +30,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Sensitive files ###
+serviceAccountKey.json
+Makefile

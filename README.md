@@ -138,6 +138,10 @@ cd facelinked
 cd Frontend
 npm install
 
+# Rename the AppManager_Template.jsx to AppManager.jsx
+# Then configure with your server's IP address and Google OAuth credentials
+mv components/AppManager_Template.jsx components/AppManager.jsx
+
 # Build for Android
 npx expo run:android
 

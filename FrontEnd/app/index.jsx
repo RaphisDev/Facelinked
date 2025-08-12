@@ -6,7 +6,7 @@ import WebSocketProvider from "../components/WebSocketProvider";
 import {Image} from "expo-image";
 import * as Device from "expo-device";
 import * as Notification from "expo-notifications";
-import ip from "../components/AppManager";
+import ip, {androidClientId, iosClientId} from "../components/AppManager";
 import React, {useEffect, useRef, useState} from 'react';
 import {
     ArrowLeft,
@@ -39,11 +39,11 @@ import {GoogleSignin, GoogleSigninButton,} from '@react-native-google-signin/goo
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 GoogleSignin.configure({
-    webClientId: "770069358586-ocnflboghb2psdbsdo9jniv584b69n62.apps.googleusercontent.com",
+    webClientId: androidClientId,
     scopes: ['profile', 'email'],
     offlineAccess: true,
     forceCodeForRefreshToken: false,
-    iosClientId: "770069358586-doqfol8erj0q0aki2qg5rcn56440c2t4.apps.googleusercontent.com",
+    iosClientId: iosClientId,
 });
 
 global.TextEncoder = TextEncoder;
