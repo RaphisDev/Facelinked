@@ -41,7 +41,6 @@ export default function NetworkMessage(props) {
     const handleSaveImage = async () => {
         try {
             if (isWeb) {
-                // Desktop-specific image download logic
                 const link = document.createElement('a');
                 link.href = selectedImage;
                 link.download = `facelinked_${Date.now()}.jpg`;
@@ -49,7 +48,6 @@ export default function NetworkMessage(props) {
                 link.click();
                 document.body.removeChild(link);
             } else {
-                // Mobile-specific logic
                 const {status} = await MediaLibrary.requestPermissionsAsync();
 
                 if (status !== 'granted') {
@@ -138,19 +136,16 @@ export default function NetworkMessage(props) {
         return null;
     };
 
-    // Format timestamp to show only time if it's today
     const formatTime = (timestamp) => {
         if (!timestamp) return '';
 
         const date = new Date(timestamp);
         const now = new Date();
 
-        // Check if it's today
         if (date.toDateString() === now.toDateString()) {
             return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
 
-        // Return formatted date and time
         return date.toLocaleString([], {
             month: 'short',
             day: 'numeric',

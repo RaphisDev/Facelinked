@@ -19,7 +19,6 @@ import * as Haptics from "expo-haptics";
 import {useTranslation} from "react-i18next";
 
 export default function Post(props) {
-    // Check if we're in desktop mode
     const isDesktop = props.isDesktop || false;
     const username = useRef(Platform.OS === "web" ? localStorage.getItem("username") : SecureStore.getItem("username"));
     const [optionsVisible, setOptionsVisible] = useState(false);
@@ -50,7 +49,6 @@ export default function Post(props) {
                 </TouchableOpacity>
             );
         } else {
-            // For multiple images, create a grid layout
             return (
                 <View className="mb-3">
                     <FlatList
@@ -86,7 +84,7 @@ export default function Post(props) {
                                 </View>
                             </TouchableOpacity>
                         )}
-                        // Only show first 4 images in grid, with a +X overlay on the 4th if there are more
+                        // Only show first 4 images in grid, with a +X overlay for more than 4
                         data={props.content.slice(0, Math.min(4, props.content.length))}
                     />
                 </View>

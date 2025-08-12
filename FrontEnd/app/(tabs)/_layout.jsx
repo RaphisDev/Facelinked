@@ -13,7 +13,6 @@ import {MotiView} from "moti";
 const MOBILE_WIDTH_THRESHOLD = 768;
 const SIDEBAR_WIDTH = 220;
 
-// A wrapper component that handles the layout for desktop/mobile
 function LayoutWrapper({ children }) {
     const [dimensions, setDimensions] = useState(() => Dimensions.get('window'));
     const isDesktop = dimensions.width > MOBILE_WIDTH_THRESHOLD;

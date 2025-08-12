@@ -71,7 +71,7 @@ class WebsocketController{
                     }
                 },
                 onWebSocketError: (error) => {
-                    //alert("Network error. Please check your internet connection.");
+                    //alert("Network error. Please check your internet connection."); Todo: Rather display a toast notification or a permanent banner
                     if (!this.stompClient.connected) {
                         this.stompClient?.deactivate();
                         webSocketInstance = null;
@@ -105,7 +105,6 @@ class WebsocketController{
                     }
 
                     const saveChats = async (senderId, loadedChats, oldMessage, message, receiverId) => {
-                        //Add last message to the chat
                         if (senderId === username) {
                             await asyncStorage.setItem("chats", JSON.stringify(loadedChats.map((chat) => {
                                 if (chat.username === receiverId) {
@@ -257,7 +256,6 @@ class WebsocketController{
                                     alert("Failed to load messages. Please check your connection and try again.");
                                     return false;
                                 }
-                                // Wait before retrying (exponential backoff)
                                 await new Promise(r => setTimeout(r, 1000 * Math.pow(2, retries)));
                             }
                         }

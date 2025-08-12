@@ -10,10 +10,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import {useTranslation} from "react-i18next";
 
 export default function Chat(props) {
-    const router = useRouter();
     const {t} = useTranslation();
     
-    // Format the latest message timestamp
     const formatTime = (timestamp) => {
         if (!timestamp) return "";
         const date = new Date(timestamp);

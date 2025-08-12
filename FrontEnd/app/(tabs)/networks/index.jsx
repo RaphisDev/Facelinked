@@ -40,7 +40,6 @@ import {useTranslation} from "react-i18next";
 const MOBILE_WIDTH_THRESHOLD = 768;
 
 export default function Networks() {
-    const insets = useSafeAreaInsets();
     const [selected, setSelected] = useState(0);
     const [favoriteNetworks, setNetworks] = useState([]);
     const [friendNetworks, setFriendNetworks] = useState([]);
@@ -48,7 +47,6 @@ export default function Networks() {
     const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
     const [isDesktop, setIsDesktop] = useState(windowWidth > MOBILE_WIDTH_THRESHOLD);
 
-    // Animation value for tab sliding
     const tabSlideAnimation = useRef(new Animated.Value(0)).current;
 
     const stateManager = new StateManager();
@@ -64,7 +62,6 @@ export default function Networks() {
     const [refreshing, setRefreshing] = useState(false);
     const [refreshingFriends, setRefreshingFriend] = useState(false);
 
-    // Create Network Modal State
     const [isCreateModalVisible, setCreateModalVisible] = useState(false);
     const [networkName, setNetworkName] = useState("");
     const [networkDescription, setNetworkDescription] = useState("");
@@ -75,7 +72,6 @@ export default function Networks() {
     const [isCreating, setIsCreating] = useState(false);
     const [createError, setCreateError] = useState("");
 
-    // Friends list for network invitation
     const [friendsList, setFriendsList] = useState([]);
     const [selectedFriends, setSelectedFriends] = useState([]);
     const [loadingFriends, setLoadingFriends] = useState(false);
@@ -88,7 +84,6 @@ export default function Networks() {
     const token = useRef(null);
     const username = useRef(null);
 
-    // For the "Meet new People" page
     const translateX = useRef(new Animated.Value(0)).current;
     const [currentPage, setCurrentPage] = useState(0);
     const [currentPersonIndex, setCurrentPersonIndex] = useState(0);
@@ -102,7 +97,6 @@ export default function Networks() {
             setIsDesktop(newWidth > MOBILE_WIDTH_THRESHOLD);
         };
 
-        // Initialize window width and desktop state immediately
         const initialWidth = Dimensions.get('window').width;
         setWindowWidth(initialWidth);
         setIsDesktop(initialWidth > MOBILE_WIDTH_THRESHOLD);
@@ -151,7 +145,6 @@ export default function Networks() {
         stateManager.setNetworkState(true);
     }, []);
 
-    // Handle Android back button
     useEffect(() => {
         if (Platform.OS === 'android') {
             const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -167,7 +160,6 @@ export default function Networks() {
         }
     }, [currentPage]);
 
-    // Create Network Functions
     const togglePrivate = () => {
         setIsPrivate(prev => !prev);
         if (!isPrivate) {
@@ -330,7 +322,6 @@ export default function Networks() {
                 }
             ]));
 
-            // Reset form and close modal
             setNetworkName("");
             setNetworkDescription("");
             setIsPrivate(false);
@@ -338,12 +329,10 @@ export default function Networks() {
             setSelectedImage(null);
             setCreateModalVisible(false);
 
-            // Refresh networks list
             const loadedNetworks = await AsyncStorage.getItem("networks") || [];
             if (loadedNetworks.length !== 0) {
                 setNetworks(JSON.parse(loadedNetworks));
             }
-            //Doch fetchFavoriteNetworks()?
 
         } catch (error) {
             console.error("Error creating network:", error);
@@ -464,7 +453,6 @@ export default function Networks() {
         }
     }
 
-    // Fetch user's friends list
     const fetchFriendsList = async () => {
         try {
             const username = Platform.OS === "web" ? localStorage.getItem("username") : SecureStore.getItem("username");
@@ -517,17 +505,14 @@ export default function Networks() {
 
     const handleGesture = (event) => {
         if (event.nativeEvent.translationX < -50 && currentPage === 0) {
-            // Swipe left to Friends tab instead of Meet People page
-            // Animate the tab transition
             Animated.timing(tabSlideAnimation, {
                 toValue: 1,
                 duration: 300,
-                useNativeDriver: false // We need to use false for layout animations
+                useNativeDriver: false
             }).start(() => {
-                setSelected(1); // Switch to Friends tab after animation completes
+                setSelected(1);
             });
         } else if (event.nativeEvent.translationX > 50 && currentPage === 1) {
-            // Swipe right to Networks page
             Animated.timing(translateX, {
                 toValue: 0,
                 duration: 300,
@@ -536,23 +521,20 @@ export default function Networks() {
                 setCurrentPage(0);
             });
         } else if (event.nativeEvent.translationX > 50 && selected === 1) {
-            // Swipe right from Friends tab to Favorites tab
             Animated.timing(tabSlideAnimation, {
                 toValue: 0,
                 duration: 300,
                 useNativeDriver: false
             }).start(() => {
-                setSelected(0); // Switch to Favorites tab after animation completes
+                setSelected(0);
             });
         }
     };
 
-    // Navigation functions for the people list
     const goToNextPerson = () => {
         if (currentPersonIndex < people.length - 1) {
             const nextIndex = currentPersonIndex + 1;
 
-            // For desktop mode, we need to ensure the FlatList scrolls correctly
             if (isDesktop) {
                 const cardWidth = Math.min(windowWidth, 1024);
                 peopleListRef.current?.scrollToOffset({
@@ -574,7 +556,6 @@ export default function Networks() {
         if (currentPersonIndex > 0) {
             const prevIndex = currentPersonIndex - 1;
 
-            // For desktop mode, we need to ensure the FlatList scrolls correctly
             if (isDesktop) {
                 const cardWidth = Math.min(windowWidth, 1024);
                 peopleListRef.current?.scrollToOffset({
@@ -810,7 +791,6 @@ export default function Networks() {
                             <TouchableOpacity 
                                 style={[styles.tabButton, selected === 0 && styles.activeTabButton]} 
                                 onPress={() => {
-                                    // Animate back to Favorites tab
                                     Animated.timing(tabSlideAnimation, {
                                         toValue: 0,
                                         duration: 300,
@@ -824,7 +804,7 @@ export default function Networks() {
                                     alignItems: 'center',
                                     opacity: tabSlideAnimation.interpolate({
                                         inputRange: [0, 1],
-                                        outputRange: [1, 0.6] // Fade out when going to Friends tab
+                                        outputRange: [1, 0.6]
                                     })
                                 }}>
                                     <Ionicons 
@@ -840,7 +820,6 @@ export default function Networks() {
                             <TouchableOpacity 
                                 style={[styles.tabButton, selected === 1 && styles.activeTabButton]} 
                                 onPress={() => {
-                                    // Animate to Friends tab
                                     Animated.timing(tabSlideAnimation, {
                                         toValue: 1,
                                         duration: 300,
@@ -854,7 +833,7 @@ export default function Networks() {
                                     alignItems: 'center',
                                     opacity: tabSlideAnimation.interpolate({
                                         inputRange: [0, 1],
-                                        outputRange: [0.6, 1] // Fade in when going to Friends tab
+                                        outputRange: [0.6, 1]
                                     })
                                 }}>
                                     <Ionicons 
@@ -876,7 +855,7 @@ export default function Networks() {
                                 {
                                     translateX: tabSlideAnimation.interpolate({
                                         inputRange: [0, 1],
-                                        outputRange: [0, -windowWidth] // Slide content left when going to Friends tab
+                                        outputRange: [0, -windowWidth]
                                     })
                                 }
                             ]
@@ -1125,7 +1104,6 @@ export default function Networks() {
         );
     };
 
-    // Create Network Modal
     const renderCreateNetworkModal = () => (
         <Modal
             visible={isCreateModalVisible}
@@ -1209,18 +1187,14 @@ export default function Networks() {
                                 <View style={styles.formGroup}>
                                     <Text style={styles.formLabel}>{t("add.members")}</Text>
 
-                                    {/* Friends List Selection */}
                                     <View style={styles.friendsSelectionContainer}>
-                                        {/* Select All Button */}
-                                        <TouchableOpacity 
+                                        <TouchableOpacity
                                             style={styles.selectAllButton}
                                             onPress={() => {
                                                 if (selectedFriends.length === friendsList.length) {
-                                                    // Deselect all
                                                     setSelectedFriends([]);
                                                     setMembers([]);
                                                 } else {
-                                                    // Select all
                                                     const allFriends = friendsList.map(friend => friend.memberId);
                                                     setSelectedFriends(allFriends);
                                                     setMembers(friendsList.map(friend => ({ memberId: friend.memberId })));
@@ -1260,11 +1234,9 @@ export default function Networks() {
                                                         onPress={() => {
                                                             const isSelected = selectedFriends.includes(friend.memberId);
                                                             if (isSelected) {
-                                                                // Remove from selected
                                                                 setSelectedFriends(selectedFriends.filter(id => id !== friend.memberId));
                                                                 setMembers(members.filter(m => m.memberId !== friend.memberId));
                                                             } else {
-                                                                // Add to selected
                                                                 setSelectedFriends([...selectedFriends, friend.memberId]);
                                                                 setMembers([...members, { memberId: friend.memberId }]);
                                                             }
@@ -1373,14 +1345,12 @@ export default function Networks() {
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
             <GestureHandlerRootView style={{flex: 1}}>
                 {isDesktop ? (
-                    // Desktop layout - centered content with max width
                     <View style={styles.desktopContainer}>
                         <View style={styles.desktopContent}>
                             {currentPage === 0 ? renderNetworksContent() : renderMeetPeopleContent()}
                         </View>
                     </View>
                 ) : (
-                    // Mobile layout - swipeable view
                     <PanGestureHandler onGestureEvent={handleGesture}>
                         <Animated.View 
                             style={[
@@ -1488,39 +1458,38 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: '#f1f4f9',
-        paddingTop: 0, // Remove extra padding, use insets instead
+        paddingTop: 0
     },
     container: {
         flex: 1,
-        backgroundColor: '#f1f4f9',
+        backgroundColor: '#f1f4f9'
     },
-    // Desktop styles
     desktopContainer: {
         flex: 1,
         backgroundColor: '#f1f4f9',
-        alignItems: 'center',
+        alignItems: 'center'
     },
     desktopContent: {
         width: '100%',
-        maxWidth: 1024, // Similar to max-w-7xl in Tailwind
+        maxWidth: 1024,
         backgroundColor: '#f1f4f9',
         paddingHorizontal: 20,
         flex: 1
     },
     contentContainer: {
         flex: 1,
-        padding: 16,
+        padding: 16
     },
     pageHeader: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 16,
+        marginBottom: 16
     },
     pageTitle: {
-        fontSize: 20, // Smaller font size to match chats and profiles
+        fontSize: 20,
         fontWeight: '600',
-        color: '#1E293B',
+        color: '#1E293B'
     },
     headerActions: {
         flexDirection: 'row',
@@ -1532,17 +1501,17 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(59, 130, 246, 0.1)',
         justifyContent: 'center',
         alignItems: 'center',
-        marginLeft: 8,
+        marginLeft: 8
     },
     desktopActionButton: {
         width: 'auto',
         paddingHorizontal: 16,
-        flexDirection: 'row',
+        flexDirection: 'row'
     },
     desktopActionButtonText: {
         color: '#3B82F6',
         fontWeight: '500',
-        marginLeft: 8,
+        marginLeft: 8
     },
 
     // Create Network Modal Styles
@@ -1554,9 +1523,9 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     createModalContent: {
-        width: '95%', // Wider to fill more of the screen
-        maxWidth: 600, // Larger maximum width
-        maxHeight: '95%', // Taller to fill more of the screen
+        width: '95%',
+        maxWidth: 600,
+        maxHeight: '95%',
         backgroundColor: 'white',
         borderRadius: 16,
         overflow: 'hidden',
@@ -2060,7 +2029,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
 
-    // Meet People styles
+    // Meet New People styles
     meetPeopleContainer: {
         flex: 1,
         backgroundColor: '#F8FAFC',
@@ -2088,7 +2057,7 @@ const styles = StyleSheet.create({
         marginLeft: 8,
     },
     meetPeopleTitle: {
-        fontSize: 20, // Smaller font size to match chats and profiles
+        fontSize: 20,
         fontWeight: '600',
         color: '#1E293B',
     },

@@ -13,7 +13,6 @@ export default function MessageEntry({ message }) {
   const [optionsVisible, setOptionsVisible] = useState(false);
   const [imageLoaded, setImageLoaded] = useState({});
 
-  // Animation for new message appearance
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
 
@@ -37,12 +36,11 @@ export default function MessageEntry({ message }) {
   const isSender = message.isSender;
   message.timestamp = message.millis;
 
-  // Get images from message if they exist
   const images = message.images || [];
   const hasImages = images.length > 0;
   const hasText = message.content && message.content.trim().length > 0;
 
-  // Determine if message was sent recently (within last minute)
+  //Todo: Determine if message was sent recently (within last minute). Isn't implemented yet
   const isRecent = Date.now() - message.timestamp < 60000;
 
   const handleImageLoaded = (index) => {
@@ -64,7 +62,6 @@ export default function MessageEntry({ message }) {
   const handleSaveImage = async () => {
     try {
       if (isWeb) {
-        // Desktop-specific image download logic
         const link = document.createElement('a');
         link.href = selectedImage;
         link.download = `facelinked_${Date.now()}.jpg`;
@@ -72,7 +69,6 @@ export default function MessageEntry({ message }) {
         link.click();
         document.body.removeChild(link);
       } else {
-        // Mobile-specific logic
         const {status} = await MediaLibrary.requestPermissionsAsync();
 
         if (status !== 'granted') {

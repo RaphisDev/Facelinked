@@ -37,15 +37,11 @@
                     let {profile, post} = useLocalSearchParams();0
                     const {t} = useTranslation();
                     const router = useRouter();
-                    const insets = useSafeAreaInsets();
-                    const segments = useSegments();
 
                     const stateManager = new StateManager();
 
-                    // State for badge notification
                     const [hasFriendRequests, setHasFriendRequests] = useState(false);
 
-                    // State for responsive layout
                     const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
                     const [isDesktop, setIsDesktop] = useState(windowWidth > 768);
 
@@ -83,7 +79,6 @@
                     const fadeAnimText = useRef(new Animated.Value(1)).current;
                     const fadeAnim = useRef(new Animated.Value(1)).current;
 
-                    // New states for additional features
                     const [showPostModal, setShowPostModal] = useState(false);
                     const [selectedPost, setSelectedPost] = useState(null);
                     const [showPostImageGallery, setShowPostImageGallery] = useState(false);
@@ -100,7 +95,6 @@
                     const [friendRequests, setFriendRequests] = useState([]);
                     const [showFriendRequests, setShowFriendRequests] = useState(false);
 
-                    // State for profile editing
                     const [showEditProfile, setShowEditProfile] = useState(false);
                     const [editName, setEditName] = useState("");
                     const [editLocation, setEditLocation] = useState("");
@@ -496,7 +490,6 @@
 
                         setShowPostCreation(false);
 
-                        // Upload images if any
                         let imageUrls = [];
                         try {
                             if (selectedImages.length > 0) {
@@ -508,7 +501,6 @@
                                     const savedImage = await renderedImage.saveAsync({format: SaveFormat.JPEG, compress: 0.7});
                                     tempImage = savedImage.uri;
 
-                                    // Get upload URL from server
                                     const uploadResponse = await fetch(`${ip}/profile/upload`, {
                                         method: 'GET',
                                         headers: {
@@ -519,7 +511,6 @@
                                     if (uploadResponse.ok) {
                                         const uploadUrl = await uploadResponse.text();
 
-                                        // Upload image to the URL
                                         const response = await fetch(tempImage);
                                         const blob = await response.blob();
 
@@ -531,13 +522,11 @@
                                             body: blob
                                         });
 
-                                        // Add the image URL to the array (without query parameters)
                                         imageUrls.push(uploadUrl.split('?')[0]);
                                     }
                                 }
                             }
 
-                            // Create the post with image URLs
                             const data = await fetch(`${ip}/profile/post`, {
                                 method: 'POST',
                                 headers: {
@@ -550,7 +539,6 @@
                                 })
                             });
 
-                            // Clear selected images
                             setSelectedImages([]);
 
                             if (!data.ok) {
@@ -651,26 +639,22 @@
                     }
 
                     const pickImages = async () => {
-                        // Request permission to access the media library
                         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
                         if (status !== 'granted') {
-                            Alert.alert('Permission Required', 'Sorry, we need camera roll permissions to make this work!');
+                            Alert.alert('Permission Required', 'Sorry, we need access to your photos to upload images.');
                             return;
                         }
 
-                        // Launch the image picker
                         let result = await ImagePicker.launchImageLibraryAsync({
                             mediaTypes: "images",
                             allowsMultipleSelection: true,
                             quality: 0.8,
                             aspect: [4, 3],
-                            selectionLimit: 7 - selectedImages.length,
+                            selectionLimit: 5 - selectedImages.length,
                         });
 
                         if (!result.canceled && result.assets) {
-                            // Add the selected images to the state
-                            // Limit to 5 images total
                             const newImages = result.assets.map(asset => asset.uri);
                             const updatedImages = [...selectedImages, ...newImages].slice(0, 5);
                             setSelectedImages(updatedImages);
@@ -763,7 +747,6 @@
                         ]).start();
                     }
 
-                    // Function to open post details and comments
                     const openPostDetails = (post) => {
                         setSelectedPost(post);
                         setComments(
@@ -778,7 +761,6 @@
                         setShowPostModal(true);
                     };
 
-                    // Function to add a comment
                     const addComment = async () => {
                         if (commentText.current.trim() === "") return;
 
@@ -837,12 +819,6 @@
                         }
                     };
 
-                    const formatTimestamp = (timestamp) => {
-                        const date = new Date(timestamp);
-                        return date.toLocaleString();
-                    };
-
-                    // Function to handle friend request response
                     const handleFriendRequest = async (id, accept) => {
                         if (accept) {
                             const status = await fetch(`${ip}/profile/friend/${id}`, {
@@ -893,7 +869,6 @@
                         setShowEditProfile(true);
                     };
 
-                    // Function to save edited profile
                     const saveProfile = async () => {
                         try {
                             const updatedProfile = {
@@ -916,7 +891,6 @@
                                 setProfileInfos({...profileInfos, ...updatedProfile});
                                 setShowEditProfile(false);
 
-                                // Update local storage
                                 if (Platform.OS === "web") {
                                     localStorage.setItem('profile', JSON.stringify({...profileInfos, ...updatedProfile}));
                                 } else {
@@ -2198,7 +2172,6 @@
                                                                 <TouchableOpacity
                                                                     className="w-10 h-10 rounded-full bg-blue-500/50 items-center justify-center mr-3"
                                                                     onPress={() => {
-                                                                        // Set as profile picture
                                                                         const currentIndex = profileImages.findIndex(img => img === selectedImage);
                                                                         if (currentIndex !== 0 && currentIndex !== -1) {
                                                                             newMainProfilePicture(profileImages[currentIndex])
@@ -2211,7 +2184,6 @@
                                                                 <TouchableOpacity
                                                                     className="w-10 h-10 rounded-full bg-red-500/50 items-center justify-center"
                                                                     onPress={() => {
-                                                                        // Remove image
                                                                         const currentIndex = profileImages.findIndex(img => img === selectedImage);
                                                                         if (currentIndex !== -1) {
                                                                             removeProfilePicture(profileImages[currentIndex])

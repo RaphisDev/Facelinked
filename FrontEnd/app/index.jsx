@@ -99,7 +99,7 @@ const Index = () => {
             }
         }
 
-        //when app is reinstalled the app doesnt have permission
+        //when app is reinstalled the app wouldn't have permission otherwise
         if (Notification.PermissionStatus.UNDETERMINED && Platform.OS !== "web" && Device.isDevice && token != null) {
             const deviceToken = await requestPermission();
             if (!deviceToken) {
@@ -332,7 +332,7 @@ const NavigationBar = ({navigateTo, scrollContent}) => {
 }
 
 const Footer = ({navigateTo, scrollContent}) => {
-    //html is alright (only displayed in web, please future self don't do the pain and convert the lists)
+    //html is alright (only displayed in web)
     const router = useRouter();
 
     if (Platform.OS !== 'web') { return null}

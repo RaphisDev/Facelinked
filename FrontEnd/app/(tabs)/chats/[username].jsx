@@ -32,7 +32,6 @@ const MOBILE_WIDTH_THRESHOLD = 768;
 export default function ChatRoom() {
     const { username } = useLocalSearchParams();
     const insets = useSafeAreaInsets();
-    const segments = useSegments();
     const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
     const [isDesktop, setIsDesktop] = useState(windowWidth > MOBILE_WIDTH_THRESHOLD);
     const [isEmbedded, setIsEmbedded] = useState(false);
@@ -42,9 +41,8 @@ export default function ChatRoom() {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [userData, setUserData] = useState({});
-    const [isTyping, setIsTyping] = useState(false);
+    const [isTyping, setIsTyping] = useState(false); //Todo: Isn't used yet, but can be used to show typing indicators in the future
     const [isLoading, setIsLoading] = useState(true);
-    const [keyboardHeight, setKeyboardHeight] = useState(0);
     const [keyboardVisible, setKeyboardVisible] = useState(false);
     const [selectedImages, setSelectedImages] = useState([]);
     const [inputHeight, setInputHeight] = useState(40);
@@ -63,7 +61,6 @@ export default function ChatRoom() {
             setIsDesktop(newWidth > MOBILE_WIDTH_THRESHOLD);
         };
 
-        // Initialize window width and desktop state immediately
         const initialWidth = Dimensions.get('window').width;
         const initialIsDesktop = initialWidth > MOBILE_WIDTH_THRESHOLD;
         setWindowWidth(initialWidth);
@@ -446,10 +443,12 @@ export default function ChatRoom() {
                 return message;
             }))
             ws.messageReceived.emit("newMessageReceived")
-            await asyncStorage.setItem("lastMessageId", (Date.now() + 1000).toString());
+            await asyncStorage.setItem("lastMessageId", (Date.now() + 1000).toString()); //Todo: not a good approach, but it works for now. This is used to ensure there is enough time for the server to process the message and keeping the last message ID beyond the sent message id
         }
         catch (e) {
-            //setMessages(prevState => prevState.filter((chat) => !chat.isOptimistic)); letting the message just vanish isnt a good approach to network failure either
+            // Letting the message just vanish isn't a good approach to network failure either
+            //Todo: Instead, we should try to send the message again later
+            //setMessages(prevState => prevState.filter((chat) => !chat.isOptimistic));
             console.error(e);
         }
     }
@@ -458,7 +457,6 @@ export default function ChatRoom() {
         const keyboardShowListener = Platform.OS === 'ios'
             ? Keyboard.addListener('keyboardWillShow', (e) => {
                 setKeyboardVisible(true);
-                setKeyboardHeight(e.endCoordinates.height);
                 Animated.timing(inputBarAnimation, {
                     toValue: 1,
                     duration: 250,
@@ -467,7 +465,6 @@ export default function ChatRoom() {
             })
             : Keyboard.addListener('keyboardDidShow', (e) => {
                 setKeyboardVisible(true);
-                setKeyboardHeight(e.endCoordinates.height);
                 Animated.timing(inputBarAnimation, {
                     toValue: 1,
                     duration: 150,
@@ -478,7 +475,6 @@ export default function ChatRoom() {
         const keyboardHideListener = Platform.OS === 'ios'
             ? Keyboard.addListener('keyboardWillHide', () => {
                 setKeyboardVisible(false);
-                setKeyboardHeight(0);
                 Animated.timing(inputBarAnimation, {
                     toValue: 0,
                     duration: 200,
@@ -487,7 +483,6 @@ export default function ChatRoom() {
             })
             : Keyboard.addListener('keyboardDidHide', () => {
                 setKeyboardVisible(false);
-                setKeyboardHeight(0);
                 Animated.timing(inputBarAnimation, {
                     toValue: 0,
                     duration: 100,

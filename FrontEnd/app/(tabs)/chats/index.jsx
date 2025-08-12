@@ -188,7 +188,6 @@ export default function Chats() {
         makeChatRead();
         if (isDesktop) {
             setSelectedChat(username);
-            // Update URL with selected chat
             const newUrl = new URL(window.location.href);
             newUrl.searchParams.set('username', username);
             window.history.pushState({}, '', newUrl);
@@ -253,7 +252,7 @@ export default function Chats() {
         </View>
     );
 
-    // Desktop split view layout
+    //Todo: Desktop split view isn't working that well yet
     if (isDesktop) {
         return (
             <View 
@@ -322,7 +321,6 @@ export default function Chats() {
         );
     }
 
-    // Mobile layout
     return (
         <View 
             className="flex-1 bg-blue-50/50 dark:bg-dark-primary"

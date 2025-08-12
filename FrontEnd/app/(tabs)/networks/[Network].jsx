@@ -49,7 +49,6 @@ export default function Network() {
     const navigator = useNavigation();
     const router = useRouter();
     const ws = new WebSocketProvider();
-    const stateManager = new StateManager();
 
     const [messages, setMessages] = useState([]);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -82,7 +81,6 @@ export default function Network() {
             setIsDesktop(newWidth > MOBILE_WIDTH_THRESHOLD);
         };
 
-        // Initialize window width and desktop state immediately
         const initialWidth = Dimensions.get('window').width;
         setWindowWidth(initialWidth);
         setIsDesktop(initialWidth > MOBILE_WIDTH_THRESHOLD);
@@ -111,18 +109,14 @@ export default function Network() {
             if (token.current === null) { router.replace("/") }
         });
 
-        // Set up header
         navigator.setOptions({
             headerShown: false
         });
 
-        // Load network data
         loadNetwork();
 
-        // Load messages
         loadInitialMessages();
 
-        // Set up WebSocket listener
         ws.messageReceived.addListener("networkMessageReceived", handleNewMessage);
 
         return () => {
@@ -175,7 +169,6 @@ export default function Network() {
         };
     }, []);
 
-    // Format message date for grouping
     const formatMessageDate = (timestamp) => {
         const messageDate = new Date(timestamp);
         const today = new Date();
@@ -201,7 +194,6 @@ export default function Network() {
         }
     };
 
-    // Group messages by date
     const groupMessagesByDate = (messages) => {
         if (!messages || messages.length === 0) return [];
 
@@ -209,10 +201,9 @@ export default function Network() {
         let currentDate = null;
 
         messages.sort((a, b) => {
-            // Handle date headers which don't have millis property
             const millisA = a.millis || 0;
             const millisB = b.millis || 0;
-            return millisA - millisB; // Ascending order (older first, newer last)
+            return millisA - millisB;
         }).forEach(message => {
             const timestamp = message.millis;
             const dateString = formatMessageDate(timestamp);
@@ -305,7 +296,6 @@ export default function Network() {
     const loadInitialMessages = async () => {
         setIsLoading(true);
         try {
-            // First try to load from local storage
             const loadedMessages = await asyncStorage.getItem(`networks/${Network}`) || null;
             if (loadedMessages !== null) {
                 const parsedMessages = JSON.parse(loadedMessages);
@@ -316,7 +306,6 @@ export default function Network() {
                 }
             }
 
-            // Then fetch from server
             const receivedMessages = await fetch(`${ip}/networks/${Network}/messages`, {
                 method: "GET",
                 headers: {
@@ -339,7 +328,6 @@ export default function Network() {
                     setMessages(formattedMessages);
                     oldestMessageTimestamp.current = Math.min(...formattedMessages.map(msg => msg.millis));
 
-                    // Save to local storage
                     await asyncStorage.setItem(`networks/${Network}`, JSON.stringify(formattedMessages));
                     await asyncStorage.setItem(`lastNetworkMessageId/${Network}`, formattedMessages[formattedMessages.length - 1].millis.toString());
                 }
@@ -378,13 +366,10 @@ export default function Network() {
                         millis: message.millis
                     }));
 
-                    // Update oldest timestamp
                     oldestMessageTimestamp.current = Math.min(...formattedMessages.map(msg => msg.millis));
 
-                    // Add messages to the beginning of the list
                     setMessages(prevMessages => [...formattedMessages, ...prevMessages]);
 
-                    // Update local storage
                     const allMessages = [...formattedMessages, ...messages];
                     await asyncStorage.setItem(`networks/${Network}`, JSON.stringify(allMessages));
                 }
@@ -407,7 +392,6 @@ export default function Network() {
 
         setMessages(prevMessages => [...prevMessages, e.detail]);
 
-        // Update local storage
         const updatedMessages = [...messages, e.detail];
         await asyncStorage.setItem(`networks/${Network}`, JSON.stringify(updatedMessages));
     };
@@ -515,7 +499,6 @@ export default function Network() {
         }
 
         try {
-            // Add optimistic message
             const optimisticMessage = {
                 sender: username.current,
                 senderProfilePicturePath: Platform.OS === "web" 
@@ -529,7 +512,6 @@ export default function Network() {
 
             setMessages(prevMessages => [...prevMessages, optimisticMessage]);
 
-            // Send message via WebSocket
             ws.stompClient.publish({
                 destination: `/app/networks/send`,
                 body: JSON.stringify({
@@ -539,7 +521,6 @@ export default function Network() {
                 })
             });
 
-            // Update local storage
             if (JSON.parse(await asyncStorage.getItem("networks"))?.some((network) => network.networkId === Network)) {
                 let loadedMessages = await asyncStorage.getItem(`networks/${Network}`) || [];
                 if (loadedMessages.length !== 0) {
@@ -555,7 +536,6 @@ export default function Network() {
 
                 await asyncStorage.setItem(`networks/${Network}`, JSON.stringify(updatedMessages));
 
-                // Update networks list order
                 let loadedNetworks = await asyncStorage.getItem("networks") || [];
                 if (loadedNetworks.length !== 0) {
                     loadedNetworks = JSON.parse(loadedNetworks);
@@ -568,7 +548,6 @@ export default function Network() {
             }
         } catch (error) {
             console.error("Error sending message:", error);
-            // Remove optimistic message on error
             setMessages(prevMessages => prevMessages.filter(msg => !msg.isOptimistic));
         }
     };
@@ -687,7 +666,6 @@ export default function Network() {
                             return;
                         }
 
-                        // Use setTimeout to ensure the next alert shows properly
                         setTimeout(() => {
                             showAlert({
                                 title: t("update.network"),
@@ -814,7 +792,6 @@ export default function Network() {
             });
 
             if (response.ok) {
-                // Refresh member list
                 const receivedData = await fetch(`${ip}/networks/${Network}`, {
                     method: "GET",
                     headers: {
@@ -1273,7 +1250,6 @@ export default function Network() {
             <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
             {isDesktop ? (
-                // Desktop layout
                 <View style={styles.desktopContainer}>
                     {/* Network info sidebar */}
                     <View style={styles.desktopSidebar}>
@@ -1405,7 +1381,6 @@ export default function Network() {
                     </View>
                 </View>
             ) : (
-                // Mobile layout
                 <>
                     {renderHeader()}
                     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -1696,7 +1671,6 @@ const styles = StyleSheet.create({
         color: '#94A3B8',
         fontStyle: 'italic',
     },
-    // Desktop styles
     desktopContainer: {
         flex: 1,
         flexDirection: 'row',
@@ -1820,7 +1794,7 @@ const styles = StyleSheet.create({
         marginLeft: 12,
     },
     headerTitle: {
-        fontSize: 20, // Consistent with other headers
+        fontSize: 20,
         fontWeight: '600',
         color: '#1E293B',
         flex: 1,

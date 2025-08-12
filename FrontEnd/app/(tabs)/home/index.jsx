@@ -51,18 +51,15 @@ export default function Index() {
 
     const [allPostsFetched, setAllPostsFetched] = useState(false);
 
-    // State for image viewing
     const [showImageModal, setShowImageModal] = useState(false);
     const [currentImage, setCurrentImage] = useState(null);
     const [imageGallery, setImageGallery] = useState([]);
 
-    // State for commenting
     const [showCommentInput, setShowCommentInput] = useState(false);
     const [commentText, setCommentText] = useState("");
     const [currentPost, setCurrentPost] = useState(null);
     const [comments, setComments] = useState([]);
 
-    // State for post creation
     const [showPostCreation, setShowPostCreation] = useState(false);
     const [postText, setPostText] = useState("");
     const [selectedImages, setSelectedImages] = useState([]);
@@ -122,7 +119,7 @@ export default function Index() {
     }, []);
 
     useEffect(() => {
-        // Check authentication
+        //Todo: This is redundant and should be centralized in the future
         if (Platform.OS === "web") {
             token.current = localStorage.getItem("token");
             username.current = localStorage.getItem("username");
@@ -135,7 +132,6 @@ export default function Index() {
             if (token.current === null) {
                 router.replace("/");
             } else {
-                // Load posts
                 fetchPosts();
             }
         });
@@ -235,7 +231,6 @@ export default function Index() {
     };
 
     const handleCommentPress = (post) => {
-        // Open comment input for this post
         setCurrentPost(post);
         setShowCommentInput(true);
 
@@ -250,14 +245,11 @@ export default function Index() {
     };
 
     const handleImagePress = (post, image) => {
-        // Open image viewer directly on the homepage
         setCurrentImage(image);
 
         if (post.content.length > 1) {
-            // Set the image gallery for multiple images
             setImageGallery(post.content);
         } else {
-            // Set a single image in the gallery
             setImageGallery([image]);
         }
 
@@ -379,9 +371,7 @@ export default function Index() {
         }
     }
 
-    // Function to pick images from gallery
     const pickImages = async () => {
-        // Request permission to access the media library
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
         if (status !== 'granted') {
@@ -389,18 +379,15 @@ export default function Index() {
             return;
         }
 
-        // Launch the image picker
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: "images",
             allowsMultipleSelection: true,
             quality: 0.8,
             aspect: [4, 3],
-            selectionLimit: 7 - selectedImages.length,
+            selectionLimit: 5 - selectedImages.length,
         });
 
         if (!result.canceled && result.assets) {
-            // Add the selected images to the state
-            // Limit to 5 images total
             const newImages = result.assets.map(asset => asset.uri);
             const updatedImages = [...selectedImages, ...newImages].slice(0, 5);
             setSelectedImages(updatedImages);
@@ -568,7 +555,6 @@ export default function Index() {
         </View>
     );
 
-    // Render friends' posts
     const renderFriendsPosts = () => {
         return (
             <FlatList
