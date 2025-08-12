@@ -19,9 +19,9 @@
 
 <table>
   <tr>
-    <td><img src="readme/iOS_Demo.png" alt="iOS Demo" width="250" style="border-radius: 12px;"></td>
-    <td><img src="readme/iPadOS_Demo.png" alt="iPadOS Demo" width="407" style="border-radius: 7px;"></td>
-    <td><img src="readme/iOS_Demo_02.png" alt="iOS Demo 2" width="250" style="border-radius: 12px;"></td>
+    <td><img src="https://github.com/raphisdev/facelinked/blob/main/readme/iOS_Demo.png" alt="iOS Demo" width="250" style="border-radius: 12px;"></td>
+    <td><img src="https://github.com/raphisdev/facelinked/blob/main/readme/iPadOS_Demo.png" alt="iPadOS Demo" width="407" style="border-radius: 7px;"></td>
+    <td><img src="https://github.com/raphisdev/facelinked/blob/main/readme/iOS_Demo_02.png" alt="iOS Demo 2" width="250" style="border-radius: 12px;"></td>
   </tr>
 </table>
 
@@ -68,7 +68,7 @@ Just **real connections**.
 ## Get Facelinked
 
 [![Download Facelinked](https://img.shields.io/badge/Download-Facelinked-blue.svg)](https://www.facelinked.com/apps)
-<br/><br/><img src="readme/qr-code.png" width="150" alt="QR Code"/>
+<br/><br/><img src="https://github.com/raphisdev/facelinked/blob/main/readme/qr-code.png" width="150" alt="QR Code"/>
 
 ---
 
