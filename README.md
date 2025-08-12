@@ -1,210 +1,225 @@
-<!DOCTYPE html>
-<html lang="en">
+```
+███████╗ █████╗  ██████╗███████╗██╗     ██╗███╗   ██╗██╗  ██╗███████╗██████╗ 
+██╔════╝██╔══██╗██╔════╝██╔════╝██║     ██║████╗  ██║██║ ██╔╝██╔════╝██╔══██╗
+█████╗  ███████║██║     █████╗  ██║     ██║██╔██╗ ██║█████╔╝ █████╗  ██║  ██║
+██╔══╝  ██╔══██║██║     ██╔══╝  ██║     ██║██║╚██╗██║██╔═██╗ ██╔══╝  ██║  ██║
+██║     ██║  ██║╚██████╗███████╗███████╗██║██║ ╚████║██║  ██╗███████╗██████╔╝
+╚═╝     ╚═╝  ╚═╝ ╚═════╝╚══════╝╚══════╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═════╝
+                     Real friendships. No noise.
+```
+[![License][license-image]][license-url]
+[![Contributors][contributors-image]][contributors-url]
+[![GitHub stars][stars-image]][stars-url]
 
-<body>
-<!-- *Kommentar*
-	Dieses File ist nur gedacht, um Facelinked-Teammitglieder einzuführen!
-	Sieh dir dieses File im Browser bei Github im Projekt an, um es ordentlich lesen zu können!
-	VON: FACELINKED 2024
-*Kommentar* -->
-<div>
-	<h1>
-		Willkommen im Facelinked Team,<br/>
-		und Willkommen auf Facelinked!
-	</h1>
-</div>
-<div>
-  <label>
-		<h3>
-            Eine App von Schüler für Schüler
-		</h3>   
-	</label>
-</div>
+> Facelinked — an open-source, ad-free social platform for **genuine friendships**, not followers or clicks.
 
-<div>
-<label>
-<p>
-Wir arbeiten an einer Social Media App, ausgelegt für gute Benutzerfreundlichkeit und grossem Nutzen
-</p>
-</label>
-</div>
+---
 
-<div>
-	<img src="/Docs/FacelinkedMobileGUI.png" alt="Hier sollte die Facelinked Mobile Version zu sehen sein!" width="40%" />
-</div>
+## 🎥 Quick Look
 
-<!-- *Kommentar*
+<table>
+  <tr>
+    <td><img src="readme/iOS_Demo.png" alt="iOS Demo" width="250" style="border-radius: 12px;"></td>
+    <td><img src="readme/iPadOS_Demo.png" alt="iPadOS Demo" width="407" style="border-radius: 7px;"></td>
+    <td><img src="readme/iOS_Demo_02.png" alt="iOS Demo 2" width="250" style="border-radius: 12px;"></td>
+  </tr>
+</table>
 
-	Ab hier kommen kurze wichtige kräftige Schlagwörter 
+*A quick glimpse of the platform in action — fostering real friendships.*
 
-*Kommentar* -->
+**[More iPad images](https://github.com/raphisdev/facelinked/blob/main/readme/iPad%20Images%20Store)** | **[More iPhone images](https://github.com/raphisdev/facelinked/blob/main/readme/iOS%20Images%20Store)**
 
-<div>
-	<label>
-		<p>
-			<h2>
-				Die App soll...
-			</h2>
-		</p>
-	</label>
-	<table>
-		<tr>
-			<td>
-				<div>
-				<h3>	
-				mobil<br/><br/><br/><div> </div>
-				</h3>
-				</div>
-			</td>
-			<td>
-				<div><h3>
-				minimalistisch<br/><br/><br/><div> </div>
-				</h3>
-				</div>
-			</td>
-			<td>
-				<div>
-				<h3>
-				modern<br/><br/><br/><div> </div>
-				</h3>
-				</div>
-			</td>
-			<td>
-				<div>
-				<h3>
-				intuitiv<br/><br/><br/><div> </div>
-				</h3>
-				</div>
-			</td>
-		</tr>
-	</table>	
+---
+
+## 📑 Table of Contents
+
+- [🌱 Why Facelinked Exists](#-why-facelinked-exists)
+- [Get Facelinked](#get-facelinked)
+- [🚀 Features](#-features)
+- [🤝 Contributing](#-contributing)
+- [📜 License](#-license)
+- [🔧 Getting Started](#-getting-started)
+  - [Prerequisites](#prerequisites)
+  - [🛠 Installation](#-installation)
+    - [🌐 Frontend Setup](#-frontend-setup)
+    - [⚙️ Backend Setup](#️-backend-setup)
+
+---
+
+## 🌱 Why Facelinked Exists
+
+Social media started as a way to connect with friends.  
+Somewhere along the way, it became a billboard.  
+Your feed turned into an ad slot. Your time became a product.  
+
+**Facelinked is here to change that.**  
+
+We’re building a platform where your feed isn’t hijacked by celebrities or advertisers,  
+where “likes” matter less than *laughs shared in real life*,  
+and where technology helps you stay close to real friends.
+
+✨ No ads  
+✨ No influencers  
+✨ No addictive tricks  
+Just **real connections**.
+
+---
+
+## Get Facelinked
+
+[![Download Facelinked](https://img.shields.io/badge/Download-Facelinked-blue.svg)](https://www.facelinked.com/apps)
+<br/><br/><img src="readme/qr-code.png" width="150" alt="QR Code"/>
+
+---
+
+## 🚀 Features
+
+- 📰 **Ad-free feed** — only updates from people you actually know
+- 🔒 **Private** — no data tracking, no selling your info
+- 📱 **Cross-platform** — Web, iOS, Android, macOS, and iPadOS
+- 🛠 **Open source** — community-driven
+
+“We’re not here to keep you scrolling. We’re here to keep you connected.”
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions that align with our mission—helping people form and sustain real friendships.
+
+1. Fork the repo
+2. Create a feature branch (`git checkout -b feature-name`)
+3. Commit changes
+4. Submit a Pull Request (PR)
+
+**Note:** For discussions, questions, and ideas, please use [GitHub Discussions](https://github.com/raphisdev/facelinked/discussions).
+
+---
+
+## 📜 License
+
+[MIT License](https://github.com/raphisdev/facelinked/blob/main/LICENSE) — Free to use, modify, and share.
+
+---
+
+## 🔧 Getting Started
+
+### Prerequisites
+
+- **Node.js** (v23+)
+- **Expo** & **React Native** (for Frontend)
+- **Java** (v17+)
+  - Maven (Build tool)
+  - Spring Boot
+- **Android Studio** (for Android builds)
+- **Xcode** & **Apple Developer Account** (for iOS builds)
+- **AWS Account** with:
+    - DynamoDB (with provided schema)
+    - S3 Storage
+    - EC2 Server (for backend)
+    - IAM Roles (for API access)
+    - Amplify & Route 53 (for website)
+- **Firebase Project** with FCM configured (for Android Notifications)
+- **APNS** configured (for iOS Notifications)
+- **Docker Desktop** (for backend deployment)
+- **Google Cloud Console OAuth 2.0** configured (for Google Sign-In)
+- **Git**
+
+## 🛠 Installation
+
+```sh
+git clone https://github.com/raphisdev/facelinked.git
+cd facelinked
+```
+
+### 🌐 Frontend Setup
+
+```sh
+cd Frontend
+npm install
+
+# Build for Android
+npx expo run:android
+
+# Build for iOS
+npx expo run:ios
+
+# Start development server
+npx expo start
+# Press "w" to open in web browser
+```
+
+### ⚙️ Backend Setup
+
+**MacOS & Linux**
+```sh
+# Transfer APNS Key to the server
+scp -i /path/to/your/NOTIFICATION_KEY user@your-server-ip:/path/to/destination/ -i /path/to/your/private-key.pem
+
+# Paste your secretAccountKey.json from Firebase Console in resources
+cp /path/to/your/secretAccountKey.json facelinked/src/main/resources/
+
+# Configure the application.properties file in facelinked/src/main/resources/
+cd facelinked/src/main/resources/
+
+# Build the backend
+docker buildx build --platform linux/amd64 -t YOUR_DOCKER_HUB_ID/YOUR_PROJECT_ID:AVAILABLE_TAG .
+docker push YOUR_DOCKER_HUB_ID/YOUR_PROJECT_ID:AVAILABLE_TAG
+
+# Connect to the server with the private key from your AWS EC2 instance
+# Make sure you have the permissions to access the server
+ssh user@your-server-ip -i /path/to/your/private-key.pem
+
+# Install Docker
+sudo apt-get update
+sudo apt-get install docker.io -y
+
+# Install Certbot and configure SSL
+sudo apt-get install certbot -y
+
+# Follow prompts to generate SSL certificates
+# (Replace [your domain] with your actual domain that points to your server)
+# Make sure your EC2 Security Group allows port 80 and 443
+sudo certbot certonly -a standalone -d [your domain]
+
+# Generate PKCS#12 file
+# Generated files in: /etc/letsencrypt/live/[your domain]
+cd /etc/letsencrypt/live/[your domain]
+openssl pkcs12 -export -in fullchain.pem -inkey privkey.pem -out keystore.p12
+
+# Install and configure AWS CLI with your IAM credentials
+# Currently your IAM user should only have permissions for DynamoDB and S3
+sudo apt-get install awscli -y
+aws configure
 	
-</div>
-<div>
-	<label>
-		<p>
-			<h3>
-				… sein, denn niemand sollte Probleme bei der Bedienung haben <br/><br/><br/><br/><br/><div> </div>
-			</h3>
-		</p>
-	</label>
-</div>
+# Replace placeholder and paste this command to run the Docker container
+sudo docker run \
+  -e JWT_SECRET='YOUR_256_BIT_JWT_SECRET_KEY' \
+  -e KEY_STORE_PASSWORD='YOUR_PASSWORD_FOR_SSL_CERTIFICATE' \
+  -e APNS_KEY_PATH='YOUR_PATH_TO_APNS_KEY' \
+  -e APNS_TEAM_ID='YOUR_APPLE_ACCOUNT_TEAM_ID' \
+  -e APNS_KEY_ID='YOUR_APNS_KEY_ID' \
+  -e GOOGLE_ANDROID_CLIENT_ID='YOUR_ANDROID_CLIENT_ID_FROM_GOOGLE_CLOUD_CONSOLE' \
+  -e GOOGLE_IOS_CLIENT_ID='YOUR_IOS_CLIENT_ID_FROM_GOOGLE_CLOUD_CONSOLE' \
+  -v ~/.aws:/root/.aws \
+  -v ./PATH_TO_SSL_keystore.p12:/app/keystore.p12 \
+  -v ./PATH_TO_APNS_KEY:/app/Notification_key.p8 \
+  -d -p 8443:8443 YOUR_DOCKER_HUB_ID/YOUR_PROJECT_ID:latest
 
-<!-- *Kommentar*
+# Keep in mind that you need to change the ip address in the Frontend to your server's IP address
+# The AppManager.jsx contains the IP addresses of the backend server
+cd ../Frontend/components/
+```
 
-	erste Einführung zum Starten der Wep-App für Devs (FACELINKED-TEAM)
+**Windows**
+```sh
 
-*Kommentar* -->
+```
 
-
-<div>
-	<label>
-		<h2>
-			How to start?
-		</h2>
-	</label>
-</div>
-<div>
-	<label>
-		<h3>
-			FrontEnd:
-   		</h3>
- 	</label>
- </div>
- <div>
-  	<label>
-  		Hallo, schön, dass du dich entschlossen hast mit beim FaceLinked Front-End zu helfen! Um dir den Start so einfach wie möglich zu machen, erklären wir dir in wenigen Schritten, wie du es zum Laufen bekommst!<br/><br/>
-		Sobald du dieses Projekt geklont hast, öffnest du den FaceLinked Ordner und anschließend den Front-End Ordner!<br/><br/><br/>
-		Hier kannst du nun das ganze Front-End Projekt betrachten!<br/><br/>
-		Öffne nun die IDE deiner Wahl, öffne nun auch dort den Ordner "Frontend" und öffne anschließend das Terminal.<br/>
-		<h4>Tippe dort nun Folgendes ein:</h4>
-		<pre>npm run (android, ios, web)</pre>
-		<h4>Nach kurzer Zeit sollte sich die React-App im Browser starten</h4><br>
-	</label>
-</div>
-<div>
- 	<label>
- 		<h3>
-			BackEnd:
-   		</h3>
- 	</label>
- </div>
- <div>
-	<label>
-  		comming soon!...<br/><br/><br/><br/>
-	</label>
-</div>
-<div>
-	<label>
-		<h1>
-			Danke, für <i>deine</i> Hilfe!<br/><br/><br/><hr/><h4>Facelinked 2024</h4><br/><br/>
-		</h1>
-	</label>
-</div>
-
-<!-- *Kommentar*
-	Anfoderungen. ~was sollte man können?
-*Kommentar* -->
-<div>
-	<h3>Was sollte <i>Ich</i> können?</h3>
-</div>
-<div>
-	<table>
-		<tr>
-			<td>
-				<div>
-					FrontEnd:
-				</div>
-			</td>
-			<td>
-				<div>
-					HTML, CSS(Tailwind css)
-				</div>
-			</td>
-			<td>
-				<div>
-					JavaScript
-				</div>
-			</td>
-			<td>
-				<div>
-					React (Native)
-				</div>
-			</td>
-			<td>
-				<div>
-					Javascript
-				</div>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<div>
-					BackEnd:
-				</div>
-			</td>
-			<td>
-				<div>
-					Java (Spring)
-				</div>
-			</td>
-			<td>
-				<div>
-					(Postgre) SQL
-				</div>
-			</td>
-			<td>
-				<div>
-					JavaScript (API)
-				</div>
-			</td>
-            <td>
-                <div>
-                    AWS
-                </div>
-            </td>
-		</tr>
-	</table>
-</div>
-
-</body>
+<!-- Markdown link & img dfn's -->
+[stars-image]: https://img.shields.io/github/stars/raphisdev/facelinked?style=social
+[stars-url]: https://github.com/raphisdev/facelinked/stargazers
+[contributors-image]: https://img.shields.io/github/contributors/raphisdev/facelinked
+[contributors-url]: https://github.com/raphisdev/facelinked/graphs/contributors
+[license-image]: https://img.shields.io/github/license/raphisdev/facelinked
+[license-url]: https://github.com/raphisdev/facelinked/blob/main/LICENSE
