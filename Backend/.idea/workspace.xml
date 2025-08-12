@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5df5b1b0-a712-4d22-96cf-9dab4776096d" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/facelinked/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/facelinked/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/facelinked/Makefile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/facelinked/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/facelinked/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/facelinked/src/main/resources/serviceAccountKey.json" beforeDir="false" />
-    </list>
+    <list default="true" id="5df5b1b0-a712-4d22-96cf-9dab4776096d" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -68,7 +63,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1755009329858</updated>
-      <workItem from="1755009331159" duration="2524000" />
+      <workItem from="1755009331159" duration="3187000" />
     </task>
     <servers />
   </component>

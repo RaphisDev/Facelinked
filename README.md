@@ -163,13 +163,6 @@ scp -i /path/to/your/NOTIFICATION_KEY user@your-server-ip:/path/to/destination/ 
 # Paste your secretAccountKey.json from Firebase Console in resources
 cp /path/to/your/secretAccountKey.json facelinked/src/main/resources/
 
-# Configure the application.properties file in facelinked/src/main/resources/
-cd facelinked/src/main/resources/
-
-# Build the backend
-docker buildx build --platform linux/amd64 -t YOUR_DOCKER_HUB_ID/YOUR_PROJECT_ID:AVAILABLE_TAG .
-docker push YOUR_DOCKER_HUB_ID/YOUR_PROJECT_ID:AVAILABLE_TAG
-
 # Connect to the server with the private key from your AWS EC2 instance
 # Make sure you have the permissions to access the server
 ssh user@your-server-ip -i /path/to/your/private-key.pem
@@ -195,7 +188,16 @@ openssl pkcs12 -export -in fullchain.pem -inkey privkey.pem -out keystore.p12
 # Currently your IAM user should only have permissions for DynamoDB and S3
 sudo apt-get install awscli -y
 aws configure
+
+# Now switch to your local Backend directory
+# Configure the application.properties file in facelinked/src/main/resources/
+
+# Build the backend
+cd facelinked
+docker buildx build --platform linux/amd64 -t YOUR_DOCKER_HUB_ID/YOUR_PROJECT_ID:AVAILABLE_TAG .
+docker push YOUR_DOCKER_HUB_ID/YOUR_PROJECT_ID:AVAILABLE_TAG
 	
+# Now switch to terminal
 # Replace placeholder and paste this command to run the Docker container
 sudo docker run \
   -e JWT_SECRET='YOUR_256_BIT_JWT_SECRET_KEY' \
@@ -209,10 +211,6 @@ sudo docker run \
   -v ./PATH_TO_SSL_keystore.p12:/app/keystore.p12 \
   -v ./PATH_TO_APNS_KEY:/app/Notification_key.p8 \
   -d -p 8443:8443 YOUR_DOCKER_HUB_ID/YOUR_PROJECT_ID:latest
-
-# Keep in mind that you need to change the ip address in the Frontend to your server's IP address
-# The AppManager.jsx contains the IP addresses of the backend server
-cd ../Frontend/components/
 ```
 
 <!-- Markdown link & img dfn's -->
