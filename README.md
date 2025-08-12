@@ -11,7 +11,7 @@
 [![Contributors][contributors-image]][contributors-url]
 [![GitHub stars][stars-image]][stars-url]
 
-> Facelinked — an open-source, ad-free social platform for **genuine friendships**, not followers or clicks.
+> Facelinked — an open-source, ad-free social media platform for **genuine friendships**, not followers or clicks.
 
 ---
 
