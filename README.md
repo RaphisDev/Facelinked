@@ -189,7 +189,7 @@ openssl pkcs12 -export -in fullchain.pem -inkey privkey.pem -out keystore.p12
 sudo apt-get install awscli -y
 aws configure
 
-# Now switch to your local Backend directory
+# Now switch to your Backend directory on a local terminal
 # Configure the application.properties file in facelinked/src/main/resources/
 
 # Build the backend
@@ -197,7 +197,7 @@ cd facelinked
 docker buildx build --platform linux/amd64 -t YOUR_DOCKER_HUB_ID/YOUR_PROJECT_ID:AVAILABLE_TAG .
 docker push YOUR_DOCKER_HUB_ID/YOUR_PROJECT_ID:AVAILABLE_TAG
 	
-# Now switch to terminal
+# Now switch to terminal connected to server
 # Replace placeholder and paste this command to run the Docker container
 sudo docker run \
   -e JWT_SECRET='YOUR_256_BIT_JWT_SECRET_KEY' \
